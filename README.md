@@ -27,10 +27,13 @@ Typecal Use
 
 1. You inherit "absObjectiveFunction" class and design objective function.
 1. Choose an optimization method and implement code.
-1. Do optimization!
+1. Do optimization.
 1. Get result and evaluate.
 
-* Sample
+Sample code
+===========
+
+* Typical use code
 ```html
 'Instantiation optimization class and set objective function.
 Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(1))
@@ -66,6 +69,58 @@ While (optimization.DoIteration(5) = False)
     clsUtil.DebugValue(optimization)
 End While
 clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+```
+
+* You can use other optimization method(inherit absObjctiveFcuntion).
+```
+Dim optimization As New clsOptRealGASPX(New clsBenchRastriginFunction(20))
+optimization.Init()
+clsUtil.DebugValue(optimization)
+While True
+    If optimization.DoIteration(10) = True Then
+        Exit While
+    End If
+    clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+End While
+If optimization.IsRecentError() = True Then
+    Return
+End If
+clsUtil.DebugValue(optimization)
+```
+
+* Multi point and MultiThread
+*  - Multipoint avoids Local minimum by preparing many values.
+```
+'prepare many optimization class.
+Dim multipointNumber As Integer = 30
+Dim listOptimization As New List(Of absOptimization)
+For i As Integer = 0 To multipointNumber - 1
+    Dim tempOpt As New clsOptNelderMead(New clsBenchAckley(20))
+    tempOpt.Init()
+    listOptimization.Add(tempOpt)
+Next
+
+'using Parallel.ForEach
+Dim lockObj As New Object()
+Dim best As LibOptimization.absOptimization = Nothing
+Threading.Tasks.Parallel.ForEach(listOptimization, Sub(opt As absOptimization)
+                                                       opt.DoIteration()
+                                                       'Swap best result
+                                                       SyncLock lockObj
+                                                           If best Is Nothing Then
+                                                               best = opt
+                                                           ElseIf best.Result.Eval > opt.Result.Eval Then
+                                                               best = opt
+                                                           End If
+                                                       End SyncLock
+                                                   End Sub)
+
+'Check Error
+If best.IsRecentError() = True Then
+    Return
+Else
+    clsUtil.DebugValue(best)
+End If
 ```
 
 License
