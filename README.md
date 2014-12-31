@@ -12,10 +12,10 @@ using Derivative
 
 * Steepest Descent Method
 * Newton Method
-* Derivative free
 
-Nelder Mead Method
+Derivative free
 
+* Nelder Mead Method (Down-Hill simplex method)
 * Hooke and Jeeves of Pattern Search (Direct Search)
 * Real-coded Genetic Algorithm Simplex and JGG
 * Real-coded Genetic Algorithm REX and JGG
@@ -34,7 +34,7 @@ Sample code
 ===========
 
 * Typical use code
-```html
+```vb
 'Instantiation optimization class and set objective function.
 Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(1))
 'Initialize starting value
@@ -50,7 +50,7 @@ End If
 ```
 
 * When you want result every 5 times.
-```
+```vb
 With Nothing
     Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
     optimization.Init()
@@ -62,7 +62,7 @@ End With
 ```
 
 * set initial point
-```
+```vb
 Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
 optimization.Init(New Double() {-10, 10})
 While (optimization.DoIteration(5) = False)
@@ -72,7 +72,7 @@ clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
 ```
 
 * You can use other optimization method(inherit absObjctiveFcuntion).
-```
+```vb
 Dim optimization As New clsOptRealGASPX(New clsBenchRastriginFunction(20))
 optimization.Init()
 clsUtil.DebugValue(optimization)
@@ -89,8 +89,8 @@ clsUtil.DebugValue(optimization)
 ```
 
 * Multi point and MultiThread
-*  - Multipoint avoids Local minimum by preparing many values.
-```
+** Multipoint avoids Local minimum by preparing many values.
+```vb
 'prepare many optimization class.
 Dim multipointNumber As Integer = 30
 Dim listOptimization As New List(Of absOptimization)
