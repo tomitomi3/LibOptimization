@@ -31,15 +31,6 @@ Public Class clsRandomXorshift : Inherits System.Random
     Public Sub New(ByVal ai_seed As UInteger)
         Me.SetSeed(ai_seed)
     End Sub
-
-    ''' <summary>
-    ''' Constructor with seed
-    ''' </summary>
-    ''' <param name="ai_isUseDefaultSeed"></param>
-    ''' <remarks></remarks>
-    Public Sub New(ByVal ai_isUseDefaultSeed As Boolean)
-        Me.SetSeed(CUInt(Date.Now.Millisecond * Date.Now.Minute * Date.Now.Second))
-    End Sub
 #End Region
 
     ''' <summary>
@@ -81,9 +72,17 @@ Public Class clsRandomXorshift : Inherits System.Random
     ''' <remarks>
     ''' </remarks>
     Public Overloads Function NextDouble(ByVal ai_min As Double, ByVal ai_max As Double) As Double
-        Dim range As Double = Math.Abs(ai_max - ai_min)
-        Dim ret As Double = range * MyBase.NextDouble() + ai_min
+        Dim ret As Double = Math.Abs(ai_max - ai_min) * MyBase.NextDouble() + ai_min
         Return ret
+    End Function
+
+    ''' <summary>
+    ''' for random seed
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Shared Function GetTimeSeed() As UInteger
+        Return CUInt(Date.Now.Millisecond * Date.Now.Minute * Date.Now.Second)
     End Function
 
 #Region "Private"

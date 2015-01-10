@@ -13,6 +13,14 @@ Public MustInherit Class absOptimization
     Public MustOverride Sub Init()
 
     ''' <summary>
+    ''' Random object
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public MustOverride Property Random() As System.Random
+
+    ''' <summary>
     ''' Do Iteration
     ''' </summary>
     ''' <param name="ai_iteration">Iteration count. When you set zero, use the default value.</param>
@@ -28,7 +36,7 @@ Public MustInherit Class absOptimization
     Public MustOverride ReadOnly Property Result() As clsPoint
 
     ''' <summary>
-    ''' IsError
+    ''' Recent Error
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
@@ -44,7 +52,7 @@ Public MustInherit Class absOptimization
     End Function
 
     ''' <summary>
-    ''' Get FunctionClass
+    ''' Get Function Class
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>

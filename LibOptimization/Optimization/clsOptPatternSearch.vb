@@ -20,7 +20,7 @@ Public Class clsOptPatternSearch : Inherits absOptimization
 
     'This Parameter to use when generate a variable
     Private ReadOnly INIT_PARAM_RANGE As Double = 5
-    Private rand As New clsRandomXorshift(True)
+    Private rand As System.Random = New clsRandomXorshift(clsRandomXorshift.GetTimeSeed())
 
     Private m_stepLength As Double = 0.6
     Private m_base As clsPoint = Nothing
@@ -71,7 +71,7 @@ Public Class clsOptPatternSearch : Inherits absOptimization
             'Initialize
             Me.m_base = New clsPoint(MyBase.m_func)
             For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                Me.m_base(i) = rand.NextDouble(-INIT_PARAM_RANGE, INIT_PARAM_RANGE)
+                Me.m_base(i) = Math.Abs(2.0 * INIT_PARAM_RANGE) * rand.NextDouble() - INIT_PARAM_RANGE
             Next
             Me.m_base.ReEvaluate()
 
@@ -238,5 +238,20 @@ Public Class clsOptPatternSearch : Inherits absOptimization
     Public Overrides Function IsRecentError() As Boolean
         Return Me.m_error.IsError()
     End Function
+
+    ''' <summary>
+    ''' Random object
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Overrides Property Random As System.Random
+        Get
+            Return Me.rand
+        End Get
+        Set(ByVal value As System.Random)
+            Me.rand = value
+        End Set
+    End Property
 #End Region
 End Class

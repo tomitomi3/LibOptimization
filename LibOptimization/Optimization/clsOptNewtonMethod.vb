@@ -24,7 +24,7 @@ Public Class clsOptNewtonMethod : Inherits absOptimization
 
     'This parameters to use when generate a variable
     Private ReadOnly INIT_PARAM_RANGE As Double = 5
-    Private rand As New clsRandomXorshift(True)
+    Private rand As System.Random = New clsRandomXorshift(clsRandomXorshift.GetTimeSeed())
 
     'vector
     Private m_vect As clsShoddyVector = Nothing
@@ -68,7 +68,7 @@ Public Class clsOptNewtonMethod : Inherits absOptimization
         Try
             'Init value
             For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                Me.m_vect(i) = rand.NextDouble(-INIT_PARAM_RANGE, INIT_PARAM_RANGE)
+                Me.m_vect(i) = Math.Abs(2.0 * INIT_PARAM_RANGE) * rand.NextDouble() - INIT_PARAM_RANGE
             Next
             Me.m_vect.Direction = clsShoddyVector.VectorDirection.COL
         Catch ex As Exception
@@ -167,5 +167,20 @@ Public Class clsOptNewtonMethod : Inherits absOptimization
     Public Overrides Function IsRecentError() As Boolean
         Return Me.m_error.IsError()
     End Function
+
+    ''' <summary>
+    ''' Random object
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Overrides Property Random As System.Random
+        Get
+            Return Me.rand
+        End Get
+        Set(ByVal value As System.Random)
+            Me.rand = value
+        End Set
+    End Property
 #End Region
 End Class

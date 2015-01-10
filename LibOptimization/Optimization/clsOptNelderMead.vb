@@ -24,9 +24,9 @@ Public Class clsOptNelderMead : Inherits absOptimization
     Private ReadOnly COEFF_Contraction As Double = 0.5
     Private ReadOnly COEFF_Shrink As Double = 2.0
 
-    'This Parameter to use when generate a vertex
+    'This Parameter to use when generate a variable
     Private ReadOnly INIT_PARAM_RANGE As Double = 5
-    Private rand As New clsRandomXorshift(True)
+    Private rand As System.Random = New clsRandomXorshift(clsRandomXorshift.GetTimeSeed())
 
     Private m_points As New List(Of clsPoint)
 
@@ -88,7 +88,7 @@ Public Class clsOptNelderMead : Inherits absOptimization
             For i As Integer = 0 To tempSimplex.Length - 1
                 ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
                 For j As Integer = 0 To m_func.NumberOfVariable - 1
-                    tempSimplex(i)(j) = rand.NextDouble(-INIT_PARAM_RANGE, INIT_PARAM_RANGE)
+                    tempSimplex(i)(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * rand.NextDouble() - INIT_PARAM_RANGE
                 Next
             Next
 
@@ -128,7 +128,7 @@ Public Class clsOptNelderMead : Inherits absOptimization
                 ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
                 'Normal distribution
                 For j As Integer = 0 To m_func.NumberOfVariable - 1
-                    tempSimplex(i)(j) = rand.NextDouble(-INIT_PARAM_RANGE, INIT_PARAM_RANGE)
+                    tempSimplex(i)(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * rand.NextDouble() - INIT_PARAM_RANGE
                 Next
             Next
 
@@ -457,6 +457,21 @@ Public Class clsOptNelderMead : Inherits absOptimization
         Get
             Return Me.m_points
         End Get
+    End Property
+
+    ''' <summary>
+    ''' Random object
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Overrides Property Random As System.Random
+        Get
+            Return Me.rand
+        End Get
+        Set(ByVal value As System.Random)
+            Me.rand = value
+        End Set
     End Property
 #End Region
 End Class

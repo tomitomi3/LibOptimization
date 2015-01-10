@@ -26,7 +26,7 @@ Public Class clsOptNelderMeadNR : Inherits absOptimization
 
     'This Parameter to use when generate a vertex
     Private ReadOnly INIT_PARAM_RANGE As Double = 5
-    Private rand As New clsRandomXorshift(True)
+    Private rand As System.Random = New clsRandomXorshift(clsRandomXorshift.GetTimeSeed())
 
     Private m_points As New List(Of clsPoint)
 
@@ -89,7 +89,7 @@ Public Class clsOptNelderMeadNR : Inherits absOptimization
                 ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
                 'Normal distribution
                 For j As Integer = 0 To m_func.NumberOfVariable - 1
-                    tempSimplex(i)(j) = rand.NextDouble(-INIT_PARAM_RANGE, INIT_PARAM_RANGE)
+                    tempSimplex(i)(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * rand.NextDouble() - INIT_PARAM_RANGE
                 Next
             Next
 
@@ -129,7 +129,7 @@ Public Class clsOptNelderMeadNR : Inherits absOptimization
                 ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
                 'Normal distribution
                 For j As Integer = 0 To m_func.NumberOfVariable - 1
-                    tempSimplex(i)(j) = rand.NextDouble(-INIT_PARAM_RANGE, INIT_PARAM_RANGE)
+                    tempSimplex(i)(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * rand.NextDouble() - INIT_PARAM_RANGE
                 Next
             Next
 
@@ -373,7 +373,7 @@ Public Class clsOptNelderMeadNR : Inherits absOptimization
     End Function
 #End Region
 
-#Region "Property(Private)"
+#Region "Property"
     Private Property BestPoint() As clsPoint
         Get
             Return Me.m_points(0)
@@ -400,13 +400,26 @@ Public Class clsOptNelderMeadNR : Inherits absOptimization
             Me.m_points(m_points.Count - 2) = value
         End Set
     End Property
-#End Region
 
-#Region "Property(Public)"
     Public ReadOnly Property AllVertexs() As List(Of clsPoint)
         Get
             Return Me.m_points
         End Get
+    End Property
+
+    ''' <summary>
+    ''' Random object
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Overrides Property Random As System.Random
+        Get
+            Return Me.rand
+        End Get
+        Set(ByVal value As System.Random)
+            Me.rand = value
+        End Set
     End Property
 #End Region
 End Class

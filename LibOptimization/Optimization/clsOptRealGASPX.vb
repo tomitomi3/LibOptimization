@@ -19,16 +19,15 @@ Public Class clsOptRealGASPX : Inherits absOptimization
     Private ReadOnly EPS As Double = 0.000000001
     Private ReadOnly IsUseEps As Boolean = True
 
-    'This parameter to use when generate a variable
-    Private ReadOnly INIT_PARAM_RANGE As Double = 10
-
     'GA Parameters
     Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
     Private ReadOnly POPULATION_SIZE As Integer = 1000
     Private ReadOnly CHILDS_SIZE As Integer = 100
     Private ReadOnly REX_RAND As REX_RANDMODE = REX_RANDMODE.UNIFORM
 
-    Private rand As New clsRandomXorshift(True)
+    'This Parameter to use when generate a variable
+    Private ReadOnly INIT_PARAM_RANGE As Double = 5
+    Private rand As System.Random = New clsRandomXorshift(clsRandomXorshift.GetTimeSeed())
 
     Public Enum REX_RANDMODE
         UNIFORM
@@ -105,7 +104,7 @@ Public Class clsOptRealGASPX : Inherits absOptimization
             For i As Integer = 0 To Me.POPULATION_SIZE - 1
                 Dim temp As New List(Of Double)
                 For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    temp.Add(rand.NextDouble(-INIT_PARAM_RANGE, INIT_PARAM_RANGE))
+                    temp.Add(Math.Abs(2.0 * INIT_PARAM_RANGE) * rand.NextDouble() - INIT_PARAM_RANGE)
                 Next
                 Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
             Next
@@ -273,13 +272,28 @@ Public Class clsOptRealGASPX : Inherits absOptimization
     End Function
 #End Region
 
-#Region "Property(Private)"
+#Region "Property"
     Private Property BestPoint() As clsPoint
         Get
             Return m_parents(0)
         End Get
         Set(value As clsPoint)
             m_parents(0) = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Random object
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Overrides Property Random As System.Random
+        Get
+            Return Me.rand
+        End Get
+        Set(ByVal value As System.Random)
+            Me.rand = value
         End Set
     End Property
 #End Region

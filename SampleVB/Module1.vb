@@ -7,12 +7,15 @@ Module Module1
         'LibOptimization simplifies Optimization.
 
         'Easy to use
-        ' 1. You inherit "absFunction" class and design objective function.
+        ' 1. You inherit "absObjectiveFunction" class and design objective function.
         ' 2. Choose an optimization method and implement code.
         ' 3. Do optimization!
         ' 4. Get result and evaluate.
 
-        'typical use
+        'Test
+        'CheckOptimization()
+
+        'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
             Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(1))
@@ -21,6 +24,19 @@ Module Module1
             'Do calc
             optimization.DoIteration()
             'Get result. Check recent error.
+            If optimization.IsRecentError() = True Then
+                Return
+            Else
+                clsUtil.DebugValue(optimization)
+            End If
+        End With
+
+        'Set random class and seed.
+        With Nothing
+            Dim optimization As New clsOptRealGASPX(New clsBenchSphere(1))
+            optimization.Random = New clsRandomXorshift(123456) ' or System.Random(123456)
+            optimization.Init()
+            optimization.DoIteration()
             If optimization.IsRecentError() = True Then
                 Return
             Else
@@ -99,7 +115,38 @@ Module Module1
                 clsUtil.DebugValue(best)
             End If
         End With
+    End Sub
 
+    Private Sub CheckOptimization()
+        Dim optimization As absOptimization
+        optimization = New clsOptSteepestDescent(New clsBenchSphere(10))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization)
+        optimization = New clsOptNewtonMethod(New clsBenchSphere(10))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization)
+        optimization = New clsOptNelderMead(New clsBenchSphere(10))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization)
+        optimization = New clsOptNelderMeadNR(New clsBenchSphere(10))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization)
+        optimization = New clsOptPatternSearch(New clsBenchSphere(10))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization)
+        optimization = New clsOptRealGAREX(New clsBenchSphere(10))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization)
+        optimization = New clsOptRealGASPX(New clsBenchSphere(10))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization)
     End Sub
 
     Private Sub ComparisonHJNR()
