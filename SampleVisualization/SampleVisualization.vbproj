@@ -75,7 +75,6 @@
   <ItemGroup>
     <Compile Include="clsBenchRosenblock.vb" />
     <Compile Include="clsDrawStack.vb" />
-    <Compile Include="clsRandomXorshiftSingleton.vb" />
     <Compile Include="Visualization.vb">
       <SubType>Form</SubType>
     </Compile>
