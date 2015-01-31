@@ -2,16 +2,11 @@
 
 ''' <summary>
 ''' Benchmark function
-''' Rosenblock function(Banana function)
+''' De Jong’s function 3 (Step Function)
 ''' </summary>
 ''' <remarks>
-''' Features:
-'''  -Famous benchmark function.
-''' 
-''' Minimum:
-'''  x = {0,...,0}
 ''' </remarks>
-Public Class clsBenchRosenblock : Inherits absObjectiveFunction
+Public Class clsBenchDeJongFunction3 : Inherits absObjectiveFunction
     Private dimension As Integer = 0
 
     ''' <summary>
@@ -34,24 +29,34 @@ Public Class clsBenchRosenblock : Inherits absObjectiveFunction
             Return 0
         End If
 
-        If Me.dimension <> ai_var.Count Then
-            Return 0
-        End If
-
-        Dim ret As Double = 0.0
-        For i As Integer = 0 To Me.dimension - 2
-            ret += 100 * (ai_var(i + 1) - ai_var(i) ^ 2) ^ 2 + (ai_var(i) - 1) ^ 2
+        Dim ret As Double = 0
+        For i As Integer = 0 To Me.dimension - 1
+            ret += ai_var(i) ^ 2
         Next
-
         Return ret
     End Function
 
     Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
-        Return Nothing
+        Dim ret As New List(Of Double)
+        For i As Integer = 0 To Me.dimension - 1
+            ret.Add(2.0 * ai_var(i))
+        Next
+        Return ret
     End Function
 
     Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
-        Return Nothing
+        Dim ret As New List(Of List(Of Double))
+        For i As Integer = 0 To Me.dimension - 1
+            ret.Add(New List(Of Double))
+            For j As Integer = 0 To Me.dimension - 1
+                If i = j Then
+                    ret(i).Add(2.0)
+                Else
+                    ret(i).Add(0)
+                End If
+            Next
+        Next
+        Return ret
     End Function
 
     Public Overrides ReadOnly Property NumberOfVariable As Integer

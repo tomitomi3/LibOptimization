@@ -1,14 +1,16 @@
 ﻿Imports System.Drawing.Drawing2D
+Imports LibOptimization.Optimization
+Imports LibOptimization.Util
 
 Public Class Visualization
-    Private opt As LibOptimization.absOptimization = Nothing
+    Private opt As absOptimization = Nothing
     Private vertexs As New List(Of List(Of List(Of Double)))
     Private evals As New List(Of List(Of Double))
     Private indexSimplex As Integer = 0
 
     Private Sub Form1_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         'ローゼンブロック関数
-        Me.opt = New LibOptimization.clsOptNelderMead(New clsBenchRosenblock(2))
+        Me.opt = New clsOptNelderMead(New clsBenchRosenblock(2))
 
         'Init my graphctrl
         Me.graph.Init(-1, -1, 2)
@@ -16,18 +18,18 @@ Public Class Visualization
 
     Private Sub btnInit_Click(sender As System.Object, e As System.EventArgs) Handles btnInit.Click
         'Init Random
-        LibOptimization.clsRandomXorshiftSingleton.GetInstance().SetSeed()
+        clsRandomXorshiftSingleton.GetInstance().SetSeed()
 
         'Init optimization class
-        CType(Me.opt, LibOptimization.clsOptNelderMead).Init(New Double()() {New Double() {0, 0}, New Double() {0, 1}, New Double() {1, 0}})
+        CType(Me.opt, clsOptNelderMead).Init(New Double()() {New Double() {0, 0}, New Double() {0, 1}, New Double() {1, 0}})
 
         'Get simplex history
         vertexs.Clear()
         evals.Clear()
         Dim tempSimplex As New List(Of List(Of Double))
         Dim tempSimplexEvals As New List(Of Double)
-        For Each p As LibOptimization.clsPoint In CType(opt, LibOptimization.clsOptNelderMead).AllVertexs
-            Dim tempPoint As New LibOptimization.clsPoint(p)
+        For Each p As clsPoint In CType(opt, clsOptNelderMead).AllVertexs
+            Dim tempPoint As New clsPoint(p)
             tempSimplex.Add(tempPoint)
             tempSimplexEvals.Add(tempPoint.Eval)
         Next
@@ -36,8 +38,8 @@ Public Class Visualization
         While (Me.opt.DoIteration(1) = False)
             tempSimplex = New List(Of List(Of Double))
             tempSimplexEvals = New List(Of Double)
-            For Each p As LibOptimization.clsPoint In CType(opt, LibOptimization.clsOptNelderMead).AllVertexs
-                Dim tempPoint As New LibOptimization.clsPoint(p)
+            For Each p As clsPoint In CType(opt, clsOptNelderMead).AllVertexs
+                Dim tempPoint As New clsPoint(p)
                 tempSimplex.Add(tempPoint)
                 tempSimplexEvals.Add(tempPoint.Eval)
             Next

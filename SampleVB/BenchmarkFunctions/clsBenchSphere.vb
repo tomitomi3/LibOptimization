@@ -1,4 +1,6 @@
-﻿''' <summary>
+﻿Imports LibOptimization.Optimization
+
+''' <summary>
 ''' Benchmark function
 ''' Sphere Function
 ''' </summary>
@@ -7,7 +9,7 @@
 '''  x = {0,...,0}
 '''  f(x) = 0
 ''' </remarks>
-Public Class clsBenchSphere : Inherits LibOptimization.absObjectiveFunction
+Public Class clsBenchSphere : Inherits absObjectiveFunction
     Private dimension As Integer = 0
 
     ''' <summary>

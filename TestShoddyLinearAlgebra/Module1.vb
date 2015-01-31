@@ -1,4 +1,5 @@
 ﻿Imports LibOptimization
+Imports LibOptimization.MathUtil
 
 Module Module1
 

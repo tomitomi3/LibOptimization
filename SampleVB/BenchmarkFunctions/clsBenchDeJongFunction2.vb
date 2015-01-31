@@ -2,16 +2,11 @@
 
 ''' <summary>
 ''' Benchmark function
-''' Rosenblock function(Banana function)
+''' De Jong’s function 2 (Rosenblock Function)
 ''' </summary>
 ''' <remarks>
-''' Features:
-'''  -Famous benchmark function.
-''' 
-''' Minimum:
-'''  x = {0,...,0}
 ''' </remarks>
-Public Class clsBenchRosenblock : Inherits absObjectiveFunction
+Public Class clsBenchDeJongFunction2 : Inherits absObjectiveFunction
     Private dimension As Integer = 0
 
     ''' <summary>

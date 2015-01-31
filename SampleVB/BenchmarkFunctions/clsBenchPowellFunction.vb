@@ -1,4 +1,6 @@
-﻿''' <summary>
+﻿Imports LibOptimization.Optimization
+
+''' <summary>
 ''' Benchmark function
 ''' Powell function
 ''' </summary>
@@ -7,7 +9,7 @@
 '''  x = {0,0,0,0}
 '''  f(x) = 0
 ''' </remarks>
-Public Class clsBenchPowellFunction : Inherits LibOptimization.absObjectiveFunction
+Public Class clsBenchPowellFunction : Inherits absObjectiveFunction
     ''' <summary>
     ''' Default constructor
     ''' </summary>

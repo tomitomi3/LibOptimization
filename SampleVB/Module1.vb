@@ -1,4 +1,6 @@
 ﻿Imports LibOptimization
+Imports LibOptimization.Optimization
+Imports LibOptimization.Util
 
 Module Module1
     Sub Main()
@@ -95,7 +97,7 @@ Module Module1
 
             'using Parallel.ForEach
             Dim lockObj As New Object()
-            Dim best As LibOptimization.absOptimization = Nothing
+            Dim best As absOptimization = Nothing
             Threading.Tasks.Parallel.ForEach(listOptimization, Sub(opt As absOptimization)
                                                                    opt.DoIteration()
                                                                    'Swap best result

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LibOptimization.Optimization ;
+using LibOptimization.Util;
 
 namespace SampleCSharp
 {
     //RosenBlock Functio
-    class RosenBlock : LibOptimization.absObjectiveFunction 
+    class RosenBlock : absObjectiveFunction 
     {
         public override double F(List<double> ai_var)
         {
@@ -46,7 +48,7 @@ namespace SampleCSharp
             RosenBlock func = new RosenBlock();
 
             //Set Function
-            LibOptimization.absOptimization opt = new LibOptimization.clsOptNelderMead(func);
+            absOptimization opt = new clsOptNelderMead(func);
             opt.Init();
 
             //Optimization
@@ -60,7 +62,7 @@ namespace SampleCSharp
             else
             {
                 //Get Result
-                LibOptimization.clsUtil.DebugValue(opt);
+                clsUtil.DebugValue(opt);
             }
         }
     }

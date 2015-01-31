@@ -1,4 +1,6 @@
-﻿''' <summary>
+﻿Imports LibOptimization.Optimization
+
+''' <summary>
 ''' Benchmark function
 ''' Easom function
 ''' </summary>
@@ -7,7 +9,7 @@
 '''  x = {pi, pi}
 '''  f(x) = -1
 ''' </remarks>
-Public Class clsBenchEasom : Inherits LibOptimization.absObjectiveFunction
+Public Class clsBenchEasom : Inherits absObjectiveFunction
     ''' <summary>
     ''' Default constructor
     ''' </summary>

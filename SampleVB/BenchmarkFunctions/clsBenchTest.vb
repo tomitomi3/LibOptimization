@@ -1,8 +1,10 @@
-﻿''' <summary>
+﻿Imports LibOptimization.Optimization
+
+''' <summary>
 ''' </summary>
 ''' <remarks>
 ''' </remarks>
-Public Class clsBenchTest : Inherits LibOptimization.absObjectiveFunction
+Public Class clsBenchTest : Inherits absObjectiveFunction
     ''' <summary>
     ''' Default constructor
     ''' </summary>

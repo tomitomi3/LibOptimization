@@ -1,4 +1,6 @@
-﻿''' <summary>
+﻿Imports LibOptimization.Optimization
+
+''' <summary>
 ''' Benchmark function
 ''' Ridge Function
 ''' </summary>
@@ -9,7 +11,7 @@
 ''' Referrence:
 ''' http://mikilab.doshisha.ac.jp/dia/research/pdga/archive/doc/ga2k_performance.pdf
 ''' </remarks>
-Public Class clsBenchRidgeFunction : Inherits LibOptimization.absObjectiveFunction
+Public Class clsBenchRidgeFunction : Inherits absObjectiveFunction
     Private dimension As Integer = 0
 
     ''' <summary>
