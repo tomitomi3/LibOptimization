@@ -14,16 +14,11 @@ Namespace BenchmarkFunction
     '''  De Jong, K. A., "Analysis of the Behavior of a Class of Genetic Adaptive Systems", PhD dissertation, The University of Michigan, Computer and Communication Sciences Department (1975)
     ''' </remarks>
     Public Class clsBenchDeJongFunction4 : Inherits absObjectiveFunction
-        Dim randParam As New List(Of Double)
-
         ''' <summary>
         ''' Default constructor
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New()
-            For i As Integer = 0 To 29
-                Me.randParam.Add(Util.clsUtil.NormRand())
-            Next
         End Sub
 
         ''' <summary>
@@ -46,11 +41,8 @@ Namespace BenchmarkFunction
                     ret += Math.Abs(i) 'penarty
                 End If
             Next
-            Return ret + Util.clsUtil.NormRand()
-        End Function
 
-        Private Function ND(ByVal x As Double) As Double
-            Return 0.56418958354 * Math.Exp(-(x ^ 2) / 2)
+            Return ret + Util.clsUtil.NormRand() '??? 
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)

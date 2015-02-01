@@ -7,13 +7,17 @@ Namespace BenchmarkFunction
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
-    '''  x = {1, 1}
+    '''  x = {-32,-32}
+    '''  f(x) ~ 1
     ''' Range
     '''  -65.536 ~ 65.536
     ''' Refference:
     '''  De Jong, K. A., "Analysis of the Behavior of a Class of Genetic Adaptive Systems", PhD dissertation, The University of Michigan, Computer and Communication Sciences Department (1975)
     ''' </remarks>
     Public Class clsBenchDeJongFunction5 : Inherits absObjectiveFunction
+        Private ReadOnly a()() As Double = {New Double() {-32, -16, 0, 16, 32, -32, -16, 0, 16, 32, -32, -16, 0, 16, 32, -32, -16, 0, 16, 32, -32, -16, 0, 16, 32}, _
+                                            New Double() {-32, -32, -32, -32, -32, -16, -16, -16, -16, -16, 0, 0, 0, 0, 0, 16, 16, 16, 16, 16, 32, 32, 32, 32, 32}}
+
         ''' <summary>
         ''' Default constructor
         ''' </summary>
@@ -32,8 +36,29 @@ Namespace BenchmarkFunction
                 Return 0
             End If
 
-            Throw New NotImplementedException
-            Return 0
+            'Correc value
+            ' Taken from : http://jp.mathworks.com/help/gads/example-minimizing-de-jongs-fifth-function.html
+            ' x = {-16.1292, -15.8214}
+            ' f(x) = 6.9034
+
+            'range check
+            If (x(0) >= -65.536) AndAlso (x(0) <= 65.536) Then
+                If (x(1) >= -65.536) AndAlso (x(1) <= 65.536) Then
+                    Dim ret As Double = 1 / 500
+                    For j As Integer = 0 To 24
+                        Dim temp As Double = j + 1
+                        For i As Integer = 0 To 1
+                            temp += (x(i) - a(i)(j)) ^ 6
+                        Next
+                        ret += 1 / temp
+                    Next
+
+                    Return 1 / ret
+                End If
+            End If
+
+            'out of range
+            Return Math.Abs(x(0)) + Math.Abs(x(1)) + 1000
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
@@ -46,7 +71,7 @@ Namespace BenchmarkFunction
 
         Public Overrides ReadOnly Property NumberOfVariable As Integer
             Get
-                Return 30
+                Return 2
             End Get
         End Property
     End Class

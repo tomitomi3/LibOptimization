@@ -86,16 +86,26 @@ Module Module1
 
         'Elite Strategy for RGA
         With Nothing
-            'De jong Function3 is step function.
-            Dim optimization As New Optimization.clsOptRealGASPX(New BenchmarkFunction.clsBenchDeJongFunction3())
-            optimization.Init()
+            'De jong Function3
+            Dim optimization1 As New Optimization.clsOptRealGASPX(New BenchmarkFunction.clsBenchDeJongFunction3())
+            optimization1.Init()
             For i As Integer = 0 To 2
-                optimization.DoIteration()
-                clsUtil.DebugValue(optimization)
+                optimization1.DoIteration()
+                clsUtil.DebugValue(optimization1)
                 'Carry over to the new iteration.
-                optimization.UseEliteStrategy(0.1)
+                optimization1.UseEliteStrategy(0.1)
             Next
-            clsUtil.DebugValue(optimization)
+            clsUtil.DebugValue(optimization1)
+
+            'De jong Function5
+            Dim optimization2 As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5(), ai_randomRange:=65.536, ai_childsSize:=100)
+            optimization2.Init()
+            For i As Integer = 0 To 5
+                optimization2.DoIteration()
+                clsUtil.DebugValue(optimization2, ai_isOutValue:=False)
+                optimization2.UseEliteStrategy(0.1)
+            Next
+            clsUtil.DebugValue(optimization2)
         End With
 
         'Multi point and MultiThread

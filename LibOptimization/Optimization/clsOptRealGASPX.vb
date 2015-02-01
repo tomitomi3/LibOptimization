@@ -27,15 +27,9 @@ Namespace Optimization
         Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
         Private ReadOnly POPULATION_SIZE As Integer = 1000
         Private ReadOnly CHILDS_SIZE As Integer = 100
-        Private ReadOnly REX_RAND As REX_RANDMODE = REX_RANDMODE.UNIFORM
 
         'This Parameter to use when generate a variable
         Private ReadOnly INIT_PARAM_RANGE As Double = 5
-
-        Public Enum REX_RANDMODE
-            UNIFORM
-            NORMAL_DIST
-        End Enum
 
         'Parent
         Private m_parents As New List(Of clsPoint)
@@ -54,7 +48,6 @@ Namespace Optimization
         ''' <param name="ai_eps">Optional:Eps(Default:1e-8)</param>
         ''' <param name="ai_isUseEps">Optional:Use criterion(Default: true)</param>
         ''' <param name="ai_populationSize">Optional:Population size(0 is n*8)</param>
-        ''' <param name="ai_REXRandomMode">Optional:REX(phi) Uniform or ND(default: Uniform)</param>
         ''' <param name="ai_childsSize">Optional:Childs size(0 is n*6)</param>
         ''' <remarks>
         ''' "n" is function dimension.
@@ -65,7 +58,6 @@ Namespace Optimization
                        Optional ByVal ai_eps As Double = 0.000000001, _
                        Optional ByVal ai_isUseEps As Boolean = True, _
                        Optional ByVal ai_populationSize As Integer = 0, _
-                       Optional ByVal ai_REXRandomMode As REX_RANDMODE = REX_RANDMODE.UNIFORM, _
                        Optional ByVal ai_childsSize As Integer = 0)
             Me.m_func = ai_func
 
@@ -81,8 +73,6 @@ Namespace Optimization
             Else
                 Me.POPULATION_SIZE = ai_populationSize
             End If
-
-            Me.REX_RAND = ai_REXRandomMode
 
             If ai_childsSize = 0 Then
                 Me.CHILDS_SIZE = Me.m_func.NumberOfVariable * 10
@@ -188,16 +178,21 @@ Namespace Optimization
             If ai_density < 0 Then
                 Return
             End If
-
             Dim index As Integer = CInt(Me.m_parents.Count * ai_density)
+            If index = 0 Then
+                Return
+            End If
+
+            'replace new point
             For i As Integer = index To Me.POPULATION_SIZE - 1
                 Dim temp As New List(Of Double)
                 For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     temp.Add(Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE)
                 Next
-                Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
+                Me.m_parents(i) = New clsPoint(MyBase.m_func, temp)
             Next
 
+            'iteration count reset
             Me.m_iteration = 0
         End Sub
 

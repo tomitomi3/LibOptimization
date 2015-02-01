@@ -196,16 +196,21 @@ Namespace Optimization
             If ai_density < 0 Then
                 Return
             End If
-
             Dim index As Integer = CInt(Me.m_parents.Count * ai_density)
+            If index = 0 Then
+                Return
+            End If
+
+            'replace new point
             For i As Integer = index To Me.POPULATION_SIZE - 1
                 Dim temp As New List(Of Double)
                 For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     temp.Add(Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE)
                 Next
-                Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
+                Me.m_parents(i) = New clsPoint(MyBase.m_func, temp)
             Next
 
+            'iteration count reset
             Me.m_iteration = 0
         End Sub
 
