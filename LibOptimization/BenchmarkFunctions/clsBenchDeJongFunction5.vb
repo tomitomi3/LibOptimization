@@ -6,35 +6,34 @@ Namespace BenchmarkFunction
     ''' De Jong’s function 5 (Shekel  Function)
     ''' </summary>
     ''' <remarks>
+    ''' Minimum:
+    '''  x = {1, 1}
+    ''' Range
+    '''  -65.536 ~ 65.536
+    ''' Refference:
+    '''  De Jong, K. A., "Analysis of the Behavior of a Class of Genetic Adaptive Systems", PhD dissertation, The University of Michigan, Computer and Communication Sciences Department (1975)
     ''' </remarks>
     Public Class clsBenchDeJongFunction5 : Inherits absObjectiveFunction
-        Private dimension As Integer = 0
-
         ''' <summary>
         ''' Default constructor
         ''' </summary>
-        ''' <param name="ai_dim">Set dimension</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_dim As Integer)
-            Me.dimension = ai_dim
+        Public Sub New()
         End Sub
 
         ''' <summary>
         ''' Target Function
         ''' </summary>
-        ''' <param name="ai_var"></param>
+        ''' <param name="x"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function F(ByVal ai_var As List(Of Double)) As Double
-            If ai_var Is Nothing Then
+        Public Overrides Function F(ByVal x As List(Of Double)) As Double
+            If x Is Nothing Then
                 Return 0
             End If
 
-            Dim ret As Double = 0
-
-            'not implement
-
-            Return ret
+            Throw New NotImplementedException
+            Return 0
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
@@ -47,7 +46,7 @@ Namespace BenchmarkFunction
 
         Public Overrides ReadOnly Property NumberOfVariable As Integer
             Get
-                Return Me.dimension
+                Return 30
             End Get
         End Property
     End Class

@@ -17,14 +17,14 @@ Namespace Util
         ''' </remarks>
         Public Shared Function NormRand(Optional ByVal ai_ave As Double = 0,
                                         Optional ByVal ai_sigma2 As Double = 1) As Double
-            Dim a As Double = 1 - clsRandomXorshiftSingleton.GetInstance().NextDouble()
-            Dim b As Double = 1 - clsRandomXorshiftSingleton.GetInstance().NextDouble()
-            Dim c As Double = Math.Sqrt(-2.0 * Math.Log(a))
+            Dim x As Double = clsRandomXorshiftSingleton.GetInstance().NextDouble()
+            Dim y As Double = clsRandomXorshiftSingleton.GetInstance().NextDouble()
 
+            Dim c As Double = Math.Sqrt(-2.0 * Math.Log(x))
             If (0.5 - clsRandomXorshiftSingleton.GetInstance().NextDouble() > 0.0) Then
-                Return c * Math.Sin(Math.PI * 2.0 * b) * ai_sigma2 + ai_ave
+                Return c * Math.Sin(2.0 * Math.PI * y) * ai_sigma2 + ai_ave
             Else
-                Return c * Math.Cos(Math.PI * 2.0 * b) * ai_sigma2 + ai_ave
+                Return c * Math.Cos(2.0 * Math.PI * y) * ai_sigma2 + ai_ave
             End If
         End Function
 
@@ -68,15 +68,15 @@ Namespace Util
             End If
 
             If ai_isOnlyIterationCount = True Then
-                Console.WriteLine("IterationCount:," & String.Format("{0}", ai_opt.GetIterationCount()))
+                Console.WriteLine("IterationCount:," & String.Format("{0}", ai_opt.IterationCount()))
                 Return
             End If
 
             If ai_isOutValue = True Then
-                Console.WriteLine("TargetFunction:" & ai_opt.GetFunc().GetType().Name & " Dimension:" & ai_opt.GetFunc().NumberOfVariable.ToString())
+                Console.WriteLine("TargetFunction:" & ai_opt.ObjectiveFunction().GetType().Name & " Dimension:" & ai_opt.ObjectiveFunction().NumberOfVariable.ToString())
                 Console.WriteLine("OptimizeMethod:" & ai_opt.GetType().Name)
                 Console.WriteLine("Eval          :" & String.Format("{0}", ai_opt.Result.Eval))
-                Console.WriteLine("IterationCount:" & String.Format("{0}", ai_opt.GetIterationCount()))
+                Console.WriteLine("IterationCount:" & String.Format("{0}", ai_opt.IterationCount()))
                 Console.WriteLine("Result        :")
                 Dim str As New System.Text.StringBuilder()
                 For Each value As Double In ai_opt.Result

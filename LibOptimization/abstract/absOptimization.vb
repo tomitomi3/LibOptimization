@@ -43,18 +43,27 @@ Namespace Optimization
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function GetIterationCount() As Integer
-            Return Me.m_iteration
-        End Function
+        Public ReadOnly Property IterationCount() As Integer
+            Get
+                Return Me.m_iteration
+            End Get
+        End Property
 
         ''' <summary>
-        ''' Get Function Class
+        ''' Objective Function
         ''' </summary>
+        ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function GetFunc() As absObjectiveFunction
-            Return Me.m_func
-        End Function
+        Public Property ObjectiveFunction As absObjectiveFunction
+            Get
+                Return Me.m_func
+            End Get
+            Set(ByVal value As absObjectiveFunction)
+                Me.m_func = value
+                Me.Init() 'should init
+            End Set
+        End Property
 
         ''' <summary>
         ''' Random object

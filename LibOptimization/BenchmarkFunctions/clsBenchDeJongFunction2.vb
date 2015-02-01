@@ -3,23 +3,22 @@
 Namespace BenchmarkFunction
     ''' <summary>
     ''' Benchmark function
-    ''' De Jong’s function 2 (Rosenblock Function)
+    ''' De Jong’s function 2 (2D Rosenblock Function)
     ''' </summary>
     ''' <remarks>
+    ''' Minimum:
+    '''  x = {1,1}
+    ''' Range
+    '''  -2.048 ~ 2.048
+    ''' Refference:
+    '''  De Jong, K. A., "Analysis of the Behavior of a Class of Genetic Adaptive Systems", PhD dissertation, The University of Michigan, Computer and Communication Sciences Department (1975)
     ''' </remarks>
     Public Class clsBenchDeJongFunction2 : Inherits absObjectiveFunction
-        Private dimension As Integer = 0
-
         ''' <summary>
         ''' Default constructor
         ''' </summary>
-        ''' <param name="ai_dim">Set dimension</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_dim As Integer)
-            If ai_dim <= 1 Then
-                Throw New NotImplementedException
-            End If
-            Me.dimension = ai_dim
+        Public Sub New()
         End Sub
 
         ''' <summary>
@@ -33,88 +32,29 @@ Namespace BenchmarkFunction
                 Return 0
             End If
 
-            If Me.dimension <> x.Count Then
-                Return 0
+            Dim ret As Double = 0.0
+
+            If (x(0) >= -2.048) AndAlso (x(0) <= 2.048) Then
+                If (x(1) >= -2.048) AndAlso (x(1) <= 2.048) Then
+                    Return 100 * ((x(1) ^ 2 - x(0)) ^ 2) + (1 - x(1)) ^ 2
+                End If
             End If
 
-            Dim ret As Double = 0.0
-            For i As Integer = 0 To Me.dimension - 2
-                ret += 100 * (x(i + 1) - x(i) ^ 2) ^ 2 + (x(i) - 1) ^ 2
-            Next
-
-            Return ret
+            'out of range
+            Return 1000 'penarty
         End Function
 
         Public Overrides Function Gradient(ByVal x As List(Of Double)) As List(Of Double)
-            Dim gradVec As New List(Of Double)
-
-            'i0
-            Dim grad As Double = 0
-            grad = -400 * x(0) * (x(0) - x(1) ^ 2) - 2 * (x(0) - 1)
-            gradVec.Add(grad)
-
-            'i1 ~ in-1
-            For i As Integer = 1 To Me.dimension - 2
-                grad = -400 * x(i) * (x(i + 1) - x(i) ^ 2) + 200 * (x(i) - x(i - 1) ^ 2) - 2
-                gradVec.Add(grad)
-            Next
-
-            'in
-            grad = 200 * (x(Me.dimension - 1) - x(Me.dimension - 2) ^ 2)
-            gradVec.Add(grad)
-
-            Return gradVec
+            Throw New NotImplementedException
         End Function
 
         Public Overrides Function Hessian(ByVal x As List(Of Double)) As List(Of List(Of Double))
-            Dim hesse As New List(Of List(Of Double))
-            Dim tempVect(Me.dimension - 1) As Double
-            For i As Integer = 0 To Me.dimension - 1
-                hesse.Add(New List(Of Double)(tempVect))
-            Next
-
-            If Me.dimension = 2 Then
-                For i As Integer = 0 To Me.dimension - 1
-                    For j As Integer = 0 To Me.dimension - 1
-                        If i = j Then
-                            If i <> Me.dimension - 1 Then
-                                hesse(i)(j) = -400 * (x(i + 1) - x(i) ^ 2) + 800 * x(i) ^ 2 - 2
-                            Else
-                                hesse(i)(j) = 200
-                            End If
-                        Else
-                            hesse(i)(j) = -400 * x(0)
-                        End If
-                    Next
-                Next
-            Else
-                For i As Integer = 0 To Me.dimension - 1
-                    For j As Integer = 0 To Me.dimension - 1
-                        If i = j Then
-                            If i = 0 Then
-                                hesse(i)(j) = -400 * (x(i + 1) - x(i) ^ 2) + 800 * x(i) ^ 2 - 2
-                            ElseIf i = Me.dimension - 1 Then
-                                hesse(i)(j) = 200
-                            Else
-                                hesse(i)(j) = -400 * (x(i + 1) - x(i) ^ 2) + 800 * x(i) ^ 2 + 198
-                            End If
-                        End If
-                        If i = j - 1 Then
-                            hesse(i)(j) = -400 * x(i)
-                        End If
-                        If i - 1 = j Then
-                            hesse(i)(j) = -400 * x(j)
-                        End If
-                    Next
-                Next
-            End If
-
-            Return hesse
+            Throw New NotImplementedException
         End Function
 
         Public Overrides ReadOnly Property NumberOfVariable As Integer
             Get
-                Return Me.dimension
+                Return 2
             End Get
         End Property
     End Class

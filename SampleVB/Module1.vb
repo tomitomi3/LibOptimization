@@ -18,6 +18,19 @@ Module Module1
         'Test
         'CheckOptimization()
 
+        With Nothing
+            Dim optimization As New Optimization.clsOptRealGASPX(New BenchmarkFunction.clsBenchDeJongFunction3())
+            optimization.Init()
+            While (optimization.DoIteration(50) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            optimization.UseEliteStrategy(0.5)
+            While (optimization.DoIteration(50) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+        End With
+
         'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
@@ -181,7 +194,7 @@ Module Module1
                 Dim optimization As New clsOptPatternSearch(New clsBenchRosenblock(2))
                 optimization.Init()
                 optimization.DoIteration()
-                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             End With
         Next
 
@@ -191,7 +204,7 @@ Module Module1
                 Dim optimization As New clsOptNelderMead(New clsBenchRosenblock(2))
                 optimization.Init()
                 optimization.DoIteration()
-                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             End With
         Next
 
@@ -201,7 +214,7 @@ Module Module1
                 Dim optimization As New clsOptPatternSearch(New clsBenchRosenblock(10))
                 optimization.Init()
                 optimization.DoIteration()
-                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             End With
         Next
 
@@ -211,7 +224,7 @@ Module Module1
                 Dim optimization As New clsOptNelderMead(New clsBenchRosenblock(10))
                 optimization.Init()
                 optimization.DoIteration()
-                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             End With
         Next
 
@@ -221,7 +234,7 @@ Module Module1
                 Dim optimization As New clsOptPatternSearch(New clsBenchRosenblock(20))
                 optimization.Init()
                 optimization.DoIteration()
-                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             End With
         Next
 
@@ -231,7 +244,7 @@ Module Module1
                 Dim optimization As New clsOptNelderMead(New clsBenchRosenblock(20))
                 optimization.Init()
                 optimization.DoIteration()
-                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             End With
         Next
     End Sub
@@ -241,9 +254,9 @@ Module Module1
         With Nothing
             Dim optimization As New clsOptRealGASPX(New clsBenchRastriginFunction(20))
             optimization.Init()
-            Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+            Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             While (optimization.DoIteration(10) = False)
-                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             End While
             If optimization.IsRecentError() = True Then
                 Return
@@ -255,9 +268,9 @@ Module Module1
         With Nothing
             Dim optimization As New clsOptRealGAREX(New clsBenchRastriginFunction(20))
             optimization.Init()
-            Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+            Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             While (optimization.DoIteration(10) = False)
-                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.GetIterationCount())
+                Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             End While
             If optimization.IsRecentError() = True Then
                 Return

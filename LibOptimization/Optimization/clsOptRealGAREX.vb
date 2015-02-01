@@ -183,6 +183,33 @@ Namespace Optimization
         End Function
 
         ''' <summary>
+        ''' using Elite Strategy
+        ''' </summary>
+        ''' <param name="ai_density">density</param>
+        ''' <remarks>
+        ''' Elite strategy
+        ''' </remarks>
+        Public Sub UseEliteStrategy(ByVal ai_density As Double)
+            If ai_density > 1 Then
+                Return
+            End If
+            If ai_density < 0 Then
+                Return
+            End If
+
+            Dim index As Integer = CInt(Me.m_parents.Count * ai_density)
+            For i As Integer = index To Me.POPULATION_SIZE - 1
+                Dim temp As New List(Of Double)
+                For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                    temp.Add(Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE)
+                Next
+                Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
+            Next
+
+            Me.m_iteration = 0
+        End Sub
+
+        ''' <summary>
         ''' Select Parent
         ''' </summary>
         ''' <param name="ai_population"></param>
