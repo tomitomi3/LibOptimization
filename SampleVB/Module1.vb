@@ -18,19 +18,6 @@ Module Module1
         'Test
         'CheckOptimization()
 
-        With Nothing
-            Dim optimization As New Optimization.clsOptRealGASPX(New BenchmarkFunction.clsBenchDeJongFunction3())
-            optimization.Init()
-            While (optimization.DoIteration(50) = False)
-                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-            End While
-            optimization.UseEliteStrategy(0.5)
-            While (optimization.DoIteration(50) = False)
-                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-            End While
-            clsUtil.DebugValue(optimization)
-        End With
-
         'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
@@ -80,7 +67,7 @@ Module Module1
             clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
         End With
 
-        'You can use other optimization method.
+        'You can use other optimization algorithm.
         With Nothing
             Dim optimization As New clsOptRealGASPX(New clsBenchRastriginFunction(20))
             optimization.Init()
@@ -94,6 +81,20 @@ Module Module1
             If optimization.IsRecentError() = True Then
                 Return
             End If
+            clsUtil.DebugValue(optimization)
+        End With
+
+        'Elite Strategy for RGA
+        With Nothing
+            'De jong Function3 is step function.
+            Dim optimization As New Optimization.clsOptRealGASPX(New BenchmarkFunction.clsBenchDeJongFunction3())
+            optimization.Init()
+            For i As Integer = 0 To 2
+                optimization.DoIteration()
+                clsUtil.DebugValue(optimization)
+                'Carry over to the new iteration.
+                optimization.UseEliteStrategy(0.1)
+            Next
             clsUtil.DebugValue(optimization)
         End With
 
