@@ -3,7 +3,7 @@
 Namespace BenchmarkFunction
     ''' <summary>
     ''' Benchmark function
-    ''' De Jong’s function 5 (Shekel  Function)
+    ''' De Jong’s function 5
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
@@ -46,11 +46,7 @@ Namespace BenchmarkFunction
                 If (x(1) >= -65.536) AndAlso (x(1) <= 65.536) Then
                     Dim ret As Double = 1 / 500
                     For j As Integer = 0 To 24
-                        Dim temp As Double = j + 1
-                        For i As Integer = 0 To 1
-                            temp += (x(i) - a(i)(j)) ^ 6
-                        Next
-                        ret += 1 / temp
+                        ret += 1 / (j + 1 + (x(0) - a(0)(j)) ^ 6 + (x(1) - a(1)(j)) ^ 6)
                     Next
 
                     Return 1 / ret
