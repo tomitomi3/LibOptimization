@@ -1,6 +1,7 @@
 ﻿Imports System.Drawing.Drawing2D
 Imports LibOptimization.Optimization
 Imports LibOptimization.Util
+Imports LibOptimization.BenchmarkFunction
 
 Public Class Visualization
     Private opt As absOptimization = Nothing

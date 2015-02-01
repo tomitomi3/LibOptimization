@@ -1,6 +1,7 @@
 ﻿Imports LibOptimization
 Imports LibOptimization.Optimization
 Imports LibOptimization.Util
+Imports LibOptimization.BenchmarkFunction
 
 Module Module1
     Sub Main()

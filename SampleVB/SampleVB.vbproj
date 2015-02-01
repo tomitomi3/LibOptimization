@@ -73,22 +73,6 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenchmarkFunctions\clsBenchAckley.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchBoothFunction.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchDeJongFunction5.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchDeJongFunction4.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchDeJongFunction3.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchDeJongFunction2.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchEasom.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchEllipsoidFunction.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchPowellFunction.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchRastriginFunction.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchRidgeFunction.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchRosenblock.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchSchafferFunction.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchDeJongFunction1.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchSphere.vb" />
-    <Compile Include="BenchmarkFunctions\clsBenchTest.vb" />
     <Compile Include="Module1.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
