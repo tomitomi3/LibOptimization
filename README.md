@@ -5,6 +5,16 @@ LibOptimization is collection of optimization algorithm for .NET Framework
 
 See also wiki(https://github.com/tomitomi3/LibOptimization/wiki)
 
+LibOptimizationは制約条件の無い最適化を行うライブラリです。実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法、実数値遺伝的アルゴリズム（シンプレクス法、REX法）です。
+
+NuGet
+=====
+
+URL:https://www.nuget.org/packages/LibOptimization/
+```
+PM> Install-Package LibOptimization
+```
+
 Implement Optimization algorithm
 ================================
 
