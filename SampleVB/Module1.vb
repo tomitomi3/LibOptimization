@@ -17,6 +17,7 @@ Module Module1
 
         'Test
         'CheckOptimization()
+        OptimizeDeJongFunction()
 
         'Typical use
         With Nothing
@@ -287,6 +288,55 @@ Module Module1
                 Return
             End If
             clsUtil.DebugValue(optimization)
+        End With
+    End Sub
+
+    Private Sub OptimizeDeJongFunction()
+        With Nothing
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction1(), ai_randomRange:=5.12)
+            opt.Init()
+            clsUtil.DebugValue(opt)
+            opt.DoIteration()
+            clsUtil.DebugValue(opt)
+        End With
+
+        With Nothing
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction2(), ai_randomRange:=2.048)
+            opt.Init()
+            clsUtil.DebugValue(opt)
+            opt.DoIteration()
+            clsUtil.DebugValue(opt)
+        End With
+
+        With Nothing
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction3(), ai_randomRange:=5.12)
+            opt.Init()
+
+            opt.DoIteration()
+            clsUtil.DebugValue(opt)
+
+            opt.UseEliteStrategy(0.2) 'Carry over to the new iteration.
+            opt.DoIteration()
+            clsUtil.DebugValue(opt)
+        End With
+
+        With Nothing
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction4(), ai_randomRange:=1.28)
+            opt.Init()
+            clsUtil.DebugValue(opt)
+            opt.DoIteration()
+            clsUtil.DebugValue(opt)
+        End With
+
+        With Nothing
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5(), ai_randomRange:=65.536, ai_childsSize:=100)
+            opt.Init()
+            For i As Integer = 0 To 2
+                opt.DoIteration()
+                clsUtil.DebugValue(opt, ai_isOutValue:=False)
+                opt.UseEliteStrategy(0.1) 'Carry over to the new iteration.
+            Next
+            clsUtil.DebugValue(opt)
         End With
     End Sub
 
