@@ -33,8 +33,7 @@
         ''' <param name="ai_msg"></param>
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_series As Series, ByVal ai_msg As String)
-            MyBase.New(String.Format("ErrorCode:{0}\nErrorMsg:", ai_series, ai_msg))
+            MyBase.New(String.Format("ErrorCode:{0}\nErrorMsg:{1}", ai_series, ai_msg))
         End Sub
     End Class
-
 End Namespace
