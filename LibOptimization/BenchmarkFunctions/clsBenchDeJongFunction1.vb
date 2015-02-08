@@ -38,7 +38,7 @@ Namespace BenchmarkFunction
                     ret += x(i) ^ 2
                 Else
                     'out of range
-                    ret += Math.Abs(x(i)) ^ 2 'penarty
+                    ret += Math.Abs(x(i)) * 2 'penarty
                 End If
             Next
             Return ret

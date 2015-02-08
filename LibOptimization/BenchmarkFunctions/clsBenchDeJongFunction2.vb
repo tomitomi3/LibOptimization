@@ -41,7 +41,7 @@ Namespace BenchmarkFunction
             End If
 
             'out of range
-            Return Math.Abs(x(0)) + Math.Abs(x(1)) + 1000 'penarty
+            Return Math.Abs(x(0)) * Math.Abs(x(1)) * 100 'penarty
         End Function
 
         Public Overrides Function Gradient(ByVal x As List(Of Double)) As List(Of Double)
