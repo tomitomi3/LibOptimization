@@ -51,18 +51,41 @@
         ''' <param name="ai_seed"></param>
         ''' <remarks></remarks>
         Public Sub SetSeed(Optional ByVal ai_seed As UInteger = 88675123)
-            If ai_seed = 0 Then
-                '"The seed set for xor128 is four 32-bit integers x,y,z,w not all 0" by refference
-                ai_seed = 88675123
-            End If
+            '"The seed set for xor128 is four 32-bit integers x,y,z,w not all 0" by refference
 
-            'Init parameter
-            x = 123456789
-            y = 362436069
-            z = 521288629
-            w = ai_seed 'Set seed
-            t = 0
+            If ai_seed = 88675123 Then
+                'using default parameter
+                x = 123456789
+                y = 362436069
+                z = 521288629
+                w = 88675123
+                t = 0
+            Else
+                'Init parameter
+                '全パラメータにseedの影響を与えないと初期の乱数が同じ傾向になる。8bitずつ回転左シフト
+                x = x Xor Me.RotateLeftShiftForUInteger(ai_seed, 8)
+                y = y Xor Me.RotateLeftShiftForUInteger(ai_seed, 16)
+                z = z Xor Me.RotateLeftShiftForUInteger(ai_seed, 24)
+                w = w Xor ai_seed 'Set seed
+                t = 0
+            End If
         End Sub
+
+        ''' <summary>
+        ''' Rotate Shift
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function RotateLeftShiftForUInteger(ByVal ai_val As UInteger, ByVal ai_leftshit As Integer) As UInteger
+            If 32 - ai_leftshit <= 0 Then
+                Return ai_val
+            End If
+            Dim upper As UInteger = CUInt(ai_val And &HFF000000)
+            upper = upper >> (ai_leftshit - 32)
+            Dim temp As UInteger = ai_val << ai_leftshit
+            ai_val = temp Or upper
+            Return ai_val
+        End Function
 
         ''' <summary>
         ''' Random double with range

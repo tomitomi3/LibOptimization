@@ -8,7 +8,7 @@ Namespace Optimization
     Public MustInherit Class absOptimization
         Protected m_func As absObjectiveFunction = Nothing
         Protected m_iteration As Integer = 0
-        Protected m_rand As System.Random = New clsRandomXorshift(clsRandomXorshift.GetTimeSeed())
+        Protected m_rand As System.Random = New clsRandomXorshift(CUInt(Environment.TickCount))
 
         ''' <summary>
         ''' Initialize parameter
