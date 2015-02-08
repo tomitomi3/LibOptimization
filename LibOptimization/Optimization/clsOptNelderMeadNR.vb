@@ -404,7 +404,15 @@ Namespace Optimization
             End Set
         End Property
 
-        Public ReadOnly Property AllVertexs() As List(Of clsPoint)
+        ''' <summary>
+        ''' All Result
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' for Debug, Experiment
+        ''' </remarks>
+        Public ReadOnly Property AllResult() As List(Of clsPoint)
             Get
                 Return Me.m_points
             End Get

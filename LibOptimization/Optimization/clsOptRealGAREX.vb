@@ -296,7 +296,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result() As clsPoint
             Get
-                Return Me.BestPoint
+                Return Me.m_parents(0)
             End Get
         End Property
 
@@ -308,6 +308,20 @@ Namespace Optimization
         Public Overrides Function IsRecentError() As Boolean
             Return Me.m_error.IsError()
         End Function
+
+        ''' <summary>
+        ''' All Result
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' for Debug, Experiment
+        ''' </remarks>
+        Public ReadOnly Property AllResult() As List(Of clsPoint)
+            Get
+                Return Me.m_parents
+            End Get
+        End Property
 #End Region
 
 #Region "Private Methods"
@@ -324,17 +338,6 @@ Namespace Optimization
             Dim temp As Double = 2.0 * Math.Abs(worstEval - bestEval) / (Math.Abs(worstEval) + Math.Abs(bestEval) + 0.0000000001)
             Return temp
         End Function
-#End Region
-
-#Region "Property"
-        Private Property BestPoint() As clsPoint
-            Get
-                Return m_parents(0)
-            End Get
-            Set(value As clsPoint)
-                m_parents(0) = value
-            End Set
-        End Property
 #End Region
     End Class
 

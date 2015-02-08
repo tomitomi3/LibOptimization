@@ -262,6 +262,20 @@ Namespace Optimization
                 Return Me.BestPoint
             End Get
         End Property
+
+        ''' <summary>
+        ''' All Result
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' for Debug, Experiment
+        ''' </remarks>
+        Public ReadOnly Property AllResult() As List(Of clsPoint)
+            Get
+                Return Me.m_points
+            End Get
+        End Property
 #End Region
 
 #Region "Private Methods"
@@ -452,14 +466,6 @@ Namespace Optimization
             Set(ByVal value As clsPoint)
                 Me.m_points(m_points.Count - 2) = value
             End Set
-        End Property
-#End Region
-
-#Region "Property(Public)"
-        Public ReadOnly Property AllVertexs() As List(Of clsPoint)
-            Get
-                Return Me.m_points
-            End Get
         End Property
 #End Region
     End Class
