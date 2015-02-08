@@ -80,11 +80,21 @@
             If 32 - ai_leftshit <= 0 Then
                 Return ai_val
             End If
-            Dim upper As UInteger = CUInt(ai_val And &HFF000000)
-            upper = upper >> (ai_leftshit - 32)
+
+            'keeping upper bits
+            Dim maskBit As UInteger = 0
+            For i As Integer = 32 - ai_leftshit To 32 - 1
+                maskBit = CUInt(maskBit + (2 ^ i))
+            Next
+            Dim upperBit As UInteger = ai_val And maskBit
+            upperBit = upperBit >> (32 - ai_leftshit)
+
+            'left shift
             Dim temp As UInteger = ai_val << ai_leftshit
-            ai_val = temp Or upper
-            Return ai_val
+
+            'rotate upperbits
+            temp = temp Or upperBit
+            Return temp
         End Function
 
         ''' <summary>
