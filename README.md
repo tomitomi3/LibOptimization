@@ -1,9 +1,9 @@
 LibOptimization
 ===============
 
-LibOptimization is collection of optimization algorithm for .NET Framework
+![LibOptimization Log](https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png)
 
-See also wiki(https://github.com/tomitomi3/LibOptimization/wiki)
+LibOptimization is collection of optimization algorithm for .NET Framework
 
 LibOptimizationは制約条件の無い最適化を行うライブラリです。実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法、実数値遺伝的アルゴリズム（シンプレクス法、REX法）です。
 
@@ -18,17 +18,17 @@ PM> Install-Package LibOptimization
 Implement Optimization algorithm
 ================================
 
-using Derivative
+require derivative algorithm
 
 * Steepest Descent Method
 * Newton Method
 
-Derivative free
+derivative free algorithm
 
 * Nelder Mead Method (Down-Hill simplex method)
 * Hooke and Jeeves of Pattern Search (Direct Search)
-* Real-coded Genetic Algorithm Simplex and JGG
-* Real-coded Genetic Algorithm REX and JGG
+* Real-coded Genetic Algorithm Simplex and JGG(Just Generation Gap)
+* Real-coded Genetic Algorithm REX(Real-coded Ensemble Crossover) and JGG
 
 How to use
 ==========
@@ -141,6 +141,19 @@ Microsoft Public License (MS-PL)
 http://opensource.org/licenses/MS-PL
 
 Requirements
-===============
+============
 
 .NET Framework 4.0
+
+
+Refference
+==========
+
+1. 金谷 健一, "これなら分かる最適化数学―基礎原理から計算手法まで", 共立出版株式会社, 2007年初版第7刷
+1. Hooke, R. and Jeeves, T.A., ""Direct search" solution of numerical and statistical problems", Journal of the Association for Computing Machinery (ACM) 8 (2), pp212–229.
+1. J.A.Nelder and R.Mead, "A simplex method for function minimization" ,The Computer Journal vol.7, 308–313 (1965)
+1. W.H.Press， B.P.Flannery，S.A.Teukolsky，W.T.Vetterlin, "NUMERICAL RECIPES in C 日本語版 C言語による数値計算のレシピ", 株式会社技術評論社, 平成19年 初版 第14刷,
+1. 北野宏明編著, “『遺伝的アルゴリズム』”, 産業図書株式会社, 平成5年初版
+1. 樋口 隆英, 筒井 茂義, 山村 雅幸, "実数値GAにおけるシンプレクス交叉", 人工知能学会論文誌Vol. 16 (2001) No. 1 pp.147-155
+1. 小林重信, "実数値GAのフロンティア"，人工知能学会誌 Vol. 24, No. 1, pp.147-162 (2009)
+
