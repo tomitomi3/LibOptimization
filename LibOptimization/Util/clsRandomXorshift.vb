@@ -32,18 +32,6 @@
         Public Sub New(ByVal ai_seed As UInteger)
             Me.SetSeed(ai_seed)
         End Sub
-#End Region
-
-        ''' <summary>
-        ''' Sample
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' The Sample method generates a distribution proportional to the value of the random numbers, in the range [0.0, 1.0].
-        ''' </remarks>
-        Protected Overrides Function Sample() As Double
-            Return Me.Xor128() / UInteger.MaxValue
-        End Function
 
         ''' <summary>
         ''' Set random seed
@@ -72,29 +60,42 @@
         End Sub
 
         ''' <summary>
-        ''' Rotate Shift
+        ''' Override Next
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function RotateLeftShiftForUInteger(ByVal ai_val As UInteger, ByVal ai_leftshit As Integer) As UInteger
-            If 32 - ai_leftshit <= 0 Then
-                Return ai_val
-            End If
+        Public Overrides Function [Next]() As Integer
+            Return CInt(Me.Xor128 And &H7FFFFFFF)
+        End Function
 
-            'keeping upper bits
-            Dim maskBit As UInteger = 0
-            For i As Integer = 32 - ai_leftshit To 32 - 1
-                maskBit = CUInt(maskBit + (2 ^ i))
-            Next
-            Dim upperBit As UInteger = ai_val And maskBit
-            upperBit = upperBit >> (32 - ai_leftshit)
+        ''' <summary>
+        ''' Override Next
+        ''' </summary>
+        ''' <param name="maxValue"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function [Next](maxValue As Integer) As Integer
+            Return Me.Next(0, maxValue)
+        End Function
 
-            'left shift
-            Dim temp As UInteger = ai_val << ai_leftshit
+        ''' <summary>
+        ''' Override Next
+        ''' </summary>
+        ''' <param name="minValue"></param>
+        ''' <param name="maxValue"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function [Next](minValue As Integer, maxValue As Integer) As Integer
+            Return CInt(minValue + Me.Xor128() Mod (maxValue - minValue))
+        End Function
 
-            'rotate upperbits
-            temp = temp Or upperBit
-            Return temp
+        ''' <summary>
+        ''' Override NextDouble
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function NextDouble() As Double
+            Return Me.Xor128() / UInteger.MaxValue
         End Function
 
         ''' <summary>
@@ -118,6 +119,7 @@
         Public Shared Function GetTimeSeed() As UInteger
             Return CUInt(Date.Now.Millisecond * Date.Now.Minute * Date.Now.Second)
         End Function
+#End Region
 
 #Region "Private"
         ''' <summary>
@@ -140,6 +142,32 @@
             w = (w Xor (w >> 19)) Xor (t Xor (t >> 8))
 
             Return w
+        End Function
+
+        ''' <summary>
+        ''' Rotate Shift
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function RotateLeftShiftForUInteger(ByVal ai_val As UInteger, ByVal ai_leftshit As Integer) As UInteger
+            If 32 - ai_leftshit <= 0 Then
+                Return ai_val
+            End If
+
+            'keeping upper bits
+            Dim maskBit As UInteger = 0
+            For i As Integer = 32 - ai_leftshit To 32 - 1
+                maskBit = CUInt(maskBit + (2 ^ i))
+            Next
+            Dim upperBit As UInteger = ai_val And maskBit
+            upperBit = upperBit >> (32 - ai_leftshit)
+
+            'left shift
+            Dim temp As UInteger = ai_val << ai_leftshit
+
+            'rotate upperbits
+            temp = temp Or upperBit
+            Return temp
         End Function
 #End Region
     End Class

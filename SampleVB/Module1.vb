@@ -16,7 +16,7 @@ Module Module1
         ' 4. Get result and evaluate.
 
         'Test
-        'CheckOptimization()
+        CheckOptimization()
         OptimizeDeJongFunction()
 
         'Typical use
