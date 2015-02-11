@@ -179,14 +179,16 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Function MakeExploratoryMoves(ByVal ai_base As clsPoint, ByVal ai_stepLength As Double) As clsPoint
             Dim explorePoint As New List(Of clsPoint)
-            Dim temp() As Double = Nothing
             For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                temp = ai_base.ToArray()
-                temp(i) = ai_base(i) + ai_stepLength
-                explorePoint.Add(New clsPoint(ai_base.GetFunc(), temp))
+                Dim tempPlus As New clsPoint(ai_base)
+                tempPlus(i) += ai_stepLength
+                tempPlus.ReEvaluate()
+                explorePoint.Add(tempPlus)
 
-                temp(i) = ai_base(i) - 2.0 * ai_stepLength
-                explorePoint.Add(New clsPoint(ai_base.GetFunc(), temp))
+                Dim tempMinus As New clsPoint(ai_base)
+                tempMinus(i) -= ai_stepLength
+                tempMinus.ReEvaluate()
+                explorePoint.Add(tempMinus)
             Next
             explorePoint.Sort()
 
@@ -209,6 +211,7 @@ Namespace Optimization
             For i As Integer = 0 To ai_base.Count - 1
                 ret(i) = 2.0 * ai_base(i) - ai_previousBasePoint(i)
             Next
+            ret.ReEvaluate()
 
             Return ret
         End Function
