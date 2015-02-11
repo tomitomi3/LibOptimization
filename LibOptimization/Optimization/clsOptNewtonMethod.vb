@@ -154,6 +154,20 @@ Namespace Optimization
         End Property
 
         ''' <summary>
+        ''' Result for debug.(not implementation)
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' for Debug
+        ''' </remarks>
+        Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
+            Get
+                Throw New NotImplementedException
+            End Get
+        End Property
+
+        ''' <summary>
         ''' Get recent error infomation
         ''' </summary>
         ''' <returns></returns>

@@ -5,14 +5,6 @@
     ''' <remarks></remarks>
     Public MustInherit Class absObjectiveFunction
         ''' <summary>
-        ''' default constructor
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Sub absFuncForOptimization()
-            'nop
-        End Sub
-
-        ''' <summary>
         ''' Get number of variables
         ''' </summary>
         ''' <value></value>

@@ -293,6 +293,20 @@ Namespace Optimization
                 Return Me.BestPoint
             End Get
         End Property
+
+        ''' <summary>
+        ''' All Result
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' for Debug
+        ''' </remarks>
+        Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
+            Get
+                Return Me.m_points
+            End Get
+        End Property
 #End Region
 
 #Region "Private Methods"

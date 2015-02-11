@@ -225,6 +225,30 @@ Namespace Optimization
         End Property
 
         ''' <summary>
+        ''' Base with length
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' for Debug
+        ''' </remarks>
+        Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
+            Get
+                Dim ret = New List(Of clsPoint)
+                ret.Add(New clsPoint(Me.m_base))
+                For i As Integer = 0 To Me.m_base.Count - 1
+                    Dim tempPlus As New clsPoint(Me.m_base)
+                    tempPlus(i) += Me.m_stepLength
+                    ret.Add(tempPlus)
+                    Dim tempMinus As New clsPoint(Me.m_base)
+                    tempMinus(i) -= Me.m_stepLength
+                    ret.Add(tempMinus)
+                Next
+                Return ret
+            End Get
+        End Property
+
+        ''' <summary>
         ''' Get recent error infomation
         ''' </summary>
         ''' <returns></returns>

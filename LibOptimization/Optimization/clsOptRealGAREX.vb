@@ -315,9 +315,9 @@ Namespace Optimization
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>
-        ''' for Debug, Experiment
+        ''' for Debug
         ''' </remarks>
-        Public ReadOnly Property AllResult() As List(Of clsPoint)
+        Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
             Get
                 Return Me.m_parents
             End Get
