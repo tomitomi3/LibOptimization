@@ -86,6 +86,9 @@
     <Compile Include="BenchmarkFunctions\clsBenchTest.vb" />
     <Compile Include="Optimization\clsOptRealGASPX.vb" />
     <Compile Include="Optimization\clsOptNelderMeadNR.vb" />
+    <Compile Include="Optimization\clsOptSPO.vb" />
+    <Compile Include="Optimization\clsOptTemplate.vb" />
+    <Compile Include="Optimization\clsParticle.vb" />
     <Compile Include="ShoddyLinearAlgebra\clsException.vb" />
     <Compile Include="ShoddyLinearAlgebra\clsShoddyMatrix.vb" />
     <Compile Include="ShoddyLinearAlgebra\clsShoddyVector.vb" />

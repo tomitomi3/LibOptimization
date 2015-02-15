@@ -16,8 +16,9 @@ Module Module1
         ' 4. Get result and evaluate.
 
         'Test
-        CheckOptimization()
-        OptimizeDeJongFunction()
+        'CheckOptimization()
+        'OptimizeDeJongFunction()
+        CheckPSO()
 
         'Typical use
         With Nothing
@@ -337,6 +338,18 @@ Module Module1
                 opt.UseEliteStrategy(0.1) 'Carry over to the new iteration.
             Next
             clsUtil.DebugValue(opt)
+        End With
+    End Sub
+
+    Private Sub CheckPSO()
+        With Nothing
+            Dim temp = New clsOptSPO(New BenchmarkFunction.clsBenchRosenblock(2))
+            temp.Init()
+            clsUtil.DebugValue(temp)
+            While temp.DoIteration(10) = False
+                clsUtil.DebugValue(temp, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(temp)
         End With
     End Sub
 

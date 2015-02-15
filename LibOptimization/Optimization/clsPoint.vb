@@ -28,8 +28,8 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_vertex As clsPoint)
             Me.m_func = ai_vertex.m_func
-            Me.AddRange(ai_vertex.ToArray())
-            Me.m_evaluateValue = Me.m_func.F(Me)
+            Me.AddRange(ai_vertex.ToArray()) 'ok
+            Me.m_evaluateValue = ai_vertex.Eval
         End Sub
 
         ''' <summary>
@@ -40,7 +40,7 @@ Namespace Optimization
         Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
             Dim temp(ai_func.NumberOfVariable - 1) As Double
-            Me.AddRange(New List(Of Double)(temp))
+            Me.AddRange(New List(Of Double)(temp)) 'ok
             Me.m_evaluateValue = Me.m_func.F(Me)
         End Sub
 
@@ -52,7 +52,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_func As absObjectiveFunction, ByVal ai_vars As List(Of Double))
             Me.m_func = ai_func
-            Me.AddRange(ai_vars)
+            Me.AddRange(ai_vars.ToArray()) 'ok
             Me.m_evaluateValue = Me.m_func.F(Me)
         End Sub
 
@@ -64,8 +64,20 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_func As absObjectiveFunction, ByVal ai_vars() As Double)
             Me.m_func = ai_func
-            Me.AddRange(ai_vars)
+            Me.AddRange(ai_vars.ToArray()) 'ok
             Me.m_evaluateValue = Me.m_func.F(Me)
+        End Sub
+
+        ''' <summary>
+        ''' constructor
+        ''' </summary>
+        ''' <param name="ai_func"></param>
+        ''' <param name="ai_dim"></param>
+        ''' <remarks></remarks>
+        Public Sub New(ByVal ai_func As absObjectiveFunction, ByVal ai_dim As Integer)
+            Me.m_func = ai_func
+            Dim temp(ai_dim - 1) As Double
+            Me.AddRange(temp)
         End Sub
 
         ''' <summary>

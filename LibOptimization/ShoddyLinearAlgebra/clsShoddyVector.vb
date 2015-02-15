@@ -228,6 +228,18 @@
         End Sub
 
         ''' <summary>
+        ''' Set Double()
+        ''' </summary>
+        ''' <param name="ai_list"></param>
+        ''' <remarks></remarks>
+        Public Sub SetList(ByVal ai_list() As Double)
+            Me.Clear()
+            For i As Integer = 0 To ai_list.Count - 1
+                Me.Add(ai_list(i))
+            Next
+        End Sub
+
+        ''' <summary>
         ''' To Matrix
         ''' </summary>
         ''' <returns></returns>

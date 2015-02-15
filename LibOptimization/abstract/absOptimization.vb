@@ -72,7 +72,6 @@ Namespace Optimization
             End Get
             Set(ByVal value As absObjectiveFunction)
                 Me.m_func = value
-                Me.Init() 'should init
             End Set
         End Property
 
