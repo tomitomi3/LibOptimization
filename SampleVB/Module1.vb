@@ -343,7 +343,7 @@ Module Module1
 
     Private Sub CheckPSO()
         With Nothing
-            Dim temp = New clsOptSPO(New BenchmarkFunction.clsBenchRosenblock(2))
+            Dim temp = New clsOptPSO(New BenchmarkFunction.clsBenchRosenblock(2))
             temp.Init()
             clsUtil.DebugValue(temp)
             While temp.DoIteration(10) = False

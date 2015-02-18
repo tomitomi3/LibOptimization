@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Basic Swarm Particle Optmization
+    ''' Basic Particle Swarm Optmization
     ''' </summary>
     ''' <remarks>
     ''' Features:
@@ -15,7 +15,7 @@ Namespace Optimization
     ''' [2]Y. Shi and Eberhart, R.C., "A Modified Particle Swarm Optimizer", Proceedings of Congress on Evolu-tionary Computation, 79-73., 1998
     ''' [3]Eberhart, R.C. and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.
     ''' </remarks>
-    Public Class clsOptSPO : Inherits absOptimization
+    Public Class clsOptPSO : Inherits absOptimization
 #Region "Member"
         'Common parameters
         Private EPS As Double = 0.000000001
