@@ -342,8 +342,50 @@ Module Module1
     End Sub
 
     Private Sub CheckPSO()
+        'With Nothing
+        '    Dim temp = New clsOptPSO(New BenchmarkFunction.clsBenchDeJongFunction1())
+        '    temp.Init()
+        '    clsUtil.DebugValue(temp)
+        '    While temp.DoIteration(100) = False
+        '        clsUtil.DebugValue(temp, ai_isOutValue:=False)
+        '    End While
+        '    clsUtil.DebugValue(temp)
+        'End With
+        'With Nothing
+        '    Dim temp = New clsOptAIWPSO(New BenchmarkFunction.clsBenchDeJongFunction1())
+        '    temp.Init()
+        '    clsUtil.DebugValue(temp)
+        '    While temp.DoIteration(100) = False
+        '        clsUtil.DebugValue(temp, ai_isOutValue:=False)
+        '    End While
+        '    clsUtil.DebugValue(temp)
+        'End With
+
         With Nothing
-            Dim temp = New clsOptPSO(New BenchmarkFunction.clsBenchRosenblock(2))
+            Dim temp = New clsOptPSO(New BenchmarkFunction.clsBenchDeJongFunction2())
+            temp.Init()
+            clsUtil.DebugValue(temp)
+            While temp.DoIteration(100) = False
+                clsUtil.DebugValue(temp, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(temp)
+        End With
+        With Nothing
+            Dim temp = New clsOptAIWPSO(New BenchmarkFunction.clsBenchDeJongFunction2())
+            temp.Init()
+            clsUtil.DebugValue(temp)
+            While temp.DoIteration(100) = False
+                clsUtil.DebugValue(temp, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(temp)
+        End With
+
+
+
+
+
+        With Nothing
+            Dim temp = New clsOptPSO(New BenchmarkFunction.clsBenchDeJongFunction3())
             temp.Init()
             clsUtil.DebugValue(temp)
             While temp.DoIteration(10) = False
@@ -351,6 +393,33 @@ Module Module1
             End While
             clsUtil.DebugValue(temp)
         End With
-    End Sub
+        With Nothing
+            Dim temp = New clsOptPSO(New BenchmarkFunction.clsBenchDeJongFunction4())
+            temp.Init()
+            clsUtil.DebugValue(temp)
+            While temp.DoIteration(10) = False
+                clsUtil.DebugValue(temp, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(temp)
+        End With
+        With Nothing
+            Dim temp = New clsOptPSO(New BenchmarkFunction.clsBenchDeJongFunction5())
+            temp.Init()
+            clsUtil.DebugValue(temp)
+            While temp.DoIteration(10) = False
+                clsUtil.DebugValue(temp, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(temp)
+        End With
 
+        'With Nothing
+        '    Dim temp = New clsOptSPO(New BenchmarkFunction.clsBenchRosenblock(2))
+        '    temp.Init()
+        '    clsUtil.DebugValue(temp)
+        '    While temp.DoIteration(10) = False
+        '        clsUtil.DebugValue(temp, ai_isOutValue:=False)
+        '    End While
+        '    clsUtil.DebugValue(temp)
+        'End With
+    End Sub
 End Module

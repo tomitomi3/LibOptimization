@@ -84,6 +84,7 @@
     <Compile Include="BenchmarkFunctions\clsBenchSchafferFunction.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchSphere.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchTest.vb" />
+    <Compile Include="Optimization\clsOptAIWPSO.vb" />
     <Compile Include="Optimization\clsOptRealGASPX.vb" />
     <Compile Include="Optimization\clsOptNelderMeadNR.vb" />
     <Compile Include="Optimization\clsOptPSO.vb" />
