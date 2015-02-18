@@ -18,7 +18,7 @@ Namespace Optimization
     Public Class clsOptPSO : Inherits absOptimization
 #Region "Member"
         'Common parameters
-        Private EPS As Double = 0.000000001
+        Private EPS As Double = 0.000001 '1e-6
         Private MAX_ITERATION As Integer = 5000
         Private INIT_PARAM_RANGE As Double = 5.12 'This Parameter to use when generate a variable
         Private IsUseCriterion As Boolean = True
@@ -27,7 +27,7 @@ Namespace Optimization
         Private m_swarm As New List(Of clsParticle)
 
         'PSO Parameters
-        Private Size As Integer = 100
+        Private SwarmSize As Integer = 100
         Private Weight As Double = 0.729
         Private C1 As Double = 1.49445
         Private C2 As Double = 1.49445
@@ -48,7 +48,7 @@ Namespace Optimization
 
 #Region "Property(Parameter setting)"
         ''' <summary>
-        ''' EPS
+        ''' epsilon
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Common parameter</remarks>
@@ -59,7 +59,7 @@ Namespace Optimization
         End Property
 
         ''' <summary>
-        ''' Max Iteration
+        ''' Max iteration count
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Common parameter</remarks>
@@ -70,7 +70,7 @@ Namespace Optimization
         End Property
 
         ''' <summary>
-        ''' Init range
+        ''' Range of initial value
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Common parameter</remarks>
@@ -98,7 +98,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public WriteOnly Property PARAM_Size As Integer
             Set(value As Integer)
-                Me.Size = value
+                Me.SwarmSize = value
             End Set
         End Property
 
@@ -153,7 +153,7 @@ Namespace Optimization
                 Me.m_swarm.Clear()
 
                 'Set initialize value
-                For i As Integer = 0 To Me.Size - 1
+                For i As Integer = 0 To Me.SwarmSize - 1
                     Dim tempPosition = New clsPoint(Me.m_func)
                     Dim tempBestPosition = New clsPoint(Me.m_func)
                     Dim tempVelocity(Me.m_func.NumberOfVariable - 1) As Double
@@ -215,7 +215,7 @@ Namespace Optimization
 
                 'check criterion
                 If Me.IsUseCriterion = True Then
-                    If IsCriterion(Me.m_swarm(0).BestPoint, Me.m_swarm(Me.Size - 1).BestPoint) < Me.EPS Then
+                    If IsCriterion(Me.m_swarm(0).BestPoint, Me.m_swarm(Me.SwarmSize - 1).BestPoint) < Me.EPS Then
                         Return True
                     End If
                 End If
@@ -289,7 +289,11 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property ResultForDebug As List(Of Optimization.clsPoint)
             Get
-                Throw New NotImplementedException()
+                Dim ret As New List(Of clsPoint)(Me.m_swarm.Count - 1)
+                For Each p In Me.m_swarm
+                    ret.Add(New clsPoint(p.BestPoint))
+                Next
+                Return ret
             End Get
         End Property
 #End Region
@@ -305,7 +309,14 @@ Namespace Optimization
         Private Function IsCriterion(ByVal ai_best As clsPoint, ByVal ai_worst As clsPoint) As Double
             Dim bestEval As Double = ai_best.Eval
             Dim worstEval As Double = ai_worst.Eval
-            Dim temp As Double = 2.0 * Math.Abs(worstEval - bestEval) / (Math.Abs(worstEval) + Math.Abs(bestEval) + 0.0000000001)
+
+            'check division by zero
+            Dim denominator = (Math.Abs(worstEval) + Math.Abs(bestEval))
+            If denominator = 0 Then
+                Return 0
+            End If
+
+            Dim temp = 2.0 * Math.Abs(worstEval - bestEval) / denominator
             Return temp
         End Function
 #End Region
