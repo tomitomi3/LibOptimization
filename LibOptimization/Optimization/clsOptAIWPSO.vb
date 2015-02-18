@@ -213,17 +213,9 @@ Namespace Optimization
                 '-------------------------------------------------------------------
                 'Particle Swarm Optimize Iteration
                 '-------------------------------------------------------------------
-                'replace personal best
-                For Each particle In Me.m_swarm
-                    If particle.Point.Eval < particle.BestPoint.Eval Then
-                        particle.BestPoint = particle.Point
-                        replaceBestCount += 1 'for AIWPSO
-                    End If
-                Next
-
                 'get global best
                 Me.m_swarm.Sort()
-                Dim globalBestPoint = Me.m_swarm(0).BestPoint.ToArray()
+                Dim globalBestPoint As clsPoint = New clsPoint(Me.m_swarm(0).BestPoint)
 
                 'check criterion
                 If Me.IsUseCriterion = True Then
@@ -232,7 +224,6 @@ Namespace Optimization
                     End If
                 End If
 
-                'update point and velocity
                 For Each particle In Me.m_swarm
                     'update a velocity 
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
@@ -250,6 +241,17 @@ Namespace Optimization
                         particle.Point(i) = newPos
                     Next
                     particle.Point.ReEvaluate()
+
+                    'replace personal best
+                    If particle.Point.Eval < particle.BestPoint.Eval Then
+                        particle.BestPoint = New clsPoint(particle.Point)
+                        replaceBestCount += 1 'for AIWPSO
+
+                        'replace global best
+                        If particle.Point.Eval < globalBestPoint.Eval Then
+                            globalBestPoint = New clsPoint(particle.Point)
+                        End If
+                    End If
                 Next
 
                 'AIWPSO

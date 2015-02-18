@@ -205,13 +205,13 @@ Namespace Optimization
                 'replace personal best
                 For Each particle In Me.m_swarm
                     If particle.Point.Eval < particle.BestPoint.Eval Then
-                        particle.BestPoint = particle.Point
+                        particle.BestPoint = New clsPoint(particle.Point)
                     End If
                 Next
 
                 'get global best
                 Me.m_swarm.Sort()
-                Dim globalBestPoint = Me.m_swarm(0).BestPoint.ToArray()
+                Dim globalBestPoint As clsPoint = New clsPoint(Me.m_swarm(0).BestPoint)
 
                 'check criterion
                 If Me.IsUseCriterion = True Then
