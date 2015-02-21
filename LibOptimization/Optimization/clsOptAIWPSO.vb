@@ -18,7 +18,7 @@ Namespace Optimization
 #Region "Member"
         'Common parameters
         Private EPS As Double = 0.000001 '1e-6
-        Private MAX_ITERATION As Integer = 5000
+        Private MAX_ITERATION As Integer = 20000
         Private INIT_PARAM_RANGE As Double = 5.12 'This Parameter to use when generate a variable
         Private IsUseCriterion As Boolean = True
 
@@ -104,7 +104,8 @@ Namespace Optimization
         End Property
 
         ''' <summary>
-        ''' Weight max for adaptive weight(recommend value is 1.0).
+        ''' Weight max for adaptive weight.
+        ''' default 1.0
         ''' </summary>
         ''' <value></value>
         ''' <remarks>
@@ -116,7 +117,8 @@ Namespace Optimization
         End Property
 
         ''' <summary>
-        ''' Weight min for adaptive weight(recommend value is 0.0).
+        ''' Weight min for adaptive weight.
+        ''' default 0.0
         ''' </summary>
         ''' <value></value>
         ''' <remarks>
@@ -129,6 +131,7 @@ Namespace Optimization
 
         ''' <summary>
         ''' velocity coefficient(affected by personal best).
+        ''' default 1.49445
         ''' </summary>
         ''' <value></value>
         ''' <remarks></remarks>
@@ -140,6 +143,7 @@ Namespace Optimization
 
         ''' <summary>
         ''' velocity coefficient(affected by global best)
+        ''' default 1.49445
         ''' </summary>
         ''' <value></value>
         ''' <remarks></remarks>
@@ -178,6 +182,7 @@ Namespace Optimization
 
                 'Sort Evaluate
                 Me.m_swarm.Sort()
+                Me.Weight = 1
 
             Catch ex As Exception
                 Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
@@ -201,8 +206,6 @@ Namespace Optimization
             'do iterate
             ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
-                Dim replaceBestCount As Integer = 0
-
                 'check iteration count
                 If MAX_ITERATION <= m_iteration Then
                     Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_OPT_MAXITERATION)
@@ -210,20 +213,18 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                '-------------------------------------------------------------------
-                'Particle Swarm Optimize Iteration
-                '-------------------------------------------------------------------
                 'get global best
                 Me.m_swarm.Sort()
-                Dim globalBestPoint As clsPoint = New clsPoint(Me.m_swarm(0).BestPoint)
+                Dim globalBestPoint As clsPoint = Me.m_swarm(0).BestPoint.Copy()
 
                 'check criterion
                 If Me.IsUseCriterion = True Then
-                    If IsCriterion(Me.m_swarm(0).BestPoint, Me.m_swarm(Me.SwarmSize - 1).BestPoint) < Me.EPS Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(Me.SwarmSize - 1).BestPoint) Then
                         Return True
                     End If
                 End If
 
+                Dim replaceBestCount As Integer = 0
                 For Each particle In Me.m_swarm
                     'update a velocity 
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
@@ -233,10 +234,8 @@ Namespace Optimization
                                    C1 * r1 * (particle.BestPoint(i) - particle.Point(i)) + _
                                    C2 * r2 * (globalBestPoint(i) - particle.Point(i))
                         particle.Velocity(i) = newV
-                    Next
 
-                    'update a position using velocity
-                    For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                        'update a position using velocity
                         Dim newPos = particle.Point(i) + particle.Velocity(i)
                         particle.Point(i) = newPos
                     Next
@@ -244,19 +243,19 @@ Namespace Optimization
 
                     'replace personal best
                     If particle.Point.Eval < particle.BestPoint.Eval Then
-                        particle.BestPoint = New clsPoint(particle.Point)
+                        particle.BestPoint = particle.Point.Copy()
                         replaceBestCount += 1 'for AIWPSO
 
                         'replace global best
                         If particle.Point.Eval < globalBestPoint.Eval Then
-                            globalBestPoint = New clsPoint(particle.Point)
+                            globalBestPoint = particle.Point.Copy()
                         End If
                     End If
                 Next
 
                 'AIWPSO
                 Dim PS = replaceBestCount / Me.SwarmSize
-                Me.Weight = (WeightMax - WeightMin) * PS - WeightMin
+                Me.Weight = (Me.WeightMax - Me.WeightMin) * PS - Me.WeightMin
             Next
 
             Return False
@@ -293,7 +292,7 @@ Namespace Optimization
             Get
                 Dim ret As New List(Of clsPoint)(Me.m_swarm.Count - 1)
                 For Each p In Me.m_swarm
-                    ret.Add(New clsPoint(p.BestPoint))
+                    ret.Add(p.BestPoint.Copy())
                 Next
                 Return ret
             End Get
@@ -301,26 +300,6 @@ Namespace Optimization
 #End Region
 
 #Region "Private"
-        ''' <summary>
-        ''' Check Criterion
-        ''' </summary>
-        ''' <param name="ai_best"></param>
-        ''' <param name="ai_worst"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function IsCriterion(ByVal ai_best As clsPoint, ByVal ai_worst As clsPoint) As Double
-            Dim bestEval As Double = ai_best.Eval
-            Dim worstEval As Double = ai_worst.Eval
-
-            'check division by zero
-            Dim denominator = (Math.Abs(worstEval) + Math.Abs(bestEval))
-            If denominator = 0 Then
-                Return 0
-            End If
-
-            Dim temp = 2.0 * Math.Abs(worstEval - bestEval) / denominator
-            Return temp
-        End Function
 #End Region
     End Class
 End Namespace

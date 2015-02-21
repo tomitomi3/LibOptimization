@@ -92,5 +92,51 @@ Namespace Util
                 Console.WriteLine("Eval          :" & String.Format("{0}", ai_opt.Result.Eval))
             End If
         End Sub
+
+        ''' <summary>
+        ''' Check Criterion
+        ''' </summary>
+        ''' <param name="ai_eps">EPS</param>
+        ''' <param name="ai_comparisonA"></param>
+        ''' <param name="ai_comparisonB"></param>
+        ''' <param name="ai_tiny"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function IsCriterion(ByVal ai_eps As Double, _
+                                           ByVal ai_comparisonA As clsPoint, ByVal ai_comparisonB As clsPoint, _
+                                           Optional ByVal ai_tiny As Double = 0.0000000000001) As Boolean
+            Return clsUtil.IsCriterion(ai_eps, ai_comparisonA.Eval, ai_comparisonB.Eval, ai_tiny)
+        End Function
+
+        ''' <summary>
+        ''' Check Criterion
+        ''' </summary>
+        ''' <param name="ai_eps">EPS</param>
+        ''' <param name="ai_comparisonA"></param>
+        ''' <param name="ai_comparisonB"></param>
+        ''' <param name="ai_tiny"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Reffrence:
+        ''' William H. Press, Saul A. Teukolsky, William T. Vetterling, Brian P. Flannery,
+        ''' "NUMRICAL RECIPIES 3rd Edition: The Art of Scientific Computing", Cambridge University Press 2007, pp505-506
+        ''' </remarks>
+        Public Shared Function IsCriterion(ByVal ai_eps As Double, _
+                                           ByVal ai_comparisonA As Double, ByVal ai_comparisonB As Double, _
+                                           Optional ByVal ai_tiny As Double = 0.0000000000001) As Boolean
+            'check division by zero
+            Dim denominator = (Math.Abs(ai_comparisonB) + Math.Abs(ai_comparisonA)) + ai_tiny
+            If denominator = 0 Then
+                Return True
+            End If
+
+            'check criteorion
+            Dim temp = 2.0 * Math.Abs(ai_comparisonB - ai_comparisonA) / denominator
+            If temp < ai_eps Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
     End Class
 End Namespace

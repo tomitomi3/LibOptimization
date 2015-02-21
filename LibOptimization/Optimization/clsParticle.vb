@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Particle class
+    ''' Particle class for PSO
     ''' </summary>
     ''' <remarks>
     ''' for Swarm Particle Optimization
@@ -40,9 +40,9 @@ Namespace Optimization
         ''' <param name="ai_particle"></param>
         ''' <remarks></remarks>
         Sub New(ByVal ai_particle As clsParticle)
-            Me.m_point = New clsPoint(ai_particle.Point)
+            Me.m_point = ai_particle.Point.Copy()
             Me.m_velocity = ai_particle.Velocity.ToArray()
-            Me.m_bestPoint = New clsPoint(ai_particle.BestPoint)
+            Me.m_bestPoint = ai_particle.BestPoint.Copy()
         End Sub
 
         ''' <summary>

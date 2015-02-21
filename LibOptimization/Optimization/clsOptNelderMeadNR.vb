@@ -200,8 +200,8 @@ Namespace Optimization
                 'Sort Evaluate
                 m_points.Sort()
 
-                'Check conversion
-                If Me.IsConversion2(m_points) < Me.EPS Then
+                'Check criteorion
+                If clsUtil.IsCriterion(Me.EPS, m_points(0).Eval, m_points(m_points.Count - 1).Eval) Then
                     Return True
                 End If
 
@@ -353,23 +353,6 @@ Namespace Optimization
                 ai_allVertexs(i).ReEvaluate()
             Next
         End Sub
-
-        ''' <summary>
-        ''' Check conversion
-        ''' </summary>
-        ''' <param name="ai_vertexs">All vertexs</param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Reffrence:
-        ''' William H. Press, Saul A. Teukolsky, William T. Vetterling, Brian P. Flannery,
-        ''' "NUMRICAL RECIPIES 3rd Edition: The Art of Scientific Computing", Cambridge University Press 2007, pp505-506
-        ''' </remarks>
-        Private Function IsConversion2(ByVal ai_vertexs As List(Of clsPoint)) As Double
-            Dim bestEval As Double = ai_vertexs(0).Eval
-            Dim worstEval As Double = ai_vertexs(ai_vertexs.Count - 1).Eval
-            Dim temp As Double = 2.0 * Math.Abs(worstEval - bestEval) / (Math.Abs(worstEval) + Math.Abs(bestEval) + 0.0000000001) '<-avoid a 0 division error by using tiny parameter.
-            Return temp
-        End Function
 
         ''' <summary>
         ''' Get recent error infomation

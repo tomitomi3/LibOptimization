@@ -131,10 +131,12 @@ Namespace Optimization
                 'Check stop criterion
                 If Me.IsUseEps = True Then
                     Dim lastIndex As Integer = CInt(m_parents.Count * 0.7)
-                    If lastIndex = m_parents.Count Then
-                        lastIndex = m_parents.Count - 1
+                    If lastIndex = Me.m_parents.Count Then
+                        lastIndex = Me.m_parents.Count - 1
                     End If
-                    If Me.IsCriterion(m_parents(0), m_parents(lastIndex)) < Me.EPS Then
+
+                    'Check criteorion
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(lastIndex).Eval) Then
                         Return True
                     End If
                 End If
@@ -296,19 +298,6 @@ Namespace Optimization
 #End Region
 
 #Region "Private Methods"
-        ''' <summary>
-        ''' Check Criterion
-        ''' </summary>
-        ''' <param name="ai_best"></param>
-        ''' <param name="ai_worst"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function IsCriterion(ByVal ai_best As clsPoint, ByVal ai_worst As clsPoint) As Double
-            Dim bestEval As Double = ai_best.Eval
-            Dim worstEval As Double = ai_worst.Eval
-            Dim temp As Double = 2.0 * Math.Abs(worstEval - bestEval) / (Math.Abs(worstEval) + Math.Abs(bestEval) + 0.0000000001)
-            Return temp
-        End Function
 #End Region
     End Class
 

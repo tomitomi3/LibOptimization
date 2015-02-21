@@ -19,7 +19,7 @@ Namespace Optimization
 #Region "Member"
         'Common parameters
         Private EPS As Double = 0.000001 '1e-6
-        Private MAX_ITERATION As Integer = 5000
+        Private MAX_ITERATION As Integer = 20000
         Private INIT_PARAM_RANGE As Double = 5.12 'This Parameter to use when generate a variable
         Private IsUseCriterion As Boolean = True
 
@@ -199,29 +199,28 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                '-------------------------------------------------------------------
-                'Particle Swarm Optimize Iteration
-                '-------------------------------------------------------------------
-                'replace personal best
-                For Each particle In Me.m_swarm
-                    If particle.Point.Eval < particle.BestPoint.Eval Then
-                        particle.BestPoint = New clsPoint(particle.Point)
-                    End If
-                Next
-
                 'get global best
                 Me.m_swarm.Sort()
-                Dim globalBestPoint As clsPoint = New clsPoint(Me.m_swarm(0).BestPoint)
+                Dim globalBestPoint As clsPoint = Me.m_swarm(0).BestPoint.Copy()
 
                 'check criterion
                 If Me.IsUseCriterion = True Then
-                    If IsCriterion(Me.m_swarm(0).BestPoint, Me.m_swarm(Me.SwarmSize - 1).BestPoint) < Me.EPS Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(Me.SwarmSize - 1).BestPoint) Then
                         Return True
                     End If
                 End If
 
-                'update point and velocity
                 For Each particle In Me.m_swarm
+                    'replace personal best
+                    If particle.Point.Eval < particle.BestPoint.Eval Then
+                        particle.BestPoint = particle.Point.Copy()
+
+                        'replace global best
+                        If particle.Point.Eval < globalBestPoint.Eval Then
+                            globalBestPoint = particle.Point.Copy()
+                        End If
+                    End If
+
                     'update a velocity 
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim r1 = Me.m_rand.NextDouble()
@@ -229,28 +228,10 @@ Namespace Optimization
                         Dim newV = Me.Weight * particle.Velocity(i) + _
                                    C1 * r1 * (particle.BestPoint(i) - particle.Point(i)) + _
                                    C2 * r2 * (globalBestPoint(i) - particle.Point(i))
-
-                        'range check
-                        'If newV < Me.SEARCH_SPACE_RANGE_MIN Then
-                        '    newV = Me.SEARCH_SPACE_RANGE_MIN
-                        'ElseIf newV > Me.SEARCH_SPACE_RANGE_MAX Then
-                        '    newV = Me.SEARCH_SPACE_RANGE_MAX
-                        'End If
-
                         particle.Velocity(i) = newV
-                    Next
 
-                    'update a position using velocity
-                    For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                        'update a position using velocity
                         Dim newPos = particle.Point(i) + particle.Velocity(i)
-
-                        'range check
-                        'If newPos < Me.SEARCH_SPACE_RANGE_MIN Then
-                        '    newPos = Me.SEARCH_SPACE_RANGE_MIN
-                        'ElseIf newPos > Me.SEARCH_SPACE_RANGE_MAX Then
-                        '    newPos = Me.SEARCH_SPACE_RANGE_MAX
-                        'End If
-
                         particle.Point(i) = newPos
                     Next
                     particle.Point.ReEvaluate()
@@ -299,26 +280,6 @@ Namespace Optimization
 #End Region
 
 #Region "Private"
-        ''' <summary>
-        ''' Check Criterion
-        ''' </summary>
-        ''' <param name="ai_best"></param>
-        ''' <param name="ai_worst"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function IsCriterion(ByVal ai_best As clsPoint, ByVal ai_worst As clsPoint) As Double
-            Dim bestEval As Double = ai_best.Eval
-            Dim worstEval As Double = ai_worst.Eval
-
-            'check division by zero
-            Dim denominator = (Math.Abs(worstEval) + Math.Abs(bestEval))
-            If denominator = 0 Then
-                Return 0
-            End If
-
-            Dim temp = 2.0 * Math.Abs(worstEval - bestEval) / denominator
-            Return temp
-        End Function
 #End Region
     End Class
 End Namespace
