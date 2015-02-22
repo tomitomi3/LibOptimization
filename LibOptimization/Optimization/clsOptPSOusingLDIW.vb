@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Basic Particle Swarm Optmization
+    ''' Particle Swarm Optimization using Linear Decrease Inertia Weight(LDIW)
     ''' </summary>
     ''' <remarks>
     ''' Features:
@@ -11,11 +11,9 @@ Namespace Optimization
     '''  -Derivative free optimization algorithm.
     ''' 
     ''' Refference:
-    ''' [1]James Kennedy and Russell Eberhart, "Particle Swarm Optimization．", Proceedings of IEEE the International Conference on Neural Networks，1995
-    ''' [2]Y. Shi and Eberhart, R.C., "A Modified Particle Swarm Optimizer", Proceedings of Congress on Evolu-tionary Computation, 79-73., 1998
-    ''' [3]Eberhart, R.C. and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.
+    ''' [1]Y. Shi and Russell C. Eberhart, "Empirical Study of Particle Swarm Optimization, Proceeding Congress on Evolutionary Computation 1999, Piscataway, 1945-1949
     ''' </remarks>
-    Public Class clsOptPSO : Inherits absOptimization
+    Public Class clsOptPSO_beta : Inherits absOptimization
 #Region "Member"
         'Common parameters
         Private EPS As Double = 0.000001 '1e-6
@@ -28,7 +26,9 @@ Namespace Optimization
 
         'PSO Parameters
         Private SwarmSize As Integer = 100
-        Private Weight As Double = 0.729
+        Private Weight As Double = 1
+        Private WeightMax As Double = 0.9 'recommend value
+        Private WeightMin As Double = 0.4 'recommend value
         Private C1 As Double = 1.49445
         Private C2 As Double = 1.49445
 
@@ -103,22 +103,34 @@ Namespace Optimization
         End Property
 
         ''' <summary>
-        ''' Inertia weight.
-        ''' Weigth=1.0(orignal paper 1995), Weight=0.729(Default setting)
+        ''' Weight max for adaptive weight.
+        ''' default 0.9
         ''' </summary>
         ''' <value></value>
         ''' <remarks>
-        ''' recommend value is 0.4 to 0.9.
         ''' </remarks>
-        Public WriteOnly Property PARAM_Weight As Double
+        Public WriteOnly Property PARAM_WeightMax As Double
             Set(value As Double)
-                Me.Weight = value
+                Me.WeightMax = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Weight min for adaptive weight.
+        ''' default 0.4
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>
+        ''' </remarks>
+        Public WriteOnly Property PARAM_WeightMin As Double
+            Set(value As Double)
+                Me.WeightMin = value
             End Set
         End Property
 
         ''' <summary>
         ''' velocity coefficient(affected by personal best).
-        ''' C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)
+        ''' default 1.49445
         ''' </summary>
         ''' <value></value>
         ''' <remarks></remarks>
@@ -130,7 +142,7 @@ Namespace Optimization
 
         ''' <summary>
         ''' velocity coefficient(affected by global best)
-        ''' C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)
+        ''' default 1.49445
         ''' </summary>
         ''' <value></value>
         ''' <remarks></remarks>
@@ -169,6 +181,7 @@ Namespace Optimization
 
                 'Sort Evaluate
                 Me.m_swarm.Sort()
+                Me.Weight = 1
 
             Catch ex As Exception
                 Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
@@ -204,6 +217,7 @@ Namespace Optimization
                 Me.m_swarm.Sort()
                 Dim globalBestPoint As clsPoint = Me.m_swarm(0).BestPoint.Copy()
 
+
                 'check criterion
                 If Me.IsUseCriterion = True Then
                     If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(Me.SwarmSize - 1).BestPoint) Then
@@ -211,17 +225,8 @@ Namespace Optimization
                     End If
                 End If
 
+                Dim replaceBestCount As Integer = 0
                 For Each particle In Me.m_swarm
-                    'replace personal best
-                    If particle.Point.Eval < particle.BestPoint.Eval Then
-                        particle.BestPoint = particle.Point.Copy()
-
-                        'replace global best
-                        If particle.Point.Eval < globalBestPoint.Eval Then
-                            globalBestPoint = particle.Point.Copy()
-                        End If
-                    End If
-
                     'update a velocity 
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim r1 = Me.m_rand.NextDouble()
@@ -236,7 +241,21 @@ Namespace Optimization
                         particle.Point(i) = newPos
                     Next
                     particle.Point.ReEvaluate()
+
+                    'replace personal best
+                    If particle.Point.Eval < particle.BestPoint.Eval Then
+                        particle.BestPoint = particle.Point.Copy()
+                        replaceBestCount += 1 'for AIWPSO
+
+                        'replace global best
+                        If particle.Point.Eval < globalBestPoint.Eval Then
+                            globalBestPoint = particle.Point.Copy()
+                        End If
+                    End If
                 Next
+
+                'Inertia Weight Strategie - LDIW Linear Decreasing Inertia Weight
+                Me.Weight = (Me.WeightMax - Me.WeightMin) * (Me.MAX_ITERATION - Me.m_iteration) / Me.MAX_ITERATION + Me.WeightMin
             Next
 
             Return False

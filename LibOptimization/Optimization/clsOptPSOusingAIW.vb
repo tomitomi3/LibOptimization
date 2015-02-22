@@ -208,6 +208,7 @@ Namespace Optimization
             For iterate As Integer = 0 To ai_iteration
                 'check iteration count
                 If MAX_ITERATION <= m_iteration Then
+                    Me.m_swarm.Sort()
                     Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
