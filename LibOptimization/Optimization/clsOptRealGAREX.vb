@@ -21,8 +21,9 @@ Namespace Optimization
     Public Class clsOptRealGAREX : Inherits absOptimization
 #Region "Member"
         Private ReadOnly EPS As Double = 0.000000001
-        Private ReadOnly IsUseEps As Boolean = True
+        Private ReadOnly IsUseCriterion As Boolean = True
         Private HigherNPercent As Double = 0.7 'for IsCriteorion()
+        Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
 
         'GA Parameters
         Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
@@ -78,7 +79,7 @@ Namespace Optimization
             Me.MAX_ITERATION = ai_generation
 
             Me.EPS = ai_eps
-            Me.IsUseEps = ai_isUseEps
+            Me.IsUseCriterion = ai_isUseEps
 
             If ai_populationSize = 0 Then
                 Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 8
@@ -139,6 +140,12 @@ Namespace Optimization
                 'Sort Evaluate
                 Me.m_parents.Sort()
 
+                'Detect HigherNPercentIndex
+                Me.HigherNPercentIndex = CInt(Me.m_parents.Count * Me.HigherNPercent)
+                If Me.HigherNPercentIndex = Me.m_parents.Count Then
+                    Me.HigherNPercentIndex = Me.m_parents.Count - 1
+                End If
+
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try
@@ -162,16 +169,10 @@ Namespace Optimization
                 'Sort Evaluate
                 Me.m_parents.Sort()
 
-                'Check stop criterion
-                If Me.IsUseEps = True Then
+                'check criterion
+                If Me.IsUseCriterion = True Then
                     'higher N percentage particles are finished at the time of same evaluate value.
-                    Dim nPercentIndex As Integer = CInt(Me.m_parents.Count * Me.HigherNPercent)
-                    If nPercentIndex = Me.m_parents.Count Then
-                        nPercentIndex = Me.m_parents.Count - 1
-                    End If
-
-                    'Check criteorion
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(nPercentIndex).Eval) Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(Me.HigherNPercentIndex).Eval) Then
                         Return True
                     End If
                 End If

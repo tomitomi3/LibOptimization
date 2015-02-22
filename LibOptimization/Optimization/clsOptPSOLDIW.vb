@@ -20,7 +20,8 @@ Namespace Optimization
         Private MAX_ITERATION As Integer = 20000
         Private INIT_PARAM_RANGE As Double = 5.12 'This Parameter to use when generate a variable
         Private IsUseCriterion As Boolean = True
-        Private HigherNPercent As Double = 0.9 'for IsCriteorion()
+        Private HigherNPercent As Double = 0.9 'for IsCriterion()
+        Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
 
         'particles
         Private m_swarm As New List(Of clsParticle)
@@ -196,6 +197,12 @@ Namespace Optimization
                 Me.m_swarm.Sort()
                 Me.Weight = 1
 
+                'Detect HigherNPercentIndex
+                Me.HigherNPercentIndex = CInt(Me.m_swarm.Count * Me.HigherNPercent)
+                If Me.HigherNPercentIndex = Me.m_swarm.Count Then
+                    Me.HigherNPercentIndex = Me.m_swarm.Count - 1
+                End If
+
             Catch ex As Exception
                 Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
             Finally
@@ -233,12 +240,7 @@ Namespace Optimization
                 'check criterion
                 If Me.IsUseCriterion = True Then
                     'higher N percentage particles are finished at the time of same evaluate value.
-                    Dim nPercentIndex As Integer = CInt(Me.m_swarm.Count * Me.HigherNPercent)
-                    If nPercentIndex = Me.m_swarm.Count Then
-                        nPercentIndex = Me.m_swarm.Count - 1
-                    End If
-
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(nPercentIndex).BestPoint) Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(Me.HigherNPercentIndex).BestPoint) Then
                         Return True
                     End If
                 End If
