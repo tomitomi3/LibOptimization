@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Particle Swarm Optimization using Chaotic inertia weight
+    ''' Particle Swarm Optimization using Linear Decrease Inertia Weight(LDIW)
     ''' </summary>
     ''' <remarks>
     ''' Features:
@@ -11,9 +11,9 @@ Namespace Optimization
     '''  -Derivative free optimization algorithm.
     ''' 
     ''' Refference:
-    ''' [1]Y. Feng, G. Teng, A. Wang, Y.M. Yao, "Chaotic inertia weight in particle swarm optimization", in: Second International Conference on Innovative Computing, Information and Control (ICICIC 07), 2007, pp. 475–1475.
+    ''' [1]Y. Shi and Russell C. Eberhart, "Empirical Study of Particle Swarm Optimization, Proceeding Congress on Evolutionary Computation 1999, Piscataway, 1945-1949
     ''' </remarks>
-    Public Class clsOptPSOwithChaoticIW : Inherits absOptimization
+    Public Class clsOptPSOLDIW : Inherits absOptimization
 #Region "Member"
         'Common parameters
         Private EPS As Double = 0.000001 '1e-6
@@ -27,18 +27,10 @@ Namespace Optimization
         'PSO Parameters
         Private SwarmSize As Integer = 100
         Private Weight As Double = 1
-        Private WeightMax As Double = 0.9 'base LDIW
-        Private WeightMin As Double = 0.4
+        Private WeightMax As Double = 0.9 'recommend value
+        Private WeightMin As Double = 0.4 'recommend value
         Private C1 As Double = 1.49445
         Private C2 As Double = 1.49445
-        Private ChaoticMode As EnumChaoticInertiaWeightMode = EnumChaoticInertiaWeightMode.CDIW
-
-        Public Enum EnumChaoticInertiaWeightMode
-            ''' <summary>Charotic Decrease Inertia Weight</summary>
-            CDIW
-            ''' <summary>Charotic Random Inertia Weight</summary>
-            CRIW
-        End Enum
 
         'ErrorManage
         Private m_error As New clsError
@@ -159,17 +151,6 @@ Namespace Optimization
                 Me.C2 = value
             End Set
         End Property
-
-        ''' <summary>
-        ''' Inertial weight strategie
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_InertialWeightStrategie As EnumChaoticInertiaWeightMode
-            Set(value As EnumChaoticInertiaWeightMode)
-                Me.ChaoticMode = value
-            End Set
-        End Property
 #End Region
 
 #Region "Public"
@@ -273,20 +254,8 @@ Namespace Optimization
                     End If
                 Next
 
-                'Inertia Weight Strategie
-                If Me.ChaoticMode = EnumChaoticInertiaWeightMode.CDIW Then
-                    'CDIW is Chaotic Descending(Decreasing?) Inertia Weight
-                    Dim randVal = Me.m_rand.NextDouble()
-                    Dim u = 4.0 '3.75 to 4.0
-                    Dim z = u * randVal * (1 - randVal)
-                    Me.Weight = (Me.WeightMax - Me.WeightMin) * (Me.MAX_ITERATION - Me.m_iteration) / Me.MAX_ITERATION + Me.WeightMin * z
-                ElseIf Me.ChaoticMode = EnumChaoticInertiaWeightMode.CRIW Then
-                    'CRIW is Chaotic Random Inertia Weight
-                    Dim randVal = Me.m_rand.NextDouble()
-                    Dim u = 4.0
-                    Dim z = u * randVal * (1 - randVal)
-                    Me.Weight = 0.5 * Me.m_rand.NextDouble() + 0.5 * z
-                End If
+                'Inertia Weight Strategie - LDIW Linear Decreasing Inertia Weight
+                Me.Weight = (Me.WeightMax - Me.WeightMin) * (Me.MAX_ITERATION - Me.m_iteration) / Me.MAX_ITERATION + Me.WeightMin
             Next
 
             Return False
