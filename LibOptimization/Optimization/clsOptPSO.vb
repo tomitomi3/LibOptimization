@@ -11,9 +11,9 @@ Namespace Optimization
     '''  -Derivative free optimization algorithm.
     ''' 
     ''' Refference:
-    ''' [1]James Kennedy and Russell Eberhart, "Particle Swarm Optimization．", Proceedings of IEEE the International Conference on Neural Networks，1995
-    ''' [2]Y. Shi and Eberhart, R.C., "A Modified Particle Swarm Optimizer", Proceedings of Congress on Evolu-tionary Computation, 79-73., 1998
-    ''' [3]Eberhart, R.C. and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.
+    ''' [1]James Kennedy and Russell Eberhart, "Particle Swarm Optimization", Proceedings of IEEE the International Conference on Neural Networks，1995
+    ''' [2]Y. Shi and Russell Eberhart, "A Modified Particle Swarm Optimizer", Proceedings of Congress on Evolu-tionary Computation, 79-73., 1998
+    ''' [3]R. C. Eberhart and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.
     ''' </remarks>
     Public Class clsOptPSO : Inherits absOptimization
 #Region "Member"
@@ -22,6 +22,7 @@ Namespace Optimization
         Private MAX_ITERATION As Integer = 20000
         Private INIT_PARAM_RANGE As Double = 5.12 'This Parameter to use when generate a variable
         Private IsUseCriterion As Boolean = True
+        Private HigherNPercent As Double = 0.9 'for IsCriteorion()
 
         'particles
         Private m_swarm As New List(Of clsParticle)
@@ -88,6 +89,18 @@ Namespace Optimization
         Public WriteOnly Property PARAM_IsUseCriterion As Boolean
             Set(value As Boolean)
                 Me.IsUseCriterion = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' higher N percentage particles are finished at the time of same evaluate value.
+        ''' This parameter is valid is when PARAM_IsUseCriterion is true.
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_CriterionPersent As Double
+            Set(value As Double)
+                Me.HigherNPercent = value
             End Set
         End Property
 
@@ -206,11 +219,18 @@ Namespace Optimization
 
                 'check criterion
                 If Me.IsUseCriterion = True Then
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(Me.SwarmSize - 1).BestPoint) Then
+                    'higher N percentage particles are finished at the time of same evaluate value.
+                    Dim nPercentIndex As Integer = CInt(Me.m_swarm.Count * Me.HigherNPercent)
+                    If nPercentIndex = Me.m_swarm.Count Then
+                        nPercentIndex = Me.m_swarm.Count - 1
+                    End If
+
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(nPercentIndex).BestPoint) Then
                         Return True
                     End If
                 End If
 
+                'PSO process
                 For Each particle In Me.m_swarm
                     'replace personal best
                     If particle.Point.Eval < particle.BestPoint.Eval Then

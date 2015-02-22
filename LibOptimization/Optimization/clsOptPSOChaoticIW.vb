@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Particle Swarm Optimization using Chaotic inertia weight
+    ''' Particle Swarm Optimization using Chaotic inertia weight(CDIW-PSO, CRIW-PSO)
     ''' </summary>
     ''' <remarks>
     ''' Features:
@@ -20,6 +20,7 @@ Namespace Optimization
         Private MAX_ITERATION As Integer = 20000
         Private INIT_PARAM_RANGE As Double = 5.12 'This Parameter to use when generate a variable
         Private IsUseCriterion As Boolean = True
+        Private HigherNPercent As Double = 0.9 'for IsCriteorion()
 
         'particles
         Private m_swarm As New List(Of clsParticle)
@@ -96,6 +97,18 @@ Namespace Optimization
         Public WriteOnly Property PARAM_IsUseCriterion As Boolean
             Set(value As Boolean)
                 Me.IsUseCriterion = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' higher N percentage particles are finished at the time of same evaluate value.
+        ''' This parameter is valid is when PARAM_IsUseCriterion is true.
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_CriterionPersent As Double
+            Set(value As Double)
+                Me.HigherNPercent = value
             End Set
         End Property
 
@@ -236,15 +249,20 @@ Namespace Optimization
                 Me.m_swarm.Sort()
                 Dim globalBestPoint As clsPoint = Me.m_swarm(0).BestPoint.Copy()
 
-
                 'check criterion
                 If Me.IsUseCriterion = True Then
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(Me.SwarmSize - 1).BestPoint) Then
+                    'higher N percentage particles are finished at the time of same evaluate value.
+                    Dim nPercentIndex As Integer = CInt(Me.m_swarm.Count * Me.HigherNPercent)
+                    If nPercentIndex = Me.m_swarm.Count Then
+                        nPercentIndex = Me.m_swarm.Count - 1
+                    End If
+
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(nPercentIndex).BestPoint) Then
                         Return True
                     End If
                 End If
 
-                Dim replaceBestCount As Integer = 0
+                'PSO process
                 For Each particle In Me.m_swarm
                     'update a velocity 
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
@@ -264,7 +282,6 @@ Namespace Optimization
                     'replace personal best
                     If particle.Point.Eval < particle.BestPoint.Eval Then
                         particle.BestPoint = particle.Point.Copy()
-                        replaceBestCount += 1 'for AIWPSO
 
                         'replace global best
                         If particle.Point.Eval < globalBestPoint.Eval Then

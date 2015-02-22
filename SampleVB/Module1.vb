@@ -16,9 +16,8 @@ Module Module1
         ' 4. Get result and evaluate.
 
         'Test
-        'CheckOptimization()
+        CheckOptimization()
         'OptimizeDeJongFunction()
-        CheckPSO()
 
         'Typical use
         With Nothing
@@ -147,35 +146,71 @@ Module Module1
     End Sub
 
     Private Sub CheckOptimization()
+        Dim DIMENSION = 5
         Dim optimization As absOptimization
-        optimization = New clsOptSteepestDescent(New clsBenchSphere(10))
+        optimization = New clsOptSteepestDescent(New clsBenchSphere(DIMENSION))
         optimization.Init()
         optimization.DoIteration()
-        clsUtil.DebugValue(optimization)
-        optimization = New clsOptNewtonMethod(New clsBenchSphere(10))
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptNewtonMethod(New clsBenchSphere(DIMENSION))
         optimization.Init()
         optimization.DoIteration()
-        clsUtil.DebugValue(optimization)
-        optimization = New clsOptNelderMead(New clsBenchSphere(10))
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptNelderMead(New clsBenchSphere(DIMENSION))
         optimization.Init()
         optimization.DoIteration()
-        clsUtil.DebugValue(optimization)
-        optimization = New clsOptNelderMeadNR(New clsBenchSphere(10))
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptNelderMeadNR(New clsBenchSphere(DIMENSION))
         optimization.Init()
         optimization.DoIteration()
-        clsUtil.DebugValue(optimization)
-        optimization = New clsOptPatternSearch(New clsBenchSphere(10))
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptPatternSearch(New clsBenchSphere(DIMENSION))
         optimization.Init()
         optimization.DoIteration()
-        clsUtil.DebugValue(optimization)
-        optimization = New clsOptRealGAREX(New clsBenchSphere(10))
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptRealGAREX(New clsBenchSphere(DIMENSION))
         optimization.Init()
         optimization.DoIteration()
-        clsUtil.DebugValue(optimization)
-        optimization = New clsOptRealGASPX(New clsBenchSphere(10))
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptRealGASPX(New clsBenchSphere(DIMENSION))
         optimization.Init()
         optimization.DoIteration()
-        clsUtil.DebugValue(optimization)
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptPSO(New clsBenchSphere(DIMENSION))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptPSOLDIW(New clsBenchSphere(DIMENSION))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptPSOChaoticIW(New clsBenchSphere(DIMENSION))
+        CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptPSOChaoticIW(New clsBenchSphere(DIMENSION))
+        CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        optimization = New clsOptPSOAIW(New clsBenchSphere(DIMENSION))
+        optimization.Init()
+        optimization.DoIteration()
+        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+        Console.WriteLine("-------------")
     End Sub
 
     Private Sub ComparisonHJNR()
@@ -341,24 +376,4 @@ Module Module1
         End With
     End Sub
 
-    Private Sub CheckPSO()
-        With Nothing
-            Dim temp = New clsOptPSO(New BenchmarkFunction.clsBenchRosenblock(2))
-            temp.Init()
-            clsUtil.DebugValue(temp)
-            While temp.DoIteration(100) = False
-                clsUtil.DebugValue(temp, ai_isOutValue:=False)
-            End While
-            clsUtil.DebugValue(temp)
-        End With
-        With Nothing
-            Dim temp = New clsOptAIWPSO(New BenchmarkFunction.clsBenchRosenblock(2))
-            temp.Init()
-            clsUtil.DebugValue(temp)
-            While temp.DoIteration(100) = False
-                clsUtil.DebugValue(temp, ai_isOutValue:=False)
-            End While
-            clsUtil.DebugValue(temp)
-        End With
-    End Sub
 End Module

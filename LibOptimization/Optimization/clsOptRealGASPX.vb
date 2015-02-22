@@ -22,6 +22,7 @@ Namespace Optimization
 #Region "Member"
         Private ReadOnly EPS As Double = 0.000000001
         Private ReadOnly IsUseEps As Boolean = True
+        Private HigherNPercent As Double = 0.7 'for IsCriteorion()
 
         'GA Parameters
         Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
@@ -82,6 +83,20 @@ Namespace Optimization
         End Sub
 #End Region
 
+#Region "Property(Parameter setting)"
+        ''' <summary>
+        ''' higher N percentage particles are finished at the time of same evaluate value.
+        ''' This parameter is valid is when PARAM_IsUseCriterion is true.
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_CriterionPersent As Double
+            Set(value As Double)
+                Me.HigherNPercent = value
+            End Set
+        End Property
+#End Region
+
 #Region "Public"
         ''' <summary>
         ''' Init
@@ -130,13 +145,14 @@ Namespace Optimization
 
                 'Check stop criterion
                 If Me.IsUseEps = True Then
-                    Dim lastIndex As Integer = CInt(m_parents.Count * 0.7)
-                    If lastIndex = Me.m_parents.Count Then
-                        lastIndex = Me.m_parents.Count - 1
+                    'higher N percentage particles are finished at the time of same evaluate value.
+                    Dim nPercentIndex As Integer = CInt(Me.m_parents.Count * Me.HigherNPercent)
+                    If nPercentIndex = Me.m_parents.Count Then
+                        nPercentIndex = Me.m_parents.Count - 1
                     End If
 
                     'Check criteorion
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(lastIndex).Eval) Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(nPercentIndex).Eval) Then
                         Return True
                     End If
                 End If
