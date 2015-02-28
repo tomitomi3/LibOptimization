@@ -16,7 +16,7 @@ Module Module1
         ' 4. Get result and evaluate.
 
         'Test
-        CheckOptimization()
+        'CheckOptimization()
         'OptimizeDeJongFunction()
 
         'Typical use
@@ -376,4 +376,67 @@ Module Module1
         End With
     End Sub
 
+    Private Sub PSOComparison(ByVal loopCount As Integer, ByVal func As absObjectiveFunction)
+        With Nothing
+            'Console.WriteLine("BasicPSO")
+            Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
+                                                           Dim optimization As New clsOptPSO(func)
+                                                           optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
+                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.Init()
+                                                           optimization.DoIteration()
+                                                           Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
+                                                           'clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+                                                       End Sub)
+        End With
+        With Nothing
+            'Console.WriteLine("LDIWPSO")
+            Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
+                                                           Dim optimization As New clsOptPSOLDIW(func)
+                                                           optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
+                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.Init()
+                                                           optimization.DoIteration()
+                                                           Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
+                                                           'clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+                                                       End Sub)
+        End With
+        With Nothing
+            'Console.WriteLine("CDIWPSO")
+            Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
+                                                           Dim optimization As New clsOptPSOChaoticIW(func)
+                                                           optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
+                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.Init()
+                                                           optimization.DoIteration()
+                                                           Console.WriteLine("{0,20}CDIW,{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
+                                                           'clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+                                                       End Sub)
+        End With
+        With Nothing
+            'Console.WriteLine("CRIWPSO")
+            Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
+                                                           Dim optimization As New clsOptPSOChaoticIW(func)
+                                                           optimization.PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
+                                                           optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
+                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.Init()
+                                                           optimization.DoIteration()
+                                                           Console.WriteLine("{0,20}CRIW,{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
+                                                           'clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+                                                       End Sub)
+        End With
+        With Nothing
+            'Console.WriteLine("AIWPSO")
+            Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
+                                                           Dim optimization As New clsOptPSOAIW(func)
+                                                           optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
+                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.Init()
+                                                           optimization.DoIteration()
+                                                           Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
+                                                           'clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+                                                       End Sub)
+        End With
+    End Sub
 End Module

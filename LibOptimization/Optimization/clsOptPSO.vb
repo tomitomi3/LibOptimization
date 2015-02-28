@@ -27,6 +27,7 @@ Namespace Optimization
 
         'particles
         Private m_swarm As New List(Of clsParticle)
+        Private m_globalBest As clsPoint = Nothing
 
         'PSO Parameters
         Private SwarmSize As Integer = 100
@@ -183,6 +184,7 @@ Namespace Optimization
 
                 'Sort Evaluate
                 Me.m_swarm.Sort()
+                Me.m_globalBest = Me.m_swarm(0).BestPoint.Copy()
 
                 'Detect HigherNPercentIndex
                 Me.HigherNPercentIndex = CInt(Me.m_swarm.Count * Me.HigherNPercent)
@@ -220,10 +222,6 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                'get global best
-                Me.m_swarm.Sort()
-                Dim globalBestPoint As clsPoint = Me.m_swarm(0).BestPoint.Copy()
-
                 'check criterion
                 If Me.IsUseCriterion = True Then
                     'higher N percentage particles are finished at the time of same evaluate value.
@@ -239,8 +237,8 @@ Namespace Optimization
                         particle.BestPoint = particle.Point.Copy()
 
                         'replace global best
-                        If particle.Point.Eval < globalBestPoint.Eval Then
-                            globalBestPoint = particle.Point.Copy()
+                        If particle.Point.Eval < Me.m_globalBest.Eval Then
+                            Me.m_globalBest = particle.Point.Copy()
                         End If
                     End If
 
@@ -250,7 +248,7 @@ Namespace Optimization
                         Dim r2 = Me.m_rand.NextDouble()
                         Dim newV = Me.Weight * particle.Velocity(i) + _
                                    C1 * r1 * (particle.BestPoint(i) - particle.Point(i)) + _
-                                   C2 * r2 * (globalBestPoint(i) - particle.Point(i))
+                                   C2 * r2 * (Me.m_globalBest(i) - particle.Point(i))
                         particle.Velocity(i) = newV
 
                         'update a position using velocity
