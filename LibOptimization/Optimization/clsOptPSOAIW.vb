@@ -202,7 +202,7 @@ Namespace Optimization
 
                 'Detect HigherNPercentIndex
                 Me.HigherNPercentIndex = CInt(Me.m_swarm.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_swarm.Count Then
+                If Me.HigherNPercentIndex = Me.m_swarm.Count OrElse Me.HigherNPercentIndex >= Me.m_swarm.Count Then
                     Me.HigherNPercentIndex = Me.m_swarm.Count - 1
                 End If
 
