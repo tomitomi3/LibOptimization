@@ -147,5 +147,17 @@ Namespace Optimization
         Public Function Copy() As clsPoint
             Return New clsPoint(Me)
         End Function
+
+        ''' <summary>
+        ''' Copy
+        ''' </summary>
+        ''' <param name="ai_point"></param>
+        ''' <remarks></remarks>
+        Public Sub Copy(ByVal ai_point As clsPoint)
+            For i As Integer = 0 To ai_point.Count - 1
+                Me(i) = ai_point(i)
+            Next
+            Me.m_evaluateValue = ai_point.Eval
+        End Sub
     End Class
 End Namespace

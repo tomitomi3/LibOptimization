@@ -328,7 +328,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result As Optimization.clsPoint
             Get
-                Return Me.m_swarm(0).Point
+                Return Me.m_swarm(0).BestPoint
             End Get
         End Property
 
