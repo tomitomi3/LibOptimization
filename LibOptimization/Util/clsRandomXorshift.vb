@@ -41,13 +41,15 @@
         Public Sub SetSeed(Optional ByVal ai_seed As UInteger = 88675123)
             '"The seed set for xor128 is four 32-bit integers x,y,z,w not all 0" by refference
 
+            'default parameter
+            x = 123456789
+            y = 362436069
+            z = 521288629
+            w = 88675123
+            t = 0
+
             If ai_seed = 88675123 Then
-                'using default parameter
-                x = 123456789
-                y = 362436069
-                z = 521288629
-                w = 88675123
-                t = 0
+                'nop (using default parameter)
             Else
                 'Init parameter
                 '全パラメータにseedの影響を与えないと初期の乱数が同じ傾向になる。8bitずつ回転左シフト
