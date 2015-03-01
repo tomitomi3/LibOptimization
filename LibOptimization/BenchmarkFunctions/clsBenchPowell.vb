@@ -7,10 +7,9 @@ Namespace BenchmarkFunction
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
-    '''  x = {0,0,0,0}
-    '''  f(x) = 0
+    '''  F(0,0,0,0) = 0
     ''' </remarks>
-    Public Class clsBenchPowellFunction : Inherits absObjectiveFunction
+    Public Class clsBenchPowell : Inherits absObjectiveFunction
         ''' <summary>
         ''' Default constructor
         ''' </summary>

@@ -3,16 +3,17 @@
 Namespace BenchmarkFunction
     ''' <summary>
     ''' Benchmark function
-    ''' Ridge Function
+    ''' Griewank function
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
-    '''  x = {0,...,0}
-    ''' 
+    '''  F(0,...,0) = 0
+    ''' Range:
+    '''  -512 to 512
     ''' Referrence:
     ''' http://mikilab.doshisha.ac.jp/dia/research/pdga/archive/doc/ga2k_performance.pdf
     ''' </remarks>
-    Public Class clsBenchRidgeFunction : Inherits absObjectiveFunction
+    Public Class clsBenchGriewank : Inherits absObjectiveFunction
         Private dimension As Integer = 0
 
         ''' <summary>
@@ -38,20 +39,15 @@ Namespace BenchmarkFunction
                 Return 0
             End If
 
-            Dim ret As Double = 0.0
+            Dim a As Double = 0.0
+            Dim b As Double = 0.0
             For i As Integer = 0 To Me.dimension - 1
-                ret += ai_var(i)
+                a += (ai_var(i) ^ 2)
+                b *= Math.Cos(ai_var(i) / Math.Sqrt(i + 1))
             Next
-            ret = ret ^ 2
-            'Sum
-            For i As Integer = 0 To 4
-                ret += ret
-            Next
-            Return ret
-        End Function
+            Dim ret As Double = a / 4000.0 - b + 1
 
-        Public Overloads Function F(ByVal ai_var() As Double) As Double
-            Return Me.F(New List(Of Double)(ai_var))
+            Return ret
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)

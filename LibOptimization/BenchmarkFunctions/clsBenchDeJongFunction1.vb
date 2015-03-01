@@ -7,7 +7,7 @@ Namespace BenchmarkFunction
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
-    '''  x = {0, 0, 0}
+    '''  F(0, 0, 0) = 0
     ''' Range
     '''  -5.12 ~ 5.12 
     ''' Refference:

@@ -6,14 +6,12 @@ Namespace BenchmarkFunction
     ''' Ackley's function
     ''' </summary>
     ''' <remarks>
-    ''' Features:
-    '''  -Multi modal.
-    ''' 
     ''' Minimum:
-    '''  x = {0,...,0}
-    ''' 
-    ''' Refference:
-    ''' [1]小林重信, "実数値GAのフロンティア"，人工知能学会誌 Vol. 24, No. 1, pp.147-162 (2009)
+    '''  F(0,...,0) = 0
+    ''' Range:
+    '''  -32.768 to 32.768
+    ''' Referrence:
+    ''' 小林重信, "実数値GAのフロンティア"，人工知能学会誌 Vol. 24, No. 1, pp.147-162 (2009)
     ''' </remarks>
     Public Class clsBenchAckley : Inherits absObjectiveFunction
         Private dimension As Integer = 0
@@ -45,7 +43,7 @@ Namespace BenchmarkFunction
             Dim b As Double = 0.0
             For i As Integer = 0 To Me.dimension - 1
                 a += ai_var(i) ^ 2
-                b += Math.Cos(2 * 3.141592653589 * ai_var(i))
+                b += Math.Cos(2 * Math.PI * ai_var(i))
             Next
             Dim ret As Double = 20 - 20 * Math.Exp(-0.2 * Math.Sqrt((1 / Me.dimension) * a)) + Math.E - Math.Exp((1 / Me.dimension) * b)
 

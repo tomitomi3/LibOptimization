@@ -6,11 +6,8 @@ Namespace BenchmarkFunction
     ''' Rosenblock function(Banana function)
     ''' </summary>
     ''' <remarks>
-    ''' Features:
-    '''  -Famous benchmark function.
-    ''' 
     ''' Minimum:
-    '''  x = {0,...,0}
+    '''  F(0,...,0) = 0
     ''' </remarks>
     Public Class clsBenchRosenblock : Inherits absObjectiveFunction
         Private dimension As Integer = 0

@@ -3,21 +3,23 @@
 Namespace BenchmarkFunction
     ''' <summary>
     ''' Benchmark function
-    ''' Rastrigin function
+    ''' Ellipsoid function
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
-    '''  x = {0,...,0}
-    ''' 
+    '''  F(0,...,0) = 0
+    ''' Range:
+    '''  -5.12 to 5.12
     ''' Referrence:
-    ''' http://mikilab.doshisha.ac.jp/dia/research/pdga/archive/doc/ga2k_performance.pdf
+    ''' 小林重信, "実数値GAのフロンティア"，人工知能学会誌 Vol. 24, No. 1, pp.147-162 (2009)
     ''' </remarks>
-    Public Class clsBenchRastriginFunction : Inherits absObjectiveFunction
+    Public Class clsBenchEllipsoid : Inherits absObjectiveFunction
         Private dimension As Integer = 0
 
         ''' <summary>
         ''' Default constructor
         ''' </summary>
+        ''' <param name="ai_dim">Set dimension</param>
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_dim As Integer)
             Me.dimension = ai_dim
@@ -38,18 +40,13 @@ Namespace BenchmarkFunction
                 Return 0
             End If
 
-            Dim A As Double = 10.0
             Dim ret As Double = 0.0
             For i As Integer = 0 To Me.dimension - 1
-                ret += ai_var(i) ^ 2 - A * Math.Cos(2 * 3.141592653589 * ai_var(i))
+                Dim temp As Double = (1000 ^ (i / (Me.dimension - 1))) * ai_var(i)
+                ret += temp ^ 2
             Next
-            ret += A
 
             Return ret
-        End Function
-
-        Public Overloads Function F(ByVal ai_var() As Double) As Double
-            Return Me.F(New List(Of Double)(ai_var))
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)

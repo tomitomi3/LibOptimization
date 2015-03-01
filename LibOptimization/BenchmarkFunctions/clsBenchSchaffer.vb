@@ -3,23 +3,22 @@
 Namespace BenchmarkFunction
     ''' <summary>
     ''' Benchmark function
-    ''' Sphere Function
+    ''' Schaffer function
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
     '''  F(0,...,0) = 0
     ''' Range:
-    '''  -5.12 to 5.12
+    '''  -100 to 100
     ''' Referrence:
-    ''' http://mikilab.doshisha.ac.jp/dia/research/pdga/archive/doc/ga2k_performance.pdf
+    ''' 小林重信, "実数値GAのフロンティア"，人工知能学会誌 Vol. 24, No. 1, pp.147-162 (2009)
     ''' </remarks>
-    Public Class clsBenchSphere : Inherits absObjectiveFunction
+    Public Class clsBenchSchaffer : Inherits absObjectiveFunction
         Private dimension As Integer = 0
 
         ''' <summary>
         ''' Default constructor
         ''' </summary>
-        ''' <param name="ai_dim">Set dimension</param>
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_dim As Integer)
             Me.dimension = ai_dim
@@ -36,34 +35,28 @@ Namespace BenchmarkFunction
                 Return 0
             End If
 
-            Dim ret As Double = 0
-            For i As Integer = 0 To Me.dimension - 1
-                ret += ai_var(i) ^ 2
+            If Me.dimension <> ai_var.Count Then
+                Return 0
+            End If
+
+            Dim ret As Double = 0.0
+            For i As Integer = 0 To Me.dimension - 2
+                ret += ((ai_var(i) ^ 2 + ai_var(i + 1) ^ 2) ^ 0.25) * (Math.Sin(50 * ((ai_var(i) ^ 2 + ai_var(i + 1) ^ 2)) ^ 0.1) ^ 2 + 1.0)
             Next
+
             Return ret
+        End Function
+
+        Public Overloads Function F(ByVal ai_var() As Double) As Double
+            Return Me.F(New List(Of Double)(ai_var))
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
-            Dim ret As New List(Of Double)
-            For i As Integer = 0 To Me.dimension - 1
-                ret.Add(2.0 * ai_var(i))
-            Next
-            Return ret
+            Throw New NotImplementedException
         End Function
 
         Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
-            Dim ret As New List(Of List(Of Double))
-            For i As Integer = 0 To Me.dimension - 1
-                ret.Add(New List(Of Double))
-                For j As Integer = 0 To Me.dimension - 1
-                    If i = j Then
-                        ret(i).Add(2.0)
-                    Else
-                        ret(i).Add(0)
-                    End If
-                Next
-            Next
-            Return ret
+            Throw New NotImplementedException
         End Function
 
         Public Overrides ReadOnly Property NumberOfVariable As Integer

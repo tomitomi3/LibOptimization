@@ -3,7 +3,7 @@
 Namespace BenchmarkFunction
     ''' <summary>
     ''' Benchmark function
-    ''' Sphere Function
+    ''' Ridge Function
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
@@ -13,13 +13,12 @@ Namespace BenchmarkFunction
     ''' Referrence:
     ''' http://mikilab.doshisha.ac.jp/dia/research/pdga/archive/doc/ga2k_performance.pdf
     ''' </remarks>
-    Public Class clsBenchSphere : Inherits absObjectiveFunction
+    Public Class clsBenchRidge : Inherits absObjectiveFunction
         Private dimension As Integer = 0
 
         ''' <summary>
         ''' Default constructor
         ''' </summary>
-        ''' <param name="ai_dim">Set dimension</param>
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_dim As Integer)
             Me.dimension = ai_dim
@@ -36,34 +35,32 @@ Namespace BenchmarkFunction
                 Return 0
             End If
 
-            Dim ret As Double = 0
+            If Me.dimension <> ai_var.Count Then
+                Return 0
+            End If
+
+            Dim ret As Double = 0.0
             For i As Integer = 0 To Me.dimension - 1
-                ret += ai_var(i) ^ 2
+                ret += ai_var(i)
+            Next
+            ret = ret ^ 2
+            'Sum
+            For i As Integer = 0 To 4
+                ret += ret
             Next
             Return ret
+        End Function
+
+        Public Overloads Function F(ByVal ai_var() As Double) As Double
+            Return Me.F(New List(Of Double)(ai_var))
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
-            Dim ret As New List(Of Double)
-            For i As Integer = 0 To Me.dimension - 1
-                ret.Add(2.0 * ai_var(i))
-            Next
-            Return ret
+            Throw New NotImplementedException
         End Function
 
         Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
-            Dim ret As New List(Of List(Of Double))
-            For i As Integer = 0 To Me.dimension - 1
-                ret.Add(New List(Of Double))
-                For j As Integer = 0 To Me.dimension - 1
-                    If i = j Then
-                        ret(i).Add(2.0)
-                    Else
-                        ret(i).Add(0)
-                    End If
-                Next
-            Next
-            Return ret
+            Throw New NotImplementedException
         End Function
 
         Public Overrides ReadOnly Property NumberOfVariable As Integer

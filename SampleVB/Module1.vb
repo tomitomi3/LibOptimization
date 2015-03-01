@@ -19,6 +19,22 @@ Module Module1
         'CheckOptimization()
         'OptimizeDeJongFunction()
 
+        Dim temp = New clsBenchSchwefel(2)
+        Dim f As Double
+        f = temp.F(New Double() {1, 1}.ToList())
+        f = temp.F(New Double() {418.9829, 418.9829}.ToList())
+
+        With Nothing
+            Dim optimization As New clsOptRealGASPX(New clsBenchPowell())
+            optimization.Init()
+            While (optimization.DoIteration(100) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+                'clsUtil.DebugValue(optimization)
+            End While
+            clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+            clsUtil.DebugValue(optimization)
+        End With
+
         'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
@@ -70,7 +86,7 @@ Module Module1
 
         'You can use other optimization algorithm.
         With Nothing
-            Dim optimization As New clsOptRealGASPX(New clsBenchRastriginFunction(20))
+            Dim optimization As New clsOptRealGASPX(New clsBenchRastrigin(20))
             optimization.Init()
             clsUtil.DebugValue(optimization)
             While True
@@ -300,7 +316,7 @@ Module Module1
     Private Sub ComplarisonRGA()
         Console.WriteLine("SPX Rastrigin 20D")
         With Nothing
-            Dim optimization As New clsOptRealGASPX(New clsBenchRastriginFunction(20))
+            Dim optimization As New clsOptRealGASPX(New clsBenchRastrigin(20))
             optimization.Init()
             Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             While (optimization.DoIteration(10) = False)
@@ -314,7 +330,7 @@ Module Module1
 
         Console.WriteLine("REX Rastrigin 20D")
         With Nothing
-            Dim optimization As New clsOptRealGAREX(New clsBenchRastriginFunction(20))
+            Dim optimization As New clsOptRealGAREX(New clsBenchRastrigin(20))
             optimization.Init()
             Console.WriteLine("{0},{1}", optimization.Result.Eval, optimization.IterationCount())
             While (optimization.DoIteration(10) = False)

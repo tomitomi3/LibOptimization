@@ -7,8 +7,7 @@ Namespace BenchmarkFunction
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
-    '''  x = {pi, pi}
-    '''  f(x) = -1
+    '''  F(PI,...,PI) = -1
     ''' </remarks>
     Public Class clsBenchEasom : Inherits absObjectiveFunction
         ''' <summary>

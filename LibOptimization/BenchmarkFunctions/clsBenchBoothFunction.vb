@@ -7,8 +7,9 @@ Namespace BenchmarkFunction
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
-    '''  x = {1,3}
-    ''' 
+    '''  F(1,3) = 0
+    ''' Range:
+    '''  -10 to 10
     ''' Referrence:
     ''' http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page816.htm
     ''' </remarks>
