@@ -86,6 +86,7 @@
     <Compile Include="BenchmarkFunctions\clsBenchSchaffer.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchSphere.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchTest.vb" />
+    <Compile Include="Optimization\clsOptNelderMeadWiki.vb" />
     <Compile Include="Optimization\clsOptPSOChaoticIW.vb" />
     <Compile Include="Optimization\clsOptPSOLDIW.vb" />
     <Compile Include="Optimization\clsOptPSOAIW.vb" />

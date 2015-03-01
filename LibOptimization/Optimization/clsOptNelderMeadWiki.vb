@@ -3,21 +3,20 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Nelder Mead Method
+    ''' Nelder Mead Method wikipedia ver
     ''' </summary>
     ''' <remarks>
     ''' Features:
     '''  -Derivative free optimization algorithm.
     '''  -Also known as "Down hill simplex" or "simplex method".
-    '''  -Implementation according to the original paper.
     ''' 
     ''' Reffrence:
-    ''' J.A.Nelder and R.Mead, "A Simplex Method for Function Minimization", The Computer Journal vol.7, 308–313 (1965)
+    ''' http://ja.wikipedia.org/wiki/Nelder-Mead%E6%B3%95
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
-    Public Class clsOptNelderMead : Inherits absOptimization
+    Public Class clsOptNelderMeadWiki : Inherits absOptimization
 #Region "Member"
         Private ReadOnly MAX_ITERATION As Integer = 5000
         Private ReadOnly EPS As Double = 0.000001
@@ -25,8 +24,8 @@ Namespace Optimization
         'Coefficient of Simplex Operator
         Private ReadOnly COEFF_Refrection As Double = 1.0
         Private ReadOnly COEFF_Expantion As Double = 2.0
-        Private ReadOnly COEFF_Contraction As Double = 0.5
-        Private ReadOnly COEFF_Shrink As Double = 2.0
+        Private ReadOnly COEFF_Contraction As Double = -0.5
+        Private ReadOnly COEFF_Shrink As Double = 0.5
 
         'This Parameter to use when generate a variable
         Private ReadOnly INIT_PARAM_RANGE As Double = 5
@@ -47,8 +46,8 @@ Namespace Optimization
         ''' <param name="ai_eps">Optional:Eps(default:1e-6)</param>
         ''' <param name="ai_coeffRefrection">Optional:Refrection coeffcient(default:1.0)</param>
         ''' <param name="ai_coeffExpantion">Optional:Expantion coeffcient(default:2.0)</param>
-        ''' <param name="ai_coeffContraction">Optional:Contraction coeffcient(default:0.5)</param>
-        ''' <param name="ai_coeffShrink">Optional:Shrink coeffcient(default:2.0)</param>
+        ''' <param name="ai_coeffContraction">Optional:Contraction coeffcient(default:-0.5)</param>
+        ''' <param name="ai_coeffShrink">Optional:Shrink coeffcient(default:0.5)</param>
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_func As absObjectiveFunction, _
                        Optional ByVal ai_randomRange As Double = 5, _
@@ -56,8 +55,8 @@ Namespace Optimization
                        Optional ByVal ai_eps As Double = 0.000001, _
                        Optional ByVal ai_coeffRefrection As Double = 1.0, _
                        Optional ByVal ai_coeffExpantion As Double = 2.0, _
-                       Optional ByVal ai_coeffContraction As Double = 0.5, _
-                       Optional ByVal ai_coeffShrink As Double = 2.0
+                       Optional ByVal ai_coeffContraction As Double = -0.5, _
+                       Optional ByVal ai_coeffShrink As Double = 0.5
                        )
             Me.m_func = ai_func
 
@@ -168,36 +167,28 @@ Namespace Optimization
                 'The following is optimization by Nelder-Mead Method.
                 '-----------------------------------------------------
                 'Calc centroid
-                Dim centroid As clsPoint = Me.GetCentroid(Me.m_points)
+                Dim centroid = Me.GetCentroid(m_points)
 
-                '1st Refrection
-                Dim refrection As clsPoint = Me.CalcRefrection(WorstPoint, centroid, Me.COEFF_Refrection)
-
-                'Simplex Operators - Refrection, Expantion, Constratction, (Shrink)
-                If refrection.Eval < BestPoint.Eval Then
-                    Dim expantion As clsPoint = Me.CalcExpantion(refrection, centroid, Me.COEFF_Expantion) 'Fig. 1 Flow diagram is constratction??
-                    If expantion.Eval < BestPoint.Eval Then
+                'Reflection
+                Dim refrection = Me.ModifySimplex(Me.WorstPoint, centroid, Me.COEFF_Refrection)
+                If BestPoint.Eval <= refrection.Eval AndAlso refrection.Eval < Worst2ndPoint.Eval Then
+                    WorstPoint = refrection
+                ElseIf refrection.Eval < BestPoint.Eval Then
+                    'Expantion
+                    Dim expantion = Me.ModifySimplex(Me.WorstPoint, centroid, Me.COEFF_Expantion)
+                    If expantion.Eval < refrection.Eval Then
                         WorstPoint = expantion
                     Else
                         WorstPoint = refrection
                     End If
                 Else
-                    If refrection.Eval > Worst2ndPoint.Eval Then
-                        If refrection.Eval > WorstPoint.Eval Then
-                            'nop
-                        Else
-                            WorstPoint = refrection
-                        End If
-                        'Contraction
-                        Dim contraction As clsPoint = Me.CalcContraction(WorstPoint, centroid, Me.COEFF_Contraction)
-                        If contraction.Eval > WorstPoint.Eval Then
-                            WorstPoint = contraction
-                        Else
-                            'Shrink
-                            Me.Shrink(Me.COEFF_Shrink)
-                        End If
+                    'Contraction
+                    Dim contraction = Me.ModifySimplex(WorstPoint, centroid, Me.COEFF_Contraction)
+                    If contraction.Eval < WorstPoint.Eval Then
+                        WorstPoint = contraction
                     Else
-                        WorstPoint = refrection
+                        'Reduction(Shrink) BestPoint以外を縮小
+                        Me.Shrink(Me.COEFF_Shrink)
                     End If
                 End If
             Next
@@ -273,90 +264,34 @@ Namespace Optimization
         End Function
 
         ''' <summary>
-        ''' Refrection
+        ''' Simplex
         ''' </summary>
         ''' <param name="ai_tgt">Target vertex</param>
         ''' <param name="ai_base">Base vertex</param>
-        ''' <param name="ai_coeff">Expantion coeffcient. Recommned value 1.0</param>
+        ''' <param name="ai_coeff">Coeffcient</param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' xr = (1 + alpha)¯x - p
         ''' </remarks>
-        Private Function CalcRefrection(ByVal ai_tgt As clsPoint, ByVal ai_base As clsPoint,
-                                        Optional ByVal ai_coeff As Double = 1.0) As clsPoint
-            Dim ret As New clsPoint(MyBase.m_func)
-
-            Dim numVar As Integer = ai_base.Count
-            For i As Integer = 0 To numVar - 1
-                Dim temp As Double = -ai_coeff * ai_tgt(i) + (1 + ai_coeff) * ai_base(i)
+        Private Function ModifySimplex(ByVal ai_tgt As clsPoint, ByVal ai_base As clsPoint, ByVal ai_coeff As Double) As clsPoint
+            Dim ret As New clsPoint(Me.m_func)
+            For i As Integer = 0 To ret.Count - 1
+                Dim temp As Double = ai_base(i) + ai_coeff * (ai_base(i) - ai_tgt(i))
                 ret(i) = temp
             Next
-
             ret.ReEvaluate()
             Return ret
         End Function
 
         ''' <summary>
-        ''' Expantion
+        ''' Shrink(Except best point)
         ''' </summary>
-        ''' <param name="ai_tgt">Target vertex</param>
-        ''' <param name="ai_base">Base vertex</param>
-        ''' <param name="ai_coeff">Expantion coeffcient. Recommned value 2.0</param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' xe = gamma * p + (1 - gamma)¯x
-        ''' </remarks>
-        Private Function CalcExpantion(ByVal ai_tgt As clsPoint, ByVal ai_base As clsPoint, _
-                                       Optional ByVal ai_coeff As Double = 2.0) As clsPoint
-            Dim ret As New clsPoint(MyBase.m_func)
-
-            Dim numVar As Integer = ai_base.Count
-            For i As Integer = 0 To numVar - 1
-                Dim temp As Double = ai_coeff * ai_tgt(i) + (1 - ai_coeff) * ai_base(i)
-                ret(i) = temp
-            Next
-
-            ret.ReEvaluate()
-            Return ret
-        End Function
-
-        ''' <summary>
-        ''' Contraction
-        ''' </summary>
-        ''' <param name="ai_tgt">Target vertex</param>
-        ''' <param name="ai_base">Base vertex</param>
-        ''' <param name="ai_coeff">Constraction coeffcient. Recommned value 0.5</param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' xc = beta * p + (1 - beta)¯x
-        ''' </remarks>
-        Private Function CalcContraction(ByVal ai_tgt As clsPoint, ByVal ai_base As clsPoint, _
-                                         Optional ByVal ai_coeff As Double = 0.5) As clsPoint
-            Dim ret As New clsPoint(MyBase.m_func)
-
-            Dim numVar As Integer = ai_base.Count
-            For i As Integer = 0 To numVar - 1
-                Dim temp As Double = -ai_coeff * ai_tgt(i) + (1 + ai_coeff) * ai_base(i)
-                ret(i) = temp
-            Next
-
-            ret.ReEvaluate()
-            Return ret
-        End Function
-
-        ''' <summary>
-        ''' Shrink(All point replace)
-        ''' </summary>
-        ''' <param name="ai_coeff">Shrink coeffcient.</param>
+        ''' <param name="ai_coeff">Shrink coeffcient</param>
         ''' <remarks>
         ''' </remarks>
-        Private Sub Shrink(Optional ByVal ai_coeff As Double = 2.0)
-            Dim numVar As Integer = Me.m_points(0).Count
-
-            Dim tempBestPoint As New clsPoint(BestPoint)
-            For i As Integer = 0 To m_points.Count - 1
-                For j As Integer = 0 To numVar - 1
-                    Dim temp As Double = (tempBestPoint(j) + m_points(i)(j)) / ai_coeff
+        Private Sub Shrink(ByVal ai_coeff As Double)
+            For i As Integer = 1 To m_points.Count - 1 'expect BestPoint
+                For j As Integer = 0 To Me.m_points(0).Count - 1
+                    Dim temp = BestPoint(j) + ai_coeff * (Me.m_points(i)(j) - BestPoint(j))
                     m_points(i)(j) = temp
                 Next
                 m_points(i).ReEvaluate()
