@@ -24,3 +24,8 @@ Requirements
 ============
 
 .NET Framework 4.0
+
+Build status
+============
+
+[![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/master?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/master)
