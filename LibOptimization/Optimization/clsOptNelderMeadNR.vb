@@ -80,17 +80,11 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides Sub Init()
             Try
-                'Init meber varibles
-                Me.m_error.Clear()
-                Me.m_iteration = 0
-                Me.m_points.Clear()
-
                 'Make simplex from random vertex
                 Dim tempSimplex()() As Double = Nothing
                 ReDim tempSimplex(MyBase.m_func.NumberOfVariable)
                 For i As Integer = 0 To tempSimplex.Length - 1
                     ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
-                    'Normal distribution
                     For j As Integer = 0 To m_func.NumberOfVariable - 1
                         tempSimplex(i)(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE
                     Next
@@ -99,46 +93,6 @@ Namespace Optimization
                 Me.Init(tempSimplex)
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
-            End Try
-        End Sub
-
-        ''' <summary>
-        ''' Init
-        ''' </summary>
-        ''' <param name="ai_initPoint">Set 1 vertex</param>
-        ''' <remarks>
-        ''' Other vertexs are made at random.
-        ''' </remarks>
-        Public Overloads Sub Init(ByVal ai_initPoint() As Double)
-            Try
-                'init meber varibles
-                Me.m_error.Clear()
-                Me.m_iteration = 0
-                Me.m_points.Clear()
-
-                'Check var
-                If ai_initPoint.Length <> Me.m_func.NumberOfVariable Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
-                    Return
-                End If
-
-                'Make simplex from random vertex
-                Dim tempSimplex()() As Double
-                ReDim tempSimplex(MyBase.m_func.NumberOfVariable)
-                tempSimplex(0) = ai_initPoint
-
-                'Generate another vertexs
-                For i As Integer = 1 To tempSimplex.Length - 1
-                    ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
-                    'Normal distribution
-                    For j As Integer = 0 To m_func.NumberOfVariable - 1
-                        tempSimplex(i)(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE
-                    Next
-                Next
-
-                Me.Init(tempSimplex)
-            Catch ex As Exception
-                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try
         End Sub
 
@@ -194,17 +148,11 @@ Namespace Optimization
                 Return True
             End If
 
+            Dim psum = Me.GetPSUM()
+
             'Do Iterate
             ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
-                'Sort Evaluate
-                m_points.Sort()
-
-                'Check criteorion
-                If clsUtil.IsCriterion(Me.EPS, m_points(0).Eval, m_points(m_points.Count - 1).Eval) Then
-                    Return True
-                End If
-
                 'Counting Iteration
                 If MAX_ITERATION <= m_iteration Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
@@ -212,49 +160,39 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                'pick Best, worst, 2nd worst
-                Dim bestVertex As clsPoint = m_points(0)
-                Dim worstVertex As clsPoint = m_points(m_points.Count - 1)
-                Dim worst2ndVertex As clsPoint = m_points(m_points.Count - 2)
-
-                'Calc centroid
-                Dim centroid As clsPoint = Me.GetCentroid(m_points)
-
-                'Refrection
-                Dim refrection As New clsPoint(centroid)
-                For i As Integer = 0 To centroid.Count - 1
-                    refrection(i) = 2.0 * centroid(i) - worstVertex(i)
-                Next
-                refrection.ReEvaluate()
-
-                'comparison of refrection and worst
-                If refrection.Eval >= worstVertex.Eval Then
-                    Dim alpha As Double = 0.5
-                    For i As Integer = 0 To centroid.Count - 1
-                        Dim temp As Double = (1.0 - alpha) * centroid(i) - refrection(i)
-                        refrection(i) = temp
-                    Next
-                    refrection.ReEvaluate()
-                End If
-                If refrection.Eval < worstVertex.Eval Then
-                    m_points(m_points.Count - 1) = refrection
+                'Check criterion
+                Me.m_points.Sort()
+                If clsUtil.IsCriterion(Me.EPS, Me.m_points(0).Eval, Me.m_points(m_points.Count - 1).Eval) Then
+                    Return True
                 End If
 
-                If refrection.Eval <= bestVertex.Eval Then
+                '-----------------------------------------------------
+                'The following is optimization by Nelder-Mead Method.
+                '-----------------------------------------------------
+                'refrection
+                Dim refrection = Me.Ametory(psum, Me.WorstPoint, -1.0)
+                If refrection.Eval <= Me.BestPoint.Eval Then
                     'Expantion
-                    Dim temp As clsPoint = Me.Ame(centroid, refrection)
-                    If temp.Eval < worstVertex.Eval Then
-                        m_points(m_points.Count - 1) = refrection
+                    Dim expantion = Me.Ametory(psum, Me.WorstPoint, 2.0)
+                    If expantion.Eval < Me.WorstPoint.Eval Then
+                        Me.WorstPoint = expantion 'replace
                     End If
-                ElseIf refrection.Eval >= worst2ndVertex.Eval Then
-                    'Contraction
-                    Dim temp As clsPoint = Me.Ame(centroid, worst2ndVertex)
-                    If temp.Eval < worstVertex.Eval Then
-                        m_points(m_points.Count - 1) = refrection
-                    End If
-                    'Shrink
-                    If refrection.Eval >= worst2ndVertex.Eval Then
-                        Me.Shrink(m_points)
+                ElseIf refrection.Eval >= Me.Worst2ndPoint.Eval Then
+                    'contraction
+                    Dim previousWorstPointEval = Me.WorstPoint.Eval
+                    Dim contraction = Me.Ametory(psum, Me.WorstPoint, 0.5)
+                    If contraction.Eval >= previousWorstPointEval Then
+                        'shrink
+                        Dim dimNum = Me.m_func.NumberOfVariable
+                        Dim pNum = Me.m_points.Count
+                        For i As Integer = 1 To pNum - 1  'expect BestPoint
+                            For j As Integer = 0 To dimNum - 1
+                                Dim temp = 0.5 * (Me.m_points(i)(j) - Me.BestPoint(j))
+                                Me.m_points(i)(j) = temp
+                            Next
+                            Me.m_points(i).ReEvaluate()
+                        Next
+                        psum = Me.GetPSUM()
                     End If
                 End If
             Next
@@ -263,26 +201,35 @@ Namespace Optimization
         End Function
 
         ''' <summary>
-        ''' Contraction, Expantion
+        ''' Refrection, Expantion, Contraction
         ''' </summary>
-        ''' <param name="ai_base1"></param>
-        ''' <param name="ai_base2"></param>
+        ''' <param name="psum"></param>
+        ''' <param name="p"></param>
+        ''' <param name="fac"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function Ame(ByVal ai_base1 As clsPoint, ByVal ai_base2 As clsPoint) As clsPoint
-            Dim fac As Double = -1.0
-            Dim fac1 As Double = (1.0 - fac) / ai_base1.Eval
-            Dim fac2 As Double = fac1 - fac
+        Private Function Ametory(ByVal psum As clsPoint, ByVal p As clsPoint, ByVal fac As Double) As clsPoint
+            Dim temp As New clsPoint(Me.m_func)
+            Dim fac1 = (1.0 - fac) / Me.m_func.NumberOfVariable
+            Dim fac2 = fac1 - fac
 
-            Dim ref As New clsPoint(ai_base1)
-            For i As Integer = 0 To ai_base2.Count - 1
-                ref(i) = ai_base1(i) * fac1 - ai_base2(i) * fac2
+            For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                temp(i) = psum(i) * fac1 - p(i) * fac2
             Next
-            ref.ReEvaluate()
+            temp.ReEvaluate()
 
-            Return ref
+            If temp.Eval < p.Eval Then
+                For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                    psum(i) += temp(i) - p(i)
+                    p(i) = temp(i)
+                Next
+                psum.ReEvaluate()
+                p.ReEvaluate()
+            End If
+
+            Return temp
         End Function
-
+        
         ''' <summary>
         ''' Best result
         ''' </summary>
@@ -293,6 +240,24 @@ Namespace Optimization
                 Return Me.BestPoint
             End Get
         End Property
+
+        ''' <summary>
+        ''' Get recent error infomation
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetLastErrorInfomation() As clsError.clsErrorInfomation
+            Return Me.m_error.GetLastErrorInfomation()
+        End Function
+
+        ''' <summary>
+        ''' Get recent error
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function IsRecentError() As Boolean
+            Return Me.m_error.IsError()
+        End Function
 
         ''' <summary>
         ''' All Result
@@ -310,25 +275,14 @@ Namespace Optimization
 #End Region
 
 #Region "Private Methods"
-        ''' <summary>
-        ''' Calc Centroid
-        ''' </summary>
-        ''' <param name="ai_vertexs"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function GetCentroid(ByVal ai_vertexs As List(Of clsPoint)) As clsPoint
-            Dim ret As New clsPoint(ai_vertexs(0))
 
-            Dim numVar As Integer = ai_vertexs(0).Count
-            For i As Integer = 0 To numVar - 1
-                Dim temp As Double = 0.0
-                For numVertex As Integer = 0 To ai_vertexs.Count - 2 'Except Worst
-                    temp += ai_vertexs(numVertex)(i)
+        Private Function GetPSUM() As clsPoint
+            Dim ret As New clsPoint(Me.m_func)
+            For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                For j As Integer = 0 To Me.m_points.Count - 1
+                    ret(i) += Me.m_points(j)(i)
                 Next
-                ret(i) = temp / (ai_vertexs.Count - 1)
             Next
-
-            ret.ReEvaluate()
             Return ret
         End Function
 
@@ -354,26 +308,6 @@ Namespace Optimization
             Next
         End Sub
 
-        ''' <summary>
-        ''' Get recent error infomation
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function GetLastErrorInfomation() As clsError.clsErrorInfomation
-            Return Me.m_error.GetLastErrorInfomation()
-        End Function
-
-        ''' <summary>
-        ''' Get recent error
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Overrides Function IsRecentError() As Boolean
-            Return Me.m_error.IsError()
-        End Function
-#End Region
-
-#Region "Property"
         Private Property BestPoint() As clsPoint
             Get
                 Return Me.m_points(0)
@@ -400,21 +334,6 @@ Namespace Optimization
                 Me.m_points(m_points.Count - 2) = value
             End Set
         End Property
-
-        ''' <summary>
-        ''' All Result
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' for Debug, Experiment
-        ''' </remarks>
-        Public ReadOnly Property AllResult() As List(Of clsPoint)
-            Get
-                Return Me.m_points
-            End Get
-        End Property
 #End Region
     End Class
-
 End Namespace
