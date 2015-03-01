@@ -142,7 +142,7 @@ Namespace Optimization
 
                 'Detect HigherNPercentIndex
                 Me.HigherNPercentIndex = CInt(Me.m_parents.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_parents.Count Then
+                If Me.HigherNPercentIndex = Me.m_parents.Count OrElse Me.HigherNPercentIndex >= Me.m_parents.Count Then
                     Me.HigherNPercentIndex = Me.m_parents.Count - 1
                 End If
 
