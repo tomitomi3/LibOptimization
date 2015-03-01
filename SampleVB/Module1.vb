@@ -19,22 +19,6 @@ Module Module1
         'CheckOptimization()
         'OptimizeDeJongFunction()
 
-        Dim temp = New clsBenchSchwefel(2)
-        Dim f As Double
-        f = temp.F(New Double() {1, 1}.ToList())
-        f = temp.F(New Double() {418.9829, 418.9829}.ToList())
-
-        With Nothing
-            Dim optimization As New clsOptRealGASPX(New clsBenchPowell())
-            optimization.Init()
-            While (optimization.DoIteration(100) = False)
-                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-                'clsUtil.DebugValue(optimization)
-            End While
-            clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
-            clsUtil.DebugValue(optimization)
-        End With
-
         'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
@@ -162,71 +146,141 @@ Module Module1
     End Sub
 
     Private Sub CheckOptimization()
-        Dim DIMENSION = 5
-        Dim optimization As absOptimization
-        optimization = New clsOptSteepestDescent(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+        Dim tgtFunction As absObjectiveFunction = New clsBenchSphere(5)
+        With Nothing
+            Dim DIMENSION = 5
+            Dim optimization As absOptimization
+            optimization = New clsOptSteepestDescent(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptNewtonMethod(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptNewtonMethod(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptNelderMead(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptNelderMead(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptNelderMeadNR(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptNelderMeadWiki(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptPatternSearch(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptPatternSearch(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptRealGAREX(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptRealGAREX(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptRealGASPX(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptRealGASPX(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptPSO(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptPSO(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptPSOLDIW(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptPSOLDIW(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptPSOChaoticIW(New clsBenchSphere(DIMENSION))
-        CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptPSOChaoticIW(tgtFunction)
+            CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptPSOChaoticIW(New clsBenchSphere(DIMENSION))
-        CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptPSOChaoticIW(tgtFunction)
+            CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-        optimization = New clsOptPSOAIW(New clsBenchSphere(DIMENSION))
-        optimization.Init()
-        optimization.DoIteration()
-        clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            optimization = New clsOptPSOAIW(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+        End With
 
         Console.WriteLine("-------------")
+
+        tgtFunction = New clsBenchRosenblock(5)
+        With Nothing
+            Dim DIMENSION = 5
+            Dim optimization As absOptimization
+            optimization = New clsOptSteepestDescent(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptNewtonMethod(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptNelderMead(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptNelderMeadWiki(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptPatternSearch(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptRealGAREX(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptRealGASPX(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptPSO(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptPSOLDIW(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptPSOChaoticIW(tgtFunction)
+            CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptPSOChaoticIW(tgtFunction)
+            CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptPSOAIW(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+        End With
     End Sub
 
     Private Sub ComparisonHJNR()
@@ -243,7 +297,7 @@ Module Module1
         Console.WriteLine("Nelder-Mead - MovePoint")
         With Nothing
             Dim optimization As New clsOptNelderMead(New clsBenchRosenblock(2))
-            optimization.Init(New Double() {-1, 1})
+            optimization.Init()
             Console.WriteLine("{0},{1},{2}", optimization.Result.Eval, optimization.Result(0), optimization.Result(1))
             While (optimization.DoIteration(10) = False)
                 Console.WriteLine("{0},{1},{2}", optimization.Result.Eval, optimization.Result(0), optimization.Result(1))
