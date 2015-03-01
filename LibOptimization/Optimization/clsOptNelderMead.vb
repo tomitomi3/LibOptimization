@@ -80,11 +80,6 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides Sub Init()
             Try
-                'Init meber varibles
-                Me.m_error.Clear()
-                Me.m_iteration = 0
-                Me.m_points.Clear()
-
                 'Make simplex from random vertex
                 Dim tempSimplex()() As Double = Nothing
                 ReDim tempSimplex(MyBase.m_func.NumberOfVariable)
@@ -98,46 +93,6 @@ Namespace Optimization
                 Me.Init(tempSimplex)
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
-            End Try
-        End Sub
-
-        ''' <summary>
-        ''' Init
-        ''' </summary>
-        ''' <param name="ai_initPoint">Set 1 vertex</param>
-        ''' <remarks>
-        ''' Other vertexs are made at random.
-        ''' </remarks>
-        Public Overloads Sub Init(ByVal ai_initPoint() As Double)
-            Try
-                'init meber varibles
-                Me.m_error.Clear()
-                Me.m_iteration = 0
-                Me.m_points.Clear()
-
-                'Check var
-                If ai_initPoint.Length <> Me.m_func.NumberOfVariable Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
-                    Return
-                End If
-
-                'Make simplex from random vertex
-                Dim tempSimplex()() As Double
-                ReDim tempSimplex(MyBase.m_func.NumberOfVariable)
-                tempSimplex(0) = ai_initPoint
-
-                'Generate another vertexs
-                For i As Integer = 1 To tempSimplex.Length - 1
-                    ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
-                    'Normal distribution
-                    For j As Integer = 0 To m_func.NumberOfVariable - 1
-                        tempSimplex(i)(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE
-                    Next
-                Next
-
-                Me.Init(tempSimplex)
-            Catch ex As Exception
-                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try
         End Sub
 
@@ -196,20 +151,18 @@ Namespace Optimization
             'Do Iterate
             ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
-                'Sort Evaluate
-                m_points.Sort()
-
-                'Check criteorion
-                If clsUtil.IsCriterion(Me.EPS, m_points(0).Eval, m_points(m_points.Count - 1).Eval) Then
-                    Return True
-                End If
-
                 'Counting Iteration
                 If MAX_ITERATION <= m_iteration Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1
+
+                'Check criterion
+                m_points.Sort()
+                If clsUtil.IsCriterion(Me.EPS, m_points(0).Eval, m_points(m_points.Count - 1).Eval) Then
+                    Return True
+                End If
 
                 '-----------------------------------------------------
                 'The following is optimization by Nelder-Mead Method.
@@ -262,6 +215,24 @@ Namespace Optimization
                 Return Me.BestPoint
             End Get
         End Property
+
+        ''' <summary>
+        ''' Get recent error infomation
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetLastErrorInfomation() As clsError.clsErrorInfomation
+            Return Me.m_error.GetLastErrorInfomation()
+        End Function
+
+        ''' <summary>
+        ''' Get recent error
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function IsRecentError() As Boolean
+            Return Me.m_error.IsError()
+        End Function
 
         ''' <summary>
         ''' All Result
@@ -391,24 +362,6 @@ Namespace Optimization
                 m_points(i).ReEvaluate()
             Next
         End Sub
-
-        ''' <summary>
-        ''' Get recent error infomation
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function GetLastErrorInfomation() As clsError.clsErrorInfomation
-            Return Me.m_error.GetLastErrorInfomation()
-        End Function
-
-        ''' <summary>
-        ''' Get recent error
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Overrides Function IsRecentError() As Boolean
-            Return Me.m_error.IsError()
-        End Function
 #End Region
 
 #Region "Property(Private)"

@@ -130,7 +130,7 @@ Namespace Util
                 Return True
             End If
 
-            'check criteorion
+            'check criterion
             Dim temp = 2.0 * Math.Abs(ai_comparisonB - ai_comparisonA) / denominator
             If temp < ai_eps Then
                 Return True

@@ -20,7 +20,7 @@ Namespace Optimization
         Private MAX_ITERATION As Integer = 20000
         Private INIT_PARAM_RANGE As Double = 5.12 'This Parameter to use when generate a variable
         Private IsUseCriterion As Boolean = True
-        Private HigherNPercent As Double = 0.9 'for IsCriteorion()
+        Private HigherNPercent As Double = 0.9 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
 
         'particles

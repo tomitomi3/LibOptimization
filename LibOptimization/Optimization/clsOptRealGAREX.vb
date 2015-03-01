@@ -22,7 +22,7 @@ Namespace Optimization
 #Region "Member"
         Private ReadOnly EPS As Double = 0.000000001
         Private ReadOnly IsUseCriterion As Boolean = True
-        Private HigherNPercent As Double = 0.7 'for IsCriteorion()
+        Private HigherNPercent As Double = 0.7 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
 
         'GA Parameters
