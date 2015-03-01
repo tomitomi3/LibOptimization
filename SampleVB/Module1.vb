@@ -6,10 +6,10 @@ Imports LibOptimization.BenchmarkFunction
 Module Module1
     Sub Main()
         'Sample code.
-        'LibOptimization is collection of optimization algorithm for .NET Framework.
-        'LibOptimization simplifies Optimization.
+        'LibOptimization is optimization algorithm library for .NET Framework. 
+        'Maybe simplify the optimization by using this.
 
-        'Easy to use
+        'How to use
         ' 1. You inherit "absObjectiveFunction" class and design objective function.
         ' 2. Choose an optimization method and implement code.
         ' 3. Do optimization!
