@@ -138,5 +138,17 @@ Namespace Util
                 Return False
             End If
         End Function
+
+        ''' <summary>
+        ''' Random generator helper
+        ''' </summary>
+        ''' <param name="oRand"></param>
+        ''' <param name="ai_min"></param>
+        ''' <param name="ai_max"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function GenRandomRange(ByVal oRand As System.Random, ByVal ai_min As Double, ByVal ai_max As Double) As Double
+            Return Math.Abs(ai_max - ai_min) * oRand.NextDouble() + ai_min
+        End Function
     End Class
 End Namespace

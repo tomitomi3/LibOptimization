@@ -4,36 +4,33 @@ Imports LibOptimization.MathUtil
 Namespace Optimization
     ''' <summary>
     ''' Real-coded Genetic Algorithm
-    ''' REX + JGG
+    ''' BLX-Alpha + JGG
     ''' </summary>
     ''' <remarks>
     ''' Features:
     '''  -Derivative free optimization algorithm.
-    '''  -Cross over algorithm is SPX(Simplex Cross over).
     '''  -Alternation of generation algorithm is JGG.
     ''' 
     ''' Refference:
-    ''' 樋口 隆英, 筒井 茂義, 山村 雅幸, "実数値GAにおけるシンプレクス交叉", 人工知能学会論文誌Vol. 16 (2001) No. 1 pp.147-155
+    ''' 北野 宏明 (編集), 遺伝的アルゴリズム 4, 産業図書出版株式会社, 2000年 初版, p261
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
-    Public Class clsOptRealGASPX : Inherits absOptimization
+    Public Class clsOptRealGABLX : Inherits absOptimization
 #Region "Member"
-        Private ReadOnly EPS As Double = 0.000000001
-        Private ReadOnly IsUseCriterion As Boolean = True
+        'Common settings
+        Private EPS As Double = 0.000000001
+        Private IsUseCriterion As Boolean = True
         Private HigherNPercent As Double = 0.7 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
+        Private MAX_ITERATION As Integer = 10000 'generation
+        Private INIT_PARAM_RANGE As Double = 5 'parameter range
 
         'GA Parameters
-        Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
-        Private ReadOnly POPULATION_SIZE As Integer = 1000
-        Private ReadOnly CHILDS_SIZE As Integer = 100
-
-        'This Parameter to use when generate a variable
-        Private ReadOnly INIT_PARAM_RANGE As Double = 5
-
-        'Parent
+        Private POPULATION_SIZE As Integer = 100
+        Private CHILDS_SIZE As Integer = 100
+        Private Alpha As Double = 0.5
         Private m_parents As New List(Of clsPoint)
 
         'ErrorManage
@@ -45,46 +42,40 @@ Namespace Optimization
         ''' Constructor
         ''' </summary>
         ''' <param name="ai_func">Optimize Function</param>
-        ''' <param name="ai_randomRange">Optional:random range(Default: 10 => -10 to 10)</param>
-        ''' <param name="ai_generation">Optional:Generation(Default: 10000)</param>
-        ''' <param name="ai_eps">Optional:Eps(Default:1e-8)</param>
-        ''' <param name="ai_isUseEps">Optional:Use criterion(Default: true)</param>
-        ''' <param name="ai_populationSize">Optional:Population size(0 is n*8)</param>
-        ''' <param name="ai_childsSize">Optional:Childs size(0 is n*6)</param>
         ''' <remarks>
         ''' "n" is function dimension.
         ''' </remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction, _
-                       Optional ByVal ai_randomRange As Double = 10, _
-                       Optional ByVal ai_generation As Integer = 10000, _
-                       Optional ByVal ai_eps As Double = 0.000000001, _
-                       Optional ByVal ai_isUseEps As Boolean = True, _
-                       Optional ByVal ai_populationSize As Integer = 0, _
-                       Optional ByVal ai_childsSize As Integer = 0)
+        Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
 
-            Me.INIT_PARAM_RANGE = ai_randomRange
-
-            Me.MAX_ITERATION = ai_generation
-
-            Me.EPS = ai_eps
-            Me.IsUseCriterion = ai_isUseEps
-
-            If ai_populationSize = 0 Then
-                Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 33
-            Else
-                Me.POPULATION_SIZE = ai_populationSize
-            End If
-
-            If ai_childsSize = 0 Then
-                Me.CHILDS_SIZE = Me.m_func.NumberOfVariable * 10
-            Else
-                Me.CHILDS_SIZE = ai_childsSize
-            End If
+            Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 50
+            Me.CHILDS_SIZE = Me.m_func.NumberOfVariable * 20
         End Sub
 #End Region
 
 #Region "Property(Parameter setting)"
+        ''' <summary>
+        ''' epsilon(Default:1e-8)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_EPS As Double
+            Set(value As Double)
+                Me.EPS = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Use criterion
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_IsUseCriterion As Boolean
+            Set(value As Boolean)
+                Me.IsUseCriterion = value
+            End Set
+        End Property
+
         ''' <summary>
         ''' higher N percentage particles are finished at the time of same evaluate value.
         ''' This parameter is valid is when PARAM_IsUseCriterion is true.
@@ -94,6 +85,61 @@ Namespace Optimization
         Public WriteOnly Property PARAM_CriterionPersent As Double
             Set(value As Double)
                 Me.HigherNPercent = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Max iteration count
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_MAX_ITERATION As Integer
+            Set(value As Integer)
+                Me.MAX_ITERATION = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Range of initial value
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_InitRange As Double
+            Set(value As Double)
+                Me.INIT_PARAM_RANGE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Population Size
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_PopulationSize As Integer
+            Set(value As Integer)
+                Me.POPULATION_SIZE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Child size
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_ChildSize As Integer
+            Set(value As Integer)
+                Me.CHILDS_SIZE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Alpha is expantion ratio(Default:0.5)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_Alpha As Integer
+            Set(value As Integer)
+                Me.Alpha = value
             End Set
         End Property
 #End Region
@@ -150,7 +196,7 @@ Namespace Optimization
                 'Sort Evaluate
                 Me.m_parents.Sort()
 
-                'check criterion
+                'Check criterion
                 If Me.IsUseCriterion = True Then
                     'higher N percentage particles are finished at the time of same evaluate value.
                     If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(Me.HigherNPercentIndex).Eval) Then
@@ -159,25 +205,49 @@ Namespace Optimization
                 End If
 
                 'Counting generation
-                If MAX_ITERATION <= m_iteration Then
+                If Me.MAX_ITERATION <= Me.m_iteration Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1
 
-                'SPX with JGG
-                'Parent is n+1
-                Dim parents As List(Of KeyValuePair(Of Integer, clsPoint)) = Me.SelectParent(Me.m_parents, Me.m_func.NumberOfVariable + 1)
+                'BLX-alpha cross-over
+                'Pick parent
+                Dim p1Index As Integer = CInt(Me.m_parents.Count * Me.m_rand.NextDouble())
+                Dim p2Index As Integer = CInt(Me.m_parents.Count * Me.m_rand.NextDouble())
+                If p1Index >= Me.m_parents.Count Then
+                    p1Index -= 1
+                End If
+                If p2Index >= Me.m_parents.Count Then
+                    p2Index -= 1
+                End If
+                Dim p1 = Me.m_parents(p1Index)
+                Dim p2 = Me.m_parents(p2Index)
 
-                'Crossover
-                Dim childs As List(Of clsPoint) = Me.CrossOverSPX(Me.CHILDS_SIZE, parents)
-
-                'Replace
-                Dim index As Integer = 0
-                For Each p As KeyValuePair(Of Integer, clsPoint) In parents
-                    Me.m_parents(p.Key) = childs(index)
-                    index += 1
+                'cross over
+                Dim child As New List(Of clsPoint)
+                For numChild As Integer = 0 To Me.CHILDS_SIZE - 1
+                    child.Add(New clsPoint(Me.m_func))
+                    For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                        Dim range As Double = Math.Abs(p1(i) - p2(i))
+                        Dim min As Double = 0
+                        Dim max As Double = 0
+                        If p1(i) > p2(i) Then
+                            min = p2(i)
+                            max = p1(i)
+                        Else
+                            min = p1(i)
+                            max = p2(i)
+                        End If
+                        child(numChild)(i) = clsUtil.GenRandomRange(Me.m_rand, min - Me.Alpha * range, max + Me.Alpha * range)
+                    Next
+                    child(numChild).ReEvaluate()
                 Next
+
+                'replace(JGG)
+                child.Sort()
+                Me.m_parents(p1Index) = child(0)
+                Me.m_parents(p2Index) = child(1)
             Next
 
             Return False
@@ -216,70 +286,6 @@ Namespace Optimization
         End Sub
 
         ''' <summary>
-        ''' Select Parent
-        ''' </summary>
-        ''' <param name="ai_population"></param>
-        ''' <param name="ai_parentSize"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function SelectParent(ByVal ai_population As List(Of clsPoint), ByVal ai_parentSize As Integer) As List(Of KeyValuePair(Of Integer, clsPoint))
-            Dim ret As New List(Of KeyValuePair(Of Integer, clsPoint))
-
-            'Index
-            Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(ai_population.Count)
-
-            'PickParents
-            For i As Integer = 0 To ai_parentSize - 1
-                ret.Add(New KeyValuePair(Of Integer, clsPoint)(randIndex(i), ai_population(randIndex(i))))
-            Next
-
-            Return ret
-        End Function
-
-        ''' <summary>
-        ''' Simplex Crossover
-        ''' </summary>
-        ''' <param name="ai_childSize"></param>
-        ''' <param name="ai_parents"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function CrossOverSPX(ByVal ai_childSize As Integer, _
-                             ByVal ai_parents As List(Of KeyValuePair(Of Integer, clsPoint))) As List(Of clsPoint)
-            'Calc Centroid
-            Dim xg As New clsShoddyVector(MyBase.m_func.NumberOfVariable)
-            For Each p As KeyValuePair(Of Integer, clsPoint) In ai_parents
-                xg += p.Value
-            Next
-            xg /= ai_parents.Count 'sum(xi)/(n+k)
-
-            'SPX
-            Dim retChilds As New List(Of clsPoint)
-            Dim alpha As Double = Math.Sqrt(MyBase.m_func.NumberOfVariable + 2) 'expantion rate
-            For i As Integer = 0 To ai_childSize - 1
-                Dim cVector As New List(Of clsShoddyVector)
-                Dim pVector As New List(Of clsShoddyVector)
-                Dim k As Integer = 0
-                For Each xi As KeyValuePair(Of Integer, clsPoint) In ai_parents
-                    pVector.Add(xg + alpha * (xi.Value - xg))
-
-                    If k = 0 Then
-                        cVector.Add(New clsShoddyVector(MyBase.m_func.NumberOfVariable)) 'all zero
-                    Else
-                        Dim rk As Double = m_rand.NextDouble() ^ (1 / k)
-                        cVector.Add(rk * (pVector(k - 1) - pVector(k) + cVector(k - 1)))
-                    End If
-                    k += 1
-                Next
-                Dim temp As clsShoddyVector = pVector(pVector.Count - 1) + cVector(cVector.Count - 1)
-
-                retChilds.Add(New clsPoint(MyBase.m_func, temp))
-            Next
-            retChilds.Sort()
-
-            Return retChilds
-        End Function
-
-        ''' <summary>
         ''' Best result
         ''' </summary>
         ''' <returns>Best point class</returns>
@@ -313,9 +319,5 @@ Namespace Optimization
             End Get
         End Property
 #End Region
-
-#Region "Private Methods"
-#End Region
     End Class
-
 End Namespace
