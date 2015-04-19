@@ -163,7 +163,7 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
             Get
-                Throw New NotImplementedException
+                Return Nothing
             End Get
         End Property
 

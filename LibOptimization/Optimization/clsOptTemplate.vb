@@ -108,7 +108,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property ResultForDebug As List(Of Optimization.clsPoint)
             Get
-                Throw New NotImplementedException()
+                Return Nothing
             End Get
         End Property
 #End Region
