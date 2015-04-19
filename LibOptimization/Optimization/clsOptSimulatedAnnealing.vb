@@ -6,9 +6,14 @@ Namespace Optimization
     ''' Simulated Annealing
     ''' </summary>
     ''' <remarks>
+    ''' Features:
+    '''  -Randomized algorithm for optimization.
     ''' 
-    ''' Refference:
-    ''' A. CORANA, M. MARCHESI, C. MARTINI, and S. RIDELLA, "Minimizing multimodal functions of continuous variables with the “simulated annealing” algorithm: Corrigenda for this article is available", ACM Transactions on Mathematical Software (TOMS) TOMS Homepage archive, Volume 13 Issue 3, Sept. 1987, pp262-280
+    ''' Reffrence:
+    ''' http://ja.wikipedia.org/wiki/%E7%84%BC%E3%81%8D%E3%81%AA%E3%81%BE%E3%81%97%E6%B3%95
+    ''' 
+    ''' Implment:
+    ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
     Public Class clsOptSimulatedAnnealing : Inherits absOptimization
 #Region "Member"
@@ -25,8 +30,8 @@ Namespace Optimization
         Private m_point As clsPoint = Nothing
 
         'Simulated Annealing Parameters
-        Private COOLING_RATIO As Double = 0.995 '0.5%
-        Private NEIGHBOR_RANGE As Double = 0.01
+        Private COOLING_RATIO As Double = 0.9995 '0.1%
+        Private NEIGHBOR_RANGE As Double = 0.1
         Private TEMPERTURE As Double = 5000.0
 #End Region
 
@@ -72,6 +77,42 @@ Namespace Optimization
         Public WriteOnly Property PARAM_InitRange As Double
             Set(value As Double)
                 Me.INIT_PARAM_RANGE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' cooling ratio
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_COOLINGRATIO As Double
+            Set(value As Double)
+                Me.COOLING_RATIO = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' neighbor range
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_NEIGHBOR_RANGE As Double
+            Set(value As Double)
+                Me.NEIGHBOR_RANGE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' TEMPERTURE
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public Property PARAM_TEMPERTURE As Double
+            Get
+                Return Me.TEMPERTURE
+            End Get
+            Set(value As Double)
+                Me.TEMPERTURE = value
             End Set
         End Property
 #End Region
@@ -133,14 +174,18 @@ Namespace Optimization
                 If evalNew < evalNow Then
                     r1 = 1.0
                 Else
-                    r1 = Math.Exp((evalNow - evalNew) / TEMPERTURE)
+                    Dim delta = evalNow - evalNew
+                    r1 = Math.Exp(delta / TEMPERTURE)
                 End If
                 If r1 >= r2 Then
                     Me.m_point = temp
                 End If
+                'Console.WriteLine("Random:{0:F5},{1:F5},{2:F5},{3:F5},{4:F5}", r1, r2, TEMPERTURE, delta, evalNow)
 
                 'cooling
-                Me.TEMPERTURE *= Me.COOLING_RATIO
+                If Me.TEMPERTURE > 10.0 Then
+                    Me.TEMPERTURE *= Me.COOLING_RATIO
+                End If
             Next
 
             Return False
@@ -175,7 +220,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property ResultForDebug As List(Of Optimization.clsPoint)
             Get
-                Throw New NotImplementedException()
+                Return Nothing
             End Get
         End Property
 #End Region
