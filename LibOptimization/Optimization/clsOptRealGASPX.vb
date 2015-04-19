@@ -4,12 +4,12 @@ Imports LibOptimization.MathUtil
 Namespace Optimization
     ''' <summary>
     ''' Real-coded Genetic Algorithm
-    ''' REX + JGG
+    ''' SPX(Simplex Crossover) + JGG
     ''' </summary>
     ''' <remarks>
     ''' Features:
     '''  -Derivative free optimization algorithm.
-    '''  -Cross over algorithm is SPX(Simplex Cross over).
+    '''  -Cross over algorithm is SPX(Simplex Crossover).
     '''  -Alternation of generation algorithm is JGG.
     ''' 
     ''' Refference:

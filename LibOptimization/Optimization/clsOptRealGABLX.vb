@@ -12,7 +12,7 @@ Namespace Optimization
     '''  -Alternation of generation algorithm is JGG.
     ''' 
     ''' Refference:
-    ''' 北野 宏明 (編集), 遺伝的アルゴリズム 4, 産業図書出版株式会社, 2000年 初版, p261
+    ''' 北野宏明 (編集), "遺伝的アルゴリズム 4", 産業図書出版株式会社, 2000年初版
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)

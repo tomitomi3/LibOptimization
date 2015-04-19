@@ -4,7 +4,7 @@ Imports LibOptimization.MathUtil
 Namespace Optimization
     ''' <summary>
     ''' Real-coded Genetic Algorithm
-    ''' SPX + JGG
+    ''' REX(Real-coded Ensemble Crossover) + JGG
     ''' </summary>
     ''' <remarks>
     ''' Features:
