@@ -4,43 +4,33 @@ Imports LibOptimization.MathUtil
 Namespace Optimization
     ''' <summary>
     ''' Real-coded Genetic Algorithm
-    ''' REX(Real-coded Ensemble Crossover) + JGG
+    ''' UNDX(Unimodal Normal Distribution Crossover)
     ''' </summary>
     ''' <remarks>
     ''' Features:
     '''  -Derivative free optimization algorithm.
-    '''  -Cross over algorithm is REX(Real-coded Ensemble Cross over).
     '''  -Alternation of generation algorithm is JGG.
     ''' 
     ''' Refference:
-    ''' 小林重信, "実数値GAのフロンティア"，人工知能学会誌 Vol. 24, No. 1, pp.147-162 (2009)
+    ''' 北野 宏明 (編集), 遺伝的アルゴリズム 4, 産業図書出版株式会社, 2000年 初版, p261
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
-    Public Class clsOptRealGAREX : Inherits absOptimization
+    Public Class clsOptRealGAUNDX : Inherits absOptimization
 #Region "Member"
-        Private ReadOnly EPS As Double = 0.000000001
-        Private ReadOnly IsUseCriterion As Boolean = True
+        'Common settings
+        Private EPS As Double = 0.000000001
+        Private IsUseCriterion As Boolean = True
         Private HigherNPercent As Double = 0.7 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
+        Private MAX_ITERATION As Integer = 10000 'generation
+        Private INIT_PARAM_RANGE As Double = 5 'parameter range
 
         'GA Parameters
-        Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
-        Private ReadOnly POPULATION_SIZE As Integer = 1000
-        Private ReadOnly PARENT_SIZE As Integer = 100 'REX(phi, n+k) -> n+1<n+k<npop
-        Private ReadOnly CHILDREN_SIZE As Integer = 100
-        Private ReadOnly REX_RAND As REX_RANDMODE = REX_RANDMODE.UNIFORM
-
-        'This Parameter to use when generate a variable
-        Private ReadOnly INIT_PARAM_RANGE As Double = 5
-
-        Public Enum REX_RANDMODE
-            UNIFORM
-            NORMAL_DIST
-        End Enum
-
-        'Parent
+        Private POPULATION_SIZE As Integer = 100
+        Private CHILDREN_SIZE As Integer = 100
+        Private SD As Double = 0.70710678
         Private m_parents As New List(Of clsPoint)
 
         'ErrorManage
@@ -52,58 +42,41 @@ Namespace Optimization
         ''' Constructor
         ''' </summary>
         ''' <param name="ai_func">Optimize Function</param>
-        ''' <param name="ai_randomRange">Optional:random range(Default: 10 => -10 to 10)</param>
-        ''' <param name="ai_generation">Optional:Generation(Default: 10000)</param>
-        ''' <param name="ai_eps">Optional:Eps(Default:1e-8)</param>
-        ''' <param name="ai_isUseEps">Optional:Use criterion(Default: true)</param>
-        ''' <param name="ai_populationSize">Optional:Population size(0 is n*8)</param>
-        ''' <param name="ai_parentsSize">Optional:Parents size(0 is n+1)</param>
-        ''' <param name="ai_REXRandomMode">Optional:REX(phi) Uniform or ND(default: Uniform)</param>
-        ''' <param name="ai_childsSize">Optional:Childs size(0 is n*6)</param>
         ''' <remarks>
         ''' "n" is function dimension.
         ''' </remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction, _
-                       Optional ByVal ai_randomRange As Double = 10, _
-                       Optional ByVal ai_generation As Integer = 10000, _
-                       Optional ByVal ai_eps As Double = 0.000000001, _
-                       Optional ByVal ai_isUseEps As Boolean = True, _
-                       Optional ByVal ai_populationSize As Integer = 0, _
-                       Optional ByVal ai_parentsSize As Integer = 0, _
-                       Optional ByVal ai_REXRandomMode As REX_RANDMODE = REX_RANDMODE.UNIFORM, _
-                       Optional ByVal ai_childsSize As Integer = 0)
+        Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
 
-            Me.INIT_PARAM_RANGE = ai_randomRange
+            Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 33
+            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 10
 
-            Me.MAX_ITERATION = ai_generation
-
-            Me.EPS = ai_eps
-            Me.IsUseCriterion = ai_isUseEps
-
-            If ai_populationSize = 0 Then
-                Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 8
-            Else
-                Me.POPULATION_SIZE = ai_populationSize
-            End If
-
-            If ai_parentsSize = 0 Then
-                Me.PARENT_SIZE = Me.m_func.NumberOfVariable + 1 'n+k
-            Else
-                Me.PARENT_SIZE = ai_parentsSize
-            End If
-
-            Me.REX_RAND = ai_REXRandomMode
-
-            If ai_childsSize = 0 Then
-                Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 6 '6-8 * n
-            Else
-                Me.CHILDREN_SIZE = ai_childsSize
-            End If
         End Sub
 #End Region
 
 #Region "Property(Parameter setting)"
+        ''' <summary>
+        ''' epsilon(Default:1e-8)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_EPS As Double
+            Set(value As Double)
+                Me.EPS = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Use criterion
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_IsUseCriterion As Boolean
+            Set(value As Boolean)
+                Me.IsUseCriterion = value
+            End Set
+        End Property
+
         ''' <summary>
         ''' higher N percentage particles are finished at the time of same evaluate value.
         ''' This parameter is valid is when PARAM_IsUseCriterion is true.
@@ -113,6 +86,61 @@ Namespace Optimization
         Public WriteOnly Property PARAM_CriterionPersent As Double
             Set(value As Double)
                 Me.HigherNPercent = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Max iteration count
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_MAX_ITERATION As Integer
+            Set(value As Integer)
+                Me.MAX_ITERATION = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Range of initial value
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_InitRange As Double
+            Set(value As Double)
+                Me.INIT_PARAM_RANGE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Population Size(Default:200)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_PopulationSize As Integer
+            Set(value As Integer)
+                Me.POPULATION_SIZE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Child size
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_ChildSize As Integer
+            Set(value As Integer)
+                Me.CHILDREN_SIZE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' SD(Default:0.70710678)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_SD As Integer
+            Set(value As Integer)
+                Me.SD = value
             End Set
         End Property
 #End Region
@@ -184,22 +212,72 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                'REX with JGG
-                Dim parents As List(Of KeyValuePair(Of Integer, clsPoint)) = Me.SelectParent(Me.m_parents, Me.PARENT_SIZE)
+                'select parent
+                Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count)
+                Dim p1Index As Integer = randIndex(0)
+                Dim p2Index As Integer = randIndex(1)
+                Dim p3Index As Integer = randIndex(2)
+                Dim p1 = Me.m_parents(p1Index)
+                Dim p2 = Me.m_parents(p2Index)
+                Dim p3 = Me.m_parents(p3Index) 'for d
 
-                'Crossover
-                Dim children As List(Of clsPoint) = Me.CrossOverREX(Me.REX_RAND, Me.CHILDREN_SIZE, parents)
+                'calc d
+                'p1(0) = 1
+                'p1(1) = 1
+                'p2(0) = 4
+                'p2(1) = 5
+                'p3(0) = 1
+                'p3(1) = 4
+                'd = 1.8
+                Dim diff1 = p2 - p1
+                Dim diff2 = p3 - p1
+                Dim diff3 = p3 - p2
+                Const TINY = 0.000000000001
+                Dim a = diff1.NormL2() + TINY
+                Dim b = diff2.NormL2() + TINY
+                Dim c = diff3.NormL2() + TINY
+                Dim s = (a + b + c) / 2.0
+                Dim areaTemp = s * (s - a) * (s - b) * (s - c)
+                Dim area = Math.Sqrt(areaTemp)
+                Dim d2 = 2.0 * area / a 'S=1/2 * h * a -> h = 2.0 * S / a
 
-                'Replace
-                Dim index As Integer = 0
-                For Each p As KeyValuePair(Of Integer, clsPoint) In parents
-                    Me.m_parents(p.Key) = children(index)
-                    index += 1
+                'UNDX
+                Dim Alpha = 0.5
+                Dim Beta = 0.35
+                Dim sd1 = Alpha * (p1 - p2).NormL2()
+                Dim sd2 = Beta * d2 / Math.Sqrt(Me.m_func.NumberOfVariable)
+                Dim e = (p1 - p2) / (p1 - p2).NormL2()
+                Dim chidren As New List(Of clsPoint)
+                For genChild As Integer = 0 To CInt(Me.CHILDREN_SIZE / 2 - 1)
+                    Dim t = New clsShoddyVector(Me.m_func.NumberOfVariable)
+                    For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                        t(i) = clsUtil.NormRand(0, sd2 ^ 2)
+                    Next
+                    t = t - (t.InnerProduct(e)) * e
+
+                    For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                        t(i) = t(i) + clsUtil.NormRand(0, sd1 ^ 2) * e(i)
+                    Next
+                    Dim child1 = (p1 + p2) / 2.0 + t
+                    Dim child2 = (p1 + p2) / 2.0 - t
+
+                    chidren.Add(New clsPoint(Me.m_func, child1))
+                    chidren.Add(New clsPoint(Me.m_func, child2))
                 Next
+
+                'replace(JGG)
+                chidren.Sort()
+                For Each child In chidren
+                    Console.WriteLine("{0}", child.Eval)
+                Next
+                Me.m_parents(p1Index) = chidren(0)
+                Me.m_parents(p2Index) = chidren(1)
             Next
 
             Return False
         End Function
+
+
 
         ''' <summary>
         ''' using Elite Strategy
@@ -255,60 +333,6 @@ Namespace Optimization
         End Function
 
         ''' <summary>
-        ''' REX(Real-coded Ensemble Crossover)
-        ''' </summary>
-        ''' <param name="ai_randomMode"></param>
-        ''' <param name="ai_childNum">ChildNum</param>
-        ''' <param name="ai_parents"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' REX(U, n+k) -> U is UniformRandom
-        ''' REX(N, n+k) -> N is NormalDistribution
-        ''' "n+k" is parents size.
-        ''' </remarks>
-        Private Function CrossOverREX(ByVal ai_randomMode As REX_RANDMODE, _
-                             ByVal ai_childNum As Integer, _
-                             ByVal ai_parents As List(Of KeyValuePair(Of Integer, clsPoint))) As List(Of clsPoint)
-            'Calc Centroid
-            Dim xg As New clsShoddyVector(MyBase.m_func.NumberOfVariable)
-            For Each p As KeyValuePair(Of Integer, clsPoint) In ai_parents
-                xg += p.Value
-            Next
-            xg /= ai_parents.Count 'sum(xi)/(n+k)
-
-            'cross over
-            Dim retChilds As New List(Of clsPoint)
-            Dim uniformRandParam As Double = Math.Sqrt(3 / ai_parents.Count)
-            Dim normalDistParam As Double = 1 / ai_parents.Count '???
-            For i As Integer = 0 To ai_childNum
-                'cross over
-                Dim childV As New clsShoddyVector(MyBase.m_func.NumberOfVariable)
-                'sum( rand * (xi-xg) )
-                For Each xi As KeyValuePair(Of Integer, clsPoint) In ai_parents
-                    'rand parameter
-                    Dim randVal As Double = 0.0
-                    If ai_randomMode = REX_RANDMODE.NORMAL_DIST Then
-                        randVal = clsUtil.NormRand(0, normalDistParam)
-                    Else
-                        randVal = Math.Abs(2.0 * uniformRandParam) * m_rand.NextDouble() - INIT_PARAM_RANGE
-                    End If
-                    'rand * (xi-xg)
-                    childV += randVal * (xi.Value - xg)
-                Next
-                'xg + sum( rand * (xi-xg) )
-                childV += xg
-
-                'convert clsPoint
-                Dim child As New clsPoint(MyBase.m_func, childV)
-                child.ReEvaluate()
-                retChilds.Add(child)
-            Next
-            retChilds.Sort()
-
-            Return retChilds
-        End Function
-
-        ''' <summary>
         ''' Best result
         ''' </summary>
         ''' <returns>Best point class</returns>
@@ -343,5 +367,4 @@ Namespace Optimization
         End Property
 #End Region
     End Class
-
 End Namespace

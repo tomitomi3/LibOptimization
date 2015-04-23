@@ -253,7 +253,7 @@
         End Function
 
         ''' <summary>
-        ''' Norm
+        ''' Norm L1 ( |x1| + |x2| ... )
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
@@ -270,7 +270,7 @@
         End Function
 
         ''' <summary>
-        ''' Norm2
+        ''' Norm L2 ( Sqrt( x1^2 + x2^2 ... ) )
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>

@@ -28,7 +28,7 @@ Namespace Optimization
         'GA Parameters
         Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
         Private ReadOnly POPULATION_SIZE As Integer = 1000
-        Private ReadOnly CHILDS_SIZE As Integer = 100
+        Private ReadOnly CHILDREN_SIZE As Integer = 100
 
         'This Parameter to use when generate a variable
         Private ReadOnly INIT_PARAM_RANGE As Double = 5
@@ -77,9 +77,9 @@ Namespace Optimization
             End If
 
             If ai_childsSize = 0 Then
-                Me.CHILDS_SIZE = Me.m_func.NumberOfVariable * 10
+                Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 10
             Else
-                Me.CHILDS_SIZE = ai_childsSize
+                Me.CHILDREN_SIZE = ai_childsSize
             End If
         End Sub
 #End Region
@@ -170,12 +170,12 @@ Namespace Optimization
                 Dim parents As List(Of KeyValuePair(Of Integer, clsPoint)) = Me.SelectParent(Me.m_parents, Me.m_func.NumberOfVariable + 1)
 
                 'Crossover
-                Dim childs As List(Of clsPoint) = Me.CrossOverSPX(Me.CHILDS_SIZE, parents)
+                Dim children As List(Of clsPoint) = Me.CrossOverSPX(Me.CHILDREN_SIZE, parents)
 
                 'Replace
                 Dim index As Integer = 0
                 For Each p As KeyValuePair(Of Integer, clsPoint) In parents
-                    Me.m_parents(p.Key) = childs(index)
+                    Me.m_parents(p.Key) = children(index)
                     index += 1
                 Next
             Next

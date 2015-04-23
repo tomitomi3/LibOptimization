@@ -29,7 +29,7 @@ Namespace Optimization
 
         'GA Parameters
         Private POPULATION_SIZE As Integer = 100
-        Private CHILDS_SIZE As Integer = 100
+        Private CHILDREN_SIZE As Integer = 100
         Private Alpha As Double = 0.5
         Private m_parents As New List(Of clsPoint)
 
@@ -49,7 +49,7 @@ Namespace Optimization
             Me.m_func = ai_func
 
             Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 50
-            Me.CHILDS_SIZE = Me.m_func.NumberOfVariable * 20
+            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 20
         End Sub
 #End Region
 
@@ -122,13 +122,13 @@ Namespace Optimization
         End Property
 
         ''' <summary>
-        ''' Child size
+        ''' Children size
         ''' </summary>
         ''' <value></value>
         ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_ChildSize As Integer
+        Public WriteOnly Property PARAM_ChildrenSize As Integer
             Set(value As Integer)
-                Me.CHILDS_SIZE = value
+                Me.CHILDREN_SIZE = value
             End Set
         End Property
 
@@ -213,21 +213,16 @@ Namespace Optimization
 
                 'BLX-alpha cross-over
                 'Pick parent
-                Dim p1Index As Integer = CInt(Me.m_parents.Count * Me.m_rand.NextDouble())
-                Dim p2Index As Integer = CInt(Me.m_parents.Count * Me.m_rand.NextDouble())
-                If p1Index >= Me.m_parents.Count Then
-                    p1Index -= 1
-                End If
-                If p2Index >= Me.m_parents.Count Then
-                    p2Index -= 1
-                End If
+                Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count)
+                Dim p1Index As Integer = randIndex(0)
+                Dim p2Index As Integer = randIndex(1)
                 Dim p1 = Me.m_parents(p1Index)
                 Dim p2 = Me.m_parents(p2Index)
 
                 'cross over
-                Dim child As New List(Of clsPoint)
-                For numChild As Integer = 0 To Me.CHILDS_SIZE - 1
-                    child.Add(New clsPoint(Me.m_func))
+                Dim children As New List(Of clsPoint)
+                For numChild As Integer = 0 To Me.CHILDREN_SIZE - 1
+                    children.Add(New clsPoint(Me.m_func))
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim range As Double = Math.Abs(p1(i) - p2(i))
                         Dim min As Double = 0
@@ -239,15 +234,15 @@ Namespace Optimization
                             min = p1(i)
                             max = p2(i)
                         End If
-                        child(numChild)(i) = clsUtil.GenRandomRange(Me.m_rand, min - Me.Alpha * range, max + Me.Alpha * range)
+                        children(numChild)(i) = clsUtil.GenRandomRange(Me.m_rand, min - Me.Alpha * range, max + Me.Alpha * range)
                     Next
-                    child(numChild).ReEvaluate()
+                    children(numChild).ReEvaluate()
                 Next
 
                 'replace(JGG)
-                child.Sort()
-                Me.m_parents(p1Index) = child(0)
-                Me.m_parents(p2Index) = child(1)
+                children.Sort()
+                Me.m_parents(p1Index) = children(0)
+                Me.m_parents(p2Index) = children(1)
             Next
 
             Return False
