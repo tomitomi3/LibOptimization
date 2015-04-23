@@ -20,21 +20,18 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptRealGASPX : Inherits absOptimization
 #Region "Member"
-        Private ReadOnly EPS As Double = 0.000000001
-        Private ReadOnly IsUseCriterion As Boolean = True
+        'Common settings
+        Private EPS As Double = 0.000000001
+        Private IsUseCriterion As Boolean = True
         Private HigherNPercent As Double = 0.7 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
+        Private MAX_ITERATION As Integer = 10000 'generation
+        Private INIT_PARAM_RANGE As Double = 5 'Range of the initial value
 
         'GA Parameters
-        Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
-        Private ReadOnly POPULATION_SIZE As Integer = 1000
-        Private ReadOnly CHILDREN_SIZE As Integer = 100
-
-        'This Parameter to use when generate a variable
-        Private ReadOnly INIT_PARAM_RANGE As Double = 5
-
-        'Parent
-        Private m_parents As New List(Of clsPoint)
+        Private m_parents As New List(Of clsPoint) 'Parent
+        Private POPULATION_SIZE As Integer = 1000
+        Private CHILDREN_SIZE As Integer = 100
 
         'ErrorManage
         Private m_error As New clsError
@@ -45,46 +42,39 @@ Namespace Optimization
         ''' Constructor
         ''' </summary>
         ''' <param name="ai_func">Optimize Function</param>
-        ''' <param name="ai_randomRange">Optional:random range(Default: 10 => -10 to 10)</param>
-        ''' <param name="ai_generation">Optional:Generation(Default: 10000)</param>
-        ''' <param name="ai_eps">Optional:Eps(Default:1e-8)</param>
-        ''' <param name="ai_isUseEps">Optional:Use criterion(Default: true)</param>
-        ''' <param name="ai_populationSize">Optional:Population size(0 is n*8)</param>
-        ''' <param name="ai_childsSize">Optional:Childs size(0 is n*6)</param>
         ''' <remarks>
         ''' "n" is function dimension.
         ''' </remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction, _
-                       Optional ByVal ai_randomRange As Double = 10, _
-                       Optional ByVal ai_generation As Integer = 10000, _
-                       Optional ByVal ai_eps As Double = 0.000000001, _
-                       Optional ByVal ai_isUseEps As Boolean = True, _
-                       Optional ByVal ai_populationSize As Integer = 0, _
-                       Optional ByVal ai_childsSize As Integer = 0)
+        Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
-
-            Me.INIT_PARAM_RANGE = ai_randomRange
-
-            Me.MAX_ITERATION = ai_generation
-
-            Me.EPS = ai_eps
-            Me.IsUseCriterion = ai_isUseEps
-
-            If ai_populationSize = 0 Then
-                Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 33
-            Else
-                Me.POPULATION_SIZE = ai_populationSize
-            End If
-
-            If ai_childsSize = 0 Then
-                Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 10
-            Else
-                Me.CHILDREN_SIZE = ai_childsSize
-            End If
+            Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 33
+            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 10
         End Sub
 #End Region
 
 #Region "Property(Parameter setting)"
+        ''' <summary>
+        ''' epsilon(Default:1e-8)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_EPS As Double
+            Set(value As Double)
+                Me.EPS = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Use criterion
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_IsUseCriterion As Boolean
+            Set(value As Boolean)
+                Me.IsUseCriterion = value
+            End Set
+        End Property
+
         ''' <summary>
         ''' higher N percentage particles are finished at the time of same evaluate value.
         ''' This parameter is valid is when PARAM_IsUseCriterion is true.
@@ -94,6 +84,50 @@ Namespace Optimization
         Public WriteOnly Property PARAM_CriterionPersent As Double
             Set(value As Double)
                 Me.HigherNPercent = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Max iteration count
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_MAX_ITERATION As Integer
+            Set(value As Integer)
+                Me.MAX_ITERATION = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Range of initial value
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_InitRange As Double
+            Set(value As Double)
+                Me.INIT_PARAM_RANGE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Population Size(Default:n*8)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_PopulationSize As Integer
+            Set(value As Integer)
+                Me.POPULATION_SIZE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Children size(Default:n*6)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_ChildrenSize As Integer
+            Set(value As Integer)
+                Me.CHILDREN_SIZE = value
             End Set
         End Property
 #End Region

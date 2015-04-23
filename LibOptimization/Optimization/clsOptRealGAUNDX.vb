@@ -234,8 +234,8 @@ Namespace Optimization
                 Dim diff3 = p3 - p2
                 Const TINY = 0.000000000001
                 Dim a = diff1.NormL2() + TINY
-                Dim b = diff2.NormL2() + TINY
-                Dim c = diff3.NormL2() + TINY
+                Dim b = diff2.NormL2()
+                Dim c = diff3.NormL2()
                 Dim s = (a + b + c) / 2.0
                 Dim areaTemp = s * (s - a) * (s - b) * (s - c)
                 Dim area = Math.Sqrt(areaTemp)
@@ -267,17 +267,12 @@ Namespace Optimization
 
                 'replace(JGG)
                 chidren.Sort()
-                For Each child In chidren
-                    Console.WriteLine("{0}", child.Eval)
-                Next
                 Me.m_parents(p1Index) = chidren(0)
                 Me.m_parents(p2Index) = chidren(1)
             Next
 
             Return False
         End Function
-
-
 
         ''' <summary>
         ''' using Elite Strategy
@@ -310,27 +305,6 @@ Namespace Optimization
             'iteration count reset
             Me.m_iteration = 0
         End Sub
-
-        ''' <summary>
-        ''' Select Parent
-        ''' </summary>
-        ''' <param name="ai_population"></param>
-        ''' <param name="ai_parentSize"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function SelectParent(ByVal ai_population As List(Of clsPoint), ByVal ai_parentSize As Integer) As List(Of KeyValuePair(Of Integer, clsPoint))
-            Dim ret As New List(Of KeyValuePair(Of Integer, clsPoint))
-
-            'Index
-            Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(ai_population.Count)
-
-            'PickParents
-            For i As Integer = 0 To ai_parentSize - 1
-                ret.Add(New KeyValuePair(Of Integer, clsPoint)(randIndex(i), ai_population(randIndex(i))))
-            Next
-
-            Return ret
-        End Function
 
         ''' <summary>
         ''' Best result

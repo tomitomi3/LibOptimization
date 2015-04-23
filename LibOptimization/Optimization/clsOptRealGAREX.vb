@@ -20,28 +20,25 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptRealGAREX : Inherits absOptimization
 #Region "Member"
-        Private ReadOnly EPS As Double = 0.000000001
-        Private ReadOnly IsUseCriterion As Boolean = True
+        'Common settings
+        Private EPS As Double = 0.000000001
+        Private IsUseCriterion As Boolean = True
         Private HigherNPercent As Double = 0.7 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
+        Private MAX_ITERATION As Integer = 10000 'generation
+        Private INIT_PARAM_RANGE As Double = 5 'Range of the initial value
 
         'GA Parameters
-        Private ReadOnly MAX_ITERATION As Integer = 10000 'generation
-        Private ReadOnly POPULATION_SIZE As Integer = 1000
-        Private ReadOnly PARENT_SIZE As Integer = 100 'REX(phi, n+k) -> n+1<n+k<npop
-        Private ReadOnly CHILDREN_SIZE As Integer = 100
-        Private ReadOnly REX_RAND As REX_RANDMODE = REX_RANDMODE.UNIFORM
-
-        'This Parameter to use when generate a variable
-        Private ReadOnly INIT_PARAM_RANGE As Double = 5
+        Private m_parents As New List(Of clsPoint) 'Parent
+        Private POPULATION_SIZE As Integer = 1000
+        Private PARENT_SIZE As Integer = 100 'REX(phi, n+k) -> n+1<n+k<npop
+        Private CHILDREN_SIZE As Integer = 100
+        Private REX_RAND As REX_RANDMODE = REX_RANDMODE.UNIFORM
 
         Public Enum REX_RANDMODE
             UNIFORM
             NORMAL_DIST
         End Enum
-
-        'Parent
-        Private m_parents As New List(Of clsPoint)
 
         'ErrorManage
         Private m_error As New clsError
@@ -51,59 +48,40 @@ Namespace Optimization
         ''' <summary>
         ''' Constructor
         ''' </summary>
-        ''' <param name="ai_func">Optimize Function</param>
-        ''' <param name="ai_randomRange">Optional:random range(Default: 10 => -10 to 10)</param>
-        ''' <param name="ai_generation">Optional:Generation(Default: 10000)</param>
-        ''' <param name="ai_eps">Optional:Eps(Default:1e-8)</param>
-        ''' <param name="ai_isUseEps">Optional:Use criterion(Default: true)</param>
-        ''' <param name="ai_populationSize">Optional:Population size(0 is n*8)</param>
-        ''' <param name="ai_parentsSize">Optional:Parents size(0 is n+1)</param>
-        ''' <param name="ai_REXRandomMode">Optional:REX(phi) Uniform or ND(default: Uniform)</param>
-        ''' <param name="ai_childsSize">Optional:Childs size(0 is n*6)</param>
+        ''' <param name="ai_func">Target Function</param>
         ''' <remarks>
-        ''' "n" is function dimension.
         ''' </remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction, _
-                       Optional ByVal ai_randomRange As Double = 10, _
-                       Optional ByVal ai_generation As Integer = 10000, _
-                       Optional ByVal ai_eps As Double = 0.000000001, _
-                       Optional ByVal ai_isUseEps As Boolean = True, _
-                       Optional ByVal ai_populationSize As Integer = 0, _
-                       Optional ByVal ai_parentsSize As Integer = 0, _
-                       Optional ByVal ai_REXRandomMode As REX_RANDMODE = REX_RANDMODE.UNIFORM, _
-                       Optional ByVal ai_childsSize As Integer = 0)
+        Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
-
-            Me.INIT_PARAM_RANGE = ai_randomRange
-
-            Me.MAX_ITERATION = ai_generation
-
-            Me.EPS = ai_eps
-            Me.IsUseCriterion = ai_isUseEps
-
-            If ai_populationSize = 0 Then
-                Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 8
-            Else
-                Me.POPULATION_SIZE = ai_populationSize
-            End If
-
-            If ai_parentsSize = 0 Then
-                Me.PARENT_SIZE = Me.m_func.NumberOfVariable + 1 'n+k
-            Else
-                Me.PARENT_SIZE = ai_parentsSize
-            End If
-
-            Me.REX_RAND = ai_REXRandomMode
-
-            If ai_childsSize = 0 Then
-                Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 6 '6-8 * n
-            Else
-                Me.CHILDREN_SIZE = ai_childsSize
-            End If
+            Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 8
+            Me.PARENT_SIZE = Me.m_func.NumberOfVariable + 1 'n+k
+            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 6 '6-8 * n
         End Sub
 #End Region
 
 #Region "Property(Parameter setting)"
+        ''' <summary>
+        ''' epsilon(Default:1e-8)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_EPS As Double
+            Set(value As Double)
+                Me.EPS = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Use criterion
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_IsUseCriterion As Boolean
+            Set(value As Boolean)
+                Me.IsUseCriterion = value
+            End Set
+        End Property
+
         ''' <summary>
         ''' higher N percentage particles are finished at the time of same evaluate value.
         ''' This parameter is valid is when PARAM_IsUseCriterion is true.
@@ -113,6 +91,72 @@ Namespace Optimization
         Public WriteOnly Property PARAM_CriterionPersent As Double
             Set(value As Double)
                 Me.HigherNPercent = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Max iteration count
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_MAX_ITERATION As Integer
+            Set(value As Integer)
+                Me.MAX_ITERATION = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Range of initial value
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks>Common parameter</remarks>
+        Public WriteOnly Property PARAM_InitRange As Double
+            Set(value As Double)
+                Me.INIT_PARAM_RANGE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Population Size(Default:n*8)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_PopulationSize As Integer
+            Set(value As Integer)
+                Me.POPULATION_SIZE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Parent size for cross over(Default:n+1)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_ParentSize As Integer
+            Set(value As Integer)
+                Me.PARENT_SIZE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Children size(Default:n*6)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_ChildrenSize As Integer
+            Set(value As Integer)
+                Me.CHILDREN_SIZE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' REX randomo mode(Default:UNIFORM)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public WriteOnly Property PARAM_REXRandMode As REX_RANDMODE
+            Set(value As REX_RANDMODE)
+                Me.REX_RAND = value
             End Set
         End Property
 #End Region

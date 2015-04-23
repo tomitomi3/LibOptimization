@@ -28,10 +28,10 @@ Namespace Optimization
         Private INIT_PARAM_RANGE As Double = 5 'parameter range
 
         'GA Parameters
+        Private m_parents As New List(Of clsPoint) 'Parent
         Private POPULATION_SIZE As Integer = 100
         Private CHILDREN_SIZE As Integer = 100
         Private Alpha As Double = 0.5
-        Private m_parents As New List(Of clsPoint)
 
         'ErrorManage
         Private m_error As New clsError
