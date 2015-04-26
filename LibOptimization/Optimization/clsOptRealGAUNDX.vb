@@ -51,8 +51,8 @@ Namespace Optimization
         Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
 
-            Me.POPULATION_SIZE = 200
-            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 15
+            Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 33
+            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 33
         End Sub
 #End Region
 
@@ -264,9 +264,7 @@ Namespace Optimization
                 Dim children = Me.UNDX(p1, p2, p3)
 
                 'MGG Strategy
-                children.Add(p1)
-                children.Add(p2)
-                Dim replace As List(Of clsPoint) = Me.SelectReplacePopulation(children)
+                Dim replace As List(Of clsPoint) = Me.SelectReplacePopulation({p1, p2}, children)
                 Me.m_parents(p1Index) = replace(0)
                 Me.m_parents(p2Index) = replace(1)
             Next
@@ -373,17 +371,19 @@ Namespace Optimization
             'calc d
             Dim diffVectorP2P1 = p2 - p1
             Dim length = diffVectorP2P1.NormL2()
+            Dim areaTriangle As Double = Me.CalcTriangleArea(length, (p3 - p2).NormL2(), (p3 - p1).NormL2())
             If length = 0 Then
                 length += 0.0000000001 'avoid Zero Divide
             End If
-            Dim areaTriangle As Double = Me.CalcTriangleArea(length, (p3 - p2).NormL2(), (p3 - p1).NormL2())
             Dim d2 = 2.0 * areaTriangle / length 'S=1/2 * h * a -> h = 2.0 * S / a
 
             'UNDX
-            Dim children As New List(Of clsPoint)(Me.CHILDREN_SIZE + 1)
+            Dim children As New List(Of clsPoint)
             Dim gVector = (p1 + p2) / 2.0
-            Dim sd1 = (Me.ALPHA * length) ^ 2
-            Dim sd2 = (Me.BETA * d2 / Math.Sqrt(Me.m_func.NumberOfVariable)) ^ 2
+            'Dim sd1 = (Me.ALPHA * length) ^ 2
+            'Dim sd2 = (Me.BETA * d2 / Math.Sqrt(Me.m_func.NumberOfVariable)) ^ 2
+            Dim sd1 = (Me.ALPHA) ^ 2
+            Dim sd2 = (Me.BETA / Math.Sqrt(Me.m_func.NumberOfVariable)) ^ 2
             Dim e = diffVectorP2P1 / length
             For genChild As Integer = 0 To CInt(Me.CHILDREN_SIZE / 2 - 1)
                 Dim t = New clsShoddyVector(Me.m_func.NumberOfVariable)
@@ -393,38 +393,48 @@ Namespace Optimization
                 t = t - (t.InnerProduct(e)) * e
 
                 'child
-                Dim child1 As New clsShoddyVector(Me.m_func.NumberOfVariable)
-                Dim child2 As New clsShoddyVector(Me.m_func.NumberOfVariable)
+                Dim child1 As New clsPoint(Me.m_func)
+                Dim child2 As New clsPoint(Me.m_func)
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    t(i) = t(i) + clsUtil.NormRand(0, sd1) * e(i)
+                    Dim temp = t(i) + clsUtil.NormRand(0, sd1) * e(i)
+                    child1(i) = gVector(i) + temp
+                    child2(i) = gVector(i) - temp
                 Next
-                child1 = gVector + t
-                child2 = gVector - t
+                child1.ReEvaluate()
+                child2.ReEvaluate()
 
-                children.Add(New clsPoint(Me.m_func, child1))
-                children.Add(New clsPoint(Me.m_func, child2))
+                If child1.Eval > 10000000000 OrElse child2.Eval > 10000000000.0 Then
+                    Console.WriteLine("")
+                End If
+
+                children.Add(child1)
+                children.Add(child2)
             Next
-
             Return children
         End Function
 
         ''' <summary>
         ''' Select child for MGG
         ''' </summary>
+        ''' <param name="ai_clsPoint"></param>
         ''' <param name="ai_children"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function SelectReplacePopulation(ByVal ai_children As List(Of clsPoint)) As List(Of clsPoint)
-            ai_children.Sort()
+        Private Function SelectReplacePopulation(ByVal ai_clsPoint As clsPoint(), ByVal ai_children As List(Of clsPoint)) As List(Of clsPoint)
+            Dim ret As New List(Of clsPoint)
+
+            Dim newPopulation As New List(Of clsPoint)(ai_clsPoint.Count + ai_children.Count)
+            newPopulation.AddRange(ai_clsPoint)
+            newPopulation.AddRange(ai_children)
+            newPopulation.Sort()
 
             'best
-            Dim ret As New List(Of clsPoint)
-            ret.Add(ai_children(0))
+            ret.Add(newPopulation(0))
 
             'roulette
-            ai_children.RemoveAt(0)
-            Dim newP2Index = Me.SelectRoulette(ai_children)
-            ret.Add(ai_children(newP2Index)) 'roulete select
+            newPopulation.RemoveAt(0)
+            Dim newP2Index = Me.SelectRoulette(newPopulation)
+            ret.Add(newPopulation(newP2Index)) 'roulete select
 
             Return ret
         End Function
@@ -436,30 +446,27 @@ Namespace Optimization
         ''' <returns>index</returns>
         ''' <remarks></remarks>
         Private Function SelectRoulette(ByVal ai_chidren As List(Of clsPoint)) As Integer
-            'sum
-            Dim absSum As Double = 0
-            For Each child In ai_chidren
-                absSum += Math.Abs(child.Eval)
+            Dim best = ai_chidren(0).Eval
+            Dim tempList As New List(Of Double)(ai_chidren.Count)
+            Dim tempSum As Double = 0
+            For i As Integer = 0 To ai_chidren.Count - 1
+                Dim temp = ai_chidren(i).Eval - ai_chidren(0).Eval
+                tempList.Add(temp)
+                tempSum += temp
             Next
-            Dim newSum As Double = 0
-            Dim evalList As New List(Of Double)(ai_chidren.Count)
-            For Each child In ai_chidren
-                Dim d = absSum - child.Eval
-                evalList.Add(d)
-                newSum += d
-            Next
+            tempList.Reverse()
 
             'select
             Dim r = Me.m_rand.NextDouble()
             Dim cumulativeRatio As Double = 0.0
-            For i As Integer = 0 To evalList.Count - 1
-                cumulativeRatio += evalList(i) / newSum
+            For i As Integer = 0 To tempList.Count - 1
+                cumulativeRatio += tempList(i) / tempSum
                 If cumulativeRatio > r Then
-                    Return i
+                    Return tempList.Count - i - 1
                 End If
             Next
 
-            Return ai_chidren.Count - 1
+            Return 0
         End Function
 #End Region
 
