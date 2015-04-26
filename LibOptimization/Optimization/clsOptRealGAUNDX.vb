@@ -9,10 +9,12 @@ Namespace Optimization
     ''' <remarks>
     ''' Features:
     '''  -Derivative free optimization algorithm.
-    '''  -Alternation of generation algorithm is JGG.
+    '''  -Alternation of generation algorithm is MGG.
+    '''   JGGだと発散する。
     ''' 
     ''' Refference:
-    ''' 北野 宏明 (編集), 遺伝的アルゴリズム 4, 産業図書出版株式会社, 2000年 初版, p261
+    ''' [1]小野功，佐藤浩，小林重信, "単峰性正規分布交叉UNDXを用いた実数値GAによる関数最適化"，人工知能学会誌，Vol. 14，No. 6，pp. 1146-1155 (1999)
+    ''' [2]北野 宏明 (編集), 遺伝的アルゴリズム 4, 産業図書出版株式会社, 2000年 初版, p261
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
@@ -24,13 +26,14 @@ Namespace Optimization
         Private IsUseCriterion As Boolean = True
         Private HigherNPercent As Double = 0.7 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
-        Private MAX_ITERATION As Integer = 10000 'generation
+        Private MAX_ITERATION As Integer = 50000 'generation
         Private INIT_PARAM_RANGE As Double = 5 'parameter range
 
         'GA Parameters
         Private POPULATION_SIZE As Integer = 100
         Private CHILDREN_SIZE As Integer = 100
-        Private SD As Double = 0.70710678
+        Private ALPHA As Double = 0.5
+        Private BETA As Double = 0.35
         Private m_parents As New List(Of clsPoint)
 
         'ErrorManage
@@ -49,8 +52,7 @@ Namespace Optimization
             Me.m_func = ai_func
 
             Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 33
-            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 10
-
+            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 33
         End Sub
 #End Region
 
@@ -60,7 +62,10 @@ Namespace Optimization
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_EPS As Double
+        Public Property PARAM_EPS As Double
+            Get
+                Return Me.EPS
+            End Get
             Set(value As Double)
                 Me.EPS = value
             End Set
@@ -71,7 +76,10 @@ Namespace Optimization
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_IsUseCriterion As Boolean
+        Public Property PARAM_IsUseCriterion As Boolean
+            Get
+                Return Me.IsUseCriterion
+            End Get
             Set(value As Boolean)
                 Me.IsUseCriterion = value
             End Set
@@ -83,7 +91,10 @@ Namespace Optimization
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_CriterionPersent As Double
+        Public Property PARAM_CriterionPersent As Double
+            Get
+                Return Me.HigherNPercent
+            End Get
             Set(value As Double)
                 Me.HigherNPercent = value
             End Set
@@ -94,7 +105,10 @@ Namespace Optimization
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_MAX_ITERATION As Integer
+        Public Property PARAM_MAX_ITERATION As Integer
+            Get
+                Return Me.MAX_ITERATION
+            End Get
             Set(value As Integer)
                 Me.MAX_ITERATION = value
             End Set
@@ -105,7 +119,10 @@ Namespace Optimization
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_InitRange As Double
+        Public Property PARAM_InitRange As Double
+            Get
+                Return Me.INIT_PARAM_RANGE
+            End Get
             Set(value As Double)
                 Me.INIT_PARAM_RANGE = value
             End Set
@@ -116,31 +133,54 @@ Namespace Optimization
         ''' </summary>
         ''' <value></value>
         ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_PopulationSize As Integer
+        Public Property PARAM_PopulationSize As Integer
+            Get
+                Return Me.POPULATION_SIZE
+            End Get
             Set(value As Integer)
                 Me.POPULATION_SIZE = value
             End Set
         End Property
 
         ''' <summary>
-        ''' Child size
+        ''' Children size( = Number of CrossOver/2 )
         ''' </summary>
         ''' <value></value>
         ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_ChildSize As Integer
+        Public Property PARAM_ChildrenSize As Integer
+            Get
+                Return Me.CHILDREN_SIZE
+            End Get
             Set(value As Integer)
                 Me.CHILDREN_SIZE = value
             End Set
         End Property
 
         ''' <summary>
-        ''' SD(Default:0.70710678)
+        ''' Alpha(Default:0.5)
         ''' </summary>
         ''' <value></value>
         ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_SD As Integer
-            Set(value As Integer)
-                Me.SD = value
+        Public Property PARAM_Alpha As Double
+            Get
+                Return Me.ALPHA
+            End Get
+            Set(value As Double)
+                Me.ALPHA = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Beta(Default:0.35)
+        ''' </summary>
+        ''' <value></value>
+        ''' <remarks></remarks>
+        Public Property PARAM_Beta As Double
+            Get
+                Return Me.BETA
+            End Get
+            Set(value As Double)
+                Me.BETA = value
             End Set
         End Property
 #End Region
@@ -216,59 +256,17 @@ Namespace Optimization
                 Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count)
                 Dim p1Index As Integer = randIndex(0)
                 Dim p2Index As Integer = randIndex(1)
-                Dim p3Index As Integer = randIndex(2)
                 Dim p1 = Me.m_parents(p1Index)
                 Dim p2 = Me.m_parents(p2Index)
-                Dim p3 = Me.m_parents(p3Index) 'for d
-
-                'calc d
-                'p1(0) = 1
-                'p1(1) = 1
-                'p2(0) = 4
-                'p2(1) = 5
-                'p3(0) = 1
-                'p3(1) = 4
-                'd = 1.8
-                Dim diff1 = p2 - p1
-                Dim diff2 = p3 - p1
-                Dim diff3 = p3 - p2
-                Const TINY = 0.000000000001
-                Dim a = diff1.NormL2() + TINY
-                Dim b = diff2.NormL2()
-                Dim c = diff3.NormL2()
-                Dim s = (a + b + c) / 2.0
-                Dim areaTemp = s * (s - a) * (s - b) * (s - c)
-                Dim area = Math.Sqrt(areaTemp)
-                Dim d2 = 2.0 * area / a 'S=1/2 * h * a -> h = 2.0 * S / a
+                Dim p3 = Me.m_parents(randIndex(2)) 'for d2
 
                 'UNDX
-                Dim Alpha = 0.5
-                Dim Beta = 0.35
-                Dim sd1 = Alpha * (p1 - p2).NormL2()
-                Dim sd2 = Beta * d2 / Math.Sqrt(Me.m_func.NumberOfVariable)
-                Dim e = (p1 - p2) / (p1 - p2).NormL2()
-                Dim chidren As New List(Of clsPoint)
-                For genChild As Integer = 0 To CInt(Me.CHILDREN_SIZE / 2 - 1)
-                    Dim t = New clsShoddyVector(Me.m_func.NumberOfVariable)
-                    For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        t(i) = clsUtil.NormRand(0, sd2 ^ 2)
-                    Next
-                    t = t - (t.InnerProduct(e)) * e
+                Dim children = Me.UNDX2(p1, p2, p3)
 
-                    For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        t(i) = t(i) + clsUtil.NormRand(0, sd1 ^ 2) * e(i)
-                    Next
-                    Dim child1 = (p1 + p2) / 2.0 + t
-                    Dim child2 = (p1 + p2) / 2.0 - t
-
-                    chidren.Add(New clsPoint(Me.m_func, child1))
-                    chidren.Add(New clsPoint(Me.m_func, child2))
-                Next
-
-                'replace(JGG)
-                chidren.Sort()
-                Me.m_parents(p1Index) = chidren(0)
-                Me.m_parents(p2Index) = chidren(1)
+                'MGG Strategy
+                Dim replace As List(Of clsPoint) = Me.SelectReplacePopulation({p1, p2}, children)
+                Me.m_parents(p1Index) = replace(0)
+                Me.m_parents(p2Index) = replace(1)
             Next
 
             Return False
@@ -340,5 +338,133 @@ Namespace Optimization
             End Get
         End Property
 #End Region
+
+#Region "Private"
+        ''' <summary>
+        ''' Calc Triangle Area using Heron formula
+        ''' </summary>
+        ''' <param name="lengthA"></param>
+        ''' <param name="lengthB"></param>
+        ''' <param name="lengthC"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function CalcTriangleArea(ByVal lengthA As Double, ByVal lengthB As Double, ByVal lengthC As Double) As Double
+            '    p3
+            '   /| 
+            '  / |
+            ' ----
+            ' p1  p2
+            Dim s = (lengthA + lengthB + lengthC) / 2.0
+            Dim area = Math.Sqrt(s * (s - lengthA) * (s - lengthB) * (s - lengthC))
+            Return area
+        End Function
+
+        ''' <summary>
+        ''' UNDX CrossOver
+        ''' </summary>
+        ''' <param name="p1"></param>
+        ''' <param name="p2"></param>
+        ''' <param name="p3"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function UNDX2(ByVal p1 As clsPoint, ByVal p2 As clsPoint, ByVal p3 As clsPoint) As List(Of clsPoint)
+            'calc d
+            Dim diffVectorP2P1 = p2 - p1
+            Dim length = diffVectorP2P1.NormL2()
+            Dim areaTriangle As Double = Me.CalcTriangleArea(length, (p3 - p2).NormL2(), (p3 - p1).NormL2())
+            If length = 0 Then
+                length += 0.0000000001 'avoid Zero Divide
+            End If
+            Dim d2 = 2.0 * areaTriangle / length 'S=1/2 * h * a -> h = 2.0 * S / a
+
+            'UNDX
+            Dim children As New List(Of clsPoint)
+            Dim gVector = (p1 + p2) / 2.0
+            Dim sd1 = (Me.ALPHA * length) ^ 2
+            Dim sd2 = (Me.BETA * d2 / Math.Sqrt(Me.m_func.NumberOfVariable)) ^ 2
+            Dim e = diffVectorP2P1 / length
+            For genChild As Integer = 0 To CInt(Me.CHILDREN_SIZE / 2 - 1)
+                Dim t = New clsShoddyVector(Me.m_func.NumberOfVariable)
+                For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                    t(i) = clsUtil.NormRand(0, sd2)
+                Next
+                t = t - (t.InnerProduct(e)) * e
+
+                'child
+                Dim child1 As New clsPoint(Me.m_func)
+                Dim child2 As New clsPoint(Me.m_func)
+                For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                    Dim temp = t(i) + clsUtil.NormRand(0, sd1) * e(i)
+                    child1(i) = gVector(i) + temp
+                    child2(i) = gVector(i) - temp
+                Next
+                child1.ReEvaluate()
+                child2.ReEvaluate()
+
+                children.AddRange({child1, child2})
+            Next
+            Return children
+        End Function
+
+        ''' <summary>
+        ''' Select child for MGG
+        ''' </summary>
+        ''' <param name="ai_clsPoint"></param>
+        ''' <param name="ai_children"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function SelectReplacePopulation(ByVal ai_clsPoint As clsPoint(), ByVal ai_children As List(Of clsPoint)) As List(Of clsPoint)
+            Dim ret As New List(Of clsPoint)
+
+            Dim newPopulation As New List(Of clsPoint)(ai_clsPoint.Count + ai_children.Count)
+            newPopulation.AddRange(ai_clsPoint)
+            newPopulation.AddRange(ai_children)
+            newPopulation.Sort()
+
+            'best
+            ret.Add(newPopulation(0))
+
+            'roulette
+            newPopulation.RemoveAt(0)
+            Dim newP2Index = Me.SelectRoulette(newPopulation)
+            ret.Add(Me.m_parents(newP2Index)) 'roulete select
+
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' RouletteWheel selection for Minimize
+        ''' </summary>
+        ''' <param name="ai_chidren">sorted children by evaluate value</param>
+        ''' <returns>index</returns>
+        ''' <remarks></remarks>
+        Private Function SelectRoulette(ByVal ai_chidren As List(Of clsPoint)) As Integer
+            'sum
+            Dim absSum As Double = 0
+            For Each child In ai_chidren
+                absSum += Math.Abs(child.Eval)
+            Next
+            Dim newSum As Double = 0
+            Dim evalList As New List(Of Double)(ai_chidren.Count)
+            For Each child In ai_chidren
+                Dim d = absSum - child.Eval
+                evalList.Add(d)
+                newSum += d
+            Next
+
+            'select
+            Dim r = Me.m_rand.NextDouble()
+            Dim cumulativeRatio As Double = 0.0
+            For i As Integer = 0 To evalList.Count - 1
+                cumulativeRatio += evalList(i) / absSum
+                If cumulativeRatio > r Then
+                    Return i
+                End If
+            Next
+
+            Return ai_chidren.Count - 1
+        End Function
+#End Region
+
     End Class
 End Namespace

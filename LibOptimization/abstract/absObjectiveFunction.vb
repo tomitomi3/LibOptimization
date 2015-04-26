@@ -20,7 +20,7 @@
         Public MustOverride Function F(ByVal x As List(Of Double)) As Double
 
         ''' <summary>
-        ''' Gradient vector
+        ''' Gradient vector (for Steepest descent method, newton method)
         ''' </summary>
         ''' <param name="x"></param>
         ''' <returns></returns>
@@ -32,7 +32,7 @@
         Public MustOverride Function Gradient(ByVal x As List(Of Double)) As List(Of Double)
 
         ''' <summary>
-        ''' Hessian matrix
+        ''' Hessian matrix (for newton method)
         ''' </summary>
         ''' <param name="x"></param>
         ''' <returns></returns>
