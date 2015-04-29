@@ -150,5 +150,40 @@ Namespace Util
         Public Shared Function GenRandomRange(ByVal oRand As System.Random, ByVal ai_min As Double, ByVal ai_max As Double) As Double
             Return Math.Abs(ai_max - ai_min) * oRand.NextDouble() + ai_min
         End Function
+
+        ''' <summary>
+        ''' to csv
+        ''' </summary>
+        ''' <param name="arP"></param>
+        ''' <remarks></remarks>
+        Public Shared Sub ToCSV(ByVal arP As clsPoint)
+            For Each p In arP
+                Console.Write("{0},", p)
+            Next
+            Console.WriteLine("")
+        End Sub
+
+        ''' <summary>
+        ''' to csv
+        ''' </summary>
+        ''' <param name="arP"></param>
+        ''' <remarks></remarks>
+        Public Shared Sub ToCSV(ByVal arP As List(Of clsPoint))
+            For Each p In arP
+                clsUtil.ToCSV(p)
+            Next
+            Console.WriteLine("")
+        End Sub
+
+        ''' <summary>
+        ''' eval output for debug
+        ''' </summary>
+        ''' <param name="arP"></param>
+        ''' <remarks></remarks>
+        Public Shared Sub ToEvalList(ByVal arP As List(Of clsPoint))
+            For Each p In arP
+                Console.WriteLine("{0}", p.Eval)
+            Next
+        End Sub
     End Class
 End Namespace
