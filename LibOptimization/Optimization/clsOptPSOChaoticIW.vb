@@ -304,6 +304,9 @@ Namespace Optimization
                     Dim z = u * randVal * (1 - randVal)
                     Me.Weight = 0.5 * Me.m_rand.NextDouble() + 0.5 * z
                 End If
+
+                'sort by eval
+                Me.m_swarm.Sort()
             Next
 
             Return False

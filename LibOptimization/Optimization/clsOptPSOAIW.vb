@@ -277,6 +277,9 @@ Namespace Optimization
                 'Inertia Weight Strategie - AIW Adaptive Inertia Weight
                 Dim PS = replaceBestCount / Me.SwarmSize
                 Me.Weight = (Me.WeightMax - Me.WeightMin) * PS - Me.WeightMin
+
+                'sort by eval
+                Me.m_swarm.Sort()
             Next
 
             Return False

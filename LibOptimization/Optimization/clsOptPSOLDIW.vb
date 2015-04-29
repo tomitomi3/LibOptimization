@@ -273,6 +273,9 @@ Namespace Optimization
 
                 'Inertia Weight Strategie - LDIW Linear Decreasing Inertia Weight
                 Me.Weight = (Me.WeightMax - Me.WeightMin) * (Me.MAX_ITERATION - Me.m_iteration) / Me.MAX_ITERATION + Me.WeightMin
+
+                'sort by eval
+                Me.m_swarm.Sort()
             Next
 
             Return False

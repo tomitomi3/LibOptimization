@@ -257,6 +257,9 @@ Namespace Optimization
                     Next
                     particle.Point.ReEvaluate()
                 Next
+
+                'sort by eval
+                Me.m_swarm.Sort()
             Next
 
             Return False
