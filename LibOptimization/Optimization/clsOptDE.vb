@@ -20,7 +20,6 @@ Namespace Optimization
     ''' 
     ''' Refference:
     ''' [1]Storn, R., Price, K., "Differential Evolution – A Simple and Efficient Heuristic for Global Optimization over Continuous Spaces", Journal of Global Optimization 11: 341–359.
-    ''' [1]Differential Evolution : http://en.wikipedia.org/wiki/Differential_evolution
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
@@ -61,19 +60,19 @@ Namespace Optimization
         'DE parameters
         '----------------------------------------------------------------
         ''' <summary>
-        ''' Population Size(Default:75)
+        ''' Population Size(Default:100)
         ''' </summary>
-        Public Property PopulationSize As Integer = 75
+        Public Property PopulationSize As Integer = 100
 
         ''' <summary>
-        ''' Differential weight(Mutation ratio)(Default:0.4717)
+        ''' Differential weight(Mutation ratio)(Default:0.5)
         ''' </summary>
-        Public Property F As Double = 0.4717
+        Public Property F As Double = 0.5
 
         ''' <summary>
-        ''' Cross over ratio(Default:0.8803)
+        ''' Cross over ratio(Default:0.9)
         ''' </summary>
-        Public Property CrossOverRatio As Double = 0.8803
+        Public Property CrossOverRatio As Double = 0.9
 
         'population
         Private m_parents As New List(Of clsPoint)
@@ -162,7 +161,7 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                'DE/rand/1/bin()
+                'DE
                 For i As Integer = 0 To Me.PopulationSize - 1
                     'pick different parent without i
                     Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count, i)
