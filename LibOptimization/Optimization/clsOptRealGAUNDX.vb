@@ -35,10 +35,9 @@ Namespace Optimization
         Private ALPHA As Double = 0.5
         Private BETA As Double = 0.35
         Private m_parents As New List(Of clsPoint)
-
-        'alternation strategy
         Private AlternationType As AlternationStrategy = AlternationStrategy.JGG
-        Private Enum AlternationStrategy
+        'alternation strategy
+        Public Enum AlternationStrategy
             MGG
             JGG
         End Enum
@@ -190,6 +189,22 @@ Namespace Optimization
                 Me.BETA = value
             End Set
         End Property
+
+        ''' <summary>
+        ''' AlternationStrategy(Default:JGG)
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property PARAM_AlternationType As AlternationStrategy
+            Get
+                Return Me.AlternationType
+            End Get
+            Set(value As AlternationStrategy)
+                Me.AlternationType = value
+            End Set
+        End Property
+
 #End Region
 
 #Region "Public"
@@ -278,13 +293,73 @@ Namespace Optimization
                 '    clsUtil.ToCSV(children)
                 'End If
 
-                'replace(JGG Strategy)
-                children.Sort()
-                Me.m_parents(p1Index) = children(0)
-                Me.m_parents(p2Index) = children(1)
+                'AlternationStrategy
+                If Me.AlternationType = AlternationStrategy.JGG Then
+                    'JGG
+                    children.Sort()
+                    Me.m_parents(p1Index) = children(0)
+                    Me.m_parents(p2Index) = children(1)
+                Else
+                    'MGG
+                    children.Add(p1)
+                    children.Add(p2)
+                    children.Sort()
+                    Me.m_parents(p1Index) = children(0) 'elite
+                    children.RemoveAt(0)
+                    Dim rIndex = Me.SelectRoulette(children, True)
+                    Me.m_parents(p2Index) = children(rIndex)
+                End If
             Next
 
             Return False
+        End Function
+
+        ''' <summary>
+        ''' RouletteWheel Selection 
+        ''' </summary>
+        ''' <param name="ai_chidren"></param>
+        ''' <param name="isForMinimize"></param>
+        ''' <returns>index</returns>
+        ''' <remarks></remarks>
+        Private Function SelectRoulette(ByVal ai_chidren As List(Of clsPoint), ByVal isForMinimize As Boolean) As Integer
+            If isForMinimize = True Then
+                Dim tempSum As Double = 0.0
+                For Each c In ai_chidren
+                    tempSum += Math.Abs(c.Eval)
+                Next
+                Dim tempList As New List(Of Double)(ai_chidren.Count)
+                Dim newTempSum As Double = 0.0
+                For i As Integer = 0 To ai_chidren.Count - 1
+                    Dim temp = tempSum - ai_chidren(i).Eval
+                    tempList.Add(temp)
+                    newTempSum += temp
+                Next
+                'select
+                Dim r = Me.m_rand.NextDouble()
+                Dim cumulativeRatio As Double = 0.0
+                For i As Integer = 0 To ai_chidren.Count - 1
+                    cumulativeRatio += tempList(i) / newTempSum
+                    If cumulativeRatio > r Then
+                        Return i
+                    End If
+                Next
+            Else
+                Dim tempSum As Double = 0.0
+                For Each c In ai_chidren
+                    tempSum += c.Eval
+                Next
+                'select
+                Dim r = Me.m_rand.NextDouble()
+                Dim cumulativeRatio As Double = 0.0
+                For i As Integer = 0 To ai_chidren.Count - 1
+                    cumulativeRatio += ai_chidren(i).eval / tempSum
+                    If cumulativeRatio > r Then
+                        Return i
+                    End If
+                Next
+            End If
+
+            Return 0
         End Function
 
         ''' <summary>
@@ -391,6 +466,10 @@ Namespace Optimization
                 length += 0.0000000001 'avoid Zero Divide
             End If
             Dim d2 = 2.0 * areaTriangle / length 'S=1/2 * h * a -> h = 2.0 * S / a
+
+            'If d2 < 0.0001 Then
+            '    d2 += Me.m_rand.NextDouble()
+            'End If
 
             'UNDX
             Dim children As New List(Of clsPoint)(Me.CHILDREN_SIZE)
