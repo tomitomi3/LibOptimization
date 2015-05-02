@@ -16,8 +16,22 @@ Module Module1
         ' 4. Get result and evaluate.
 
         'Test
-        'CheckOptimization()
+        CheckOptimization()
         'OptimizeDeJongFunction()
+        'PSOComparison(5, New clsBenchRosenblock(5))
+
+        With Nothing
+            Dim optimization As New clsOptDE(New clsBenchRosenblock(20))
+            optimization.Random = New clsRandomXorshift(123456)
+            'optimization.IsUseCriterion = False
+            optimization.Init()
+            While (optimization.DoIteration(50) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+                '   Threading.Thread.Sleep(1000)
+            End While
+            clsUtil.DebugValue(optimization)
+            Return
+        End With
 
         'Typical use
         With Nothing
@@ -25,7 +39,7 @@ Module Module1
             Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(1))
             'Initialize starting value
             optimization.Init()
-            'Do calc
+            ''Do calc
             optimization.DoIteration()
             'Get result. Check recent error.
             If optimization.IsRecentError() = True Then
@@ -99,7 +113,9 @@ Module Module1
             clsUtil.DebugValue(optimization1)
 
             'De jong Function5
-            Dim optimization2 As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5(), ai_randomRange:=65.536, ai_childsSize:=100)
+            Dim optimization2 As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5())
+            optimization2.PARAM_InitRange = 65.536
+            optimization2.PARAM_ChildrenSize = 100
             optimization2.Init()
             For i As Integer = 0 To 5
                 optimization2.DoIteration()
@@ -211,6 +227,16 @@ Module Module1
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptDE(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptSimulatedAnnealing(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
         End With
 
         Console.WriteLine("-------------")
@@ -219,12 +245,12 @@ Module Module1
         With Nothing
             Dim DIMENSION = 5
             Dim optimization As absOptimization
-            optimization = New clsOptSteepestDescent(tgtFunction)
+            optimization = New clsOptSteepestDescent(tgtFunction, ai_alpha:=0.0001)
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-            optimization = New clsOptNewtonMethod(tgtFunction)
+            optimization = New clsOptNewtonMethod(tgtFunction, ai_alpha:=0.00001)
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
@@ -277,6 +303,16 @@ Module Module1
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
             optimization = New clsOptPSOAIW(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptDE(tgtFunction)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptSimulatedAnnealing(tgtFunction)
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
@@ -399,7 +435,8 @@ Module Module1
 
     Private Sub OptimizeDeJongFunction()
         With Nothing
-            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction1(), ai_randomRange:=5.12)
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction1())
+            opt.PARAM_InitRange = 5.12
             opt.Init()
             clsUtil.DebugValue(opt)
             opt.DoIteration()
@@ -407,7 +444,8 @@ Module Module1
         End With
 
         With Nothing
-            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction2(), ai_randomRange:=2.048)
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction2())
+            opt.PARAM_InitRange = 2.048
             opt.Init()
             clsUtil.DebugValue(opt)
             opt.DoIteration()
@@ -415,7 +453,8 @@ Module Module1
         End With
 
         With Nothing
-            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction3(), ai_randomRange:=5.12)
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction3())
+            opt.PARAM_InitRange = 5.12
             opt.Init()
 
             opt.DoIteration()
@@ -427,7 +466,8 @@ Module Module1
         End With
 
         With Nothing
-            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction4(), ai_randomRange:=1.28)
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction4())
+            opt.PARAM_InitRange = 1.28
             opt.Init()
             clsUtil.DebugValue(opt)
             opt.DoIteration()
@@ -435,7 +475,9 @@ Module Module1
         End With
 
         With Nothing
-            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5(), ai_randomRange:=65.536, ai_childsSize:=100)
+            Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5())
+            opt.PARAM_InitRange = 65.536
+            opt.PARAM_ChildrenSize = 100
             opt.Init()
             For i As Integer = 0 To 2
                 opt.DoIteration()
@@ -452,7 +494,7 @@ Module Module1
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSO(func)
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.PARAM_MAX_ITERATION = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
@@ -464,7 +506,7 @@ Module Module1
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSOLDIW(func)
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.PARAM_MAX_ITERATION = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
@@ -476,7 +518,7 @@ Module Module1
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSOChaoticIW(func)
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.PARAM_MAX_ITERATION = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20}CDIW,{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
@@ -489,7 +531,7 @@ Module Module1
                                                            Dim optimization As New clsOptPSOChaoticIW(func)
                                                            optimization.PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.PARAM_MAX_ITERATION = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20}CRIW,{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
@@ -501,7 +543,7 @@ Module Module1
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSOAIW(func)
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 5000
+                                                           optimization.PARAM_MAX_ITERATION = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
