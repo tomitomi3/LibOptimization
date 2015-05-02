@@ -24,7 +24,7 @@ Namespace Optimization
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
-    Public Class clsOptDE : Inherits absOptimization
+    Public Class clsOptDE_rand_1_bin : Inherits absOptimization
 #Region "Member"
         '----------------------------------------------------------------
         'Common parameters
@@ -230,7 +230,7 @@ Namespace Optimization
 #End Region
 
 #Region "Private"
-       
+
 #End Region
     End Class
 End Namespace
