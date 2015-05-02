@@ -94,6 +94,7 @@
     <Compile Include="Optimization\clsOptRealGABLX.vb" />
     <Compile Include="Optimization\clsOptRealGASPX.vb" />
     <Compile Include="Optimization\clsOptPSO.vb" />
+    <Compile Include="Optimization\clsOptDE.vb" />
     <Compile Include="Optimization\clsOptRealGAUNDX.vb" />
     <Compile Include="Optimization\clsOptSimulatedAnnealing.vb" />
     <Compile Include="Optimization\clsOptTemplate.vb" />
