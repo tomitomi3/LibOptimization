@@ -220,7 +220,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property ResultForDebug As List(Of Optimization.clsPoint)
             Get
-                Return Nothing
+                Return New List(Of clsPoint)({Me.m_point})
             End Get
         End Property
 #End Region
