@@ -89,6 +89,14 @@ Namespace Optimization
                 Me.m_rand = value
             End Set
         End Property
+
+        ''' <summary>
+        ''' Reset Iteration count
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub ResetIterationCount()
+            Me.m_iteration = 0
+        End Sub
     End Class
 
 End Namespace
