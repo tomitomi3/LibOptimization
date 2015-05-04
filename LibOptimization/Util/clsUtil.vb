@@ -211,5 +211,20 @@ Namespace Util
                 Console.WriteLine("{0}", p.Eval)
             Next
         End Sub
+
+        ''' <summary>
+        ''' Eval list
+        ''' </summary>
+        ''' <param name="arP"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function GetSortedEvalList(ByVal arP As List(Of clsPoint)) As List(Of clsEval)
+            Dim sortedEvalList = New List(Of clsEval)
+            For i = 0 To arP.Count - 1
+                sortedEvalList.Add(New clsEval(i, arP(i).Eval))
+            Next
+            sortedEvalList.Sort()
+            Return sortedEvalList
+        End Function
     End Class
 End Namespace

@@ -87,6 +87,7 @@
     <Compile Include="BenchmarkFunctions\clsBenchSchaffer.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchSphere.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchTest.vb" />
+    <Compile Include="Optimization\clsOptCS.vb" />
     <Compile Include="Optimization\clsOptDE_best_2_bin.vb" />
     <Compile Include="Optimization\clsOptNelderMeadWiki.vb" />
     <Compile Include="Optimization\clsOptPSOChaoticIW.vb" />
@@ -100,6 +101,8 @@
     <Compile Include="Optimization\clsOptSimulatedAnnealing.vb" />
     <Compile Include="Optimization\clsOptTemplate.vb" />
     <Compile Include="Optimization\clsParticle.vb" />
+    <Compile Include="Util\clsEval.vb" />
+    <Compile Include="Util\clsRandomLevy.vb" />
     <Compile Include="ShoddyLinearAlgebra\clsException.vb" />
     <Compile Include="ShoddyLinearAlgebra\clsShoddyMatrix.vb" />
     <Compile Include="ShoddyLinearAlgebra\clsShoddyVector.vb" />
