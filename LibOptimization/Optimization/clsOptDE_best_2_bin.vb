@@ -65,7 +65,7 @@ Namespace Optimization
         Public Property PopulationSize As Integer = 100
 
         ''' <summary>
-        ''' Differential weight(Mutation ratio)(Default:0.5)
+        ''' Differential weight(Scaling factor)(Default:0.5)
         ''' </summary>
         Public Property F As Double = 0.5
 
