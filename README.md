@@ -13,6 +13,14 @@ LibOptimizationは制約条件の無い最適化を行う.NET Framework用のラ
 
 See [wiki](https://github.com/tomitomi3/LibOptimization/wiki) for details.
 
+How to get
+==========
+
+URL:https://www.nuget.org/packages/LibOptimization/
+```
+PM> Install-Package LibOptimization
+```
+
 License
 =======
 
