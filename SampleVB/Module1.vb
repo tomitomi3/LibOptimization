@@ -21,10 +21,15 @@ Module Module1
         'PSOComparison(5, New clsBenchRosenblock(5))
 
         With Nothing
-            Dim optimization As New clsOptDE_best_2_bin(New clsBenchRosenblock(20))
+            Dim optimization As New clsOptDE(New clsBenchRosenblock(20))
+            'optimization.PopulationSize = 300
             optimization.Random = New clsRandomXorshift(123456)
             'optimization.IsUseCriterion = False
+            'optimization.InitialValueRange = 100
+            optimization.DEType = clsOptDE.EnumDEStrategyType.DE_best_1_bin
             optimization.Init()
+            optimization.ResetIterationCount()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
             While (optimization.DoIteration(50) = False)
                 clsUtil.DebugValue(optimization, ai_isOutValue:=False)
                 '   Threading.Thread.Sleep(1000)
