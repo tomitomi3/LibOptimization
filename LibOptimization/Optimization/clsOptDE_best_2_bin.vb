@@ -172,23 +172,20 @@ Namespace Optimization
                     Dim p4 As clsPoint = Me.m_parents(randIndex(3))
 
                     'Mutation and Crossover
+                    Dim child = New clsPoint(Me.m_func)
                     Dim children = New List(Of clsPoint)
-                    For kk As Integer = 0 To 2 - 1
-                        Dim child = New clsPoint(Me.m_func)
-                        Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
-                        Dim D = Me.m_func.NumberOfVariable - 1
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = Me.m_parents(0)(j) + Me.F * (p1(j) + p2(j) - p3(j) - p4(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                        child.ReEvaluate()
-
-                        children.Add(child)
+                    Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
+                    Dim D = Me.m_func.NumberOfVariable - 1
+                    For k = 0 To Me.m_func.NumberOfVariable - 1
+                        If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
+                            child(j) = Me.m_parents(0)(j) + Me.F * (p1(j) + p2(j) - p3(j) - p4(j))
+                        Else
+                            child(j) = xi(k)
+                        End If
+                        j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
                     Next
+                    child.ReEvaluate()
+                    children.Add(child)
 
                     'replace
                     children.Add(Me.m_parents(i))
