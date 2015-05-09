@@ -79,7 +79,7 @@ Namespace Optimization
         ''' <summary>
         ''' Differential Evolution Strategy
         ''' </summary>
-        Public Property DEType As EnumDEStrategyType = EnumDEStrategyType.DE_rand_1_bin
+        Public Property DEStrategy As EnumDEStrategyType = EnumDEStrategyType.DE_rand_1_bin
 
         ''' <summary>
         ''' Enum Differential Evolution Strategy
@@ -106,11 +106,22 @@ Namespace Optimization
         ''' <summary>
         ''' Constructor
         ''' </summary>
-        ''' <param name="ai_func">Optimize Function</param>
+        ''' <param name="ai_func">Objective Function</param>
         ''' <remarks>
         ''' </remarks>
         Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
+        End Sub
+
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="ai_func">Objective Function</param>
+        ''' <param name="ai_destrategy">DE Strategt(e.g. DE/rand/1/bin)</param>
+        ''' <remarks></remarks>
+        Public Sub New(ByVal ai_func As absObjectiveFunction, ByVal ai_destrategy As EnumDEStrategyType)
+            Me.m_func = ai_func
+            Me.DEStrategy = ai_destrategy
         End Sub
 #End Region
 
@@ -195,10 +206,10 @@ Namespace Optimization
                     'Mutation and Crossover
                     Dim child = New clsPoint(Me.m_func)
                     Dim children = New List(Of clsPoint)
-                    If Me.DEType = EnumDEStrategyType.DE_rand_1_bin Then
+                    Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
+                    Dim D = Me.m_func.NumberOfVariable - 1
+                    If Me.DEStrategy = EnumDEStrategyType.DE_rand_1_bin Then
                         'DE/rand/1/bin
-                        Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
-                        Dim D = Me.m_func.NumberOfVariable - 1
                         For k = 0 To Me.m_func.NumberOfVariable - 1
                             If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
                                 child(j) = p1(j) + Me.F * (p2(j) - p3(j))
@@ -207,12 +218,8 @@ Namespace Optimization
                             End If
                             j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
                         Next
-                        child.ReEvaluate()
-                        children.Add(child)
-                    ElseIf Me.DEType = EnumDEStrategyType.DE_rand_2_bin Then
+                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_rand_2_bin Then
                         'DE/rand/2/bin
-                        Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
-                        Dim D = Me.m_func.NumberOfVariable - 1
                         For k = 0 To Me.m_func.NumberOfVariable - 1
                             If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
                                 child(j) = p1(j) + Me.F * (p2(j) + p3(j) - p4(j) - p5(j))
@@ -221,12 +228,8 @@ Namespace Optimization
                             End If
                             j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
                         Next
-                        child.ReEvaluate()
-                        children.Add(child)
-                    ElseIf Me.DEType = EnumDEStrategyType.DE_best_1_bin Then
+                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_best_1_bin Then
                         'DE/best/1/bin
-                        Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
-                        Dim D = Me.m_func.NumberOfVariable - 1
                         For k = 0 To Me.m_func.NumberOfVariable - 1
                             If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
                                 child(j) = Me.m_parents(0)(j) + Me.F * (p1(j) - p2(j))
@@ -235,12 +238,8 @@ Namespace Optimization
                             End If
                             j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
                         Next
-                        child.ReEvaluate()
-                        children.Add(child)
-                    ElseIf Me.DEType = EnumDEStrategyType.DE_best_2_bin Then
+                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_best_2_bin Then
                         'DE/best/2/bin
-                        Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
-                        Dim D = Me.m_func.NumberOfVariable - 1
                         For k = 0 To Me.m_func.NumberOfVariable - 1
                             If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
                                 child(j) = Me.m_parents(0)(j) + Me.F * (p1(j) + p2(j) - p3(j) - p4(j))
@@ -249,9 +248,9 @@ Namespace Optimization
                             End If
                             j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
                         Next
-                        child.ReEvaluate()
-                        children.Add(child)
                     End If
+                    child.ReEvaluate()
+                    children.Add(child)
 
                     'replace
                     children.Add(Me.m_parents(i))

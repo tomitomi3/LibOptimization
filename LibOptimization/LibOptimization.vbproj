@@ -89,7 +89,6 @@
     <Compile Include="BenchmarkFunctions\clsBenchTest.vb" />
     <Compile Include="Optimization\clsOptCS.vb" />
     <Compile Include="Optimization\clsOptDE.vb" />
-    <Compile Include="Optimization\clsOptDE_best_2_bin.vb" />
     <Compile Include="Optimization\clsOptNelderMeadWiki.vb" />
     <Compile Include="Optimization\clsOptPSOChaoticIW.vb" />
     <Compile Include="Optimization\clsOptPSOLDIW.vb" />
@@ -97,7 +96,6 @@
     <Compile Include="Optimization\clsOptRealGABLX.vb" />
     <Compile Include="Optimization\clsOptRealGASPX.vb" />
     <Compile Include="Optimization\clsOptPSO.vb" />
-    <Compile Include="Optimization\clsOptDE_rand_1_bin.vb" />
     <Compile Include="Optimization\clsOptRealGAUNDX.vb" />
     <Compile Include="Optimization\clsOptSimulatedAnnealing.vb" />
     <Compile Include="Optimization\clsOptTemplate.vb" />

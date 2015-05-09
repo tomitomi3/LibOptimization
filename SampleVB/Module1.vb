@@ -20,24 +20,6 @@ Module Module1
         'OptimizeDeJongFunction()
         'PSOComparison(5, New clsBenchRosenblock(5))
 
-        With Nothing
-            Dim optimization As New clsOptDE(New clsBenchRosenblock(20))
-            'optimization.PopulationSize = 300
-            optimization.Random = New clsRandomXorshift(123456)
-            'optimization.IsUseCriterion = False
-            'optimization.InitialValueRange = 100
-            optimization.DEType = clsOptDE.EnumDEStrategyType.DE_best_1_bin
-            optimization.Init()
-            optimization.ResetIterationCount()
-            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-            While (optimization.DoIteration(50) = False)
-                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-                '   Threading.Thread.Sleep(1000)
-            End While
-            clsUtil.DebugValue(optimization)
-            Return
-        End With
-
         'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
@@ -233,12 +215,7 @@ Module Module1
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-            optimization = New clsOptDE_rand_1_bin(tgtFunction)
-            optimization.Init()
-            optimization.DoIteration()
-            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-
-            optimization = New clsOptDE_best_2_bin(tgtFunction)
+            optimization = New clsOptDE(tgtFunction)
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
@@ -317,12 +294,22 @@ Module Module1
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-            optimization = New clsOptDE_rand_1_bin(tgtFunction)
+            optimization = New clsOptDE(tgtFunction, clsOptDE.EnumDEStrategyType.DE_rand_1_bin)
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-            optimization = New clsOptDE_best_2_bin(tgtFunction)
+            optimization = New clsOptDE(tgtFunction, clsOptDE.EnumDEStrategyType.DE_best_1_bin)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptDE(tgtFunction, clsOptDE.EnumDEStrategyType.DE_rand_2_bin)
+            optimization.Init()
+            optimization.DoIteration()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+
+            optimization = New clsOptDE(tgtFunction, clsOptDE.EnumDEStrategyType.DE_best_2_bin)
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
