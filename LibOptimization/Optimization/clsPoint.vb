@@ -140,6 +140,18 @@ Namespace Optimization
         End Property
 
         ''' <summary>
+        ''' Init
+        ''' </summary>
+        ''' <param name="ai_range">-ai_range to ai_range</param>
+        ''' <param name="ai_rand">Random object</param>
+        ''' <remarks></remarks>
+        Public Sub InitValue(ByVal ai_range As Double, ByVal ai_rand As System.Random)
+            For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                Me.Add(Math.Abs(2.0 * ai_range) * ai_rand.NextDouble() - ai_range)
+            Next
+        End Sub
+
+        ''' <summary>
         ''' Copy
         ''' </summary>
         ''' <returns></returns>

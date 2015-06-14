@@ -207,7 +207,7 @@
         ''' </summary>
         ''' <param name="ai_seed"></param>
         ''' <remarks></remarks>
-        Public Sub SetSeed(Optional ByVal ai_seed As UInteger = 123456)
+        Public Sub SetSeed(Optional ByVal ai_seed As UInteger = 88675123)
             clsRandomXorshiftSingleton.GetInstance().SetSeed(ai_seed)
         End Sub
 #End Region
