@@ -32,8 +32,6 @@ Namespace BenchmarkFunction
                 Return 0
             End If
 
-            Dim ret As Double = 0.0
-
             If (x(0) >= -2.048) AndAlso (x(0) <= 2.048) Then
                 If (x(1) >= -2.048) AndAlso (x(1) <= 2.048) Then
                     Return 100 * ((x(0) ^ 2 - x(1)) ^ 2) + (1 - x(0)) ^ 2
