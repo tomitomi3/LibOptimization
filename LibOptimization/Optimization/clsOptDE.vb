@@ -193,6 +193,7 @@ Namespace Optimization
                 m_iteration += 1
 
                 'DE
+                Dim best = Me.m_parents(0).Copy()
                 For i As Integer = 0 To Me.PopulationSize - 1
                     'pick different parent without i
                     Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count, i)
@@ -205,7 +206,6 @@ Namespace Optimization
 
                     'Mutation and Crossover
                     Dim child = New clsPoint(Me.m_func)
-                    Dim children = New List(Of clsPoint)
                     Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
                     Dim D = Me.m_func.NumberOfVariable - 1
                     If Me.DEStrategy = EnumDEStrategyType.DE_rand_1_bin Then
@@ -232,7 +232,7 @@ Namespace Optimization
                         'DE/best/1/bin
                         For k = 0 To Me.m_func.NumberOfVariable - 1
                             If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = Me.m_parents(0)(j) + Me.F * (p1(j) - p2(j))
+                                child(j) = best(j) + Me.F * (p1(j) - p2(j))
                             Else
                                 child(j) = xi(k)
                             End If
@@ -242,20 +242,23 @@ Namespace Optimization
                         'DE/best/2/bin
                         For k = 0 To Me.m_func.NumberOfVariable - 1
                             If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = Me.m_parents(0)(j) + Me.F * (p1(j) + p2(j) - p3(j) - p4(j))
+                                child(j) = best(j) + Me.F * (p1(j) + p2(j) - p3(j) - p4(j))
                             Else
                                 child(j) = xi(k)
                             End If
                             j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
                         Next
                     End If
-                    child.ReEvaluate()
-                    children.Add(child)
+                    child.ReEvaluate() 'Evaluate child
 
-                    'replace
-                    children.Add(Me.m_parents(i))
-                    children.Sort()
-                    Me.m_parents(i) = children(0)
+                    'Survive
+                    If child.Eval < Me.m_parents(i).Eval Then
+                        Me.m_parents(i) = child
+                    End If
+                    'Current best
+                    If child.Eval < best.Eval Then
+                        best = child
+                    End If
                 Next
             Next
 

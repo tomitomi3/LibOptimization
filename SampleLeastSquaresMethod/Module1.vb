@@ -6,10 +6,12 @@
 
         '最小化
         Dim opt As New LibOptimization.Optimization.clsOptDE(objectiveFunction)
-        opt.DEStrategy = LibOptimization.Optimization.clsOptDE.EnumDEStrategyType.DE_best_2_bin
+        opt.DEStrategy = LibOptimization.Optimization.clsOptDE.EnumDEStrategyType.DE_best_1_bin
         opt.Init()
         LibOptimization.Util.clsUtil.DebugValue(opt)
-        opt.DoIteration()
+        While (opt.DoIteration(50) = False)
+            LibOptimization.Util.clsUtil.DebugValue(opt, ai_isOutValue:=False)
+        End While
         LibOptimization.Util.clsUtil.DebugValue(opt)
     End Sub
 End Module
