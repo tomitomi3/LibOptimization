@@ -473,14 +473,13 @@
         ''' <param name="ai_preci"></param>
         ''' <remarks></remarks>
         Public Sub PrintValue(Optional ByVal ai_preci As Integer = 3)
-            Dim str As New System.Text.StringBuilder()
             For Each vec As clsShoddyVector In Me
-                str.Clear()
+                Dim str As New System.Text.StringBuilder()
                 For i As Integer = 0 To vec.Count - 1
                     str.Append(vec(i).ToString("F" & ai_preci.ToString()) & ControlChars.Tab)
                 Next
-                str.AppendLine("")
-                Console.Write(str.ToString())
+                Str.AppendLine("")
+                Console.Write(Str.ToString())
             Next
             Console.WriteLine()
         End Sub

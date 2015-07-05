@@ -23,7 +23,7 @@ Module Module1
         'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
-            Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(1))
+            Dim optimization As New clsOptDE(New clsBenchRosenblock(20))
             'Initialize starting value
             optimization.Init()
             ''Do calc

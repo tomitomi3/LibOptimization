@@ -41,7 +41,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Sub New(ByVal ai_particle As clsParticle)
             Me.m_point = ai_particle.Point.Copy()
-            Me.m_velocity = ai_particle.Velocity.ToArray()
+            Me.m_velocity = ai_particle.Velocity()
             Me.m_bestPoint = ai_particle.BestPoint.Copy()
         End Sub
 

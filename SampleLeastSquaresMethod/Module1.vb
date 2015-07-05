@@ -2,7 +2,9 @@
     Sub Main()
         '評価関数
         Dim objectiveFunction = New clsLeastSquaresMethod()
-        objectiveFunction.Init("data.csv")
+        If objectiveFunction.Init("..\..\_sampledata\data.csv") = False Then
+            Return
+        End If
 
         '最小化
         Dim opt As New LibOptimization.Optimization.clsOptDE(objectiveFunction)

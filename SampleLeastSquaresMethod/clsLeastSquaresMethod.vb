@@ -22,16 +22,26 @@ Public Class clsLeastSquaresMethod : Inherits LibOptimization.Optimization.absOb
     ''' </summary>
     ''' <param name="ai_path"></param>
     ''' <remarks></remarks>
-    Public Sub Init(ByVal ai_path As String)
-        Using r = New IO.StreamReader(ai_path, Text.Encoding.GetEncoding("SHIFT_JIS"))
-            Using csv = New CsvHelper.CsvReader(r)
-                csv.Configuration.HasHeaderRecord = True
-                While csv.Read()
-                    datas.Add(New List(Of Double)({csv.CurrentRecord.ElementAt(0), csv.CurrentRecord.ElementAt(1)}))
-                End While
+    Public Function Init(ByVal ai_path As String) As Boolean
+        If System.IO.File.Exists(ai_path) = False Then
+            Return False
+        End If
+
+        Try
+            Using r = New IO.StreamReader(ai_path, Text.Encoding.GetEncoding("SHIFT_JIS"))
+                Using csv = New CsvHelper.CsvReader(r)
+                    csv.Configuration.HasHeaderRecord = True
+                    While csv.Read()
+                        datas.Add(New List(Of Double)({csv.CurrentRecord.ElementAt(0), csv.CurrentRecord.ElementAt(1)}))
+                    End While
+                End Using
             End Using
-        End Using
-    End Sub
+        Catch ex As Exception
+            Return False
+        End Try
+
+        Return True
+    End Function
 
 #Region "for LibOptimization"
     ''' <summary>
