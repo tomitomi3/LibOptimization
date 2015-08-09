@@ -33,6 +33,10 @@ Requirements
 
 .NET Framework 4.0
 
+.NET Framework 3.5
+
+.NET Framework 3.0
+
 Build status
 ============
 
