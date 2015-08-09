@@ -121,11 +121,17 @@
     <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchTest.vb">
       <Link>BenchmarkFunctions\clsBenchTest.vb</Link>
     </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsFireFly.vb">
+      <Link>Optimization\clsFireFly.vb</Link>
+    </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptCS.vb">
       <Link>Optimization\clsOptCS.vb</Link>
     </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptDE.vb">
       <Link>Optimization\clsOptDE.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptFA.vb">
+      <Link>Optimization\clsOptFA.vb</Link>
     </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptNelderMead.vb">
       <Link>Optimization\clsOptNelderMead.vb</Link>

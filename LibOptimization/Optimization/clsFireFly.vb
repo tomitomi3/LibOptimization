@@ -3,15 +3,17 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Point Class
+    ''' Firefly class
     ''' </summary>
     ''' <remarks></remarks>
-    Public Class clsPoint
+    Public Class clsFireFly
         Inherits clsShoddyVector
         Implements IComparable
 
         Private m_func As absObjectiveFunction = Nothing
         Private m_evaluateValue As Double = 0.0
+
+        Public Property Intensity As Double = 0.0
 
         ''' <summary>
         ''' Default constructor
@@ -26,10 +28,11 @@ Namespace Optimization
         ''' </summary>
         ''' <param name="ai_vertex"></param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_vertex As clsPoint)
+        Public Sub New(ByVal ai_vertex As clsFireFly)
             Me.m_func = ai_vertex.GetFunc()
             Me.AddRange(ai_vertex) 'ok
             Me.m_evaluateValue = ai_vertex.Eval
+            Me.Intensity = 1 / (Me.m_evaluateValue + 0.0001)
         End Sub
 
         ''' <summary>
@@ -41,6 +44,7 @@ Namespace Optimization
             Me.m_func = ai_func
             Me.AddRange(New Double(ai_func.NumberOfVariable - 1) {}) 'ok
             Me.m_evaluateValue = Me.m_func.F(Me)
+            Me.Intensity = 1 / (Me.m_evaluateValue + 0.0001)
         End Sub
 
         ''' <summary>
@@ -53,6 +57,7 @@ Namespace Optimization
             Me.m_func = ai_func
             Me.AddRange(ai_vars) 'ok
             Me.m_evaluateValue = Me.m_func.F(Me)
+            Me.Intensity = 1 / (Me.m_evaluateValue + 0.0001)
         End Sub
 
         ''' <summary>
@@ -65,6 +70,7 @@ Namespace Optimization
             Me.m_func = ai_func
             Me.AddRange(ai_vars) 'ok
             Me.m_evaluateValue = Me.m_func.F(Me)
+            Me.Intensity = 1 / (Me.m_evaluateValue + 0.0001)
         End Sub
 
         ''' <summary>
@@ -76,6 +82,8 @@ Namespace Optimization
         Public Sub New(ByVal ai_func As absObjectiveFunction, ByVal ai_dim As Integer)
             Me.m_func = ai_func
             Me.AddRange(New Double(ai_dim - 1) {}) 'ok
+            Me.m_evaluateValue = Me.m_func.F(Me)
+            Me.Intensity = 1 / (Me.m_evaluateValue + 0.0001)
         End Sub
 
         ''' <summary>
@@ -100,7 +108,7 @@ Namespace Optimization
 
             'Compare
             Dim mineValue As Double = Me.m_evaluateValue
-            Dim compareValue As Double = DirectCast(ai_obj, clsPoint).Eval
+            Dim compareValue As Double = DirectCast(ai_obj, clsFireFly).Eval
             If mineValue = compareValue Then
                 Return 0
             ElseIf mineValue < compareValue Then
@@ -116,6 +124,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Sub ReEvaluate()
             Me.m_evaluateValue = Me.m_func.F(Me)
+            Me.Intensity = 1 / (Me.m_evaluateValue + 0.0001)
         End Sub
 
         ''' <summary>
@@ -156,8 +165,8 @@ Namespace Optimization
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function Copy() As clsPoint
-            Return New clsPoint(Me)
+        Public Function Copy() As clsFireFly
+            Return New clsFireFly(Me)
         End Function
 
         ''' <summary>
@@ -165,11 +174,12 @@ Namespace Optimization
         ''' </summary>
         ''' <param name="ai_point"></param>
         ''' <remarks></remarks>
-        Public Sub Copy(ByVal ai_point As clsPoint)
+        Public Sub Copy(ByVal ai_point As clsFireFly)
             For i As Integer = 0 To ai_point.Count - 1
                 Me(i) = ai_point(i)
             Next
             Me.m_evaluateValue = ai_point.Eval
+            Me.Intensity = ai_point.Intensity
         End Sub
     End Class
 End Namespace

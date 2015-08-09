@@ -3,10 +3,21 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' optimize template
+    ''' Firefly Algorithm
     ''' </summary>
-    ''' <remarks></remarks>
-    Public Class clsOptTemplate : Inherits absOptimization
+    ''' <remarks>
+    ''' Features:
+    '''  -Derivative free optimization algorithm.
+    '''  -for Mulitimodal optimization
+    ''' 
+    ''' Refference:
+    ''' [1]X. S. Yang, “Firefly algorithms for multimodal optimization,” in Proceedings of the 5th International Conference on Stochastic Algorithms: Foundation and Applications (SAGA '09), vol. 5792 of Lecture notes in Computer Science, pp. 169–178, 2009.
+    ''' [2]Firefly Algorithm - http://www.mathworks.com/matlabcentral/fileexchange/29693-firefly-algorithm
+    ''' 
+    ''' Implment:
+    ''' N.Tomi(tomi.nori+github at gmail.com)
+    ''' </remarks>
+    Public Class clsOptFA : Inherits absOptimization
 #Region "Member"
         '----------------------------------------------------------------
         'Common parameters
@@ -29,9 +40,9 @@ Namespace Optimization
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
 
         ''' <summary>
-        ''' Max iteration count(Default:10,000)
+        ''' Max iteration count(Default:5,000)
         ''' </summary>
-        Public Property Iteration As Integer = 10000
+        Public Property Iteration As Integer = 5000
 
         ''' <summary>
         ''' Range of initial value(Default:+-5)
@@ -42,12 +53,29 @@ Namespace Optimization
         'Peculiar parameter
         '----------------------------------------------------------------
         ''' <summary>
-        ''' Population Size(Default:100)
+        ''' Population Size(Default:50)
         ''' </summary>
-        Public Property PopulationSize As Integer = 100
+        Public Property PopulationSize As Integer = 50
 
-        'population
-        Private m_populations As New List(Of clsPoint)
+        ''' <summary>
+        ''' Fire Fly
+        ''' </summary>
+        Private m_fireflies As New List(Of clsFireFly)
+
+        ''' <summary>
+        ''' attractiveness base
+        ''' </summary>
+        Public Property Beta0 As Double = 1.0
+
+        ''' <summary>
+        ''' light absorption coefficient(Default:1.0)
+        ''' </summary>
+        Public Property Gamma As Double = 1.0
+
+        ''' <summary>
+        ''' randomization parameter
+        ''' </summary>
+        Public Property Alpha As Double = 0.2
 
         'ErrorManage
         Private m_error As New clsError
@@ -74,7 +102,7 @@ Namespace Optimization
             Try
                 'init meber varibles
                 Me.m_iteration = 0
-                Me.m_populations.Clear()
+                Me.m_fireflies.Clear()
 
                 'Set initialize value
                 For i As Integer = 0 To Me.PopulationSize - 1
@@ -82,16 +110,17 @@ Namespace Optimization
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         temp.Add(Math.Abs(2.0 * InitialValueRange) * m_rand.NextDouble() - InitialValueRange)
                     Next
-                    Me.m_populations.Add(New clsPoint(MyBase.m_func, temp))
+                    Me.m_fireflies.Add(New clsFireFly(MyBase.m_func, temp))
+                    Me.m_fireflies(i).ReEvaluate() 'with update intensity
                 Next
 
                 'Sort Evaluate
-                Me.m_populations.Sort()
+                Me.m_fireflies.Sort()
 
                 'Detect HigherNPercentIndex
-                Me.HigherNPercentIndex = CInt(Me.m_populations.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_populations.Count OrElse Me.HigherNPercentIndex >= Me.m_populations.Count Then
-                    Me.HigherNPercentIndex = Me.m_populations.Count - 1
+                Me.HigherNPercentIndex = CInt(Me.m_fireflies.Count * Me.HigherNPercent)
+                If Me.HigherNPercentIndex = Me.m_fireflies.Count OrElse Me.HigherNPercentIndex >= Me.m_fireflies.Count Then
+                    Me.HigherNPercentIndex = Me.m_fireflies.Count - 1
                 End If
 
             Catch ex As Exception
@@ -115,12 +144,12 @@ Namespace Optimization
             ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'Sort Evaluate
-                Me.m_populations.Sort()
+                Me.m_fireflies.Sort()
 
                 'check criterion
                 If Me.IsUseCriterion = True Then
                     'higher N percentage particles are finished at the time of same evaluate value.
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_populations(0).Eval, Me.m_populations(Me.HigherNPercentIndex).Eval) Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_fireflies(0).Eval, Me.m_fireflies(Me.HigherNPercentIndex).Eval) Then
                         Return True
                     End If
                 End If
@@ -132,7 +161,23 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                'add logic
+                'FireFly - original
+                For i As Integer = 0 To Me.PopulationSize - 1
+                    For j As Integer = 0 To Me.PopulationSize - 1
+                        'Move firefly
+                        If Me.m_fireflies(i).Intensity < Me.m_fireflies(j).Intensity Then
+                            Dim r As Double = (Me.m_fireflies(i) - Me.m_fireflies(j)).NormL1()
+                            Dim beta As Double = Me.Beta0 * Math.Exp(-Me.Gamma * r * r) 'attractiveness
+                            For k As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                                Dim newPos As Double = Me.m_fireflies(i)(k)
+                                newPos += beta * (Me.m_fireflies(j)(k) - Me.m_fireflies(i)(k)) 'attraction
+                                newPos += Me.Alpha * (Me.m_rand.NextDouble() - 0.5) 'random search
+                                Me.m_fireflies(i)(k) = newPos
+                            Next k
+                            Me.m_fireflies(i).ReEvaluate() 'with update intensity
+                        End If
+                    Next
+                Next
             Next
 
             Return False
@@ -145,7 +190,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result() As clsPoint
             Get
-                Return Me.m_populations(0)
+                Return New clsPoint(Me.m_func, Me.m_fireflies(0).ToArray)
             End Get
         End Property
 
@@ -168,7 +213,8 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
             Get
-                Return Me.m_populations
+                Throw New Exception()
+                Return Nothing
             End Get
         End Property
 #End Region
