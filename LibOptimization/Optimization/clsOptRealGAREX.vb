@@ -275,6 +275,9 @@ Namespace Optimization
 
             'iteration count reset
             Me.m_iteration = 0
+
+            'reset error
+            Me.m_error.Clear()
         End Sub
 
         ''' <summary>
