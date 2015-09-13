@@ -15,15 +15,10 @@ Module Module1
         ' 3. Do optimization!
         ' 4. Get result and evaluate.
 
-        'Test
-        'CheckOptimization()
-        'OptimizeDeJongFunction()
-        'PSOComparison(5, New clsBenchRosenblock(5))
-
         'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
-            Dim optimization As New clsOptDE(New clsBenchRosenblock(20))
+            Dim optimization As New clsOptDE(New clsRosenBlock())
             'Initialize starting value
             optimization.Init()
             ''Do calc
@@ -36,6 +31,11 @@ Module Module1
             End If
         End With
 
+        'how to use liboptimization
+        HowtouseLibOptimization()
+    End Sub
+
+    Private Sub HowtouseLibOptimization()
         'Set random class and seed.
         With Nothing
             Dim optimization As New clsOptRealGASPX(New clsBenchSphere(1))
@@ -144,6 +144,37 @@ Module Module1
                 Return
             Else
                 clsUtil.DebugValue(best)
+            End If
+        End With
+
+        'LeastSquaresMethod 最小二乗法
+        With Nothing
+            '評価関数
+            Dim objectiveFunction = New clsLeastSquaresMethod()
+            If objectiveFunction.Init("..\..\..\_sampledata\data.csv") = False Then
+                Return
+            End If
+
+            '最小化
+            Dim opt As New LibOptimization.Optimization.clsOptDE(objectiveFunction)
+            opt.Init()
+            LibOptimization.Util.clsUtil.DebugValue(opt)
+            While (opt.DoIteration(50) = False)
+                LibOptimization.Util.clsUtil.DebugValue(opt, ai_isOutValue:=False)
+            End While
+            LibOptimization.Util.clsUtil.DebugValue(opt)
+        End With
+
+        'Constrained optimization for the Heuristic algorithm
+        With Nothing
+            'You design a constrained function.
+            Dim optimization As New clsOptDE(New clsUnconstrainedOptimization)
+            optimization.Init()
+            optimization.DoIteration()
+            If optimization.IsRecentError() = True Then
+                Return
+            Else
+                clsUtil.DebugValue(optimization)
             End If
         End With
     End Sub
@@ -405,7 +436,7 @@ Module Module1
         Next
     End Sub
 
-    Private Sub ComplarisonRGA()
+    Private Sub ComparisonRGA()
         Console.WriteLine("SPX Rastrigin 20D")
         With Nothing
             Dim optimization As New clsOptRealGASPX(New clsBenchRastrigin(20))

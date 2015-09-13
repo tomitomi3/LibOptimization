@@ -32,7 +32,7 @@ Public Class clsLeastSquaresMethod : Inherits LibOptimization.Optimization.absOb
                 Using csv = New CsvHelper.CsvReader(r)
                     csv.Configuration.HasHeaderRecord = True
                     While csv.Read()
-                        datas.Add(New List(Of Double)({csv.CurrentRecord.ElementAt(0), csv.CurrentRecord.ElementAt(1)}))
+                        datas.Add(New List(Of Double)({CDbl(csv.CurrentRecord.ElementAt(0)), CDbl(csv.CurrentRecord.ElementAt(1))}))
                     End While
                 End Using
             End Using
