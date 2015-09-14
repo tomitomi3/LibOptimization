@@ -27,14 +27,8 @@ Namespace Optimization
         Private ReadOnly EPS As Double = 0.00000001
         Private ReadOnly ALPHA As Double = 0.3
 
-        'This parameters to use when generate a variable
-        Private ReadOnly INIT_PARAM_RANGE As Double = 5
-
         'vector
         Private m_vect As clsShoddyVector = Nothing
-
-        'ErrorManage
-        Private m_error As New clsError
 #End Region
 
 #Region "Constructor"
@@ -54,7 +48,7 @@ Namespace Optimization
                        Optional ByVal ai_alpha As Double = 0.3 _
                        )
             Me.m_func = ai_func
-            Me.INIT_PARAM_RANGE = ai_randomRange
+            Me.InitialValueRange = ai_randomRange
             Me.MAX_ITERATION = ai_maxIteration
             Me.EPS = ai_eps
             Me.ALPHA = ai_alpha
@@ -72,7 +66,11 @@ Namespace Optimization
             Try
                 'init meber varibles
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    Me.m_vect(i) = Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE
+                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                    If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        value += Me.InitialPosition(i)
+                    End If
+                    Me.m_vect(i) = value
                 Next
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")

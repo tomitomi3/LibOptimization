@@ -27,13 +27,7 @@ Namespace Optimization
         Private ReadOnly COEFF_Contraction As Double = -0.5
         Private ReadOnly COEFF_Shrink As Double = 0.5
 
-        'This Parameter to use when generate a variable
-        Private ReadOnly INIT_PARAM_RANGE As Double = 5
-
         Private m_points As New List(Of clsPoint)
-
-        'ErrorManage
-        Private m_error As New clsError
 #End Region
 
 #Region "Constructor"
@@ -60,7 +54,7 @@ Namespace Optimization
                        )
             Me.m_func = ai_func
 
-            Me.INIT_PARAM_RANGE = ai_randomRange
+            Me.InitialValueRange = ai_randomRange
             Me.MAX_ITERATION = ai_maxIteration
             Me.EPS = ai_eps
             Me.COEFF_Refrection = ai_coeffRefrection
@@ -79,13 +73,22 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides Sub Init()
             Try
+                'init meber varibles
+                Me.m_error.Clear()
+                Me.m_iteration = 0
+                Me.m_points.Clear()
+
                 'Make simplex from random vertex
                 Dim tempSimplex()() As Double = Nothing
                 ReDim tempSimplex(MyBase.m_func.NumberOfVariable)
                 For i As Integer = 0 To tempSimplex.Length - 1
                     ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
                     For j As Integer = 0 To m_func.NumberOfVariable - 1
-                        tempSimplex(i)(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE
+                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                            value += Me.InitialPosition(j)
+                        End If
+                        tempSimplex(i)(j) = value
                     Next
                 Next
 

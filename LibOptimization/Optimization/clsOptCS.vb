@@ -44,11 +44,6 @@ Namespace Optimization
         ''' </summary>
         Public Property Iteration As Integer = 50000
 
-        ''' <summary>
-        ''' Range of initial value
-        ''' </summary>
-        Public Property InitialValueRange As Double = 5 'parameter range
-
         '----------------------------------------------------------------
         'Parameters
         '----------------------------------------------------------------
@@ -71,8 +66,6 @@ Namespace Optimization
         Private m_nests As New List(Of clsPoint)
         Private m_currentBest As clsPoint
 
-        'ErrorManage
-        Private m_error As New clsError
 #End Region
 
 #Region "Constructor"
@@ -98,12 +91,17 @@ Namespace Optimization
                 'init meber varibles
                 Me.m_iteration = 0
                 Me.m_nests.Clear()
+                Me.m_error.Clear()
 
                 'Set initialize value
                 For i As Integer = 0 To Me.PopulationSize - 1
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        temp.Add(Math.Abs(2.0 * InitialValueRange) * m_rand.NextDouble() - InitialValueRange)
+                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                            value += Me.InitialPosition(j)
+                        End If
+                        temp.Add(value)
                     Next
                     Me.m_nests.Add(New clsPoint(MyBase.m_func, temp))
                 Next
@@ -116,7 +114,6 @@ Namespace Optimization
                 If Me.HigherNPercentIndex = Me.m_nests.Count OrElse Me.HigherNPercentIndex >= Me.m_nests.Count Then
                     Me.HigherNPercentIndex = Me.m_nests.Count - 1
                 End If
-
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try

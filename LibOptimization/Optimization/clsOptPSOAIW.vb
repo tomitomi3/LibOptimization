@@ -19,7 +19,6 @@ Namespace Optimization
         'Common parameters
         Private EPS As Double = 0.000001 '1e-6
         Private MAX_ITERATION As Integer = 20000
-        Private INIT_PARAM_RANGE As Double = 5.12 'This Parameter to use when generate a variable
         Private IsUseCriterion As Boolean = True
         Private HigherNPercent As Double = 0.9 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
@@ -35,9 +34,6 @@ Namespace Optimization
         Private WeightMin As Double = 0.0
         Private C1 As Double = 1.49445
         Private C2 As Double = 1.49445
-
-        'ErrorManage
-        Private m_error As New clsError
 #End Region
 
 #Region "Constructor"
@@ -70,17 +66,6 @@ Namespace Optimization
         Public WriteOnly Property PARAM_MAX_ITERATION As Integer
             Set(value As Integer)
                 Me.MAX_ITERATION = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Range of initial value
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_InitRange As Double
-            Set(value As Double)
-                Me.INIT_PARAM_RANGE = value
             End Set
         End Property
 
@@ -186,9 +171,16 @@ Namespace Optimization
                     Dim tempBestPosition = New clsPoint(Me.m_func)
                     Dim tempVelocity(Me.m_func.NumberOfVariable - 1) As Double
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        tempPosition(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE
+                        'position
+                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                            value += Me.InitialPosition(j)
+                        End If
+                        tempPosition(j) = value
                         tempBestPosition(j) = tempPosition(j)
-                        tempVelocity(j) = Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE
+
+                        'velocity
+                        tempVelocity(j) = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
                     Next
                     tempPosition.ReEvaluate()
                     tempBestPosition.ReEvaluate()

@@ -101,7 +101,7 @@ Module Module1
 
             'De jong Function5
             Dim optimization2 As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5())
-            optimization2.PARAM_InitRange = 65.536
+            optimization2.InitialValueRange = 65.536
             optimization2.PARAM_ChildrenSize = 100
             optimization2.Init()
             For i As Integer = 0 To 5
@@ -469,7 +469,7 @@ Module Module1
     Private Sub OptimizeDeJongFunction()
         With Nothing
             Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction1())
-            opt.PARAM_InitRange = 5.12
+            opt.InitialValueRange = 5.12
             opt.Init()
             clsUtil.DebugValue(opt)
             opt.DoIteration()
@@ -478,7 +478,7 @@ Module Module1
 
         With Nothing
             Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction2())
-            opt.PARAM_InitRange = 2.048
+            opt.InitialValueRange = 2.048
             opt.Init()
             clsUtil.DebugValue(opt)
             opt.DoIteration()
@@ -487,7 +487,7 @@ Module Module1
 
         With Nothing
             Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction3())
-            opt.PARAM_InitRange = 5.12
+            opt.InitialValueRange = 5.12
             opt.Init()
 
             opt.DoIteration()
@@ -500,7 +500,7 @@ Module Module1
 
         With Nothing
             Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction4())
-            opt.PARAM_InitRange = 1.28
+            opt.InitialValueRange = 1.28
             opt.Init()
             clsUtil.DebugValue(opt)
             opt.DoIteration()
@@ -509,7 +509,7 @@ Module Module1
 
         With Nothing
             Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5())
-            opt.PARAM_InitRange = 65.536
+            opt.InitialValueRange = 65.536
             opt.PARAM_ChildrenSize = 100
             opt.Init()
             For i As Integer = 0 To 2

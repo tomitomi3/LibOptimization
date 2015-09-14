@@ -44,11 +44,6 @@ Namespace Optimization
         ''' </summary>
         Public Property Iteration As Integer = 5000
 
-        ''' <summary>
-        ''' Range of initial value(Default:+-5)
-        ''' </summary>
-        Public Property InitialValueRange As Double = 5 'parameter range
-
         '----------------------------------------------------------------
         'Peculiar parameter
         '----------------------------------------------------------------
@@ -76,9 +71,6 @@ Namespace Optimization
         ''' randomization parameter
         ''' </summary>
         Public Property Alpha As Double = 0.2
-
-        'ErrorManage
-        Private m_error As New clsError
 #End Region
 
 #Region "Constructor"
@@ -103,12 +95,17 @@ Namespace Optimization
                 'init meber varibles
                 Me.m_iteration = 0
                 Me.m_fireflies.Clear()
+                Me.m_error.Clear()
 
                 'Set initialize value
                 For i As Integer = 0 To Me.PopulationSize - 1
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        temp.Add(Math.Abs(2.0 * InitialValueRange) * m_rand.NextDouble() - InitialValueRange)
+                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                            value += Me.InitialPosition(j)
+                        End If
+                        temp.Add(value)
                     Next
                     Me.m_fireflies.Add(New clsFireFly(MyBase.m_func, temp))
                     Me.m_fireflies(i).ReEvaluate() 'with update intensity

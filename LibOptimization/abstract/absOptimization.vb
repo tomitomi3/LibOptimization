@@ -6,9 +6,54 @@ Namespace Optimization
     ''' </summary>
     ''' <remarks></remarks>
     Public MustInherit Class absOptimization
+        ''' <summary>Objective function</summary>
         Protected m_func As absObjectiveFunction = Nothing
+
+        ''' <summary>Iteration count</summary>
         Protected m_iteration As Integer = 0
+
+        ''' <summary>Random object</summary>
         Protected m_rand As System.Random = New clsRandomXorshift(CUInt(Environment.TickCount))
+
+        ''' <summary>Error manage class</summary>
+        Protected m_error As New clsError
+
+        ''' <summary>Range of initial value</summary>
+        ''' <remarks>This parameters to use when generate a variable</remarks>
+        Public Property InitialValueRange As Double = 5 'parameter range
+
+        ''' <summary>Initial position</summary>
+        Public Property InitialPosition As Double() = Nothing
+
+        ''' <summary>
+        ''' Objective function Property
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property ObjectiveFunction As absObjectiveFunction
+            Get
+                Return Me.m_func
+            End Get
+            Set(ByVal value As absObjectiveFunction)
+                Me.m_func = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Random object Property
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property Random As System.Random
+            Get
+                Return Me.m_rand
+            End Get
+            Set(ByVal value As System.Random)
+                Me.m_rand = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' Initialize parameter
@@ -58,36 +103,6 @@ Namespace Optimization
             Get
                 Return Me.m_iteration
             End Get
-        End Property
-
-        ''' <summary>
-        ''' Objective Function
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Property ObjectiveFunction As absObjectiveFunction
-            Get
-                Return Me.m_func
-            End Get
-            Set(ByVal value As absObjectiveFunction)
-                Me.m_func = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Random object
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Property Random As System.Random
-            Get
-                Return Me.m_rand
-            End Get
-            Set(ByVal value As System.Random)
-                Me.m_rand = value
-            End Set
         End Property
 
         ''' <summary>

@@ -226,5 +226,30 @@ Namespace Util
             sortedEvalList.Sort()
             Return sortedEvalList
         End Function
+
+        ''' <summary>
+        ''' Best clsPoint
+        ''' </summary>
+        ''' <param name="ai_points"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function GetBestPoint(ByVal ai_points As List(Of clsPoint)) As clsPoint
+            If ai_points Is Nothing Then
+                Return Nothing
+            ElseIf ai_points.Count = 0 Then
+                Return Nothing
+            ElseIf ai_points.Count = 1 Then
+                Return ai_points(0)
+            End If
+
+            Dim best = ai_points(0)
+            For i As Integer = 1 To ai_points.Count - 1
+                If best.Eval > ai_points(i).Eval Then
+                    best = ai_points(i)
+                End If
+            Next
+
+            Return best.Copy()
+        End Function
     End Class
 End Namespace

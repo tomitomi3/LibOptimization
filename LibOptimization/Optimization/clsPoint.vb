@@ -152,7 +152,7 @@ Namespace Optimization
         End Sub
 
         ''' <summary>
-        ''' Copy
+        ''' Copy clsPoint
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
@@ -161,7 +161,7 @@ Namespace Optimization
         End Function
 
         ''' <summary>
-        ''' Copy
+        ''' Copy clsPoint
         ''' </summary>
         ''' <param name="ai_point"></param>
         ''' <remarks></remarks>

@@ -22,14 +22,8 @@ Namespace Optimization
         Private ReadOnly DEFAULT_STEPLENGTH As Double = 0.6
         Private ReadOnly COEFF_Shrink As Double = 2.0
 
-        'This Parameter to use when generate a variable
-        Private ReadOnly INIT_PARAM_RANGE As Double = 5
-
         Private m_stepLength As Double = 0.6
         Private m_base As clsPoint = Nothing
-
-        'ErrorManage
-        Private m_error As New clsError
 #End Region
 
 #Region "Constructor"
@@ -52,7 +46,7 @@ Namespace Optimization
                        )
             Me.m_func = ai_func
 
-            Me.INIT_PARAM_RANGE = ai_randomRange
+            Me.InitialValueRange = ai_randomRange
             Me.MAX_ITERATION = ai_maxIteration
             Me.EPS = ai_eps
             Me.DEFAULT_STEPLENGTH = ai_steplength
@@ -69,12 +63,19 @@ Namespace Optimization
         Public Overrides Sub Init()
             Try
                 'Init meber varibles
-                Me.InitInner()
+                Me.m_error.Clear()
+                Me.m_iteration = 0
+                Me.m_stepLength = Me.DEFAULT_STEPLENGTH
+                Me.m_base = Nothing
 
                 'Initialize
                 Me.m_base = New clsPoint(MyBase.m_func)
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    Me.m_base(i) = Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE
+                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                    If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        value += Me.InitialPosition(i)
+                    End If
+                    Me.m_base(i) = value
                 Next
                 Me.m_base.ReEvaluate()
 
@@ -92,7 +93,10 @@ Namespace Optimization
         Public Overloads Sub Init(ByVal ai_initPoint() As Double)
             Try
                 'Init meber varibles
-                Me.InitInner()
+                Me.m_error.Clear()
+                Me.m_iteration = 0
+                Me.m_stepLength = Me.DEFAULT_STEPLENGTH
+                Me.m_base = Nothing
 
                 If ai_initPoint.Length <> Me.m_func.NumberOfVariable Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
@@ -106,18 +110,6 @@ Namespace Optimization
             Finally
                 System.GC.Collect()
             End Try
-        End Sub
-
-        ''' <summary>
-        ''' Init parameter
-        ''' </summary>
-        ''' <remarks></remarks>
-        Private Sub InitInner()
-            Me.m_error.Clear()
-            Me.m_iteration = 0
-
-            Me.m_stepLength = Me.DEFAULT_STEPLENGTH
-            Me.m_base = Nothing
         End Sub
 
         ''' <summary>

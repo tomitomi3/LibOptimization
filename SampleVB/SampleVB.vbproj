@@ -120,7 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibOptimization\LibOptimization.vbproj">
-      <Project>{D27DC3B8-703D-4694-BDF9-30D809817618}</Project>
+      <Project>{d27dc3b8-703d-4694-bdf9-30d809817618}</Project>
       <Name>LibOptimization</Name>
     </ProjectReference>
   </ItemGroup>

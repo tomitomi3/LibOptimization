@@ -21,12 +21,6 @@ Namespace Optimization
         Private EPS As Double = 0.000000001
         Private MAX_ITERATION As Integer = 100000
 
-        'ErrorManage
-        Private m_error As New Util.clsError()
-
-        'This Parameter to use when generate a variable
-        Private INIT_PARAM_RANGE As Double = 5.12
-
         Private m_point As clsPoint = Nothing
 
         'Simulated Annealing Parameters
@@ -66,17 +60,6 @@ Namespace Optimization
         Public WriteOnly Property PARAM_MAX_ITERATION As Integer
             Set(value As Integer)
                 Me.MAX_ITERATION = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Range of initial value
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_InitRange As Double
-            Set(value As Double)
-                Me.INIT_PARAM_RANGE = value
             End Set
         End Property
 
@@ -126,7 +109,11 @@ Namespace Optimization
             Try
                 Me.m_point.Clear()
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    Me.m_point.Add(Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE)
+                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                    If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        value += Me.InitialPosition(i)
+                    End If
+                    Me.m_point.Add(value)
                 Next
                 Me.m_point.ReEvaluate()
 

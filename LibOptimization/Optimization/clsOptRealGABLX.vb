@@ -25,16 +25,12 @@ Namespace Optimization
         Private HigherNPercent As Double = 0.7 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
         Private MAX_ITERATION As Integer = 10000 'generation
-        Private INIT_PARAM_RANGE As Double = 5 'parameter range
 
         'GA Parameters
         Private m_parents As New List(Of clsPoint) 'Parent
         Private POPULATION_SIZE As Integer = 100
         Private CHILDREN_SIZE As Integer = 100
         Private Alpha As Double = 0.5
-
-        'ErrorManage
-        Private m_error As New clsError
 #End Region
 
 #Region "Constructor"
@@ -100,17 +96,6 @@ Namespace Optimization
         End Property
 
         ''' <summary>
-        ''' Range of initial value
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_InitRange As Double
-            Set(value As Double)
-                Me.INIT_PARAM_RANGE = value
-            End Set
-        End Property
-
-        ''' <summary>
         ''' Population Size
         ''' </summary>
         ''' <value></value>
@@ -159,7 +144,11 @@ Namespace Optimization
                 For i As Integer = 0 To Me.POPULATION_SIZE - 1
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        temp.Add(Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE)
+                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                            value += Me.InitialPosition(j)
+                        End If
+                        temp.Add(value)
                     Next
                     Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
                 Next
@@ -271,7 +260,11 @@ Namespace Optimization
             For i As Integer = index To Me.POPULATION_SIZE - 1
                 Dim temp As New List(Of Double)
                 For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    temp.Add(Math.Abs(2.0 * INIT_PARAM_RANGE) * m_rand.NextDouble() - INIT_PARAM_RANGE)
+                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
+                    If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        value += Me.InitialPosition(j)
+                    End If
+                    temp.Add(value)
                 Next
                 Me.m_parents(i) = New clsPoint(MyBase.m_func, temp)
             Next
