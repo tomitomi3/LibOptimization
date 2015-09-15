@@ -15,6 +15,11 @@ Module Module1
         ' 3. Do optimization!
         ' 4. Get result and evaluate.
 
+        'how to use liboptimization
+        HowtouseLibOptimization()
+    End Sub
+
+    Private Sub HowtouseLibOptimization()
         'Typical use
         With Nothing
             'Instantiation optimization class and set objective function.
@@ -31,11 +36,30 @@ Module Module1
             End If
         End With
 
-        'how to use liboptimization
-        HowtouseLibOptimization()
-    End Sub
+        'Set of initial value and the initial position
+        'Initial value is generated in the range of 2.5 and 3.5.
+        With Nothing
+            Dim optimization As New clsOptRealGASPX(New clsBenchSphere(2))
+            optimization.InitialPosition = {3, 3}
+            optimization.InitialValueRange = 0.5
+            optimization.Init()
+            While (optimization.DoIteration(5) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+        End With
 
-    Private Sub HowtouseLibOptimization()
+        'Set initial point.
+        '(Not preparation all algorithms.)
+        With Nothing
+            Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
+            optimization.Init(New Double() {-10, 10})
+            While (optimization.DoIteration(5) = False)
+                clsUtil.DebugValue(optimization)
+            End While
+            clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+        End With
+
         'Set random class and seed.
         With Nothing
             Dim optimization As New clsOptRealGASPX(New clsBenchSphere(1))
@@ -54,19 +78,9 @@ Module Module1
             Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
             optimization.Init()
             While (optimization.DoIteration(5) = False)
-                clsUtil.DebugValue(optimization)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
             End While
-            clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
-        End With
-
-        'set initial point.
-        With Nothing
-            Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
-            optimization.Init(New Double() {-10, 10})
-            While (optimization.DoIteration(5) = False)
-                clsUtil.DebugValue(optimization)
-            End While
-            clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+            clsUtil.DebugValue(optimization)
         End With
 
         'You can use other optimization algorithm.
