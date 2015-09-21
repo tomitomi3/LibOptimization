@@ -81,6 +81,34 @@ namespace SampleCSharp
                     clsUtil.DebugValue(opt);
                 }
             }
+
+            //LowerBounds and UpperBounds
+            {
+                //Target Function
+                var func = new LibOptimization.BenchmarkFunction.clsBenchSphere(2);
+
+                //Set Function
+                var opt = new clsOptRealGASPX(func);
+
+                //Set opt optparameter
+                opt.LowerBounds = new double[] { 0.0, 0.0 };
+                opt.UpperBounds = new double[] { 1.0, 1.0 };
+                opt.Init();
+
+                //Optimization
+                opt.DoIteration();
+
+                //Check Error
+                if (opt.IsRecentError() == true)
+                {
+                    return;
+                }
+                else
+                {
+                    //Get Result
+                    clsUtil.DebugValue(opt);
+                }
+            }
         }
     }
 }
