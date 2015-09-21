@@ -53,6 +53,12 @@ Namespace Optimization
         ''' </summary>
         Public Property Iteration As Integer = 50000
 
+        ''' <summary>Upper bound(limit solution space)</summary>
+        Public Property UpperBounds As Double() = Nothing
+
+        ''' <summary>Lower bound(limit solution space)</summary>
+        Public Property LowerBounds As Double() = Nothing
+
         '----------------------------------------------------------------
         'DE parameters
         '----------------------------------------------------------------
@@ -247,6 +253,9 @@ Namespace Optimization
                         Next
                     End If
                     child.ReEvaluate() 'Evaluate child
+
+                    'Limit solution space
+                    clsUtil.LimitSolutionSpace(child, Me.LowerBounds, Me.UpperBounds)
 
                     'Survive
                     If child.Eval < Me.m_parents(i).Eval Then

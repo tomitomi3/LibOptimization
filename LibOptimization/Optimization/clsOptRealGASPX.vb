@@ -115,6 +115,12 @@ Namespace Optimization
                 Me.CHILDREN_SIZE = value
             End Set
         End Property
+
+        ''' <summary>Upper bound(limit solution space)</summary>
+        Public Property UpperBounds As Double() = Nothing
+
+        ''' <summary>Lower bound(limit solution space)</summary>
+        Public Property LowerBounds As Double() = Nothing
 #End Region
 
 #Region "Public"
@@ -296,13 +302,17 @@ Namespace Optimization
                         cVector.Add(New clsShoddyVector(MyBase.m_func.NumberOfVariable)) 'all zero
                     Else
                         Dim rk As Double = m_rand.NextDouble() ^ (1 / k)
-                        cVector.Add(rk * (pVector(k - 1) - pVector(k) + cVector(k - 1)))
+                        Dim pos = rk * (pVector(k - 1) - pVector(k) + cVector(k - 1))
+                        cVector.Add(pos)
                     End If
                     k += 1
                 Next
-                Dim temp As clsShoddyVector = pVector(pVector.Count - 1) + cVector(cVector.Count - 1)
+                Dim tempChild = New clsPoint(MyBase.m_func, pVector(pVector.Count - 1) + cVector(cVector.Count - 1))
 
-                retChilds.Add(New clsPoint(MyBase.m_func, temp))
+                'limit solution space
+                clsUtil.LimitSolutionSpace(tempChild, Me.LowerBounds, Me.UpperBounds)
+
+                retChilds.Add(tempChild)
             Next
             retChilds.Sort()
 

@@ -15,8 +15,45 @@ Module Module1
         ' 3. Do optimization!
         ' 4. Get result and evaluate.
 
+        'Experiment
+        Experiment()
+
         'how to use liboptimization
         HowtouseLibOptimization()
+    End Sub
+
+    Private Sub Experiment()
+        With Nothing
+            Dim optimization As New clsOptRealGASPX(New clsBenchSphere(2))
+            'set inital position and inital value range
+            optimization.InitialPosition = {3, 3}
+            optimization.InitialValueRange = 0.5
+            'limit solution space
+            optimization.UpperBounds = {5, 5}
+            optimization.LowerBounds = {1, 2}
+            optimization.Init()
+            clsUtil.DebugValue(optimization)
+            While (optimization.DoIteration(50) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+        End With
+
+        With Nothing
+            Dim optimization As New clsOptDE(New clsBenchSphere(2))
+            'set inital position and inital value range
+            optimization.InitialPosition = {3, 3}
+            optimization.InitialValueRange = 0.5
+            'limit solution space
+            optimization.UpperBounds = {5, 5}
+            optimization.LowerBounds = {1, 2}
+            optimization.Init()
+            clsUtil.DebugValue(optimization)
+            While (optimization.DoIteration(50) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+        End With
     End Sub
 
     Private Sub HowtouseLibOptimization()

@@ -251,5 +251,45 @@ Namespace Util
 
             Return best.Copy()
         End Function
+
+        ''' <summary>
+        ''' Limit solution space
+        ''' </summary>
+        ''' <param name="temp"></param>
+        ''' <param name="LowerBounds"></param>
+        ''' <param name="UpperBounds"></param>
+        ''' <remarks></remarks>
+        Public Shared Sub LimitSolutionSpace(temp As clsPoint, LowerBounds As Double(), UpperBounds As Double())
+            If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                For ii As Integer = 0 To temp.Count - 1
+                    Dim upper As Double = 0
+                    Dim lower As Double = 0
+                    If UpperBounds(ii) > LowerBounds(ii) Then
+                        upper = UpperBounds(ii)
+                        lower = LowerBounds(ii)
+                    ElseIf UpperBounds(ii) < LowerBounds(ii) Then
+                        upper = LowerBounds(ii)
+                        lower = UpperBounds(ii)
+                    Else
+                        Throw New Exception("Error! upper bound and lower bound are same.")
+                    End If
+
+                    If temp(ii) > lower AndAlso temp(ii) < upper Then
+                        'in
+                    ElseIf temp(ii) > lower Then
+                        temp(ii) = lower
+                    ElseIf temp(ii) < upper Then
+                        temp(ii) = upper
+                    End If
+
+                    'random generate
+                    'If temp(ii) < limit(0) OrElse temp(ii) > limit(1) Then
+                    '    temp(ii) = clsUtil.GenRandomRange(Me.m_rand, limit(0), limit(1))
+                    'End If
+                Next
+            End If
+            temp.ReEvaluate()
+        End Sub
+
     End Class
 End Namespace
