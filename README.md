@@ -28,7 +28,7 @@ Microsoft Public License (MS-PL)
 
 http://opensource.org/licenses/MS-PL
 
-Requirements
+Support .NET Framework
 ============
 
 .NET Framework 4.0
