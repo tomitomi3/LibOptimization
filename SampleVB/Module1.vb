@@ -15,6 +15,17 @@ Module Module1
         ' 3. Do optimization!
         ' 4. Get result and evaluate.
 
+        With Nothing
+            Dim optimization As New clsOptRealGAPCX(New clsBenchRosenblock(2))
+            optimization.Init()
+            optimization.ChildrenSize = 3
+            clsUtil.DebugValue(optimization)
+            While (optimization.DoIteration(50) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+        End With
+
         'Experiment
         Experiment()
 

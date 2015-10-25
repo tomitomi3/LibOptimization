@@ -189,6 +189,9 @@
     <Compile Include="..\LibOptimization\Optimization\clsOptRealGABLX.vb">
       <Link>Optimization\clsOptRealGABLX.vb</Link>
     </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptRealGAPCX.vb">
+      <Link>Optimization\clsOptRealGAPCX.vb</Link>
+    </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptRealGAREX.vb">
       <Link>Optimization\clsOptRealGAREX.vb</Link>
     </Compile>

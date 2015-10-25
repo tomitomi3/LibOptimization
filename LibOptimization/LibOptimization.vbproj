@@ -116,6 +116,7 @@
     <Compile Include="Optimization\clsOptPSOLDIW.vb" />
     <Compile Include="Optimization\clsOptPSOAIW.vb" />
     <Compile Include="Optimization\clsOptRealGABLX.vb" />
+    <Compile Include="Optimization\clsOptRealGAPCX.vb" />
     <Compile Include="Optimization\clsOptRealGASPX.vb" />
     <Compile Include="Optimization\clsOptPSO.vb" />
     <Compile Include="Optimization\clsOptRealGAUNDX.vb" />

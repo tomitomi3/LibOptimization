@@ -320,6 +320,28 @@
         End Function
 
         ''' <summary>
+        ''' Sum
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function Sum() As Double
+            Dim ret As Double = 0.0
+            For Each value As Double In Me
+                ret += value
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Average
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function Average() As Double
+            Return Me.Sum / Me.Count
+        End Function
+
+        ''' <summary>
         ''' For Debug
         ''' </summary>
         ''' <param name="ai_preci"></param>

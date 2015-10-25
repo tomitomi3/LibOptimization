@@ -233,7 +233,7 @@ Namespace Util
         ''' <param name="ai_points"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function GetBestPoint(ByVal ai_points As List(Of clsPoint)) As clsPoint
+        Public Shared Function GetBestPoint(ByVal ai_points As List(Of clsPoint), Optional ByVal isCopy As Boolean = False) As clsPoint
             If ai_points Is Nothing Then
                 Return Nothing
             ElseIf ai_points.Count = 0 Then
@@ -249,7 +249,11 @@ Namespace Util
                 End If
             Next
 
-            Return best.Copy()
+            If isCopy = False Then
+                Return best
+            Else
+                Return best.Copy()
+            End If
         End Function
 
         ''' <summary>
