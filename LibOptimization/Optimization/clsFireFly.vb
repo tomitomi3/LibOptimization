@@ -7,7 +7,7 @@ Namespace Optimization
     ''' </summary>
     ''' <remarks></remarks>
     Public Class clsFireFly
-        Inherits clsShoddyVector
+        Inherits clsEasyVector
         Implements IComparable
 
         Private m_func As absObjectiveFunction = Nothing

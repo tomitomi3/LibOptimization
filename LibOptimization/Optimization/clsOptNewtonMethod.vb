@@ -27,7 +27,7 @@ Namespace Optimization
         Private ReadOnly ALPHA As Double = 1.0
 
         'vector
-        Private m_vect As clsShoddyVector = Nothing
+        Private m_vect As clsEasyVector = Nothing
 #End Region
 
 #Region "Constructor"
@@ -52,7 +52,7 @@ Namespace Optimization
             Me.EPS = ai_eps
             Me.ALPHA = ai_alpha
 
-            Me.m_vect = New clsShoddyVector(ai_func.NumberOfVariable)
+            Me.m_vect = New clsEasyVector(ai_func.NumberOfVariable)
         End Sub
 #End Region
 
@@ -76,7 +76,7 @@ Namespace Optimization
                     End If
                     Me.m_vect.Add(value)
                 Next
-                Me.m_vect.Direction = clsShoddyVector.VectorDirection.COL
+                Me.m_vect.Direction = clsEasyVector.VectorDirection.COL
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try
@@ -95,7 +95,7 @@ Namespace Optimization
                 End If
 
                 Me.m_vect = ai_initPoint
-                Me.m_vect.Direction = clsShoddyVector.VectorDirection.COL
+                Me.m_vect.Direction = clsEasyVector.VectorDirection.COL
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
             Finally
@@ -116,8 +116,8 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            Dim grad As New clsShoddyVector(MyBase.m_func.NumberOfVariable, clsShoddyVector.VectorDirection.COL)
-            Dim h As New clsShoddyMatrix()
+            Dim grad As New clsEasyVector(MyBase.m_func.NumberOfVariable, clsEasyVector.VectorDirection.COL)
+            Dim h As New clsEasyMatrix()
             ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'Calculate Gradient vector

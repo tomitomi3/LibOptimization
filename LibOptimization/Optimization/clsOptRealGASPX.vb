@@ -282,7 +282,7 @@ Namespace Optimization
         Private Function CrossOverSPX(ByVal ai_childSize As Integer, _
                              ByVal ai_parents As List(Of KeyValuePair(Of Integer, clsPoint))) As List(Of clsPoint)
             'Calc Centroid
-            Dim xg As New clsShoddyVector(MyBase.m_func.NumberOfVariable)
+            Dim xg As New clsEasyVector(MyBase.m_func.NumberOfVariable)
             For Each p As KeyValuePair(Of Integer, clsPoint) In ai_parents
                 xg += p.Value
             Next
@@ -292,14 +292,14 @@ Namespace Optimization
             Dim retChilds As New List(Of clsPoint)
             Dim alpha As Double = Math.Sqrt(MyBase.m_func.NumberOfVariable + 2) 'expantion rate
             For i As Integer = 0 To ai_childSize - 1
-                Dim cVector As New List(Of clsShoddyVector)
-                Dim pVector As New List(Of clsShoddyVector)
+                Dim cVector As New List(Of clsEasyVector)
+                Dim pVector As New List(Of clsEasyVector)
                 Dim k As Integer = 0
                 For Each xi As KeyValuePair(Of Integer, clsPoint) In ai_parents
                     pVector.Add(xg + alpha * (xi.Value - xg))
 
                     If k = 0 Then
-                        cVector.Add(New clsShoddyVector(MyBase.m_func.NumberOfVariable)) 'all zero
+                        cVector.Add(New clsEasyVector(MyBase.m_func.NumberOfVariable)) 'all zero
                     Else
                         Dim rk As Double = m_rand.NextDouble() ^ (1 / k)
                         Dim pos = rk * (pVector(k - 1) - pVector(k) + cVector(k - 1))

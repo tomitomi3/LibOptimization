@@ -13,8 +13,8 @@ Module Module1
     ''' <remarks></remarks>
     Private Sub TestVectorMatrix()
         With Nothing
-            Dim v As New clsShoddyVector(New Double() {1, 1, 1})
-            Dim matV As New clsShoddyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
+            Dim v As New clsEasyVector(New Double() {1, 1, 1})
+            Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
 
             v = v + matV
             v.PrintValue()
@@ -28,18 +28,18 @@ Module Module1
 
             Console.WriteLine("----------------------------------------------")
             'Product
-            Dim temp As clsShoddyVector = Nothing
-            Dim mat As New clsShoddyMatrix(New Double()() {New Double() {1, 1}, New Double() {2, 1}, New Double() {3, 1}})
-            Dim mat2 As New clsShoddyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
+            Dim temp As clsEasyVector = Nothing
+            Dim mat As New clsEasyMatrix(New Double()() {New Double() {1, 1}, New Double() {2, 1}, New Double() {3, 1}})
+            Dim mat2 As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
 
-            v.Direction = clsShoddyVector.VectorDirection.ROW
+            v.Direction = clsEasyVector.VectorDirection.ROW
             Try
                 temp = mat2 * v
                 temp.PrintValue()
             Catch ex As Exception
             End Try
 
-            v.Direction = clsShoddyVector.VectorDirection.COL
+            v.Direction = clsEasyVector.VectorDirection.COL
             temp = mat2 * v
             mat2.PrintValue()
             Console.WriteLine()
@@ -49,7 +49,7 @@ Module Module1
                 temp.PrintValue()
             End If
 
-            v.Direction = clsShoddyVector.VectorDirection.ROW
+            v.Direction = clsEasyVector.VectorDirection.ROW
             temp = v * mat2
             mat2.PrintValue()
             Console.WriteLine()
@@ -59,7 +59,7 @@ Module Module1
                 temp.PrintValue()
             End If
 
-            v.Direction = clsShoddyVector.VectorDirection.COL
+            v.Direction = clsEasyVector.VectorDirection.COL
             Try
                 temp = v * mat2
                 temp.PrintValue()
@@ -67,14 +67,14 @@ Module Module1
             End Try
 
             Console.WriteLine("----------------------------------------------")
-            v.Direction = clsShoddyVector.VectorDirection.ROW
+            v.Direction = clsEasyVector.VectorDirection.ROW
             Try
                 temp = mat * v
                 temp.PrintValue()
             Catch ex As Exception
             End Try
 
-            v.Direction = clsShoddyVector.VectorDirection.COL
+            v.Direction = clsEasyVector.VectorDirection.COL
             Try
                 temp = mat * v
                 temp.PrintValue()
@@ -84,7 +84,7 @@ Module Module1
                 temp.PrintValue()
             End If
 
-            v.Direction = clsShoddyVector.VectorDirection.ROW
+            v.Direction = clsEasyVector.VectorDirection.ROW
             temp = v * mat
             mat.PrintValue()
             Console.WriteLine()
@@ -94,7 +94,7 @@ Module Module1
                 temp.PrintValue()
             End If
 
-            v.Direction = clsShoddyVector.VectorDirection.COL
+            v.Direction = clsEasyVector.VectorDirection.COL
             Try
                 temp = v * mat
                 temp.PrintValue()
@@ -108,13 +108,13 @@ Module Module1
             '0.5	-0.5	1
             '0.5	 0.5	-2
             '-1      1  	-1
-            Dim matInv As New clsShoddyMatrix(New Double()() {New Double() {1, 1, 1, 3}, _
+            Dim matInv As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1, 3}, _
                                                                                     New Double() {2, 2, 5, -5}, _
                                                                                      New Double() {3, 10, 3, 2}, _
                                                                                      New Double() {4, 20, 40, 4}})
 
             'Experiment LU
-            Dim matTemp As New clsShoddyMatrix(New Double()() {New Double() {0, 1, 2}, New Double() {3, 4, 5}, New Double() {6, 7, 8}})
+            Dim matTemp As New clsEasyMatrix(New Double()() {New Double() {0, 1, 2}, New Double() {3, 4, 5}, New Double() {6, 7, 8}})
             'Dim tempLU = New clsLU(matTemp)
 
             'Dim temptempLU = matTemp.LU(Nothing, Nothing)
@@ -151,12 +151,12 @@ Module Module1
         'Vector check
         With Nothing
             'Vector check
-            Dim v As New clsShoddyVector(New Double() {1, 1, 1})
+            Dim v As New clsEasyVector(New Double() {1, 1, 1})
             Console.WriteLine(v.NormL1().ToString())
             v.PrintValue()
-            v = v + (New clsShoddyVector(New Double() {2, 2, 2}))
+            v = v + (New clsEasyVector(New Double() {2, 2, 2}))
             v.PrintValue()
-            v = v - (New clsShoddyVector(New Double() {2, 2, 2}))
+            v = v - (New clsEasyVector(New Double() {2, 2, 2}))
             v.PrintValue()
             v = v * 2
             v.PrintValue()
@@ -170,9 +170,9 @@ Module Module1
             v.PrintValue()
 
             'Matrix check
-            Dim mat As New clsShoddyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
+            Dim mat As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
             mat.PrintValue()
-            mat = mat + (New clsShoddyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {1, 1, 1}, New Double() {1, 1, 1}}))
+            mat = mat + (New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {1, 1, 1}, New Double() {1, 1, 1}}))
             mat(1)(1) = 10.0
             mat.PrintValue()
             Console.WriteLine("----------------------------------------------")
@@ -183,22 +183,22 @@ Module Module1
             mat.PrintValue()
             Console.WriteLine("----------------------------------------------")
 
-            Dim matA As New clsShoddyMatrix(3, True)
+            Dim matA As New clsEasyMatrix(3, True)
             matA.PrintValue()
-            Dim matB As New clsShoddyMatrix(New Double()() {New Double() {0, 1, 0}, New Double() {1, 1, 1}, New Double() {1, 1, 1}})
+            Dim matB As New clsEasyMatrix(New Double()() {New Double() {0, 1, 0}, New Double() {1, 1, 1}, New Double() {1, 1, 1}})
             matA = matA * matB
             matA.PrintValue()
 
             Console.WriteLine("----------------------------------------------")
-            Dim matT As New clsShoddyMatrix(New Double()() {New Double() {1, 2, 3}, New Double() {4, 5, 6}, New Double() {7, 8, 9}})
+            Dim matT As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3}, New Double() {4, 5, 6}, New Double() {7, 8, 9}})
             matT.PrintValue()
             matT.T().PrintValue()
-            Dim matT2 As New clsShoddyMatrix(New Double()() {New Double() {1, 2, 3}, New Double() {4, 5, 6}})
+            Dim matT2 As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3}, New Double() {4, 5, 6}})
             matT2.PrintValue()
             matT2.T().PrintValue()
             Console.WriteLine("----------------------------------------------")
             'determinant
-            Dim detMat As New clsShoddyMatrix(New Double()() {New Double() {3, 1, 1, 2}, _
+            Dim detMat As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1, 2}, _
                                                                         New Double() {5, 1, 3, 4}, _
                                                                         New Double() {2, 0, 1, 0}, _
                                                                         New Double() {1, 3, 2, 1}})
@@ -210,17 +210,17 @@ Module Module1
             '0.5	-0.5	1
             '0.5	 0.5	-2
             '-1      1  	-1
-            Dim matInv As New clsShoddyMatrix(New Double()() {New Double() {3, 1, 1}, _
+            Dim matInv As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1}, _
                                                                         New Double() {5, 1, 3}, _
                                                                         New Double() {2, 0, 1}})
-            Dim matPivotInv As clsShoddyMatrix = matInv.Inverse()
+            Dim matPivotInv As clsEasyMatrix = matInv.Inverse()
             matInv.PrintValue()
             matPivotInv.PrintValue()
             matPivotInv = matInv * matPivotInv
             matPivotInv.PrintValue()
             Console.WriteLine("----------------------------------------------")
-            Dim matPA As New clsShoddyMatrix(New Double()() {New Double() {1, 2, 3}})
-            Dim matPB As New clsShoddyMatrix(New Double()() {New Double() {1}, _
+            Dim matPA As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3}})
+            Dim matPB As New clsEasyMatrix(New Double()() {New Double() {1}, _
                                                                        New Double() {4}, _
                                                                        New Double() {7}})
             matPA.PrintValue()
@@ -228,19 +228,19 @@ Module Module1
             matPA = matPA * matPB
             matPA.PrintValue()
             Console.WriteLine("----------------------------------------------")
-            Dim vecA As New clsShoddyVector(New Double() {1, 2, 3})
-            Dim matC As New clsShoddyMatrix(New Double()() {New Double() {1, 2, 3}, _
+            Dim vecA As New clsEasyVector(New Double() {1, 2, 3})
+            Dim matC As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3}, _
                                                                        New Double() {4, 5, 6}, _
                                                                        New Double() {7, 8, 9}})
             vecA.PrintValue()
             matC.PrintValue()
-            Dim tempV As clsShoddyVector = vecA * matC
+            Dim tempV As clsEasyVector = vecA * matC
             tempV.PrintValue()
             Console.WriteLine("----------------------------------------------")
             'Inner Product
             With Nothing
-                Dim va As New clsShoddyVector(New Double() {1, 1})
-                Dim vb As New clsShoddyVector(New Double() {0.5, 0})
+                Dim va As New clsEasyVector(New Double() {1, 1})
+                Dim vb As New clsEasyVector(New Double() {0.5, 0})
                 Console.WriteLine(va.NormL2.ToString())
                 Console.WriteLine(vb.NormL2.ToString())
                 Console.WriteLine(va.InnerProduct(vb).ToString())
@@ -252,14 +252,14 @@ Module Module1
                 Console.WriteLine(aa.ToString())
             End With
             Console.WriteLine("----------------------------------------------")
-            Dim matAA As New clsShoddyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
-            Dim vBB As New clsShoddyMatrix(New List(Of Double)({1, 1, 1}), clsShoddyVector.VectorDirection.COL)
-            Dim vAA As New clsShoddyVector(New Double() {1, 1, 1})
+            Dim matAA As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
+            Dim vBB As New clsEasyMatrix(New List(Of Double)({1, 1, 1}), clsEasyVector.VectorDirection.COL)
+            Dim vAA As New clsEasyVector(New Double() {1, 1, 1})
             matAA.PrintValue()
             vBB.PrintValue()
             vAA.PrintValue()
 
-            Dim tempMatA As clsShoddyMatrix
+            Dim tempMatA As clsEasyMatrix
             tempMatA = matAA * vBB
             tempMatA.PrintValue()
             'tempMatA = vBB * matAA

@@ -125,9 +125,9 @@
     <Compile Include="Optimization\clsParticle.vb" />
     <Compile Include="Optimization\clsFireFly.vb" />
     <Compile Include="Util\clsEval.vb" />
-    <Compile Include="ShoddyLinearAlgebra\clsException.vb" />
-    <Compile Include="ShoddyLinearAlgebra\clsShoddyMatrix.vb" />
-    <Compile Include="ShoddyLinearAlgebra\clsShoddyVector.vb" />
+    <Compile Include="EasyLinearAlgebra\clsException.vb" />
+    <Compile Include="EasyLinearAlgebra\clsEasyMatrix.vb" />
+    <Compile Include="EasyLinearAlgebra\clsEasyVector.vb" />
     <Compile Include="Util\clsError.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

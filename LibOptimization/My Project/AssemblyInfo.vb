@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 ' アセンブリ属性の値を確認します。
 
 <Assembly: AssemblyTitle("LibOptimization")> 
-<Assembly: AssemblyDescription("Optimization Library for .NET Framework")> 
+<Assembly: AssemblyDescription("Optimization Library for .NET Framework 4.0")> 
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("LibOptimization")> 
 <Assembly: AssemblyCopyright("tomit")> 

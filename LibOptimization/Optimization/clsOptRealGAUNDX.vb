@@ -471,7 +471,7 @@ Namespace Optimization
             Dim sd1 = (Me.ALPHA * length) ^ 2
             Dim sd2 = (Me.BETA * d2 / Math.Sqrt(Me.m_func.NumberOfVariable)) ^ 2
             Dim e = diffVectorP2P1 / length
-            Dim t = New clsShoddyVector(Me.m_func.NumberOfVariable)
+            Dim t = New clsEasyVector(Me.m_func.NumberOfVariable)
             For genChild As Integer = 0 To CInt(Me.CHILDREN_SIZE / 2 - 1)
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     t(i) = clsUtil.NormRand(0, sd2)

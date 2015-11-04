@@ -255,22 +255,22 @@ Namespace Optimization
                 Next
 
                 'calc g
-                Dim g As New clsShoddyVector(Me.m_func.NumberOfVariable)
+                Dim g As New clsEasyVector(Me.m_func.NumberOfVariable)
                 For i As Integer = 0 To ai_pickParentNo - 1
                     g += parentsPoint(i)
                 Next
                 g /= ai_pickParentNo
 
                 'calc D
-                Dim d As clsShoddyVector = g - parentsPoint(0)
+                Dim d As clsEasyVector = g - parentsPoint(0)
                 Dim dist As Double = d.NormL2()
                 If dist < Me.EPS Then
                     'Console.WriteLine("very near! g")
                 End If
 
-                Dim diff As New List(Of clsShoddyVector)
+                Dim diff As New List(Of clsEasyVector)
                 For i As Integer = 1 To ai_pickParentNo - 1
-                    diff.Add(New clsShoddyVector(Me.m_func.NumberOfVariable))
+                    diff.Add(New clsEasyVector(Me.m_func.NumberOfVariable))
                     diff(i - 1) = parentsPoint(i) - parentsPoint(0)
                     If diff(i - 1).NormL2 < EPS Then
                         'Console.WriteLine("very near!")
@@ -278,7 +278,7 @@ Namespace Optimization
                 Next
 
                 'orthogonal directions -> Vector D
-                Dim DD As New clsShoddyVector(Me.m_func.NumberOfVariable)
+                Dim DD As New clsEasyVector(Me.m_func.NumberOfVariable)
                 For i As Integer = 0 To ai_pickParentNo - 2
                     Dim temp1 As Double = diff(i).InnerProduct(d)
                     Dim temp2 As Double = temp1 / (diff(i).NormL2 * dist)
@@ -288,7 +288,7 @@ Namespace Optimization
 
                 'Average vector D
                 Dim meanD As Double = DD.Average()
-                Dim tempV1 As New clsShoddyVector(Me.m_func.NumberOfVariable)
+                Dim tempV1 As New clsEasyVector(Me.m_func.NumberOfVariable)
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     tempV1(i) = clsUtil.NormRand(0.0, meanD * Eta)
                 Next
@@ -300,7 +300,7 @@ Namespace Optimization
                 Next
 
                 'add population
-                Dim tempChildVector As clsShoddyVector = parentsPoint(0) + tempV1
+                Dim tempChildVector As clsEasyVector = parentsPoint(0) + tempV1
                 retPopulation.Add(New clsPoint(Me.m_func, tempChildVector))
             Next
 
