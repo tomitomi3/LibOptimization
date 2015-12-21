@@ -3,17 +3,17 @@
 Namespace BenchmarkFunction
     ''' <summary>
     ''' Benchmark function
-    ''' Fivewell-Potential
+    ''' ShubertsFunction
     ''' </summary>
     ''' <remarks>
     ''' Minimum:
-    '''  F(4.92, -9.89) = -1.4616
+    '''  Fmin = −186.7309
     ''' Range:
-    '''  -20 to 20
+    '''  −10≦x1 , x2≦10
     ''' Referrence:
-    ''' Ilya Pavlyukevich, "Levy flights, non-local search and simulated annealing", Journal of Computational Physics 226 (2007) 1830-1844
+    ''' [1]Test fXin-She Yang, "Test Problems in Optimization", arXiv(http://arxiv.org/abs/1008.0549)
     ''' </remarks>
-    Public Class clsBenchFivewellPotential : Inherits absObjectiveFunction
+    Public Class clsBenchShubertsFunction : Inherits absObjectiveFunction
         ''' <summary>
         ''' Default constructor
         ''' </summary>
@@ -28,18 +28,12 @@ Namespace BenchmarkFunction
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Overrides Function F(ByVal x As List(Of Double)) As Double
-            If x Is Nothing Then
-                Return 0
-            End If
+            Dim x1 = x(0)
+            Dim x2 = x(1)
+            Dim temp1 As Double = (Math.Cos(1 + (1 + 1) * x1) + 2 * Math.Cos(2 + (2 + 1) * x1) + 3 * Math.Cos(3 + (3 + 1) * x1) + 4 * Math.Cos(4 + (4 + 1) * x1) + 5 * Math.Cos(5 + (5 + 1) * x1))
+            Dim temp2 As Double = (Math.Cos(1 + (1 + 1) * x2) + 2 * Math.Cos(2 + (2 + 1) * x2) + 3 * Math.Cos(3 + (3 + 1) * x2) + 4 * Math.Cos(4 + (4 + 1) * x2) + 5 * Math.Cos(5 + (5 + 1) * x2))
 
-            If Me.NumberOfVariable <> x.Count Then
-                Return 0
-            End If
-
-            Dim ret As Double = 0.0
-            ret = 1 - 1 / (1 + 0.05 * (x(0) ^ 2 + (x(1) - 10) ^ 2)) - 1 / (1 + 0.05 * ((x(0) - 10)) ^ 2 + x(1) ^ 2) - 1.5 / (1 + 0.03 * ((x(0) + 10)) ^ 2 + x(1) ^ 2) - 2 / (1 + 0.05 * ((x(0) - 5)) ^ 2 + (x(1) + 10) ^ 2) - 1 / (1 + 0.1 * ((x(0) + 5)) ^ 2 + (x(1) + 10) ^ 2)
-            ret = ret * (1 + 0.0001 * (x(0) ^ 2 + x(1) ^ 2) ^ 1.2)
-            Return ret
+            Return temp1 * temp2
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)

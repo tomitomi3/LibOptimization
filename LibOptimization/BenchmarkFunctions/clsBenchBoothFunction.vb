@@ -27,12 +27,12 @@ Namespace BenchmarkFunction
         ''' <param name="ai_var"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function F(ByVal ai_var As List(Of Double)) As Double
-            If ai_var Is Nothing Then
+        Public Overrides Function F(ByVal x As List(Of Double)) As Double
+            If x Is Nothing Then
                 Return 0
             End If
 
-            Return (ai_var(0) + 2 * ai_var(1) - 7) ^ 2 + (2 * ai_var(0) + ai_var(1) - 5) ^ 2
+            Return (x(0) + 2 * x(1) - 7) ^ 2 + (2 * x(0) + x(1) - 5) ^ 2
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
