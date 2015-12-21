@@ -17,22 +17,40 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptPSO : Inherits absOptimization
 #Region "Member"
-        'Common parameters
-        Private EPS As Double = 0.000001 '1e-6
-        Private MAX_ITERATION As Integer = 20000
-        Private IsUseCriterion As Boolean = True
-        Private HigherNPercent As Double = 0.9 'for IsCriterion()
+        ''' <summary>Max iteration count(Default:20000)</summary>
+        Public Property Iteration As Integer = 20000
+
+        ''' <summary>Epsilon(Default:0.000001) for Criterion</summary>
+        Public Property EPS As Double = 0.000001 '1e-6
+
+        ''' <summary>Use criterion</summary>
+        Public Property IsUseCriterion As Boolean = True
+
+        ''' <summary>
+        ''' higher N percentage particles are finished at the time of same evaluate value.
+        ''' This parameter is valid is when IsUseCriterion is true.
+        ''' </summary>
+        Public Property HigherNPercent As Double = 0.8 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
 
         'particles
         Private m_swarm As New List(Of clsParticle)
         Private m_globalBest As clsPoint = Nothing
 
-        'PSO Parameters
-        Private SwarmSize As Integer = 100
-        Private Weight As Double = 0.729
-        Private C1 As Double = 1.49445
-        Private C2 As Double = 1.49445
+        '-------------------------------------------------------------------
+        'Coefficient of PSO
+        '-------------------------------------------------------------------
+        ''' <summary>Swarm Size(Default:100)</summary>
+        Public Property SwarmSize As Integer = 100
+
+        ''' <summary>Inertia weight. Weigth=1.0(orignal paper 1995), Weight=0.729(Default setting)</summary>
+        Public Property Weight As Double = 0.729
+
+        ''' <summary>velocity coefficient(affected by personal best). C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)</summary>
+        Public Property C1 As Double = 1.49445
+
+        ''' <summary>velocity coefficient(affected by global best). C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)</summary>
+        Public Property C2 As Double = 1.49445
 #End Region
 
 #Region "Constructor"
@@ -43,102 +61,6 @@ Namespace Optimization
         Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
         End Sub
-#End Region
-
-#Region "Property(Parameter setting)"
-        ''' <summary>
-        ''' epsilon
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_EPS As Double
-            Set(value As Double)
-                Me.EPS = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Max iteration count
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_MAX_ITERATION As Integer
-            Set(value As Integer)
-                Me.MAX_ITERATION = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Use criterion
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_IsUseCriterion As Boolean
-            Set(value As Boolean)
-                Me.IsUseCriterion = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' higher N percentage particles are finished at the time of same evaluate value.
-        ''' This parameter is valid is when PARAM_IsUseCriterion is true.
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_CriterionPersent As Double
-            Set(value As Double)
-                Me.HigherNPercent = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Swarm Size
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_Size As Integer
-            Set(value As Integer)
-                Me.SwarmSize = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Inertia weight.
-        ''' Weigth=1.0(orignal paper 1995), Weight=0.729(Default setting)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>
-        ''' recommend value is 0.4 to 0.9.
-        ''' </remarks>
-        Public WriteOnly Property PARAM_Weight As Double
-            Set(value As Double)
-                Me.Weight = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' velocity coefficient(affected by personal best).
-        ''' C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_C1 As Double
-            Set(value As Double)
-                Me.C1 = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' velocity coefficient(affected by global best)
-        ''' C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_C2 As Double
-            Set(value As Double)
-                Me.C2 = value
-            End Set
-        End Property
 #End Region
 
 #Region "Public"
@@ -204,10 +126,10 @@ Namespace Optimization
             End If
 
             'do iterate
-            ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
+            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'check iteration count
-                If MAX_ITERATION <= m_iteration Then
+                If Iteration <= m_iteration Then
                     Me.m_swarm.Sort()
                     Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
@@ -284,7 +206,7 @@ Namespace Optimization
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides ReadOnly Property ResultForDebug As List(Of Optimization.clsPoint)
+        Public Overrides ReadOnly Property Results As List(Of Optimization.clsPoint)
             Get
                 Dim ret As New List(Of clsPoint)(Me.m_swarm.Count - 1)
                 For Each p In Me.m_swarm

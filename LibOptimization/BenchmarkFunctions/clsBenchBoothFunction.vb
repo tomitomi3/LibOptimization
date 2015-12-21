@@ -24,7 +24,7 @@ Namespace BenchmarkFunction
         ''' <summary>
         ''' Target Function
         ''' </summary>
-        ''' <param name="ai_var"></param>
+        ''' <param name="x"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Overrides Function F(ByVal x As List(Of Double)) As Double

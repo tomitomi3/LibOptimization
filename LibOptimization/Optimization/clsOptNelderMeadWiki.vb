@@ -18,14 +18,26 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptNelderMeadWiki : Inherits absOptimization
 #Region "Member"
-        Private ReadOnly MAX_ITERATION As Integer = 5000
-        Private ReadOnly EPS As Double = 0.000001
+        ''' <summary>Max iteration count(Default:5,000)</summary>
+        Public Property Iteration As Integer = 5000
 
+        ''' <summary>Epsilon(Default:0.000001) for Criterion</summary>
+        Public Property EPS As Double = 0.000001
+
+        '-------------------------------------------------------------------
         'Coefficient of Simplex Operator
-        Private ReadOnly COEFF_Refrection As Double = 1.0
-        Private ReadOnly COEFF_Expantion As Double = 2.0
-        Private ReadOnly COEFF_Contraction As Double = -0.5
-        Private ReadOnly COEFF_Shrink As Double = 0.5
+        '-------------------------------------------------------------------
+        ''' <summary>Refrection coeffcient(default:1.0)</summary>
+        Public ReadOnly Refrection As Double = 1.0
+
+        ''' <summary>Expantion coeffcient(default:2.0)</summary>
+        Public ReadOnly Expantion As Double = 2.0
+
+        ''' <summary>Contraction coeffcient(default:-0.5)</summary>
+        Public ReadOnly Contraction As Double = -0.5
+
+        ''' <summary>Shrink coeffcient(default:0.5)</summary>
+        Public ReadOnly Shrink As Double = 0.5
 
         Private m_points As New List(Of clsPoint)
 #End Region
@@ -35,32 +47,9 @@ Namespace Optimization
         ''' Constructor
         ''' </summary>
         ''' <param name="ai_func">Optimize Function</param>
-        ''' <param name="ai_randomRange">Optional:random range(Default 5 => -5 to 5)</param>
-        ''' <param name="ai_maxIteration">Optional:Iteration(default 5000)</param>
-        ''' <param name="ai_eps">Optional:Eps(default:1e-6)</param>
-        ''' <param name="ai_coeffRefrection">Optional:Refrection coeffcient(default:1.0)</param>
-        ''' <param name="ai_coeffExpantion">Optional:Expantion coeffcient(default:2.0)</param>
-        ''' <param name="ai_coeffContraction">Optional:Contraction coeffcient(default:-0.5)</param>
-        ''' <param name="ai_coeffShrink">Optional:Shrink coeffcient(default:0.5)</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction, _
-                       Optional ByVal ai_randomRange As Double = 5, _
-                       Optional ByVal ai_maxIteration As Integer = 5000, _
-                       Optional ByVal ai_eps As Double = 0.000001, _
-                       Optional ByVal ai_coeffRefrection As Double = 1.0, _
-                       Optional ByVal ai_coeffExpantion As Double = 2.0, _
-                       Optional ByVal ai_coeffContraction As Double = -0.5, _
-                       Optional ByVal ai_coeffShrink As Double = 0.5
-                       )
+        Public Sub New(ByVal ai_func As absObjectiveFunction )
             Me.m_func = ai_func
-
-            Me.InitialValueRange = ai_randomRange
-            Me.MAX_ITERATION = ai_maxIteration
-            Me.EPS = ai_eps
-            Me.COEFF_Refrection = ai_coeffRefrection
-            Me.COEFF_Expantion = ai_coeffExpantion
-            Me.COEFF_Contraction = ai_coeffContraction
-            Me.COEFF_Shrink = ai_coeffShrink
         End Sub
 #End Region
 
@@ -151,10 +140,10 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
+            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'Counting Iteration
-                If MAX_ITERATION <= m_iteration Then
+                If Iteration <= m_iteration Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
@@ -173,12 +162,12 @@ Namespace Optimization
                 Dim centroid = Me.GetCentroid(m_points)
 
                 'Reflection
-                Dim refrection = Me.ModifySimplex(Me.WorstPoint, centroid, Me.COEFF_Refrection)
+                Dim refrection = Me.ModifySimplex(Me.WorstPoint, centroid, Me.Refrection)
                 If BestPoint.Eval <= refrection.Eval AndAlso refrection.Eval < Worst2ndPoint.Eval Then
                     WorstPoint = refrection
                 ElseIf refrection.Eval < BestPoint.Eval Then
                     'Expantion
-                    Dim expantion = Me.ModifySimplex(Me.WorstPoint, centroid, Me.COEFF_Expantion)
+                    Dim expantion = Me.ModifySimplex(Me.WorstPoint, centroid, Me.Expantion)
                     If expantion.Eval < refrection.Eval Then
                         WorstPoint = expantion
                     Else
@@ -186,12 +175,12 @@ Namespace Optimization
                     End If
                 Else
                     'Contraction
-                    Dim contraction = Me.ModifySimplex(WorstPoint, centroid, Me.COEFF_Contraction)
+                    Dim contraction = Me.ModifySimplex(WorstPoint, centroid, Me.Contraction)
                     If contraction.Eval < WorstPoint.Eval Then
                         WorstPoint = contraction
                     Else
                         'Reduction(Shrink) BestPoint以外を縮小
-                        Me.Shrink(Me.COEFF_Shrink)
+                        Me.CalcShrink(Me.Shrink)
                     End If
                 End If
             Next
@@ -236,7 +225,7 @@ Namespace Optimization
         ''' <remarks>
         ''' for Debug
         ''' </remarks>
-        Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
+        Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
                 Return Me.m_points
             End Get
@@ -291,7 +280,7 @@ Namespace Optimization
         ''' <param name="ai_coeff">Shrink coeffcient</param>
         ''' <remarks>
         ''' </remarks>
-        Private Sub Shrink(ByVal ai_coeff As Double)
+        Private Sub CalcShrink(ByVal ai_coeff As Double)
             For i As Integer = 1 To m_points.Count - 1 'expect BestPoint
                 For j As Integer = 0 To Me.m_points(0).Count - 1
                     Dim temp = BestPoint(j) + ai_coeff * (Me.m_points(i)(j) - BestPoint(j))

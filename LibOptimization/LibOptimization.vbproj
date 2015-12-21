@@ -89,6 +89,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BenchmarkFunctions\clsBenchShubertsFunction.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchFivewellPotential.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchSchwefel.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchGriewank.vb" />

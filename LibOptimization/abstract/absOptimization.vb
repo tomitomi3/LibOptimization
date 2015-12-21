@@ -77,7 +77,7 @@ Namespace Optimization
         Public MustOverride ReadOnly Property Result() As clsPoint
 
         ''' <summary>
-        ''' Result for debug
+        ''' Results
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
@@ -85,7 +85,7 @@ Namespace Optimization
         ''' Do not need to implement this method.
         ''' e.g)Throw New NotImplementedException
         ''' </remarks>
-        Public MustOverride ReadOnly Property ResultForDebug() As List(Of clsPoint)
+        Public MustOverride ReadOnly Property Results() As List(Of clsPoint)
 
         ''' <summary>
         ''' Recent Error

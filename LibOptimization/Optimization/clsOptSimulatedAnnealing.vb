@@ -205,7 +205,7 @@ Namespace Optimization
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides ReadOnly Property ResultForDebug As List(Of Optimization.clsPoint)
+        Public Overrides ReadOnly Property Results As List(Of Optimization.clsPoint)
             Get
                 Return New List(Of clsPoint)({Me.m_point})
             End Get

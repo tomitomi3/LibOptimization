@@ -31,14 +31,10 @@ Namespace Optimization
         '----------------------------------------------------------------
         'Common parameters
         '----------------------------------------------------------------
-        ''' <summary>
-        ''' epsilon(Default:1e-8) for Criterion
-        ''' </summary>
+        ''' <summary>epsilon(Default:1e-8) for Criterion</summary>
         Public Property EPS As Double = 0.000000001
 
-        ''' <summary>
-        ''' Use criterion
-        ''' </summary>
+        ''' <summary>Use criterion</summary>
         Public Property IsUseCriterion As Boolean = True
 
         ''' <summary>
@@ -299,7 +295,7 @@ Namespace Optimization
         ''' <remarks>
         ''' for Debug
         ''' </remarks>
-        Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
+        Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
                 Return Me.m_parents
             End Get

@@ -17,12 +17,25 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptPatternSearch : Inherits absOptimization
 #Region "Member"
-        Private ReadOnly MAX_ITERATION As Integer = 20000
-        Private ReadOnly EPS As Double = 0.00000001
-        Private ReadOnly DEFAULT_STEPLENGTH As Double = 0.6
-        Private ReadOnly COEFF_Shrink As Double = 2.0
+        ''' <summary>Max iteration count(Default:20000)</summary>
+        Public Property Iteration As Integer = 20000
 
+        ''' <summary>Epsilon(Default:0.000001) for Criterion</summary>
+        Public Property EPS As Double = 0.000001
+
+        '-------------------------------------------------------------------
+        'Coefficient of pattern search
+        '-------------------------------------------------------------------
+        ''' <summary>step length(Default:0.6)</summary>
+        Private ReadOnly StepLength As Double = 0.6
+
+        ''' <summary>shrink parameter(Default:2.0)</summary>
+        Private ReadOnly Shrink As Double = 2.0
+
+        ''' <summary>current step length</summary>
         Private m_stepLength As Double = 0.6
+
+        ''' <summary>current base</summary>
         Private m_base As clsPoint = Nothing
 #End Region
 
@@ -31,27 +44,9 @@ Namespace Optimization
         ''' Constructor
         ''' </summary>
         ''' <param name="ai_func">Optimize Function</param>
-        ''' <param name="ai_randomRange">Optional:random range(Default 5 => -5 to 5)</param>
-        ''' <param name="ai_maxIteration">Optional:Iteration(default 20000)</param>
-        ''' <param name="ai_eps">Optional:Eps(default:1e-8)</param>
-        ''' <param name="ai_steplength">Optinal:step length(default 0.6)</param>
-        ''' <param name="ai_coeffShrink">Optional:Shrink coeffcient(default:2.0)</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction, _
-                       Optional ByVal ai_randomRange As Double = 5, _
-                       Optional ByVal ai_maxIteration As Integer = 20000, _
-                       Optional ByVal ai_eps As Double = 0.00000001, _
-                       Optional ByVal ai_steplength As Double = 0.6, _
-                       Optional ByVal ai_coeffShrink As Double = 2.0
-                       )
+        Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
-
-            Me.InitialValueRange = ai_randomRange
-            Me.MAX_ITERATION = ai_maxIteration
-            Me.EPS = ai_eps
-            Me.DEFAULT_STEPLENGTH = ai_steplength
-            Me.m_stepLength = ai_steplength
-            Me.COEFF_Shrink = ai_coeffShrink
         End Sub
 #End Region
 
@@ -65,7 +60,7 @@ Namespace Optimization
                 'Init meber varibles
                 Me.m_error.Clear()
                 Me.m_iteration = 0
-                Me.m_stepLength = Me.DEFAULT_STEPLENGTH
+                Me.m_stepLength = Me.StepLength
                 Me.m_base = Nothing
 
                 'Initialize
@@ -95,7 +90,7 @@ Namespace Optimization
                 'Init meber varibles
                 Me.m_error.Clear()
                 Me.m_iteration = 0
-                Me.m_stepLength = Me.DEFAULT_STEPLENGTH
+                Me.m_stepLength = Me.StepLength
                 Me.m_base = Nothing
 
                 If ai_initPoint.Length <> Me.m_func.NumberOfVariable Then
@@ -125,10 +120,10 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
+            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'Counting Iteration
-                If MAX_ITERATION <= m_iteration Then
+                If Iteration <= m_iteration Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION, "")
                     Return True
                 End If
@@ -155,7 +150,7 @@ Namespace Optimization
                     End If
 
                     'Shrink Step
-                    Me.m_stepLength /= Me.COEFF_Shrink
+                    Me.m_stepLength /= Me.Shrink
                 End If
             Next
 
@@ -227,7 +222,7 @@ Namespace Optimization
         ''' <remarks>
         ''' for Debug
         ''' </remarks>
-        Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
+        Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
                 Dim ret = New List(Of clsPoint)
                 ret.Add(New clsPoint(Me.m_base))

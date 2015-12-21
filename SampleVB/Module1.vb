@@ -292,13 +292,13 @@ Module Module1
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
             optimization = New clsOptPSOChaoticIW(tgtFunction)
-            CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
+            CType(optimization, clsOptPSOChaoticIW).ChaoticMode = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
             optimization = New clsOptPSOChaoticIW(tgtFunction)
-            CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
+            CType(optimization, clsOptPSOChaoticIW).ChaoticMode = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
@@ -330,7 +330,8 @@ Module Module1
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
-            optimization = New clsOptNewtonMethod(tgtFunction, ai_alpha:=0.00001)
+            optimization = New clsOptNewtonMethod(tgtFunction)
+            CType(optimization, clsOptNewtonMethod).ALPHA = 0.0001
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
@@ -371,13 +372,13 @@ Module Module1
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
             optimization = New clsOptPSOChaoticIW(tgtFunction)
-            CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
+            CType(optimization, clsOptPSOChaoticIW).ChaoticMode = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
 
             optimization = New clsOptPSOChaoticIW(tgtFunction)
-            CType(optimization, clsOptPSOChaoticIW).PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
+            CType(optimization, clsOptPSOChaoticIW).ChaoticMode = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
@@ -589,7 +590,7 @@ Module Module1
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSO(func)
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 50000
+                                                           optimization.Iteration = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
@@ -601,7 +602,7 @@ Module Module1
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSOLDIW(func)
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 50000
+                                                           optimization.Iteration = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
@@ -613,7 +614,7 @@ Module Module1
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSOChaoticIW(func)
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 50000
+                                                           optimization.Iteration = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20}CDIW,{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
@@ -624,9 +625,9 @@ Module Module1
             'Console.WriteLine("CRIWPSO")
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSOChaoticIW(func)
-                                                           optimization.PARAM_InertialWeightStrategie = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
+                                                           optimization.ChaoticMode = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 50000
+                                                           optimization.Iteration = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20}CRIW,{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)
@@ -638,7 +639,7 @@ Module Module1
             Threading.Tasks.Parallel.For(0, loopCount, Sub(i)
                                                            Dim optimization As New clsOptPSOAIW(func)
                                                            optimization.Random = New Util.clsRandomXorshift(CUInt(i * 123456))
-                                                           optimization.PARAM_MAX_ITERATION = 50000
+                                                           optimization.Iteration = 50000
                                                            optimization.Init()
                                                            optimization.DoIteration()
                                                            Console.WriteLine("{0,20},{1,20},{2},{3}", optimization.GetType().Name, optimization.ObjectiveFunction.GetType().Name, optimization.IterationCount, optimization.Result.Eval)

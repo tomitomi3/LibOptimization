@@ -208,7 +208,7 @@ Namespace Optimization
         ''' <remarks>
         ''' for Debug
         ''' </remarks>
-        Public Overrides ReadOnly Property ResultForDebug As List(Of clsPoint)
+        Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
                 Throw New Exception()
                 Return Nothing
