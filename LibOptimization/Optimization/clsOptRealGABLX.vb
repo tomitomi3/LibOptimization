@@ -19,18 +19,36 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptRealGABLX : Inherits absOptimization
 #Region "Member"
-        'Common settings
-        Private EPS As Double = 0.000000001
-        Private IsUseCriterion As Boolean = True
-        Private HigherNPercent As Double = 0.7 'for IsCriterion()
-        Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
-        Private MAX_ITERATION As Integer = 10000 'generation
+        ''' <summary>Max iteration count(Default:20000)</summary>
+        Public Property Iteration As Integer = 20000 'generation
 
-        'GA Parameters
+        ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
+        Public Property EPS As Double = 0.00000001
+
+        ''' <summary>Use criterion</summary>
+        Public Property IsUseCriterion As Boolean = True
+
+        ''' <summary>
+        ''' higher N percentage particles are finished at the time of same evaluate value.
+        ''' This parameter is valid is when IsUseCriterion is true.
+        ''' </summary>
+        Public Property HigherNPercent As Double = 0.8 'for IsCriterion()
+        Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
+
+        '-------------------------------------------------------------------
+        'Coefficient of GA
+        '-------------------------------------------------------------------
+        ''' <summary>Population Size(Default:dimension*50)</summary>
+        Public Property PopulationSize As Integer = 100
+
+        ''' <summary>Children Size(Default:dimension*20)</summary>
+        Public Property ChildrenSize As Integer = 100
+
+        ''' <summary>Alpha is expantion ratio(Default:0.5)</summary>
+        Public Property Alpha As Double = 0.5
+
+        ''' <summary>population</summary>
         Private m_parents As New List(Of clsPoint) 'Parent
-        Private POPULATION_SIZE As Integer = 100
-        Private CHILDREN_SIZE As Integer = 100
-        Private Alpha As Double = 0.5
 #End Region
 
 #Region "Constructor"
@@ -44,89 +62,9 @@ Namespace Optimization
         Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
 
-            Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 50
-            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 20
+            Me.PopulationSize = Me.m_func.NumberOfVariable * 50
+            Me.ChildrenSize = Me.m_func.NumberOfVariable * 20
         End Sub
-#End Region
-
-#Region "Property(Parameter setting)"
-        ''' <summary>
-        ''' epsilon(Default:1e-8)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_EPS As Double
-            Set(value As Double)
-                Me.EPS = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Use criterion
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_IsUseCriterion As Boolean
-            Set(value As Boolean)
-                Me.IsUseCriterion = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' higher N percentage particles are finished at the time of same evaluate value.
-        ''' This parameter is valid is when PARAM_IsUseCriterion is true.
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_CriterionPersent As Double
-            Set(value As Double)
-                Me.HigherNPercent = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Max iteration count
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_MAX_ITERATION As Integer
-            Set(value As Integer)
-                Me.MAX_ITERATION = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Population Size
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_PopulationSize As Integer
-            Set(value As Integer)
-                Me.POPULATION_SIZE = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Children size
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_ChildrenSize As Integer
-            Set(value As Integer)
-                Me.CHILDREN_SIZE = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Alpha is expantion ratio(Default:0.5)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public WriteOnly Property PARAM_Alpha As Integer
-            Set(value As Integer)
-                Me.Alpha = value
-            End Set
-        End Property
 #End Region
 
 #Region "Public"
@@ -141,7 +79,7 @@ Namespace Optimization
                 Me.m_parents.Clear()
 
                 'Set initialize value
-                For i As Integer = 0 To Me.POPULATION_SIZE - 1
+                For i As Integer = 0 To Me.PopulationSize - 1
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
@@ -180,7 +118,7 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
+            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -194,7 +132,7 @@ Namespace Optimization
                 End If
 
                 'Counting generation
-                If Me.MAX_ITERATION <= Me.m_iteration Then
+                If Me.Iteration <= Me.m_iteration Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
@@ -210,7 +148,7 @@ Namespace Optimization
 
                 'cross over
                 Dim children As New List(Of clsPoint)
-                For numChild As Integer = 0 To Me.CHILDREN_SIZE - 1
+                For numChild As Integer = 0 To Me.ChildrenSize - 1
                     children.Add(New clsPoint(Me.m_func))
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim range As Double = Math.Abs(p1(i) - p2(i))
@@ -257,7 +195,7 @@ Namespace Optimization
             End If
 
             'replace new point
-            For i As Integer = index To Me.POPULATION_SIZE - 1
+            For i As Integer = index To Me.PopulationSize - 1
                 Dim temp As New List(Of Double)
                 For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)

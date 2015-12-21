@@ -17,16 +17,25 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptSimulatedAnnealing : Inherits absOptimization
 #Region "Member"
-        'Parameters
-        Private EPS As Double = 0.000000001
-        Private MAX_ITERATION As Integer = 100000
+        ''' <summary>Max iteration count(Default:20000)</summary>
+        Public Property Iteration As Integer = 20000 'generation
+
+        ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
+        Public Property EPS As Double = 0.00000001
+
+        '-------------------------------------------------------------------
+        'Coefficient of SA(Simulated Annealing)
+        '-------------------------------------------------------------------
+        ''' <summary>cooling ratio</summary>
+        Private CoolingRatio As Double = 0.9995 '0.1%
+
+        ''' <summary>range of neighbor search</summary>
+        Private NEIGHBOR_RANGE As Double = 0.1
+
+        ''' <summary>start temperture</summary>
+        Private TEMPERTURE As Double = 5000.0
 
         Private m_point As clsPoint = Nothing
-
-        'Simulated Annealing Parameters
-        Private COOLING_RATIO As Double = 0.9995 '0.1%
-        Private NEIGHBOR_RANGE As Double = 0.1
-        Private TEMPERTURE As Double = 5000.0
 #End Region
 
 #Region "Constructor"
@@ -38,66 +47,6 @@ Namespace Optimization
             Me.m_func = ai_func
             Me.m_point = New clsPoint(ai_func)
         End Sub
-#End Region
-
-#Region "Property(Parameter setting)"
-        ''' <summary>
-        ''' epsilon
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_EPS As Double
-            Set(value As Double)
-                Me.EPS = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Max iteration count
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_MAX_ITERATION As Integer
-            Set(value As Integer)
-                Me.MAX_ITERATION = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' cooling ratio
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_COOLINGRATIO As Double
-            Set(value As Double)
-                Me.COOLING_RATIO = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' neighbor range
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public WriteOnly Property PARAM_NEIGHBOR_RANGE As Double
-            Set(value As Double)
-                Me.NEIGHBOR_RANGE = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' TEMPERTURE
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public Property PARAM_TEMPERTURE As Double
-            Get
-                Return Me.TEMPERTURE
-            End Get
-            Set(value As Double)
-                Me.TEMPERTURE = value
-            End Set
-        End Property
 #End Region
 
 #Region "Public"
@@ -137,10 +86,10 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
+            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'iteration count
-                If MAX_ITERATION <= Me.m_iteration Then
+                If Iteration <= Me.m_iteration Then
                     Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
@@ -171,7 +120,7 @@ Namespace Optimization
 
                 'cooling
                 If Me.TEMPERTURE > 10.0 Then
-                    Me.TEMPERTURE *= Me.COOLING_RATIO
+                    Me.TEMPERTURE *= Me.CoolingRatio
                 End If
             Next
 

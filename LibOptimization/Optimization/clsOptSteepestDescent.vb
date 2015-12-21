@@ -23,8 +23,16 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptSteepestDescent : Inherits absOptimization
 #Region "Member"
-        Private ReadOnly MAX_ITERATION As Integer = 1000
-        Private ReadOnly EPS As Double = 0.00000001
+        ''' <summary>Max iteration count(Default:1000)</summary>
+        Public Property Iteration As Integer = 1000 'generation
+
+        ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
+        Public Property EPS As Double = 0.00000001
+
+        '-------------------------------------------------------------------
+        'Coefficient of SteepestDescent
+        '-------------------------------------------------------------------
+        ''' <summary>rate</summary>
         Private ReadOnly ALPHA As Double = 0.3
 
         'vector
@@ -36,22 +44,9 @@ Namespace Optimization
         ''' Constructor
         ''' </summary>
         ''' <param name="ai_func">Optimize Function</param>
-        ''' <param name="ai_randomRange">Optional:random range(Default 5 => -5 to 5)</param>
-        ''' <param name="ai_maxIteration">Optional:Iteration(default 1000)</param>
-        ''' <param name="ai_eps">Optional:Eps(default:1e-8)</param>
-        ''' <param name="ai_alpha">Optinal:update alpha(default 0.3)</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction, _
-                       Optional ByVal ai_randomRange As Double = 5, _
-                       Optional ByVal ai_maxIteration As Integer = 1000, _
-                       Optional ByVal ai_eps As Double = 0.00000001, _
-                       Optional ByVal ai_alpha As Double = 0.3 _
-                       )
+        Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
-            Me.InitialValueRange = ai_randomRange
-            Me.MAX_ITERATION = ai_maxIteration
-            Me.EPS = ai_eps
-            Me.ALPHA = ai_alpha
 
             Me.m_vect = New clsEasyVector(ai_func.NumberOfVariable)
         End Sub
@@ -111,12 +106,12 @@ Namespace Optimization
             End If
 
             If ai_iteration = 0 Then
-                ai_iteration = Me.MAX_ITERATION - 1
+                ai_iteration = Me.Iteration - 1
             End If
 
             'Do Iterate
             Dim grad As New clsEasyVector(MyBase.m_func.NumberOfVariable)
-            ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
+            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'Calculate Gradient vector
                 grad.RawVector = Me.m_func.Gradient(Me.m_vect)
@@ -130,7 +125,7 @@ Namespace Optimization
                 End If
 
                 'Iteration count
-                If MAX_ITERATION <= m_iteration Then
+                If Iteration <= m_iteration Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If

@@ -20,27 +20,48 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptRealGAUNDX : Inherits absOptimization
 #Region "Member"
-        'Common settings
-        Private EPS As Double = 0.000000001
-        Private IsUseCriterion As Boolean = True
-        Private HigherNPercent As Double = 0.7 'for IsCriterion()
-        Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
-        Private MAX_ITERATION As Integer = 50000 'generation
-        Private RANGE_SEARCH_SPACE As Double = 100 'search space range +-100
+        ''' <summary>Max iteration count(Default:20000)</summary>
+        Public Property Iteration As Integer = 20000 'generation
 
-        'GA Parameters
-        Private POPULATION_SIZE As Integer = 100
-        Private CHILDREN_SIZE As Integer = 100
-        Private ALPHA As Double = 0.5
-        Private BETA As Double = 0.35
-        Private m_parents As New List(Of clsPoint)
-        Private AlternationType As AlternationStrategy = AlternationStrategy.JGG
+        ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
+        Public Property EPS As Double = 0.00000001
+
+        ''' <summary>Use criterion</summary>
+        Public Property IsUseCriterion As Boolean = True
+
+        ''' <summary>
+        ''' higher N percentage particles are finished at the time of same evaluate value.
+        ''' This parameter is valid is when IsUseCriterion is true.
+        ''' </summary>
+        Public Property HigherNPercent As Double = 0.8 'for IsCriterion()
+        Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
+
+        '-------------------------------------------------------------------
+        'Coefficient of GA
+        '-------------------------------------------------------------------
+        ''' <summary>Population Size(Default:n*33)</summary>
+        Public Property PopulationSize As Integer = 100
+
+        ''' <summary>Children size( = Number of CrossOver/2 )(Default:n*10)</summary>
+        Public Property ChildrenSize As Integer = 100
+
+        ''' <summary>Alpha(Default:0.5)</summary>
+        Public Property ALPHA As Double = 0.5
+
+        ''' <summary>Beta(Default:0.35)</summary>
+        Public Property BETA As Double = 0.35
+
+        ''' <summary>AlternationStrategy(Default:JGG)</summary>
+        Public Property AlternationType As AlternationStrategy = AlternationStrategy.JGG
 
         ''' <summary>alternation strategy</summary>
         Public Enum AlternationStrategy
             MGG
             JGG
         End Enum
+
+        ''' <summary>population</summary>
+        Private m_parents As New List(Of clsPoint)
 #End Region
 
 #Region "Constructor"
@@ -54,140 +75,9 @@ Namespace Optimization
         Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
 
-            Me.POPULATION_SIZE = Me.m_func.NumberOfVariable * 33
-            Me.CHILDREN_SIZE = Me.m_func.NumberOfVariable * 10
+            Me.PopulationSize = Me.m_func.NumberOfVariable * 33
+            Me.ChildrenSize = Me.m_func.NumberOfVariable * 10
         End Sub
-#End Region
-
-#Region "Property(Parameter setting)"
-        ''' <summary>
-        ''' epsilon(Default:1e-8)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public Property PARAM_EPS As Double
-            Get
-                Return Me.EPS
-            End Get
-            Set(value As Double)
-                Me.EPS = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Use criterion
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public Property PARAM_IsUseCriterion As Boolean
-            Get
-                Return Me.IsUseCriterion
-            End Get
-            Set(value As Boolean)
-                Me.IsUseCriterion = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' higher N percentage particles are finished at the time of same evaluate value.
-        ''' This parameter is valid is when PARAM_IsUseCriterion is true.
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public Property PARAM_CriterionPersent As Double
-            Get
-                Return Me.HigherNPercent
-            End Get
-            Set(value As Double)
-                Me.HigherNPercent = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Max iteration count
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks>Common parameter</remarks>
-        Public Property PARAM_MAX_ITERATION As Integer
-            Get
-                Return Me.MAX_ITERATION
-            End Get
-            Set(value As Integer)
-                Me.MAX_ITERATION = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Population Size(Default:200)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public Property PARAM_PopulationSize As Integer
-            Get
-                Return Me.POPULATION_SIZE
-            End Get
-            Set(value As Integer)
-                Me.POPULATION_SIZE = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Children size( = Number of CrossOver/2 )
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public Property PARAM_ChildrenSize As Integer
-            Get
-                Return Me.CHILDREN_SIZE
-            End Get
-            Set(value As Integer)
-                Me.CHILDREN_SIZE = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Alpha(Default:0.5)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public Property PARAM_Alpha As Double
-            Get
-                Return Me.ALPHA
-            End Get
-            Set(value As Double)
-                Me.ALPHA = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' Beta(Default:0.35)
-        ''' </summary>
-        ''' <value></value>
-        ''' <remarks></remarks>
-        Public Property PARAM_Beta As Double
-            Get
-                Return Me.BETA
-            End Get
-            Set(value As Double)
-                Me.BETA = value
-            End Set
-        End Property
-
-        ''' <summary>
-        ''' AlternationStrategy(Default:JGG)
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Property PARAM_AlternationType As AlternationStrategy
-            Get
-                Return Me.AlternationType
-            End Get
-            Set(value As AlternationStrategy)
-                Me.AlternationType = value
-            End Set
-        End Property
-
 #End Region
 
 #Region "Public"
@@ -202,7 +92,7 @@ Namespace Optimization
                 Me.m_parents.Clear()
 
                 'Set initialize value
-                For i As Integer = 0 To Me.POPULATION_SIZE - 1
+                For i As Integer = 0 To Me.PopulationSize - 1
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
@@ -241,7 +131,7 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If(ai_iteration = 0, Me.MAX_ITERATION - 1, ai_iteration - 1)
+            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -255,7 +145,7 @@ Namespace Optimization
                 End If
 
                 'Counting generation
-                If Me.MAX_ITERATION <= Me.m_iteration Then
+                If Me.Iteration <= Me.m_iteration Then
                     Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
@@ -369,7 +259,7 @@ Namespace Optimization
             End If
 
             'replace new point
-            For i As Integer = index To Me.POPULATION_SIZE - 1
+            For i As Integer = index To Me.PopulationSize - 1
                 Dim temp As New List(Of Double)
                 For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
@@ -466,13 +356,13 @@ Namespace Optimization
             'End If
 
             'UNDX
-            Dim children As New List(Of clsPoint)(Me.CHILDREN_SIZE)
+            Dim children As New List(Of clsPoint)(Me.ChildrenSize)
             Dim g = (p1 + p2) / 2.0
             Dim sd1 = (Me.ALPHA * length) ^ 2
             Dim sd2 = (Me.BETA * d2 / Math.Sqrt(Me.m_func.NumberOfVariable)) ^ 2
             Dim e = diffVectorP2P1 / length
             Dim t = New clsEasyVector(Me.m_func.NumberOfVariable)
-            For genChild As Integer = 0 To CInt(Me.CHILDREN_SIZE / 2 - 1)
+            For genChild As Integer = 0 To CInt(Me.ChildrenSize / 2 - 1)
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     t(i) = clsUtil.NormRand(0, sd2)
                 Next

@@ -40,18 +40,18 @@ Namespace Optimization
         Public Property Iteration As Integer = 10000
 
         '----------------------------------------------------------------
-        'parameters
+        'Coefficient of GA
         '----------------------------------------------------------------
-        ''' <summary>Population Size</summary>
+        ''' <summary>Population Size(Default:100)</summary>
         Public Property PopulationSize As Integer = 100
 
-        ''' <summary>Children size</summary>
+        ''' <summary>Children size(Default:3)</summary>
         Public Property ChildrenSize As Integer = 3
 
-        ''' <summary>Randomize parameter Eta</summary>
+        ''' <summary>Randomize parameter Eta(Default:0.1)</summary>
         Public Property Eta As Double = 0.1
 
-        ''' <summary>Randomize parameter Zeta</summary>
+        ''' <summary>Randomize parameter Zeta(Default:0.1)</summary>
         Public Property Zeta As Double = 0.1
 
         ''' <summary>population</summary>
