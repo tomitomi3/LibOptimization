@@ -15,6 +15,18 @@ Module Module1
         ' 3. Do optimization!
         ' 4. Get result and evaluate.
 
+        'With Nothing
+        '    Dim f = New clsBenchDeJongFunction5()
+        '    For i As Integer = -50 To 50 - 1
+        '        For j As Integer = -50 To 50 - 1
+        '            Dim eval = f.F(New Double() {i, j}.ToList())
+        '            Console.Write("{0},", eval)
+        '        Next
+        '        Console.WriteLine("")
+        '    Next
+        '    Return
+        'End With
+
         With Nothing
             Dim optimization As New clsOptRealGAPCX(New clsBenchRosenblock(2))
             optimization.Init()
@@ -164,7 +176,7 @@ Module Module1
             'De jong Function5
             Dim optimization2 As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5())
             optimization2.InitialValueRange = 65.536
-            optimization2.PARAM_ChildrenSize = 100
+            optimization2.ChildrenSize = 100
             optimization2.Init()
             For i As Integer = 0 To 5
                 optimization2.DoIteration()
@@ -325,7 +337,7 @@ Module Module1
         With Nothing
             Dim DIMENSION = 5
             Dim optimization As absOptimization
-            optimization = New clsOptSteepestDescent(tgtFunction, ai_alpha:=0.0001)
+            optimization = New clsOptSteepestDescent(tgtFunction)
             optimization.Init()
             optimization.DoIteration()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)
@@ -573,7 +585,7 @@ Module Module1
         With Nothing
             Dim opt As New Optimization.clsOptRealGASPX(New clsBenchDeJongFunction5())
             opt.InitialValueRange = 65.536
-            opt.PARAM_ChildrenSize = 100
+            opt.ChildrenSize = 100
             opt.Init()
             For i As Integer = 0 To 2
                 opt.DoIteration()
