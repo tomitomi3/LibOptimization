@@ -1,9 +1,9 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/master?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/master)
+
 LibOptimization
 ===============
 
 ![LibOptimization Log](https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png)
-
-[![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/master?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/master)
 
 LibOptimization is optimization algorithm library for .NET Framework.
 This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.
