@@ -27,15 +27,19 @@ Namespace Optimization
         'Coefficient of SA(Simulated Annealing)
         '-------------------------------------------------------------------
         ''' <summary>cooling ratio</summary>
-        Private CoolingRatio As Double = 0.9995 '0.1%
+        Public Property CoolingRatio As Double = 0.99965
 
         ''' <summary>range of neighbor search</summary>
-        Private NEIGHBOR_RANGE As Double = 0.1
+        Public Property NeighborRange As Double = 0.1
 
-        ''' <summary>start temperture</summary>
-        Private TEMPERTURE As Double = 5000.0
+        ''' <summary>start temperature</summary>
+        Public Property Temperature As Double = 1000.0
+
+        ''' <summary>end temperature</summary>
+        Public Property EndTemperature As Double = 10.0
 
         Private m_point As clsPoint = Nothing
+        Private m_Bestpoint As clsPoint = Nothing
 #End Region
 
 #Region "Constructor"
@@ -65,6 +69,8 @@ Namespace Optimization
                     Me.m_point.Add(value)
                 Next
                 Me.m_point.ReEvaluate()
+
+                Me.m_Bestpoint = Me.m_point.Copy()
 
             Catch ex As Exception
                 Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
@@ -98,7 +104,7 @@ Namespace Optimization
                 'neighbor
                 Dim temp As New clsPoint(Me.m_point)
                 For i As Integer = 0 To temp.Count - 1
-                    temp(i) += Math.Abs(2.0 * NEIGHBOR_RANGE) * m_rand.NextDouble() - NEIGHBOR_RANGE
+                    temp(i) += Math.Abs(2.0 * NeighborRange) * m_rand.NextDouble() - NeighborRange
                 Next
                 temp.ReEvaluate()
 
@@ -111,7 +117,7 @@ Namespace Optimization
                     r1 = 1.0
                 Else
                     Dim delta = evalNow - evalNew
-                    r1 = Math.Exp(delta / TEMPERTURE)
+                    r1 = Math.Exp(delta / Temperature)
                 End If
                 If r1 >= r2 Then
                     Me.m_point = temp
@@ -119,8 +125,13 @@ Namespace Optimization
                 'Console.WriteLine("Random:{0:F5},{1:F5},{2:F5},{3:F5},{4:F5}", r1, r2, TEMPERTURE, delta, evalNow)
 
                 'cooling
-                If Me.TEMPERTURE > 10.0 Then
-                    Me.TEMPERTURE *= Me.CoolingRatio
+                If Me.Temperature > EndTemperature Then
+                    Me.Temperature *= Me.CoolingRatio
+                End If
+
+                'reserve best
+                If Me.m_point.Eval < Me.m_Bestpoint.Eval Then
+                    Me.m_Bestpoint = Me.m_point.Copy()
                 End If
             Next
 
@@ -144,7 +155,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result As Optimization.clsPoint
             Get
-                Return Me.m_point
+                Return Me.m_Bestpoint
             End Get
         End Property
 
@@ -156,7 +167,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Results As List(Of Optimization.clsPoint)
             Get
-                Return New List(Of clsPoint)({Me.m_point})
+                Return New List(Of clsPoint)({Me.m_Bestpoint})
             End Get
         End Property
 #End Region

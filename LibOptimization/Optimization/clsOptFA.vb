@@ -210,7 +210,6 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
-                Throw New Exception()
                 Return Nothing
             End Get
         End Property
