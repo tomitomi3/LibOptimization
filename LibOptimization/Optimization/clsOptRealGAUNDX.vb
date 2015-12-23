@@ -52,10 +52,10 @@ Namespace Optimization
         Public Property BETA As Double = 0.35
 
         ''' <summary>AlternationStrategy(Default:JGG)</summary>
-        Public Property AlternationType As AlternationStrategy = AlternationStrategy.JGG
+        Public Property AlternationStrategy As EnumAlternatioType = EnumAlternatioType.JGG
 
         ''' <summary>alternation strategy</summary>
-        Public Enum AlternationStrategy
+        Public Enum EnumAlternatioType
             MGG
             JGG
         End Enum
@@ -171,7 +171,7 @@ Namespace Optimization
                 'End If
 
                 'AlternationStrategy
-                If Me.AlternationType = AlternationStrategy.JGG Then
+                If Me.AlternationStrategy = EnumAlternatioType.JGG Then
                     'JGG
                     children.Sort()
                     Me.m_parents(p1Index) = children(0)
