@@ -120,6 +120,20 @@ Namespace Util
         End Sub
 
         ''' <summary>
+        ''' For Debug
+        ''' </summary>
+        ''' <param name="ai_results"></param>
+        ''' <remarks></remarks>
+        Public Shared Sub DebugValue(ByVal ai_results As List(Of clsPoint))
+            If ai_results Is Nothing OrElse ai_results.Count = 0 Then
+                Return
+            End If
+            For i As Integer = 0 To ai_results.Count - 1
+                Console.WriteLine("Eval          :" & String.Format("{0}", ai_results(i).Eval))
+            Next
+        End Sub
+
+        ''' <summary>
         ''' Check Criterion
         ''' </summary>
         ''' <param name="ai_eps">EPS</param>

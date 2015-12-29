@@ -149,7 +149,7 @@ Namespace Optimization
                 Dim selectParents As List(Of clsPoint) = Nothing
                 Me.SelectParentsForG3(3, selectParentsIndex, selectParents)
 
-                'PCS Crossover
+                'PCX Crossover
                 Dim newPopulation As List(Of clsPoint) = Me.CrossoverPCX(selectParents, Me.ChildrenSize, 3)
 
                 'Replace(by G3)
