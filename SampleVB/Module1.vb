@@ -28,12 +28,16 @@ Module Module1
         'End With
 
         With Nothing
-            Dim optimization As New clsOptRealGAPCX(New clsBenchRosenblock(2))
+            Dim optimization As New clsOptDE(New clsBenchDeJongFunction5())
+            optimization.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_1_bin
+            optimization.DEStrategy = clsOptDE.EnumDEStrategyType.DE_currentToBest_1_bin
+            optimization.DEStrategy = clsOptDE.EnumDEStrategyType.DE_randToBest_1_bin
+            optimization.IsUseCriterion = False
             optimization.Init()
-            optimization.ChildrenSize = 3
             clsUtil.DebugValue(optimization)
-            While (optimization.DoIteration(50) = False)
-                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            While (optimization.DoIteration(1000) = False)
+                'clsUtil.DebugValue(optimization.Results)
+                'clsUtil.DebugValue(optimization, ai_isOutValue:=False)
             End While
             clsUtil.DebugValue(optimization)
         End With
