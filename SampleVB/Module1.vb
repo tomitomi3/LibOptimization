@@ -28,16 +28,11 @@ Module Module1
         'End With
 
         With Nothing
-            Dim optimization As New clsOptDE(New clsBenchDeJongFunction5())
-            optimization.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_1_bin
-            optimization.DEStrategy = clsOptDE.EnumDEStrategyType.DE_currentToBest_1_bin
-            optimization.DEStrategy = clsOptDE.EnumDEStrategyType.DE_randToBest_1_bin
-            optimization.IsUseCriterion = False
+            Dim optimization As New clsOptDEJADE(New clsBenchRosenblock(10))
             optimization.Init()
             clsUtil.DebugValue(optimization)
-            While (optimization.DoIteration(1000) = False)
-                'clsUtil.DebugValue(optimization.Results)
-                'clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            While (optimization.DoIteration(100) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
             End While
             clsUtil.DebugValue(optimization)
         End With
