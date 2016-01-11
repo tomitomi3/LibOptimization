@@ -3,30 +3,23 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Differential Evolution Algorithm (DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)
+    ''' Adaptive Differential Evolution Algorithm
+    ''' JADE
     ''' </summary>
     ''' <remarks>
     ''' Features:
     '''  -Derivative free optimization algorithm.
     '''  -similar to GA algorithm.
     ''' 
-    ''' Memo:
-    '''  Notation of DE
-    '''   DE/x/y/z
-    '''    x: pick parent strategy(rand or best)
-    '''    y: number of difference vector
-    '''    z: crossover scheme
-    '''       ex.Binomial -> bin
-    ''' 
     ''' Refference:
-    ''' [1]Storn, R., Price, K., "Differential Evolution – A Simple and Efficient Heuristic for Global Optimization over Continuous Spaces", Journal of Global Optimization 11: 341–359.
-    ''' [2]Price, K. and Storn, R., "Minimizing the Real Functions of the ICEC’96 contest by Differential Evolution", IEEE International Conference on Evolutionary Computation (ICEC’96), may 1996, pp. 842–844.
-    ''' [3]Sk. Minhazul Islam, Swagatam Das, "An Adaptive Differential Evolution Algorithm With Novel Mutation and Crossover Strategies for Global Numerical Optimization", IEEE TRANSACTIONS ON SYSTEMS, MAN, AND CYBERNETICS—PART B: CYBERNETICS, VOL. 42, NO. 2, APRIL 2012, pp482-500.
+    '''  [1]Z.-H. Zhan, J. Zhang, Y. Li, and H. Chung, “JADE: Adaptive Differential Evolution With Optional External Archive” IEEE Trans. Systems, Man, and Cybernetics-Part B, vol. 39, no. 6, pp. 1362-1381, Dec. 2009. 
+    '''  [2]阪井 節子,高濱 徹行, "パラメータの相関を考慮した適応型差分進化アルゴリズムJADEの改良", 不確実性の下での数理モデルとその周辺 Mathematical Model under Uncertainty and Related Topics RIMS 研究集会報告集
+    '''     (JADEの原著論文が見れなかったので[2]文献を参照)
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
-    Public Class clsOptDE : Inherits absOptimization
+    Public Class clsOptDEJADE : Inherits absOptimization
 #Region "Member"
         '----------------------------------------------------------------
         'Common parameters
@@ -64,48 +57,37 @@ Namespace Optimization
         Public Property PopulationSize As Integer = 100
 
         ''' <summary>
-        ''' Differential weight(Scaling factor)(Default:0.5)
+        ''' Scale factor(Default:0.5)
         ''' </summary>
         Public Property F As Double = 0.5
 
         ''' <summary>
-        ''' Differential weight(Scaling factor)(Default:0.5)
-        ''' CurrentToBest, randToBest
+        ''' Cross over ratio(Default:0.5)
         ''' </summary>
-        Public Property Fdash As Double = 0.5
+        Public Property CrossOverRatio As Double = 0.5
 
-        ''' <summary>
-        ''' Cross over ratio(Default:0.9)
-        ''' </summary>
-        Public Property CrossOverRatio As Double = 0.9
 
         ''' <summary>
         ''' Differential Evolution Strategy
         ''' </summary>
-        Public Property DEStrategy As EnumDEStrategyType = EnumDEStrategyType.DE_rand_1_bin
+        Public Property DEStrategy As EnumDEStrategyType = EnumDEStrategyType.DE_current_to_pBest_1
 
         ''' <summary>
         ''' Enum Differential Evolution Strategy
         ''' </summary>
         Public Enum EnumDEStrategyType
-            ''' <summary>DE/rand/1/bin 強い大域検索</summary>
-            DE_rand_1_bin
-            ''' <summary>DE/rand/2/bin 強い大域検索</summary>
-            DE_rand_2_bin
-            ''' <summary>DE/best/1/bin 強い局所検索</summary>
-            DE_best_1_bin
-            ''' <summary>DE/best/2/bin 強い局所検索</summary>
-            DE_best_2_bin
-            ''' <summary>DE/current/1/bin 弱い大域検索</summary>
-            DE_current_1_bin
-            ''' <summary>DE/currentToBest/1/bin 弱い局所検索</summary>
-            DE_current_to_Best_1_bin
-            ''' <summary>DE/randToBest/1/bin 大域・局所検索</summary>
-            DE_rand_to_Best_1_bin
+            ''' <summary>DE/current-to-pbest/1</summary>
+            DE_current_to_pBest_1
         End Enum
 
         ''' <summary>population</summary>
         Private m_parents As New List(Of clsPoint)
+
+        ''' <summary>individual cross over ratio for population</summary>
+        Private CRs As New List(Of Double)
+
+        ''' <summary>individual F for population</summary>
+        Private Fs As New List(Of Double)
 #End Region
 
 #Region "Constructor"
@@ -117,17 +99,6 @@ Namespace Optimization
         ''' </remarks>
         Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
-        End Sub
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        ''' <param name="ai_func">Objective Function</param>
-        ''' <param name="ai_destrategy">DE Strategt(e.g. DE/rand/1/bin)</param>
-        ''' <remarks></remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction, ByVal ai_destrategy As EnumDEStrategyType)
-            Me.m_func = ai_func
-            Me.DEStrategy = ai_destrategy
         End Sub
 #End Region
 
@@ -142,9 +113,14 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
                 Me.m_error.Clear()
+                Me.CRs.Clear()
+                Me.Fs.Clear()
 
                 'generate population
                 For i As Integer = 0 To Me.PopulationSize - 1
+                    Me.CRs.Add(0.5)
+                    Me.Fs.Add(0.5)
+
                     'initialize
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
@@ -156,6 +132,9 @@ Namespace Optimization
                     Next
                     Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
                 Next
+
+                'update F and CR
+                Me.UpdateFAndCR()
 
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -204,91 +183,41 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                'DE
-                Dim best = Me.m_parents(0).Copy()
+                '--------------------------------------------------------------------------------------------
+                'DE process
+                '--------------------------------------------------------------------------------------------
+                'update F and CR
+                Dim sumF As Double = 0.0
+                Dim sumFSquare As Double = 0.0
+                Dim sumCR As Double = 0.0
+                Dim countSuccess As Integer = 0
+                Me.UpdateFAndCR()
+
                 For i As Integer = 0 To Me.PopulationSize - 1
                     'pick different parent without i
                     Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count, i)
                     Dim xi = Me.m_parents(i)
                     Dim p1 As clsPoint = Me.m_parents(randIndex(0))
                     Dim p2 As clsPoint = Me.m_parents(randIndex(1))
-                    Dim p3 As clsPoint = Me.m_parents(randIndex(2))
-                    Dim p4 As clsPoint = Me.m_parents(randIndex(3))
-                    Dim p5 As clsPoint = Me.m_parents(randIndex(4))
 
                     'Mutation and Crossover
                     Dim child = New clsPoint(Me.m_func)
-                    Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
+                    Dim jj = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
                     Dim D = Me.m_func.NumberOfVariable - 1
-                    If Me.DEStrategy = EnumDEStrategyType.DE_rand_1_bin Then
-                        'DE/rand/1/bin
+                    If Me.DEStrategy = EnumDEStrategyType.DE_current_to_pBest_1 Then
+                        'DE/current-to-pbest/1 for JADE Strategy
+                        Dim p = CInt(Me.PopulationSize - 1 * Me.m_rand.NextDouble()) '100p%
+                        Dim index = Me.m_rand.Next(0, p)
+                        Dim pbest = Me.m_parents(index)
+
+                        'crossover
                         For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = p1(j) + Me.F * (p2(j) - p3(j))
+                            If Me.m_rand.NextDouble() < Me.CRs(i) OrElse k = D Then
+                                child(jj) = xi(jj) + Me.Fs(i) * (pbest(jj) - xi(jj)) + Me.Fs(i) * (p1(jj) - p2(jj))
                             Else
-                                child(j) = xi(k)
+                                child(jj) = xi(k)
                             End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_rand_2_bin Then
-                        'DE/rand/2/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = p1(j) + Me.F * (p2(j) + p3(j) - p4(j) - p5(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_best_1_bin Then
-                        'DE/best/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = best(j) + Me.F * (p1(j) - p2(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_best_2_bin Then
-                        'DE/best/2/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = best(j) + Me.F * (p1(j) + p2(j) - p3(j) - p4(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_current_1_bin Then
-                        'DE/current-to(target-to)/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = xi(j) + Me.F * (p2(j) - p3(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_current_to_Best_1_bin Then
-                        'DE/current-to-best/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = xi(j) + Me.Fdash * (best(j) - p1(j)) + Me.F * (p2(j) - p3(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_rand_to_Best_1_bin Then
-                        'DE/rand-to-best/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = p1(j) + Me.Fdash * (best(j) - p1(j)) + Me.F * (p2(j) - p3(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
+                            jj = (jj + 1) Mod Me.m_func.NumberOfVariable 'next
                         Next
                     End If
                     child.ReEvaluate() 'Evaluate child
@@ -299,13 +228,25 @@ Namespace Optimization
                     'Survive
                     If child.Eval < Me.m_parents(i).Eval Then
                         Me.m_parents(i) = child
-                    End If
 
-                    'Current best
-                    If child.Eval < best.Eval Then
-                        best = child
+                        'for adaptive parameter
+                        sumF += Me.Fs(i)
+                        sumFSquare += Me.Fs(i) ^ 2
+                        sumCR += Me.CRs(i)
+                        countSuccess += 1
                     End If
-                Next
+                Next 'population iteration
+
+                'update muF, muCR
+                If countSuccess > 0 Then
+                    Me.F = (1 - 0.1) * Me.F + 0.1 * (sumFSquare / sumF)
+                    Me.CrossOverRatio = (1 - 0.1) * Me.CrossOverRatio + 0.1 * (sumCR / countSuccess)
+                Else
+                    Me.F = (1 - 0.1) * Me.F
+                    Me.CrossOverRatio = (1 - 0.1) * Me.CrossOverRatio
+                    'Console.WriteLine("not success")
+                    'Console.WriteLine(" F={0} CR={1}", Me.F, Me.CrossOverRatio)
+                End If
             Next
 
             Return False
@@ -348,6 +289,36 @@ Namespace Optimization
 
 #Region "Private"
 
+        ''' <summary>
+        ''' Update scalafactor and crossover ratio
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub UpdateFAndCR()
+            For i As Integer = 0 To Me.PopulationSize - 1
+                'generate F
+                While (True)
+                    Dim tempF As Double = clsUtil.CauchyRand(Me.F, 0.1)
+                    If tempF < 0 Then
+                        Continue While
+                    ElseIf tempF > 1 Then
+                        Me.Fs(i) = 1
+                    Else
+                        Me.Fs(i) = tempF
+                    End If
+                    Exit While
+                End While
+
+                'generate CR 0 to 1
+                Dim tempCR As Double = clsUtil.NormRand(Me.CrossOverRatio, 0.1)
+                If tempCR < 0 Then
+                    Me.CRs(i) = 0
+                ElseIf tempCR > 1 Then
+                    Me.CRs(i) = 1
+                Else
+                    Me.CRs(i) = tempCR
+                End If
+            Next
+        End Sub
 #End Region
     End Class
 End Namespace

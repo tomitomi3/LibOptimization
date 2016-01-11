@@ -29,6 +29,19 @@ Namespace Util
         End Function
 
         ''' <summary>
+        ''' Cauchy Distribution
+        ''' </summary>
+        ''' <param name="ai_mu">default:0</param>
+        ''' <param name="ai_gamma">default:1</param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' http://www.sat.t.u-tokyo.ac.jp/~omi/random_variables_generation.html#Cauchy
+        ''' </remarks>
+        Public Shared Function CauchyRand(Optional ByVal ai_mu As Double = 0, Optional ByVal ai_gamma As Double = 1) As Double
+            Return ai_mu + ai_gamma * Math.Tan(Math.PI * (clsRandomXorshiftSingleton.GetInstance().NextDouble() - 0.5))
+        End Function
+
+        ''' <summary>
         ''' Generate Random permutation
         ''' </summary>
         ''' <param name="ai_max">0 to ai_max-1</param>
@@ -114,6 +127,7 @@ Namespace Util
             For i As Integer = 0 To ai_results.Count - 1
                 Console.WriteLine("Eval          :" & String.Format("{0}", ai_results(i).Eval))
             Next
+            Console.WriteLine()
         End Sub
 
         ''' <summary>
@@ -260,7 +274,7 @@ Namespace Util
         ''' <param name="LowerBounds"></param>
         ''' <param name="UpperBounds"></param>
         ''' <remarks></remarks>
-        Public Shared Sub LimitSolutionSpace(temp As clsPoint, LowerBounds As Double(), UpperBounds As Double())
+        Public Shared Sub LimitSolutionSpace(ByVal temp As clsPoint, LowerBounds As Double(), UpperBounds As Double())
             If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
                 For ii As Integer = 0 To temp.Count - 1
                     Dim upper As Double = 0
@@ -288,8 +302,8 @@ Namespace Util
                     '    temp(ii) = clsUtil.GenRandomRange(Me.m_rand, limit(0), limit(1))
                     'End If
                 Next
+                temp.ReEvaluate()
             End If
-            temp.ReEvaluate()
         End Sub
 
     End Class

@@ -110,6 +110,7 @@
     <Compile Include="BenchmarkFunctions\clsBenchSphere.vb" />
     <Compile Include="BenchmarkFunctions\clsBenchTest.vb" />
     <Compile Include="Optimization\clsOptCS.vb" />
+    <Compile Include="Optimization\clsOptDEJADE.vb" />
     <Compile Include="Optimization\clsOptFA.vb" />
     <Compile Include="Optimization\clsOptDE.vb" />
     <Compile Include="Optimization\clsOptNelderMeadWiki.vb" />
