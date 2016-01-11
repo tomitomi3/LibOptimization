@@ -114,8 +114,8 @@
     <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchDeJongFunction5.vb">
       <Link>BenchmarkFunctions\clsBenchDeJongFunction5.vb</Link>
     </Compile>
-    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchEasom.vb">
-      <Link>BenchmarkFunctions\clsBenchEasom.vb</Link>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchEasomFunction.vb">
+      <Link>BenchmarkFunctions\clsBenchEasomFunction.vb</Link>
     </Compile>
     <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchEllipsoid.vb">
       <Link>BenchmarkFunctions\clsBenchEllipsoid.vb</Link>
@@ -167,6 +167,9 @@
     </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptDE.vb">
       <Link>Optimization\clsOptDE.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptDEJADE.vb">
+      <Link>Optimization\clsOptDEJADE.vb</Link>
     </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptFA.vb">
       <Link>Optimization\clsOptFA.vb</Link>

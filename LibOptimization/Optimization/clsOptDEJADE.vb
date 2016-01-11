@@ -202,7 +202,7 @@ Namespace Optimization
 
                     'Mutation and Crossover
                     Dim child = New clsPoint(Me.m_func)
-                    Dim jj = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
+                    Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
                     Dim D = Me.m_func.NumberOfVariable - 1
                     If Me.DEStrategy = EnumDEStrategyType.DE_current_to_pBest_1 Then
                         'DE/current-to-pbest/1 for JADE Strategy
@@ -213,11 +213,11 @@ Namespace Optimization
                         'crossover
                         For k = 0 To Me.m_func.NumberOfVariable - 1
                             If Me.m_rand.NextDouble() < Me.CRs(i) OrElse k = D Then
-                                child(jj) = xi(jj) + Me.Fs(i) * (pbest(jj) - xi(jj)) + Me.Fs(i) * (p1(jj) - p2(jj))
+                                child(j) = xi(j) + Me.Fs(i) * (pbest(j) - xi(j)) + Me.Fs(i) * (p1(j) - p2(j))
                             Else
-                                child(jj) = xi(k)
+                                child(j) = xi(k)
                             End If
-                            jj = (jj + 1) Mod Me.m_func.NumberOfVariable 'next
+                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
                         Next
                     End If
                     child.ReEvaluate() 'Evaluate child

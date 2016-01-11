@@ -136,6 +136,11 @@ Imports LibOptimization.Util
         Me.CheckOptUsingSphere(opt)
     End Sub
 
+    <TestMethod()> Public Sub TestOptimizationJADE()
+        Dim opt = New clsOptDEJADE(New clsBenchSphere(2))
+        Me.CheckOptUsingSphere(opt)
+    End Sub
+
     <TestMethod()> Public Sub TestOptimizationFA()
         Dim opt = New clsOptFA(New clsBenchSphere(2))
         opt.Iteration = 300
