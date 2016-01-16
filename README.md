@@ -11,7 +11,7 @@ LibOptimization is optimization algorithm library for .NET Framework.
 This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.
 
 LibOptimizationは制約条件の無い最適化を行う.NET Framework用のライブラリです。
-実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
+実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
 
 ## Implement Optimization algorithm
 
@@ -37,6 +37,7 @@ LibOptimizationは制約条件の無い最適化を行う.NET Framework用のラ
 * Particle Swarm Optimization using Chaotic inertia weight(CDIW-PSO, CRIW-PSO)
 * Particle Swarm Optmization using adaptive inertia weight
 * Differential Evolution(DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)
+* JADE(self adaptation DE)
 * Standrad Cuckoo Search
 * FireFly algorithm
 
