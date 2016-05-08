@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Liboptimization by tomitomi3</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Liboptimization</h1>
+        <h2>numeric optimization library for .NET Framework</h2>
+        <a href="https://github.com/tomitomi3/LibOptimization" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>LibOptimization is optimization algorithm library for .NET Framework.
+This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.</p>
+
+<p>LibOptimizationは制約条件の無い最適化を行う.NET Framework用のライブラリです。
+実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
+
+<p>Microsoft Public License (MS-PL)</p>
+
+<p><a href="http://opensource.org/licenses/MS-PL">http://opensource.org/licenses/MS-PL</a></p>
+
+<h2>
+<a id="support-net-framework" class="anchor" href="#support-net-framework" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support .NET Framework</h2>
+
+<p>.NET Framework 4.0</p>
+
+<p>.NET Framework 3.5</p>
+
+<p>.NET Framework 3.0</p>
+
+<h2>
+<a id="refference" class="anchor" href="#refference" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Refference</h2>
+
+<ol>
+<li>金谷 健一, "これなら分かる最適化数学―基礎原理から計算手法まで", 共立出版株式会社, 2007年初版第7刷</li>
+<li>Hooke, R. and Jeeves, T.A., ""Direct search" solution of numerical and statistical problems", Journal of the Association for Computing Machinery (ACM) 8 (2), pp212–229.</li>
+<li>J.A.Nelder and R.Mead, "A simplex method for function minimization" ,The Computer Journal vol.7, 308–313 (1965)</li>
+<li>W.H.Press， B.P.Flannery，S.A.Teukolsky，W.T.Vetterlin, "NUMERICAL RECIPES in C 日本語版 C言語による数値計算のレシピ", 株式会社技術評論社, 平成19年 初版 第14刷,</li>
+<li>北野宏明編著, "『遺伝的アルゴリズム』", 産業図書株式会社, 平成5年初版</li>
+<li>北野宏明 (編集), "遺伝的アルゴリズム 4", 産業図書出版株式会社, 2000年初版</li>
+<li>小野功，佐藤浩，小林重信, "単峰性正規分布交叉UNDXを用いた実数値GAによる関数最適化"，人工知能学会誌，Vol. 14，No. 6，pp. 1146-1155 (1999)</li>
+<li>樋口 隆英, 筒井 茂義, 山村 雅幸, "実数値GAにおけるシンプレクス交叉", 人工知能学会論文誌Vol. 16 (2001) No. 1 pp.147-155</li>
+<li>小林重信, "実数値GAのフロンティア"，人工知能学会誌 Vol. 24, No. 1, pp.147-162 (2009)</li>
+<li>James Kennedy and Russell Eberhart, "Particle Swarm Optimization．", Proceedings of IEEE the International Conference on Neural Networks，1995</li>
+<li>Shi, Y. and Eberhart, R.C., "A Modified Particle Swarm Optimizer", Proceedings of Congress on Evolu-tionary Computation, 79-73., 1998</li>
+<li>R. C. Eberhart and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.</li>
+<li>Y. Shi and Russell C. Eberhart, "Empirical Study of Particle Swarm Optimization, Proceeding Congress on Evolutionary Computation 1999, Piscataway, 1945-1949</li>
+<li>Y. Feng, G. Teng, A. Wang, Y.M. Yao, "Chaotic inertia weight in particle swarm optimization", in: Second International Conference on Innovative Computing, Information and Control (ICICIC 07), 2007, pp. 475–1475.</li>
+<li>A. Nickabadi, M. M. Ebadzadeh, and R. Safabakhsh, “A novel particle swarm optimization algorithm with adaptive inertia weight,” Applied Soft Computing Journal, vol. 11, no. 4, pp. 3658–3670, 2011.</li>
+<li>Nelder-Mead法(<a href="http://ja.wikipedia.org/wiki/Nelder-Mead%E6%B3%95">http://ja.wikipedia.org/wiki/Nelder-Mead%E6%B3%95</a>)</li>
+<li>Storn, R., Price, K., "Differential Evolution – A Simple and Efficient Heuristic for Global Optimization over Continuous Spaces", Journal of Global Optimization 11: 341–359.</li>
+<li>Sk. Minhazul Islam, Swagatam Das, "An Adaptive Differential Evolution Algorithm With Novel Mutation and Crossover Strategies for Global Numerical Optimization", IEEE TRANSACTIONS ON SYSTEMS, MAN, AND CYBERNETICS—PART B: CYBERNETICS, VOL. 42, NO. 2, APRIL 2012, pp482-500.</li>
+<li>Price, K. and Storn, R., "Minimizing the Real Functions of the ICEC’96 contest by Differential Evolution", IEEE International Conference on Evolutionary Computation (ICEC’96), may 1996, pp. 842–844.</li>
+<li>Xin-She Yang, Suash Deb, "Cuckoo search via Lévy flights.", World Congress on Nature and Biologically Inspired Computing (NaBIC 2009). IEEE Publications. pp. 210–214. arXiv:1003.1594v1.</li>
+<li>Cuckoo Search (CS) Algorithm (<a href="http://www.mathworks.com/matlabcentral/fileexchange/29809-cuckoo-search--cs--algorithm">http://www.mathworks.com/matlabcentral/fileexchange/29809-cuckoo-search--cs--algorithm</a>)</li>
+<li>焼きなまし法(<a href="http://ja.wikipedia.org/wiki/%E7%84%BC%E3%81%8D%E3%81%AA%E3%81%BE%E3%81%97%E6%B3%95">http://ja.wikipedia.org/wiki/%E7%84%BC%E3%81%8D%E3%81%AA%E3%81%BE%E3%81%97%E6%B3%95</a>)</li>
+<li>X. S. Yang, “Firefly algorithms for multimodal optimization,” in Proceedings of the 5th International Conference on Stochastic Algorithms: Foundation and Applications (SAGA '09), vol. 5792 of Lecture notes in Computer Science, pp. 169–178, 2009.</li>
+<li>Firefly Algorithm (<a href="http://www.mathworks.com/matlabcentral/fileexchange/29693-firefly-algorithm">http://www.mathworks.com/matlabcentral/fileexchange/29693-firefly-algorithm</a>)</li>
+<li>Kalyanmoy Deb, Dhiraj Joshi and Ashish Anand, "Real-Coded Evolutionary Algorithms with Parent-Centric Recombination", KanGAL Report No. 2001003</li>
+</ol>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/tomitomi3/LibOptimization/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/tomitomi3/LibOptimization/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/tomitomi3/LibOptimization"></a> is maintained by <a href="https://github.com/tomitomi3">tomitomi3</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
