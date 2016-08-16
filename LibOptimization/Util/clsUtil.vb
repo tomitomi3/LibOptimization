@@ -47,25 +47,41 @@ Namespace Util
         ''' <param name="ai_max">0 to ai_max-1</param>
         ''' <param name="ai_removeIndex">RemoveIndex</param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
         Public Shared Function RandomPermutaion(ByVal ai_max As Integer, Optional ByVal ai_removeIndex As Integer = -1) As List(Of Integer)
-            Dim ary As New List(Of Integer)(ai_max)
-            If ai_removeIndex = -1 Then
-                For i As Integer = 0 To ai_max - 1
-                    If ai_removeIndex <> i Then
-                        ary.Add(i)
-                    End If
+            Return RandomPermutaion(0, ai_max, ai_removeIndex)
+        End Function
+
+        ''' <summary>
+        ''' Generate Random permutation with range (ai_min to ai_max-1)
+        ''' </summary>
+        ''' <param name="ai_min">start value</param>
+        ''' <param name="ai_max">ai_max-1</param>
+        ''' <param name="ai_removeIndex">RemoveIndex -1 is invalid</param>
+        ''' <returns></returns>
+        Public Shared Function RandomPermutaion(ByVal ai_min As Integer, ByVal ai_max As Integer, ByVal ai_removeIndex As Integer) As List(Of Integer)
+            Dim nLength As Integer = ai_max - ai_min
+            If nLength = 0 OrElse nLength < 0 Then
+                Return New List(Of Integer)
+            End If
+
+            Dim ary As New List(Of Integer)(CInt(nLength * 1.5))
+            If ai_removeIndex <= -1 Then
+                For ii As Integer = ai_min To ai_max - 1
+                    ary.Add(ii)
                 Next
             Else
-                For i As Integer = 0 To ai_max - 1
-                    ary.Add(i)
+                For ii As Integer = ai_min To ai_max - 1
+                    If ai_removeIndex <> ii Then
+                        ary.Add(ii)
+                    End If
                 Next
             End If
 
+            'Fisher–Yates shuffle / フィッシャー - イェーツのシャッフル
             Dim n As Integer = ary.Count
             While n > 1
                 n -= 1
-                Dim k As Integer = CInt(clsRandomXorshiftSingleton.GetInstance().Next(0, n + 1))
+                Dim k As Integer = clsRandomXorshiftSingleton.GetInstance().Next(0, n + 1)
                 Dim tmp As Integer = ary(k)
                 ary(k) = ary(n)
                 ary(n) = tmp
@@ -82,8 +98,8 @@ Namespace Util
         ''' <param name="ai_isOnlyIterationCount"></param>
         ''' <remarks></remarks>
         Public Shared Sub DebugValue(ByVal ai_opt As absOptimization,
-                                     Optional ai_precision As Integer = 0, _
-                                     Optional ai_isOutValue As Boolean = True, _
+                                     Optional ai_precision As Integer = 0,
+                                     Optional ai_isOutValue As Boolean = True,
                                      Optional ai_isOnlyIterationCount As Boolean = False)
             If ai_opt Is Nothing Then
                 Return
@@ -139,8 +155,8 @@ Namespace Util
         ''' <param name="ai_tiny"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function IsCriterion(ByVal ai_eps As Double, _
-                                           ByVal ai_comparisonA As clsPoint, ByVal ai_comparisonB As clsPoint, _
+        Public Shared Function IsCriterion(ByVal ai_eps As Double,
+                                           ByVal ai_comparisonA As clsPoint, ByVal ai_comparisonB As clsPoint,
                                            Optional ByVal ai_tiny As Double = 0.0000000000001) As Boolean
             Return clsUtil.IsCriterion(ai_eps, ai_comparisonA.Eval, ai_comparisonB.Eval, ai_tiny)
         End Function
@@ -158,8 +174,8 @@ Namespace Util
         ''' William H. Press, Saul A. Teukolsky, William T. Vetterling, Brian P. Flannery,
         ''' "NUMRICAL RECIPIES 3rd Edition: The Art of Scientific Computing", Cambridge University Press 2007, pp505-506
         ''' </remarks>
-        Public Shared Function IsCriterion(ByVal ai_eps As Double, _
-                                           ByVal ai_comparisonA As Double, ByVal ai_comparisonB As Double, _
+        Public Shared Function IsCriterion(ByVal ai_eps As Double,
+                                           ByVal ai_comparisonA As Double, ByVal ai_comparisonB As Double,
                                            Optional ByVal ai_tiny As Double = 0.0000000000001) As Boolean
             'check division by zero
             Dim denominator = (Math.Abs(ai_comparisonB) + Math.Abs(ai_comparisonA)) + ai_tiny
