@@ -11,11 +11,128 @@ Imports LibOptimization.Util
 <TestClass()> Public Class UnitTestLibOptimization
 
 #Region "Vector, Matrix"
+    ''' <summary>
+    ''' check Matric initialize
+    ''' </summary>
     <TestMethod()> Public Sub TestVector()
         Dim v As New clsEasyVector(New Double() {1, 2, 3})
         For i As Integer = 0 To 3 - 1
             Assert.AreEqual(v(i), CType(i + 1, Double))
         Next
+    End Sub
+
+    ''' <summary>
+    ''' Vector + Matrix
+    ''' </summary>
+    <TestMethod()> Public Sub TestVectorMatrix_AddVectorMatrix()
+        Dim v As New clsEasyVector(New Double() {1, 1, 1})
+        Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
+        Try
+            v = v + matV
+            If v(0) = 2.0 AndAlso v(1) = 3.0 AndAlso v(2) = 4.0 Then
+                'OK
+            Else
+                Assert.Fail()
+            End If
+        Catch ex As Exception
+            Assert.Fail()
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Matrix + vector
+    ''' </summary>
+    <TestMethod()> Public Sub TestVectorMatrix_AddMatrixVector()
+        Dim v As New clsEasyVector(New Double() {1, 1, 1})
+        Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
+        Try
+            v = matV + v
+            If v(0) = 2.0 AndAlso v(1) = 3.0 AndAlso v(2) = 4.0 Then
+                'OK
+            Else
+                Assert.Fail()
+            End If
+        Catch ex As Exception
+            Assert.Fail()
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Vector - Matrix
+    ''' </summary>
+    <TestMethod()> Public Sub TestVectorMatrix_SubVectorMatrix()
+        Dim v As New clsEasyVector(New Double() {1, 1, 1})
+        Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
+        Try
+            v = v - matV
+            If v(0) = 0 AndAlso v(1) = -1.0 AndAlso v(2) = -2.0 Then
+                'OK
+            Else
+                Assert.Fail()
+            End If
+        Catch ex As Exception
+            Assert.Fail()
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Matrix - Vector
+    ''' </summary>
+    <TestMethod()> Public Sub TestVectorMatrix_SubMatrixVector()
+        Dim v As New clsEasyVector(New Double() {1, 1, 1})
+        Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
+        Try
+            v = matV - v
+            If v(0) = 0.0 AndAlso v(1) = 1.0 AndAlso v(2) = 2.0 Then
+                'OK
+            Else
+                Assert.Fail()
+            End If
+        Catch ex As Exception
+            Assert.Fail()
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Matrix * Vector
+    ''' </summary>
+    <TestMethod()> Public Sub TestVectorMatrix_ProductMatrixVector()
+        Dim v As New clsEasyVector(New Double() {1, 2, 3})
+        Dim mat As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
+        Try
+            v.Direction = clsEasyVector.VectorDirection.COL
+            Dim temp = mat * v
+            temp.PrintValue()
+        Catch ex As Exception
+            Assert.Fail()
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Vector * Matrix
+    ''' </summary>
+    <TestMethod()> Public Sub TestVectorMatrix_ProductVectorMatrix_OK()
+        Dim v As New clsEasyVector(New Double() {1, 2, 3})
+        Dim mat As New clsEasyMatrix(New Double()() {New Double() {4, 5, 6}})
+        Try
+            v.Direction = clsEasyVector.VectorDirection.COL
+            Dim temp = v * mat
+            Dim temp2 = mat * v
+        Catch ex As Exception
+            Assert.Fail()
+        End Try
+    End Sub
+
+    <TestMethod()> Public Sub TestVectorMatrix_ProductMatrixVectorFail()
+        Dim v As New clsEasyVector(New Double() {1, 2, 3})
+        Dim mat As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
+        Try
+            v.Direction = clsEasyVector.VectorDirection.ROW
+            Dim temp = mat * v
+            Assert.Fail()
+        Catch ex As Exception
+            '例外が投げられるのが正解
+        End Try
     End Sub
 
     <TestMethod()> Public Sub TestMatrix()
@@ -31,9 +148,8 @@ Imports LibOptimization.Util
 
     <TestMethod()> Public Sub TestMatrixInverse()
         Dim mat As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1},
-                                                     New Double() {5, 1, 3}, _
+                                                     New Double() {5, 1, 3},
                                                      New Double() {2, 0, 1}})
-
         'Inverse
         '0.5	-0.5	1
         '0.5	 0.5	-2
@@ -41,6 +157,7 @@ Imports LibOptimization.Util
         Dim matInv As clsEasyMatrix = mat.Inverse()
 
         'check Identy matrix
+        ' I = A * A^-1
         Dim productMat = mat * matInv
         For i As Integer = 0 To productMat.RowCount - 1
             For j As Integer = 0 To productMat.ColCount - 1

@@ -270,9 +270,20 @@
         ''' <returns></returns>
         ''' <remarks>
         ''' </remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyVector) As clsEasyVector
+        Public Shared Operator *(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyVector) As clsEasyMatrix
+            '列 ＝ 行
+            Dim col As Integer = 1
+            Dim row As Integer = ai_dest.Count
+            If ai_dest.Direction = clsEasyVector.VectorDirection.ROW Then
+                col = ai_dest.Count
+                row = 1
+            End If
+            If ai_source.ColCount <> row Then
+                Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector")
+            End If
+
             Dim temp As clsEasyMatrix = ai_source * ai_dest.ToMatrix()
-            Return temp.ToVector()
+            Return temp
         End Operator
 
         ''' <summary>
@@ -283,9 +294,19 @@
         ''' <returns></returns>
         ''' <remarks>
         ''' </remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyMatrix) As clsEasyVector
-            Dim tempV As clsEasyMatrix = ai_source.ToMatrix() * ai_dest
-            Return tempV.ToVector()
+        Public Shared Operator *(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
+            Dim col As Integer = 1
+            Dim row As Integer = ai_source.Count
+            If ai_source.Direction = clsEasyVector.VectorDirection.ROW Then
+                col = ai_source.Count
+                row = 1
+            End If
+            If col <> ai_dest.RowCount Then
+                Throw New clsException(clsException.Series.NotComputable, "Vector * Matrix")
+            End If
+
+            Dim temp As clsEasyMatrix = ai_source.ToMatrix() * ai_dest
+            Return temp
         End Operator
 
         ''' <summary>

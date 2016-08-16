@@ -32,74 +32,74 @@ Module Module1
             Dim mat As New clsEasyMatrix(New Double()() {New Double() {1, 1}, New Double() {2, 1}, New Double() {3, 1}})
             Dim mat2 As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
 
-            v.Direction = clsEasyVector.VectorDirection.ROW
-            Try
-                temp = mat2 * v
-                temp.PrintValue()
-            Catch ex As Exception
-            End Try
+            'v.Direction = clsEasyVector.VectorDirection.ROW
+            'Try
+            '    temp = mat2 * v
+            '    temp.PrintValue()
+            'Catch ex As Exception
+            'End Try
 
-            v.Direction = clsEasyVector.VectorDirection.COL
-            temp = mat2 * v
-            mat2.PrintValue()
-            Console.WriteLine()
-            v.PrintValue()
-            Console.WriteLine("Mat *  Vector")
-            If temp IsNot Nothing Then
-                temp.PrintValue()
-            End If
+            'v.Direction = clsEasyVector.VectorDirection.COL
+            'temp = mat2 * v
+            'mat2.PrintValue()
+            'Console.WriteLine()
+            'v.PrintValue()
+            'Console.WriteLine("Mat *  Vector")
+            'If temp IsNot Nothing Then
+            '    temp.PrintValue()
+            'End If
 
-            v.Direction = clsEasyVector.VectorDirection.ROW
-            temp = v * mat2
-            mat2.PrintValue()
-            Console.WriteLine()
-            v.PrintValue()
-            Console.WriteLine("Vector * Mat")
-            If temp IsNot Nothing Then
-                temp.PrintValue()
-            End If
+            'v.Direction = clsEasyVector.VectorDirection.ROW
+            'temp = v * mat2
+            'mat2.PrintValue()
+            'Console.WriteLine()
+            'v.PrintValue()
+            'Console.WriteLine("Vector * Mat")
+            'If temp IsNot Nothing Then
+            '    temp.PrintValue()
+            'End If
 
-            v.Direction = clsEasyVector.VectorDirection.COL
-            Try
-                temp = v * mat2
-                temp.PrintValue()
-            Catch ex As Exception
-            End Try
+            'v.Direction = clsEasyVector.VectorDirection.COL
+            'Try
+            '    temp = v * mat2
+            '    temp.PrintValue()
+            'Catch ex As Exception
+            'End Try
 
-            Console.WriteLine("----------------------------------------------")
-            v.Direction = clsEasyVector.VectorDirection.ROW
-            Try
-                temp = mat * v
-                temp.PrintValue()
-            Catch ex As Exception
-            End Try
+            'Console.WriteLine("----------------------------------------------")
+            'v.Direction = clsEasyVector.VectorDirection.ROW
+            'Try
+            '    temp = mat * v
+            '    temp.PrintValue()
+            'Catch ex As Exception
+            'End Try
 
-            v.Direction = clsEasyVector.VectorDirection.COL
-            Try
-                temp = mat * v
-                temp.PrintValue()
-            Catch ex As Exception
-            End Try
-            If temp IsNot Nothing Then
-                temp.PrintValue()
-            End If
+            'v.Direction = clsEasyVector.VectorDirection.COL
+            'Try
+            '    temp = mat * v
+            '    temp.PrintValue()
+            'Catch ex As Exception
+            'End Try
+            'If temp IsNot Nothing Then
+            '    temp.PrintValue()
+            'End If
 
-            v.Direction = clsEasyVector.VectorDirection.ROW
-            temp = v * mat
-            mat.PrintValue()
-            Console.WriteLine()
-            v.PrintValue()
-            Console.WriteLine("Vector * Mat")
-            If temp IsNot Nothing Then
-                temp.PrintValue()
-            End If
+            'v.Direction = clsEasyVector.VectorDirection.ROW
+            'temp = v * mat
+            'mat.PrintValue()
+            'Console.WriteLine()
+            'v.PrintValue()
+            'Console.WriteLine("Vector * Mat")
+            'If temp IsNot Nothing Then
+            '    temp.PrintValue()
+            'End If
 
-            v.Direction = clsEasyVector.VectorDirection.COL
-            Try
-                temp = v * mat
-                temp.PrintValue()
-            Catch ex As Exception
-            End Try
+            'v.Direction = clsEasyVector.VectorDirection.COL
+            'Try
+            '    temp = v * mat
+            '    temp.PrintValue()
+            'Catch ex As Exception
+            'End Try
         End With
 
         '
@@ -232,25 +232,25 @@ Module Module1
             Dim matC As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3}, _
                                                                        New Double() {4, 5, 6}, _
                                                                        New Double() {7, 8, 9}})
-            vecA.PrintValue()
-            matC.PrintValue()
-            Dim tempV As clsEasyVector = vecA * matC
-            tempV.PrintValue()
-            Console.WriteLine("----------------------------------------------")
-            'Inner Product
-            With Nothing
-                Dim va As New clsEasyVector(New Double() {1, 1})
-                Dim vb As New clsEasyVector(New Double() {0.5, 0})
-                Console.WriteLine(va.NormL2.ToString())
-                Console.WriteLine(vb.NormL2.ToString())
-                Console.WriteLine(va.InnerProduct(vb).ToString())
+            'vecA.PrintValue()
+            'matC.PrintValue()
+            'Dim tempV As clsEasyVector = vecA * matC
+            'tempV.PrintValue()
+            'Console.WriteLine("----------------------------------------------")
+            ''Inner Product
+            'With Nothing
+            '    Dim va As New clsEasyVector(New Double() {1, 1})
+            '    Dim vb As New clsEasyVector(New Double() {0.5, 0})
+            '    Console.WriteLine(va.NormL2.ToString())
+            '    Console.WriteLine(vb.NormL2.ToString())
+            '    Console.WriteLine(va.InnerProduct(vb).ToString())
 
-                Dim aa As Double
-                'aa = va.NormL1 * vb.NormL1 * Math.Cos(45 * Math.PI / 180.0)
-                'Console.WriteLine(aa.ToString())
-                aa = va.NormL2 * vb.NormL2 * Math.Cos(45 * Math.PI / 180.0)
-                Console.WriteLine(aa.ToString())
-            End With
+            '    Dim aa As Double
+            '    'aa = va.NormL1 * vb.NormL1 * Math.Cos(45 * Math.PI / 180.0)
+            '    'Console.WriteLine(aa.ToString())
+            '    aa = va.NormL2 * vb.NormL2 * Math.Cos(45 * Math.PI / 180.0)
+            '    Console.WriteLine(aa.ToString())
+            'End With
             Console.WriteLine("----------------------------------------------")
             Dim matAA As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
             Dim vBB As New clsEasyMatrix(New List(Of Double)({1, 1, 1}), clsEasyVector.VectorDirection.COL)
