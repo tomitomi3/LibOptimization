@@ -143,6 +143,16 @@ Namespace Optimization
                 Me.m_parents.Clear()
                 Me.m_error.Clear()
 
+                'bound check
+                If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                    If UpperBounds.Length <> Me.m_func.NumberOfVariable Then
+                        Throw New Exception("UpperBounds.Length is different")
+                    End If
+                    If LowerBounds.Length <> Me.m_func.NumberOfVariable Then
+                        Throw New Exception("LowerBounds.Length is different")
+                    End If
+                End If
+
                 'generate population
                 For i As Integer = 0 To Me.PopulationSize - 1
                     'initialize
@@ -154,7 +164,15 @@ Namespace Optimization
                         End If
                         temp.Add(value)
                     Next
-                    Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
+
+                    'bound check
+                    Dim tempPoint = New clsPoint(MyBase.m_func, temp)
+                    If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                        clsUtil.LimitSolutionSpace(tempPoint, Me.LowerBounds, Me.UpperBounds)
+                    End If
+
+                    'save point
+                    Me.m_parents.Add(tempPoint)
                 Next
 
                 'Sort Evaluate
@@ -204,8 +222,10 @@ Namespace Optimization
                 End If
                 m_iteration += 1
 
-                'DE
+                'reserve best value
                 Dim best = Me.m_parents(0).Copy()
+
+                'DE
                 For i As Integer = 0 To Me.PopulationSize - 1
                     'pick different parent without i
                     Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count, i)

@@ -290,7 +290,7 @@ Namespace Util
         ''' <param name="LowerBounds"></param>
         ''' <param name="UpperBounds"></param>
         ''' <remarks></remarks>
-        Public Shared Sub LimitSolutionSpace(ByVal temp As clsPoint, LowerBounds As Double(), UpperBounds As Double())
+        Public Shared Sub LimitSolutionSpace(ByVal temp As clsPoint, ByVal LowerBounds As Double(), ByVal UpperBounds As Double())
             If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
                 For ii As Integer = 0 To temp.Count - 1
                     Dim upper As Double = 0
