@@ -69,6 +69,9 @@ Typical Use
 # Sample code
 
 * Typical use code
+
+for VB.NET
+
 ```vb
 'Instantiation optimization class and set objective function.
 Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(1))
@@ -82,6 +85,50 @@ If optimization.IsRecentError() = True Then
 Else
     clsUtil.DebugValue(optimization)
 End If
+```
+
+for C#
+
+```c#
+//Instantiation objective Function
+var func = new RosenBlock();
+//Instantiation optimization class and set objective function.
+var opt = new clsOptNelderMead(func);
+opt.Init();
+//Do calc
+opt.DoIteration();
+//Check Error
+if (opt.IsRecentError() == true)
+{
+    return;
+}
+else
+{
+    //Get Result
+    clsUtil.DebugValue(opt);
+}
+```
+
+* Set boundary value for each variable.
+
+Problem setting
+
+objective function : clsBenchTest2(x1,x2) = x1^4 - 20*x1^2 + 20*x1 + x2^4 - 20*x2^2 + 20*x2
+
+boundary
+
+x1 -> 0.0 to 5.0
+
+x2 -> 0.0 to 5.0
+
+for VB.NET
+
+```vb
+Dim optimization As New clsOptDEJADE(New clsBenchTest2())
+optimization.LowerBounds = New Double() {0, 0}
+optimization.UpperBounds = New Double() {5, 5}
+optimization.Init()
+clsUtil.DebugValue(optimization)
 ```
 
 * Set of initial value and the initial position. Initial value is generated in the range of 2.5 and 3.5.
