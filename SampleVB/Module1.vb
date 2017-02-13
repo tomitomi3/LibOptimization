@@ -28,6 +28,17 @@ Module Module1
         'End With
 
         With Nothing
+            Dim optimization As New clsOptDEJADE(New clsBenchTest2())
+            optimization.LowerBounds = New Double() {0, 0}
+            optimization.UpperBounds = New Double() {5, 5}
+            optimization.Init()
+            While (optimization.DoIteration(100) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+        End With
+
+        With Nothing
             Dim optimization As New clsOptDEJADE(New clsBenchRosenblock(10))
             optimization.Init()
             clsUtil.DebugValue(optimization)

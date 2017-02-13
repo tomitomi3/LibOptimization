@@ -312,11 +312,6 @@ Namespace Util
                     ElseIf temp(ii) < upper Then
                         temp(ii) = upper
                     End If
-
-                    'random generate
-                    'If temp(ii) < limit(0) OrElse temp(ii) > limit(1) Then
-                    '    temp(ii) = clsUtil.GenRandomRange(Me.m_rand, limit(0), limit(1))
-                    'End If
                 Next
                 temp.ReEvaluate()
             End If

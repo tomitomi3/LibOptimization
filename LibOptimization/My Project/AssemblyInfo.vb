@@ -11,8 +11,8 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTitle("LibOptimization")> 
 <Assembly: AssemblyDescription("Optimization Library for .NET Framework")> 
 <Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("LibOptimization")> 
-<Assembly: AssemblyCopyright("tomit")> 
+<Assembly: AssemblyProduct("LibOptimization")>
+<Assembly: AssemblyCopyright("tomitomi3")>
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>

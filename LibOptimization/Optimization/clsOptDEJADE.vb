@@ -116,6 +116,16 @@ Namespace Optimization
                 Me.CRs.Clear()
                 Me.Fs.Clear()
 
+                'bound check
+                If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                    If UpperBounds.Length <> Me.m_func.NumberOfVariable Then
+                        Throw New Exception("UpperBounds.Length is different")
+                    End If
+                    If LowerBounds.Length <> Me.m_func.NumberOfVariable Then
+                        Throw New Exception("LowerBounds.Length is different")
+                    End If
+                End If
+
                 'generate population
                 For i As Integer = 0 To Me.PopulationSize - 1
                     Me.CRs.Add(0.5)
@@ -130,7 +140,15 @@ Namespace Optimization
                         End If
                         temp.Add(value)
                     Next
-                    Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
+
+                    'bound check
+                    Dim tempPoint = New clsPoint(MyBase.m_func, temp)
+                    If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                        clsUtil.LimitSolutionSpace(tempPoint, Me.LowerBounds, Me.UpperBounds)
+                    End If
+
+                    'save point
+                    Me.m_parents.Add(New clsPoint(MyBase.m_func, tempPoint))
                 Next
 
                 'update F and CR

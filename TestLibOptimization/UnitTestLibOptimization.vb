@@ -378,5 +378,37 @@ Imports LibOptimization.Util
         Dim opt = New clsOptSteepestDescent(New clsBenchSphere(2))
         Me.CheckOptUsingSphere(opt)
     End Sub
+
+    <TestMethod()> Public Sub TestOptimizationDEWithBound()
+        Dim opt As New clsOptDE(New clsBenchTest2())
+        'x1-> 0 to 5, x2-> 0 to 5
+        opt.LowerBounds = New Double() {0, 0}
+        opt.UpperBounds = New Double() {5, 5}
+        opt.Init()
+        Dim errorFlg = opt.IsRecentError()
+        Assert.IsFalse(errorFlg)
+
+        'check iterate
+        opt.DoIteration()
+        errorFlg = opt.IsRecentError()
+        Assert.IsFalse(errorFlg)
+
+        'Eval
+        If -78.99 < opt.Result.Eval AndAlso opt.Result.Eval < -78.98 Then
+            'OK
+        Else
+            Assert.Fail(String.Format("fail Eval {0}", opt.Result.Eval))
+        End If
+        Console.WriteLine(String.Format("Success Eval {0}", opt.Result.Eval))
+
+        'Result
+        If 2.8 < opt.Result(0) AndAlso opt.Result(0) < 2.9 Then
+            'OK
+        Else
+            Assert.Fail(String.Format("fail Result {0} {1}", opt.Result(0), opt.Result(1)))
+        End If
+        Console.WriteLine(String.Format("Success Result {0} {1}", opt.Result(0), opt.Result(1)))
+    End Sub
+
 #End Region
 End Class
