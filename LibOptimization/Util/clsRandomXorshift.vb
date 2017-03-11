@@ -17,46 +17,52 @@
 
 #Region "Public"
         ''' <summary>
-        ''' Default constructor
+        ''' Constructor with refference seed
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New()
-            'nop
+            'nop using member seed
         End Sub
 
         ''' <summary>
         ''' Constructor with seed
         ''' </summary>
-        ''' <param name="ai_seed"></param>
+        ''' <param name="ai_seed">seed for random algorithm</param>
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_seed As UInteger)
             Me.SetSeed(ai_seed)
         End Sub
 
         ''' <summary>
+        ''' Constructor with Time(Environment.TickCount)
+        ''' </summary>
+        ''' <param name="ai_isUseTickCount">TickCount seed for random algorithm</param>
+        ''' <remarks></remarks>
+        Public Sub New(ByVal ai_isUseTickCount As Boolean)
+            Me.SetSeed(BitConverter.ToUInt32(BitConverter.GetBytes(Environment.TickCount), 0))
+        End Sub
+
+        ''' <summary>
         ''' Set random seed
         ''' </summary>
-        ''' <param name="ai_seed"></param>
+        ''' <param name="ai_seed">seed for random algorithm</param>
         ''' <remarks></remarks>
         Public Sub SetSeed(Optional ByVal ai_seed As UInteger = 88675123)
-            '"The seed set for xor128 is four 32-bit integers x,y,z,w not all 0" by refference
-
-            'default parameter
-            x = 123456789
-            y = 362436069
-            z = 521288629
-            w = 88675123
+            'Init parameter. rorate seed.
+            '全パラメータにseedの影響を与えないと初期の乱数が同じ傾向になる。8bitずつ回転左シフト
+            x = x Xor Me.RotateLeftShiftForUInteger(ai_seed, 8)
+            y = y Xor Me.RotateLeftShiftForUInteger(ai_seed, 16)
+            z = z Xor Me.RotateLeftShiftForUInteger(ai_seed, 24)
+            w = w Xor ai_seed 'Set seed
             t = 0
 
-            If ai_seed = 88675123 Then
-                'nop (using default parameter)
-            Else
-                'Init parameter
-                '全パラメータにseedの影響を与えないと初期の乱数が同じ傾向になる。8bitずつ回転左シフト
-                x = x Xor Me.RotateLeftShiftForUInteger(ai_seed, 8)
-                y = y Xor Me.RotateLeftShiftForUInteger(ai_seed, 16)
-                z = z Xor Me.RotateLeftShiftForUInteger(ai_seed, 24)
-                w = w Xor ai_seed 'Set seed
+            '"The seed set for xor128 is four 32-bit integers x,y,z,w not all 0" by refference
+            If x = 0 AndAlso y = 0 AndAlso z = 0 AndAlso w = 0 Then
+                'default parameter
+                x = 123456789
+                y = 362436069
+                z = 521288629
+                w = 88675123
                 t = 0
             End If
         End Sub
