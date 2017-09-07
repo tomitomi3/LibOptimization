@@ -10,6 +10,12 @@ LibOptimization
 
 ![LibOptimization Log](https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png)
 
+# Recent change
+
+Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0.
+
+Refactoring LibOptimization code with development branch. In the future, I will add new function to the new branch.
+
 # Introduction
 
 LibOptimization is optimization algorithm library for .NET Framework.
@@ -244,13 +250,10 @@ Microsoft Public License (MS-PL)
 http://opensource.org/licenses/MS-PL
 
 # Support .NET Framework
-============
 
-.NET Framework 4.0
+.NET Framework 4.0 (Nuget)
 
-.NET Framework 3.5
-
-.NET Framework 3.0
+.NET Framework 3.0, 3.5 (include This repository)
 
 # Refference
 
