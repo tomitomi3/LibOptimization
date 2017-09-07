@@ -67,12 +67,14 @@ Namespace Optimization
                 Me.m_base = New clsPoint(MyBase.m_func)
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                        value += Me.InitialPosition(i)
-                    End If
                     Me.m_base(i) = value
                 Next
                 Me.m_base.ReEvaluate()
+
+                'add initial position
+                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                    Me.m_base = New clsPoint(MyBase.m_func, InitialPosition)
+                End If
 
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)

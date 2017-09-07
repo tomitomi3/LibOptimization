@@ -74,12 +74,16 @@ Namespace Optimization
                     ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
                     For j As Integer = 0 To m_func.NumberOfVariable - 1
                         Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                            value += Me.InitialPosition(j)
-                        End If
                         tempSimplex(i)(j) = value
                     Next
                 Next
+
+                'add initial position
+                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                    For j As Integer = 0 To m_func.NumberOfVariable - 1
+                        tempSimplex(0)(j) = MyBase.InitialPosition(j)
+                    Next
+                End If
 
                 Me.Init(tempSimplex)
             Catch ex As Exception

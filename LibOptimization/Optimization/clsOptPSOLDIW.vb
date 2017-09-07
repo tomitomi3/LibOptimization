@@ -86,9 +86,6 @@ Namespace Optimization
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         'position
                         Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                            value += Me.InitialPosition(j)
-                        End If
                         tempPosition(j) = value
                         tempBestPosition(j) = tempPosition(j)
 
@@ -99,6 +96,22 @@ Namespace Optimization
                     tempBestPosition.ReEvaluate()
                     Me.m_swarm.Add(New clsParticle(tempPosition, tempVelocity, tempBestPosition))
                 Next
+
+                'add initial point
+                If m_swarm IsNot Nothing AndAlso m_swarm.Count > 0 Then
+                    If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                        Dim index As Integer = CInt(m_swarm.Count / 10)
+                        If index < 1 Then
+                            index = 1
+                        End If
+                        For i As Integer = 0 To index - 1
+                            For j As Integer = 0 To m_func.NumberOfVariable - 1
+                                m_swarm(i).Point(j) = InitialPosition(j)
+                            Next
+                            m_swarm(i).Point.ReEvaluate()
+                        Next
+                    End If
+                End If
 
                 'Sort Evaluate
                 Me.m_swarm.Sort()

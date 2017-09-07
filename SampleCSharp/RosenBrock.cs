@@ -8,7 +8,7 @@ namespace SampleCSharp
     /// <summary>
     /// for Rosen block function(Bench mark function)
     /// </summary>
-    class RosenBlock : LibOptimization.Optimization.absObjectiveFunction
+    class RosenBrock : LibOptimization.Optimization.absObjectiveFunction
     {
         public override double F(List<double> ai_var)
         {

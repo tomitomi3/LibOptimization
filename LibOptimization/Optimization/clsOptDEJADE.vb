@@ -56,38 +56,17 @@ Namespace Optimization
         ''' </summary>
         Public Property PopulationSize As Integer = 100
 
-        ''' <summary>
-        ''' Scale factor(Default:0.5)
-        ''' </summary>
-        Public Property F As Double = 0.5
-
-        ''' <summary>
-        ''' Cross over ratio(Default:0.5)
-        ''' </summary>
-        Public Property CrossOverRatio As Double = 0.5
-
-
-        ''' <summary>
-        ''' Differential Evolution Strategy
-        ''' </summary>
-        Public Property DEStrategy As EnumDEStrategyType = EnumDEStrategyType.DE_current_to_pBest_1
-
-        ''' <summary>
-        ''' Enum Differential Evolution Strategy
-        ''' </summary>
-        Public Enum EnumDEStrategyType
-            ''' <summary>DE/current-to-pbest/1</summary>
-            DE_current_to_pBest_1
-        End Enum
-
         ''' <summary>population</summary>
         Private m_parents As New List(Of clsPoint)
 
-        ''' <summary>individual cross over ratio for population</summary>
-        Private CRs As New List(Of Double)
+        ''' <summary>Constant raio 0 to 1(Adaptive paramter for muF, muCR)(Default:0.1)</summary>
+        Public Property C As Double = 0.1
 
-        ''' <summary>individual F for population</summary>
-        Private Fs As New List(Of Double)
+        ''' <summary>Adapative cross over ratio</summary>
+        Private muCR As Double = 0.5
+
+        ''' <summary>Adapative F</summary>
+        Private muF As Double = 0.5
 #End Region
 
 #Region "Constructor"
@@ -113,8 +92,10 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
                 Me.m_error.Clear()
-                Me.CRs.Clear()
-                Me.Fs.Clear()
+
+                'init muF, muCR
+                muCR = 0.5
+                muF = 0.5
 
                 'bound check
                 If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
@@ -128,16 +109,10 @@ Namespace Optimization
 
                 'generate population
                 For i As Integer = 0 To Me.PopulationSize - 1
-                    Me.CRs.Add(0.5)
-                    Me.Fs.Add(0.5)
-
                     'initialize
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                            value += Me.InitialPosition(j)
-                        End If
                         temp.Add(value)
                     Next
 
@@ -148,11 +123,11 @@ Namespace Optimization
                     End If
 
                     'save point
-                    Me.m_parents.Add(New clsPoint(MyBase.m_func, tempPoint))
+                    Me.m_parents.Add(tempPoint)
                 Next
 
-                'update F and CR
-                Me.UpdateFAndCR()
+                'add initial point
+                clsUtil.SetInitialPoint(Me.m_parents, InitialPosition)
 
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -204,66 +179,93 @@ Namespace Optimization
                 '--------------------------------------------------------------------------------------------
                 'DE process
                 '--------------------------------------------------------------------------------------------
-                'update F and CR
+                'Mutation and Crossover
                 Dim sumF As Double = 0.0
                 Dim sumFSquare As Double = 0.0
                 Dim sumCR As Double = 0.0
                 Dim countSuccess As Integer = 0
-                Me.UpdateFAndCR()
-
                 For i As Integer = 0 To Me.PopulationSize - 1
+                    'update F
+                    Dim F As Double = 0.0
+                    While True
+                        F = clsUtil.CauchyRand(muF, 0.1)
+                        If F < 0 Then
+                            Continue While
+                        End If
+                        If F > 1 Then
+                            F = 1.0
+                        End If
+                        Exit While
+                    End While
+
+                    'update CR 0 to 1
+                    Dim CR As Double = clsUtil.NormRand(muCR, 0.1)
+                    If CR < 0 Then
+                        CR = 0.0
+                    ElseIf CR > 1 Then
+                        CR = 1.0
+                    End If
+
+                    'Sort Evaluate
+                    m_parents.Sort()
+
                     'pick different parent without i
-                    Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count, i)
-                    Dim xi = Me.m_parents(i)
-                    Dim p1 As clsPoint = Me.m_parents(randIndex(0))
-                    Dim p2 As clsPoint = Me.m_parents(randIndex(1))
+                    Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(m_parents.Count, i)
+                    Dim xi = m_parents(i)
+                    Dim p1 As clsPoint = m_parents(randIndex(0))
+                    Dim p2 As clsPoint = m_parents(randIndex(1))
 
                     'Mutation and Crossover
-                    Dim child = New clsPoint(Me.m_func)
-                    Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
-                    Dim D = Me.m_func.NumberOfVariable - 1
-                    If Me.DEStrategy = EnumDEStrategyType.DE_current_to_pBest_1 Then
-                        'DE/current-to-pbest/1 for JADE Strategy
-                        Dim p = CInt(Me.PopulationSize - 1 * Me.m_rand.NextDouble()) '100p%
-                        Dim index = Me.m_rand.Next(0, p)
-                        Dim pbest = Me.m_parents(index)
+                    Dim child = New clsPoint(ObjectiveFunction)
+                    Dim j = Random.Next() Mod ObjectiveFunction.NumberOfVariable
+                    Dim D = ObjectiveFunction.NumberOfVariable - 1
 
-                        'crossover
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CRs(i) OrElse k = D Then
-                                child(j) = xi(j) + Me.Fs(i) * (pbest(j) - xi(j)) + Me.Fs(i) * (p1(j) - p2(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
+                    'DE/current-to-pbest/1 for JADE Strategy. current 100p% p<-(0,1)
+                    Dim p = CInt(Me.PopulationSize * Random.NextDouble()) 'range is 0 to PopulationSize
+                    Dim pbest As clsPoint = Nothing
+                    If p = 0 Then
+                        pbest = m_parents(0) 'best
+                    ElseIf p >= Me.PopulationSize Then
+                        pbest = m_parents(PopulationSize - 1) 'worst
+                    Else
+                        pbest = m_parents(Random.Next(0, p))
                     End If
+
+                    'crossover
+                    For k = 0 To ObjectiveFunction.NumberOfVariable - 1
+                        If Random.NextDouble() < CR OrElse k = D Then
+                            child(j) = xi(j) + F * (pbest(j) - xi(j)) + F * (p1(j) - p2(j))
+                        Else
+                            child(j) = xi(k)
+                        End If
+                        j = (j + 1) Mod ObjectiveFunction.NumberOfVariable 'next
+                    Next
                     child.ReEvaluate() 'Evaluate child
 
                     'Limit solution space
                     clsUtil.LimitSolutionSpace(child, Me.LowerBounds, Me.UpperBounds)
 
                     'Survive
-                    If child.Eval < Me.m_parents(i).Eval Then
-                        Me.m_parents(i) = child
+                    If child.Eval < m_parents(i).Eval Then
+                        'replace
+                        m_parents(i) = child
 
                         'for adaptive parameter
-                        sumF += Me.Fs(i)
-                        sumFSquare += Me.Fs(i) ^ 2
-                        sumCR += Me.CRs(i)
+                        sumF += F
+                        sumFSquare += F ^ 2
+                        sumCR += CR
                         countSuccess += 1
                     End If
                 Next 'population iteration
 
-                'update muF, muCR
+                'calc muF, muCR
                 If countSuccess > 0 Then
-                    Me.F = (1 - 0.1) * Me.F + 0.1 * (sumFSquare / sumF)
-                    Me.CrossOverRatio = (1 - 0.1) * Me.CrossOverRatio + 0.1 * (sumCR / countSuccess)
+                    muCR = (1 - C) * muCR + C * (sumCR / countSuccess) '(1-c) * muCR + c * meanA(CRs)
+                    muF = (1 - C) * muF + C * (sumFSquare / sumF)
                 Else
-                    Me.F = (1 - 0.1) * Me.F
-                    Me.CrossOverRatio = (1 - 0.1) * Me.CrossOverRatio
-                    'Console.WriteLine("not success")
-                    'Console.WriteLine(" F={0} CR={1}", Me.F, Me.CrossOverRatio)
+                    muCR = (1 - C) * muCR
+                    muF = (1 - C) * muF
+                    'Console.WriteLine("muF={0}, muCR={1}", muF, muCR)
                 End If
             Next
 
@@ -306,37 +308,6 @@ Namespace Optimization
 #End Region
 
 #Region "Private"
-
-        ''' <summary>
-        ''' Update scalafactor and crossover ratio
-        ''' </summary>
-        ''' <remarks></remarks>
-        Private Sub UpdateFAndCR()
-            For i As Integer = 0 To Me.PopulationSize - 1
-                'generate F
-                While (True)
-                    Dim tempF As Double = clsUtil.CauchyRand(Me.F, 0.1)
-                    If tempF < 0 Then
-                        Continue While
-                    ElseIf tempF > 1 Then
-                        Me.Fs(i) = 1
-                    Else
-                        Me.Fs(i) = tempF
-                    End If
-                    Exit While
-                End While
-
-                'generate CR 0 to 1
-                Dim tempCR As Double = clsUtil.NormRand(Me.CrossOverRatio, 0.1)
-                If tempCR < 0 Then
-                    Me.CRs(i) = 0
-                ElseIf tempCR > 1 Then
-                    Me.CRs(i) = 1
-                Else
-                    Me.CRs(i) = tempCR
-                End If
-            Next
-        End Sub
 #End Region
     End Class
 End Namespace

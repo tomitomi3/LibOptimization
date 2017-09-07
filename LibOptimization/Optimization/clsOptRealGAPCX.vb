@@ -55,7 +55,7 @@ Namespace Optimization
         Public Property Zeta As Double = 0.1
 
         ''' <summary>population</summary>
-        Private m_population As New List(Of clsPoint)
+        Private m_parents As New List(Of clsPoint)
 #End Region
 
 #Region "Constructor"
@@ -79,7 +79,7 @@ Namespace Optimization
             Try
                 'init meber varibles
                 Me.m_iteration = 0
-                Me.m_population.Clear()
+                Me.m_parents.Clear()
 
                 'Set initialize value
                 For i As Integer = 0 To Me.PopulationSize - 1
@@ -91,16 +91,19 @@ Namespace Optimization
                         End If
                         temp.Add(value)
                     Next
-                    Me.m_population.Add(New clsPoint(MyBase.m_func, temp))
+                    Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
                 Next
 
+                'add initial point
+                clsUtil.SetInitialPoint(Me.m_parents, InitialPosition)
+
                 'Sort Evaluate
-                Me.m_population.Sort()
+                Me.m_parents.Sort()
 
                 'Detect HigherNPercentIndex
-                Me.HigherNPercentIndex = CInt(Me.m_population.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_population.Count OrElse Me.HigherNPercentIndex >= Me.m_population.Count Then
-                    Me.HigherNPercentIndex = Me.m_population.Count - 1
+                Me.HigherNPercentIndex = CInt(Me.m_parents.Count * Me.HigherNPercent)
+                If Me.HigherNPercentIndex = Me.m_parents.Count OrElse Me.HigherNPercentIndex >= Me.m_parents.Count Then
+                    Me.HigherNPercentIndex = Me.m_parents.Count - 1
                 End If
 
             Catch ex As Exception
@@ -124,12 +127,12 @@ Namespace Optimization
             ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
             For iterate As Integer = 0 To ai_iteration
                 'Sort Evaluate
-                Me.m_population.Sort()
+                Me.m_parents.Sort()
 
                 'check criterion
                 If Me.IsUseCriterion = True Then
                     'higher N percentage particles are finished at the time of same evaluate value.
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_population(0).Eval, Me.m_population(Me.HigherNPercentIndex).Eval) Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(Me.HigherNPercentIndex).Eval) Then
                         Return True
                     End If
                 End If
@@ -157,7 +160,7 @@ Namespace Optimization
                 Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(selectParentsIndex.Count)
                 For i As Integer = 0 To replaceParent - 1
                     Dim parentIndex As Integer = selectParentsIndex(randIndex(i))
-                    newPopulation.Add(Me.m_population(parentIndex))
+                    newPopulation.Add(Me.m_parents(parentIndex))
                 Next
                 'sort by eval
                 newPopulation.Sort()
@@ -165,10 +168,10 @@ Namespace Optimization
                 'replace
                 For i As Integer = 0 To replaceParent - 1
                     Dim parentIndex As Integer = selectParentsIndex(randIndex(i))
-                    Me.m_population(parentIndex) = newPopulation(i)
+                    Me.m_parents(parentIndex) = newPopulation(i)
                 Next
 
-                Me.m_population.Sort()
+                Me.m_parents.Sort()
             Next
 
             Return False
@@ -181,7 +184,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result() As clsPoint
             Get
-                Return Me.m_population(0)
+                Return Me.m_parents(0)
             End Get
         End Property
 
@@ -204,7 +207,7 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
-                Return Me.m_population
+                Return Me.m_parents
             End Get
         End Property
 #End Region
@@ -219,7 +222,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Private Sub SelectParentsForG3(ByVal ai_pickN As Integer, ByRef ao_parentIndex As List(Of Integer), ByRef ao_retParents As List(Of clsPoint))
             'generate random permutation array without best parent index
-            Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_population.Count, 0)
+            Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(Me.m_parents.Count, 0)
 
             'generate random permutation with best parent index
             ao_parentIndex = New List(Of Integer)(ai_pickN)
@@ -228,10 +231,10 @@ Namespace Optimization
             For i As Integer = 0 To ai_pickN - 1
                 If i = insertBestParentPosition Then
                     ao_parentIndex.Add(0)
-                    ao_retParents.Add(Me.m_population(0))
+                    ao_retParents.Add(Me.m_parents(0))
                 Else
                     ao_parentIndex.Add(randIndex(i))
-                    ao_retParents.Add(Me.m_population(randIndex(i)))
+                    ao_retParents.Add(Me.m_parents(randIndex(i)))
                 End If
             Next
         End Sub

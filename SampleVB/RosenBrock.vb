@@ -1,8 +1,8 @@
 ﻿''' <summary>
-''' Constrained optimization for the Heuristic algorithm
+''' sample conde : inherit objective function
 ''' </summary>
 ''' <remarks></remarks>
-Public Class clsRosenBlock : Inherits LibOptimization.Optimization.absObjectiveFunction
+Public Class RosenBrock : Inherits LibOptimization.Optimization.absObjectiveFunction
     ''' <summary>
     ''' for Rosen block function(Bench mark function)
     ''' </summary>
@@ -31,4 +31,5 @@ Public Class clsRosenBlock : Inherits LibOptimization.Optimization.absObjectiveF
             Return 2
         End Get
     End Property
+
 End Class

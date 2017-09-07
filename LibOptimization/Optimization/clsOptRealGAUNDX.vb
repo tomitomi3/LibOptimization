@@ -9,7 +9,7 @@ Namespace Optimization
     ''' <remarks>
     ''' Features:
     '''  -Derivative free optimization algorithm.
-    '''  -Alternation of generation algorithm is JGG
+    '''  -Alternation of generation algorithm is MGG or JGG
     ''' 
     ''' Refference:
     ''' [1]小野功，佐藤浩，小林重信, "単峰性正規分布交叉UNDXを用いた実数値GAによる関数最適化"，人工知能学会誌，Vol. 14，No. 6，pp. 1146-1155 (1999)
@@ -52,7 +52,7 @@ Namespace Optimization
         Public Property BETA As Double = 0.35
 
         ''' <summary>AlternationStrategy(Default:JGG)</summary>
-        Public Property AlternationStrategy As EnumAlternatioType = EnumAlternatioType.JGG
+        Public Property AlternationStrategy As EnumAlternatioType = EnumAlternatioType.MGG
 
         ''' <summary>alternation strategy</summary>
         Public Enum EnumAlternatioType
@@ -96,13 +96,13 @@ Namespace Optimization
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                            value += Me.InitialPosition(j)
-                        End If
                         temp.Add(value)
                     Next
                     Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
                 Next
+
+                'add initial point
+                clsUtil.SetInitialPoint(Me.m_parents, InitialPosition)
 
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -162,14 +162,6 @@ Namespace Optimization
                 'UNDX
                 Dim children = Me.UNDX(p1, p2, p3)
 
-                'for debug
-                'If Me.m_iteration = 1 OrElse (Me.m_iteration Mod 50) = 0 Then
-                '    Console.WriteLine("----")
-                '    clsUtil.ToCSV(p1)
-                '    clsUtil.ToCSV(p2)
-                '    clsUtil.ToCSV(children)
-                'End If
-
                 'AlternationStrategy
                 If Me.AlternationStrategy = EnumAlternatioType.JGG Then
                     'JGG
@@ -212,7 +204,7 @@ Namespace Optimization
                     newTempSum += temp
                 Next
                 'select
-                Dim r = Me.m_rand.NextDouble()
+                Dim r = Random.NextDouble()
                 Dim cumulativeRatio As Double = 0.0
                 For i As Integer = 0 To ai_chidren.Count - 1
                     cumulativeRatio += tempList(i) / newTempSum
@@ -226,10 +218,10 @@ Namespace Optimization
                     tempSum += c.Eval
                 Next
                 'select
-                Dim r = Me.m_rand.NextDouble()
+                Dim r = Random.NextDouble()
                 Dim cumulativeRatio As Double = 0.0
                 For i As Integer = 0 To ai_chidren.Count - 1
-                    cumulativeRatio += ai_chidren(i).eval / tempSum
+                    cumulativeRatio += ai_chidren(i).Eval / tempSum
                     If cumulativeRatio > r Then
                         Return i
                     End If
@@ -263,9 +255,6 @@ Namespace Optimization
                 Dim temp As New List(Of Double)
                 For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                        value += Me.InitialPosition(j)
-                    End If
                     temp.Add(value)
                 Next
                 Me.m_parents(i) = New clsPoint(MyBase.m_func, temp)
@@ -345,41 +334,51 @@ Namespace Optimization
             'calc d
             Dim diffVectorP2P1 = p1 - p2
             Dim length = diffVectorP2P1.NormL2()
-            Dim areaTriangle As Double = Me.CalcTriangleArea(length, (p3 - p2).NormL2(), (p3 - p1).NormL2())
-            If length = 0 Then
-                length += 0.0000000001 'avoid Zero Divide
-            End If
+            Dim areaTriangle As Double = CalcTriangleArea(length, (p3 - p2).NormL2(), (p3 - p1).NormL2())
             Dim d2 = 2.0 * areaTriangle / length 'S=1/2 * h * a -> h = 2.0 * S / a
 
-            'If d2 < 0.0001 Then
-            '    d2 += Me.m_rand.NextDouble()
-            'End If
-
             'UNDX
-            Dim children As New List(Of clsPoint)(Me.ChildrenSize)
+            Dim children As New List(Of clsPoint)(ChildrenSize)
             Dim g = (p1 + p2) / 2.0
-            Dim sd1 = (Me.ALPHA * length) ^ 2
-            Dim sd2 = (Me.BETA * d2 / Math.Sqrt(Me.m_func.NumberOfVariable)) ^ 2
+            Dim sd1 = (ALPHA * length) ^ 2
+            Dim sd2 = (BETA * d2 / Math.Sqrt(ObjectiveFunction.NumberOfVariable)) ^ 2
             Dim e = diffVectorP2P1 / length
-            Dim t = New clsEasyVector(Me.m_func.NumberOfVariable)
-            For genChild As Integer = 0 To CInt(Me.ChildrenSize / 2 - 1)
-                For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+            Dim t = New clsEasyVector(ObjectiveFunction.NumberOfVariable)
+            For genChild As Integer = 0 To CInt(ChildrenSize / 2 - 1)
+                For i As Integer = 0 To ObjectiveFunction.NumberOfVariable - 1
                     t(i) = clsUtil.NormRand(0, sd2)
                 Next
                 t = t - (t.InnerProduct(e)) * e
 
                 'child
-                Dim child1(Me.m_func.NumberOfVariable - 1) As Double
-                Dim child2(Me.m_func.NumberOfVariable - 1) As Double
+                Dim child1(ObjectiveFunction.NumberOfVariable - 1) As Double
+                Dim child2(ObjectiveFunction.NumberOfVariable - 1) As Double
                 Dim ndRand = clsUtil.NormRand(0, sd1)
-                For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                For i As Integer = 0 To ObjectiveFunction.NumberOfVariable - 1
                     Dim temp = t(i) + ndRand * e(i)
                     child1(i) = g(i) + temp
                     child2(i) = g(i) - temp
                 Next
 
-                children.Add(New clsPoint(Me.m_func, child1))
-                children.Add(New clsPoint(Me.m_func, child2))
+                'overflow check
+                Dim temp1 = New clsPoint(ObjectiveFunction, child1)
+                If clsUtil.CheckOverflow(temp1) = True Then
+                    For i As Integer = 0 To ObjectiveFunction.NumberOfVariable - 1
+                        'temp1(i) = Util.Util.NormRand(g(i), 0.1)
+                        temp1(i) = clsUtil.GenRandomRange(Random, -InitialValueRange, InitialValueRange)
+                    Next
+                    temp1.ReEvaluate()
+                End If
+                Dim temp2 = New clsPoint(ObjectiveFunction, child2)
+                If clsUtil.CheckOverflow(temp2) = True Then
+                    For i As Integer = 0 To ObjectiveFunction.NumberOfVariable - 1
+                        temp2(i) = clsUtil.GenRandomRange(Random, -InitialValueRange, InitialValueRange)
+                    Next
+                    temp2.ReEvaluate()
+                End If
+
+                children.Add(temp1)
+                children.Add(temp2)
             Next
             Return children
         End Function

@@ -44,9 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnconstrainedOptimization.cs" />
-    <Compile Include="RosenBlock.cs" />
-    <Compile Include="ConstrainedOptimization.cs" />
+    <Compile Include="RosenBrock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -55,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibOptimization\LibOptimization.vbproj">
-      <Project>{d27dc3b8-703d-4694-bdf9-30d809817618}</Project>
+      <Project>{c9b49eb1-e2a6-4534-b2cd-7379b2525182}</Project>
       <Name>LibOptimization</Name>
     </ProjectReference>
   </ItemGroup>

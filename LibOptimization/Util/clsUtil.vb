@@ -1,4 +1,5 @@
 ﻿Imports LibOptimization.Optimization
+Imports LibOptimization.Util
 
 Namespace Util
     ''' <summary>
@@ -313,9 +314,126 @@ Namespace Util
                         temp(ii) = upper
                     End If
                 Next
-                temp.ReEvaluate()
             End If
+            temp.ReEvaluate()
         End Sub
 
+        ''' <summary>
+        ''' calc length from each points
+        ''' </summary>
+        ''' <param name="points"></param>
+        ''' <returns></returns>
+        Public Shared Function IsExistZeroLength(ByVal points() As clsPoint) As Boolean
+            Dim isCanCrossover As Boolean = True
+            Dim vec As MathUtil.clsEasyVector = Nothing
+            For i As Integer = 0 To points.Length - 2
+                vec = points(i) - points(i + 1)
+                If vec.NormL1() = 0 Then
+                    Return True
+                End If
+            Next
+            vec = points(points.Length - 1) - points(0)
+            If vec.NormL1() = 0 Then
+                Return True
+            End If
+
+            Return False
+        End Function
+
+        ''' <summary>
+        ''' Overflow check for debug
+        ''' </summary>
+        ''' <param name="v"></param>
+        ''' <returns></returns>
+        Public Shared Function CheckOverflow(ByVal v As Double) As Boolean
+            If Double.IsInfinity(v) = True Then
+                Return True
+            End If
+            If Double.IsNaN(v) = True Then
+                Return True
+            End If
+            If Double.IsNegativeInfinity(v) = True Then
+                Return True
+            End If
+            If Double.IsPositiveInfinity(v) = True Then
+                Return True
+            End If
+
+            Return False
+        End Function
+
+        ''' <summary>
+        ''' Overflow check for debug
+        ''' </summary>
+        ''' <param name="p"></param>
+        ''' <returns></returns>
+        Public Shared Function CheckOverflow(ByVal p As clsPoint) As Boolean
+            For Each v In p
+                If Double.IsInfinity(v) = True Then
+                    Return True
+                End If
+                If Double.IsNaN(v) = True Then
+                    Return True
+                End If
+                If Double.IsNegativeInfinity(v) = True Then
+                    Return True
+                End If
+                If Double.IsPositiveInfinity(v) = True Then
+                    Return True
+                End If
+            Next
+
+            Return False
+        End Function
+
+        ''' <summary>
+        ''' Overflow check for debug
+        ''' </summary>
+        ''' <param name="listP"></param>
+        ''' <returns></returns>
+        Public Shared Function CheckOverflow(ByVal listP As List(Of clsPoint)) As Boolean
+            For Each temp In listP
+                For Each v In temp
+                    If Double.IsInfinity(v) = True Then
+                        Return True
+                    End If
+                    If Double.IsNaN(v) = True Then
+                        Return True
+                    End If
+                    If Double.IsNegativeInfinity(v) = True Then
+                        Return True
+                    End If
+                    If Double.IsPositiveInfinity(v) = True Then
+                        Return True
+                    End If
+                Next
+            Next
+
+            Return False
+        End Function
+
+        ''' <summary>
+        ''' Set initial point
+        ''' </summary>
+        ''' <param name="pupulation"></param>
+        ''' <param name="initialPosition"></param>
+        Public Shared Sub SetInitialPoint(ByVal pupulation As List(Of clsPoint), ByVal initialPosition() As Double)
+            If pupulation IsNot Nothing AndAlso pupulation.Count > 0 Then
+                Dim func = pupulation(0).GetFunc()
+
+                If initialPosition IsNot Nothing AndAlso initialPosition.Length = func.NumberOfVariable Then
+                    Dim index As Integer = CInt(pupulation.Count / 10)
+                    If index < 1 Then
+                        index = 1
+                    End If
+                    For i As Integer = 0 To index - 1
+                        For j As Integer = 0 To func.NumberOfVariable - 1
+                            pupulation(i)(j) = initialPosition(j)
+                        Next
+                        pupulation(i).ReEvaluate()
+                    Next
+                End If
+            End If
+        End Sub
     End Class
 End Namespace

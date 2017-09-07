@@ -82,6 +82,13 @@ Namespace Optimization
                     Next
                 Next
 
+                'add initial position
+                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                    For j As Integer = 0 To m_func.NumberOfVariable - 1
+                        tempSimplex(0)(j) = MyBase.InitialPosition(j)
+                    Next
+                End If
+
                 Me.Init(tempSimplex)
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")

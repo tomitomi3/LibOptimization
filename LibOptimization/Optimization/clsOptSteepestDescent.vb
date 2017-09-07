@@ -62,11 +62,13 @@ Namespace Optimization
                 'init meber varibles
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                        value += Me.InitialPosition(i)
-                    End If
                     Me.m_vect(i) = value
                 Next
+
+                'add initial position
+                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                    Me.m_vect = New clsEasyVector(InitialPosition)
+                End If
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
             End Try

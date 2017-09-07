@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LibOptimization", "LibOptimization\LibOptimization.vbproj", "{D27DC3B8-703D-4694-BDF9-30D809817618}"
 EndProject
@@ -22,6 +22,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LibOptimizationDotNet3.5", 
 	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestLibOptimization", "TestLibOptimization\TestLibOptimization.vbproj", "{A247B94F-0E04-437F-8D84-A30F530A4D66}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestCode", "TestCode\TestCode.vbproj", "{EC308F05-CA3C-4333-908A-19D527FCC88A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +113,18 @@ Global
 		{A247B94F-0E04-437F-8D84-A30F530A4D66}.Release|x64.Build.0 = Release|x86
 		{A247B94F-0E04-437F-8D84-A30F530A4D66}.Release|x86.ActiveCfg = Release|x86
 		{A247B94F-0E04-437F-8D84-A30F530A4D66}.Release|x86.Build.0 = Release|x86
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Debug|x64.Build.0 = Debug|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Debug|x86.Build.0 = Debug|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|x64.ActiveCfg = Release|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|x64.Build.0 = Release|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|x86.ActiveCfg = Release|Any CPU
+		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

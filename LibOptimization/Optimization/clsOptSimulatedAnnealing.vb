@@ -35,8 +35,8 @@ Namespace Optimization
         ''' <summary>start temperature</summary>
         Public Property Temperature As Double = 1000.0
 
-        ''' <summary>end temperature</summary>
-        Public Property EndTemperature As Double = 10.0
+        ''' <summary>stop temperature</summary>
+        Public Property StopTemperature As Double = 0.00000001
 
         Private m_point As clsPoint = Nothing
         Private m_Bestpoint As clsPoint = Nothing
@@ -101,18 +101,14 @@ Namespace Optimization
                 End If
                 Me.m_iteration += 1
 
-                'neighbor
-                Dim temp As New clsPoint(Me.m_point)
-                For i As Integer = 0 To temp.Count - 1
-                    temp(i) += Math.Abs(2.0 * NeighborRange) * m_rand.NextDouble() - NeighborRange
-                Next
-                temp.ReEvaluate()
+                'neighbor function
+                Dim temp As clsPoint = Neighbor(Me.m_point)
 
                 'transition
                 Dim evalNow As Double = Me.m_point.Eval
                 Dim evalNew As Double = temp.Eval
                 Dim r1 As Double = 0.0
-                Dim r2 = Me.m_rand.NextDouble()
+                Dim r2 = MyBase.Random.NextDouble()
                 If evalNew < evalNow Then
                     r1 = 1.0
                 Else
@@ -120,13 +116,13 @@ Namespace Optimization
                     r1 = Math.Exp(delta / Temperature)
                 End If
                 If r1 >= r2 Then
-                    Me.m_point = temp
+                    Me.m_point = temp 'exchange
                 End If
-                'Console.WriteLine("Random:{0:F5},{1:F5},{2:F5},{3:F5},{4:F5}", r1, r2, TEMPERTURE, delta, evalNow)
 
                 'cooling
-                If Me.Temperature > EndTemperature Then
-                    Me.Temperature *= Me.CoolingRatio
+                Temperature *= CoolingRatio
+                If Temperature < StopTemperature Then
+                    Return True 'stop iteration
                 End If
 
                 'reserve best
@@ -173,6 +169,21 @@ Namespace Optimization
 #End Region
 
 #Region "Private"
+        ''' <summary>
+        ''' Neighbor function for local search
+        ''' </summary>
+        ''' <param name="base"></param>
+        ''' <returns></returns>
+        Private Function Neighbor(ByVal base As clsPoint) As clsPoint
+            Dim temp As New clsPoint(base)
+            For i As Integer = 0 To temp.Count - 1
+                Dim tempNeighbor = Math.Abs(2.0 * NeighborRange) * MyBase.Random.NextDouble() - NeighborRange
+                temp(i) += tempNeighbor
+            Next
+            temp.ReEvaluate()
+
+            Return temp
+        End Function
 #End Region
     End Class
 End Namespace

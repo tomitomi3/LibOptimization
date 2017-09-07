@@ -98,13 +98,13 @@ Namespace Optimization
                     Dim temp As New List(Of Double)
                     For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                            value += Me.InitialPosition(j)
-                        End If
                         temp.Add(value)
                     Next
                     Me.m_nests.Add(New clsPoint(MyBase.m_func, temp))
                 Next
+
+                'add initial point
+                clsUtil.SetInitialPoint(Me.m_nests, InitialPosition)
 
                 'Sort Evaluate
                 Me.m_nests.Sort()

@@ -1,11 +1,10 @@
 ﻿Imports LibOptimization
-Imports CsvHelper
 
 ''' <summary>
-''' 最小二乗法（最小自乗法）
+''' 最小二乗法（最小自乗法）Least Squares Method
 ''' </summary>
 ''' <remarks></remarks>
-Public Class clsLeastSquaresMethod : Inherits LibOptimization.Optimization.absObjectiveFunction
+Public Class LeastSquaresMethod : Inherits Optimization.absObjectiveFunction
     ''' <summary>Data</summary>
     Private datas As New List(Of List(Of Double))
 
@@ -20,26 +19,14 @@ Public Class clsLeastSquaresMethod : Inherits LibOptimization.Optimization.absOb
     ''' <summary>
     ''' 初期化
     ''' </summary>
-    ''' <param name="ai_path"></param>
     ''' <remarks></remarks>
-    Public Function Init(ByVal ai_path As String) As Boolean
-        If System.IO.File.Exists(ai_path) = False Then
-            Return False
-        End If
-
-        Try
-            Using r = New IO.StreamReader(ai_path, Text.Encoding.GetEncoding("SHIFT_JIS"))
-                Using csv = New CsvHelper.CsvReader(r)
-                    csv.Configuration.HasHeaderRecord = True
-                    While csv.Read()
-                        datas.Add(New List(Of Double)({CDbl(csv.CurrentRecord.ElementAt(0)), CDbl(csv.CurrentRecord.ElementAt(1))}))
-                    End While
-                End Using
-            End Using
-        Catch ex As Exception
-            Return False
-        End Try
-
+    Public Function Init() As Boolean
+        Me.datas.Add(New List(Of Double)({-20, -1900}))
+        Me.datas.Add(New List(Of Double)({-19.8, -1918.02392}))
+        Me.datas.Add(New List(Of Double)({-18.8, -1953.08032}))
+        Me.datas.Add(New List(Of Double)({-7.2, 62.72128}))
+        Me.datas.Add(New List(Of Double)({3.8, -359.10232}))
+        Me.datas.Add(New List(Of Double)({7.2, -630.78272}))
         Return True
     End Function
 
