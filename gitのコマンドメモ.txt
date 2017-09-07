@@ -1,0 +1,8 @@
+タグをリモートにプッシュ
+$ git push origin タグ名
+
+すべてのタグをリモートにプッシュ
+$ git push origin --tags
+
+タグを削除
+$ git tag -d タグ名
