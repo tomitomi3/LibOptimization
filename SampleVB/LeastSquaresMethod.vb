@@ -58,11 +58,9 @@ Public Class LeastSquaresMethod : Inherits Optimization.absObjectiveFunction
         Throw New NotImplementedException
     End Function
 
-    Public Overrides ReadOnly Property NumberOfVariable As Integer
-        Get
-            Return 5
-        End Get
-    End Property
+    Public Overrides Function NumberOfVariable() As Integer
+        Return 5
+    End Function
 #End Region
 End Class
 

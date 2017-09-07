@@ -58,11 +58,9 @@ Namespace BenchmarkFunction
             Throw New NotImplementedException
         End Function
 
-        Public Overrides ReadOnly Property NumberOfVariable As Integer
-            Get
-                Return 30
-            End Get
-        End Property
+        Public Overrides Function NumberOfVariable() As Integer
+            Return 30
+        End Function
     End Class
 
 End Namespace

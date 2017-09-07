@@ -31,12 +31,9 @@ namespace SampleCSharp
             return null;
         }
 
-        public override int NumberOfVariable
+        public override int NumberOfVariable()
         {
-            get
-            {
-                return 2;
-            }
+            return 2;
         }
     }
 }

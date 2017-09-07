@@ -67,11 +67,9 @@ Namespace BenchmarkFunction
             Return ret
         End Function
 
-        Public Overrides ReadOnly Property NumberOfVariable As Integer
-            Get
-                Return 3
-            End Get
-        End Property
+        Public Overrides Function NumberOfVariable() As Integer
+            Return 3
+        End Function
     End Class
 
 End Namespace

@@ -7,10 +7,9 @@
         ''' <summary>
         ''' Get number of variables
         ''' </summary>
-        ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride ReadOnly Property NumberOfVariable() As Integer
+        Public MustOverride Function NumberOfVariable() As Integer
 
         ''' <summary>
         ''' Evaluate

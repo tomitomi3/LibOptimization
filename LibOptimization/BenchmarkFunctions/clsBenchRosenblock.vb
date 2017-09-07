@@ -114,11 +114,9 @@ Namespace BenchmarkFunction
             Return hesse
         End Function
 
-        Public Overrides ReadOnly Property NumberOfVariable As Integer
-            Get
-                Return Me.dimension
-            End Get
-        End Property
+        Public Overrides Function NumberOfVariable() As Integer
+            Return Me.dimension
+        End Function
     End Class
 
 End Namespace
