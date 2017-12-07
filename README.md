@@ -49,6 +49,7 @@ LibOptimizationは制約条件の無い最適化を行う.NET Framework用のラ
 * Particle Swarm Optmization using adaptive inertia weight
 * Differential Evolution(DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)
 * JADE(self adaptation DE)
+* Evolution Strategy ( (1+1)-ES )
 * Standrad Cuckoo Search
 * FireFly algorithm
 
@@ -282,3 +283,4 @@ http://opensource.org/licenses/MS-PL
 1. X. S. Yang, “Firefly algorithms for multimodal optimization,” in Proceedings of the 5th International Conference on Stochastic Algorithms: Foundation and Applications (SAGA '09), vol. 5792 of Lecture notes in Computer Science, pp. 169–178, 2009.
 1. Firefly Algorithm (http://www.mathworks.com/matlabcentral/fileexchange/29693-firefly-algorithm)
 1. Kalyanmoy Deb, Dhiraj Joshi and Ashish Anand, "Real-Coded Evolutionary Algorithms with Parent-Centric Recombination", KanGAL Report No. 2001003
+1. 進化戦略(https://ja.wikipedia.org/wiki/%E9%80%B2%E5%8C%96%E6%88%A6%E7%95%A5)
