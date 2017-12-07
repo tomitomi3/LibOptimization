@@ -67,7 +67,7 @@ Namespace BenchmarkFunction
         End Function
 
         Public Overrides Function NumberOfVariable() As Integer
-            Return 2
+            Return dimension
         End Function
     End Class
 
