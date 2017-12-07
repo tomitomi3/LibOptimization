@@ -267,21 +267,26 @@ Imports LibOptimization.Util
         opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_best_1_bin
         Me.CheckOptUsingSphere(opt)
 
-        opt = New clsOptDE(New clsBenchSphere(2))
+        opt = New clsOptDE(New clsBenchSphere(3))
         opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_best_2_bin
         Me.CheckOptUsingSphere(opt)
 
-        opt = New clsOptDE(New clsBenchSphere(2))
+        opt = New clsOptDE(New clsBenchSphere(4))
         opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_rand_1_bin
         Me.CheckOptUsingSphere(opt)
 
-        opt = New clsOptDE(New clsBenchSphere(2))
+        opt = New clsOptDE(New clsBenchSphere(5))
         opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_rand_2_bin
         Me.CheckOptUsingSphere(opt)
     End Sub
 
     <TestMethod()> Public Sub TestOptimizationJADE()
         Dim opt = New clsOptDEJADE(New clsBenchSphere(2))
+        Me.CheckOptUsingSphere(opt)
+    End Sub
+
+    <TestMethod()> Public Sub TestOptimizationES()
+        Dim opt = New clsOptES(New clsBenchSphere(2))
         Me.CheckOptUsingSphere(opt)
     End Sub
 
