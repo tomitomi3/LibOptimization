@@ -62,7 +62,7 @@ Namespace Optimization
         Private _variance As Double = 0.0
 
         ''' <summary>recent Mutate success history for 1/5 rule</summary>
-        Private _successMutate As New List(Of Integer)
+        Private _successMutate As New Queue(Of Integer)
 #End Region
 
 #Region "Constructor"
@@ -133,7 +133,7 @@ Namespace Optimization
                 'specify ES
                 _successMutate.Clear()
                 For i As Integer = 0 To (Me.m_func.NumberOfVariable * 10) - 1
-                    _successMutate.Add(0)
+                    _successMutate.Enqueue(0)
                 Next
                 'init variance
                 _variance = clsUtil.GenRandomRange(m_rand, 0.1, 5)
@@ -190,15 +190,14 @@ Namespace Optimization
                 child.ReEvaluate()
 
                 'check best
-                Dim index = m_iteration Mod Me.m_func.NumberOfVariable * 10
                 If child.Eval < _populations(0).Eval Then
                     _recentResult = _populations(0).Eval
                     _populations(0) = child
-                    _successMutate(index) = 1
+                    _successMutate.Enqueue(1)
                 Else
-                    _recentResult = child.Eval
-                    _successMutate(index) = 0
+                    _successMutate.Enqueue(0)
                 End If
+                _successMutate.Dequeue()
 
                 '1/5 rule
                 Dim successCount = _successMutate.Sum()
