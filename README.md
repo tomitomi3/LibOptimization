@@ -22,7 +22,7 @@ LibOptimization is optimization algorithm library for .NET Framework.
 This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.
 
 LibOptimizationは制約条件の無い最適化を行う.NET Framework用のライブラリです。
-実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
+実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
 
 ## Implement Optimization algorithm
 
@@ -36,20 +36,27 @@ LibOptimizationは制約条件の無い最適化を行う.NET Framework用のラ
 * Nelder Mead Method (Original ver, Wikipedia ver)
 * Hooke and Jeeves of Pattern Search (Direct Search)
 
-### Nature inspired derivative free algorithm
+### Derivative free algorithm (Nature inspired algorithm)
 
-* Real-coded Genetic Algorithm BLX-alpha and JGG(Just Generation Gap)
-* Real-coded Genetic Algorithm UNDX(Unimodal Normal Distribution Crossover) and JGG
-* Real-coded Genetic Algorithm SPX(Simplex Crossover) and JGG
-* Real-coded Genetic Algorithm REX(Real-coded Ensemble Crossover) and JGG
-* Real-coded Genetic Algorithm PCX(Parent Centric Recombination) and G3(Generalize Generation Gap)
-* Basic Particle Swarm Optimization
-* Particle Swarm Optimization using Linear Decrease Inertia Weight
-* Particle Swarm Optimization using Chaotic inertia weight(CDIW-PSO, CRIW-PSO)
-* Particle Swarm Optmization using adaptive inertia weight
-* Differential Evolution(DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)
-* JADE(self adaptation DE)
-* Evolution Strategy ( (1+1)-ES )
+* Real-coded Genetic Algorithm
+  * BLX-alpha and JGG(Just Generation Gap)
+  * UNDX(Unimodal Normal Distribution Crossover) and JGG
+  * SPX(Simplex Crossover) and JGG
+  * REX(Real-coded Ensemble Crossover) and JGG
+  * PCX(Parent Centric Recombination) and G3(Generalize Generation Gap)
+* Particle Swarm Optimization(PSO)
+  * Basic PSO
+  * PSO using Linear Decrease Inertia Weight
+  * PSO using Chaotic inertia weight(CDIW-PSO, CRIW-PSO)
+  * PSO using Adaptive inertia weight
+* Differential Evolution
+  * DE/rand/1/bin
+  * DE/rand/2/bin
+  * DE/best/1/bin
+  * DE/best/2/bin
+  * JADE(self adaptation DE)
+* Evolution Strategy
+  * (1+1)-ES )
 * Standrad Cuckoo Search
 * FireFly algorithm
 
