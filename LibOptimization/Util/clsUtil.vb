@@ -39,8 +39,8 @@ Namespace Util
         Public Shared Function NormRand(ByVal oRand As System.Random,
                                         Optional ByVal ai_ave As Double = 0,
                                         Optional ByVal ai_sigma2 As Double = 1) As Double
-            Dim x As Double = clsRandomXorshiftSingleton.GetInstance().NextDouble()
-            Dim y As Double = clsRandomXorshiftSingleton.GetInstance().NextDouble()
+            Dim x As Double = oRand.NextDouble()
+            Dim y As Double = oRand.NextDouble()
 
             Dim c As Double = Math.Sqrt(-2.0 * Math.Log(x))
             If (0.5 - clsRandomXorshiftSingleton.GetInstance().NextDouble() > 0.0) Then
