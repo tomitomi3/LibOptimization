@@ -20,6 +20,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestLibOptimization", "Test
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestCode", "TestCode\TestCode.vbproj", "{EC308F05-CA3C-4333-908A-19D527FCC88A}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LibOptimizationDotNet3.0", "LibOptimizationDotNet3.0\LibOptimizationDotNet3.0.vbproj", "{C1522D60-670D-4843-BD96-FAF195A071C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,18 @@ Global
 		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|x64.Build.0 = Release|Any CPU
 		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|x86.ActiveCfg = Release|Any CPU
 		{EC308F05-CA3C-4333-908A-19D527FCC88A}.Release|x86.Build.0 = Release|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Debug|x64.Build.0 = Debug|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Debug|x86.ActiveCfg = Debug|x86
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Debug|x86.Build.0 = Debug|x86
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Release|x64.ActiveCfg = Release|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Release|x64.Build.0 = Release|Any CPU
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Release|x86.ActiveCfg = Release|x86
+		{C1522D60-670D-4843-BD96-FAF195A071C5}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

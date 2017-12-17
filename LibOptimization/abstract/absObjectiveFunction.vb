@@ -54,9 +54,9 @@
             Dim df As New List(Of Double)
             For i As Integer = 0 To NumberOfVariable() - 1
                 '中心差分
-                Dim tempX1 = x.ToList()
+                Dim tempX1 As New List(Of Double)(x)
+                Dim tempX2 As New List(Of Double)(x)
                 tempX1(i) = tempX1(i) + h
-                Dim tempX2 = x.ToList()
                 tempX2(i) = tempX2(i) - h
                 Dim tempDf = (F(tempX1) - F(tempX2))
                 tempDf = tempDf / (2.0 * h)

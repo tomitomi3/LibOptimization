@@ -200,7 +200,10 @@ Namespace Optimization
                 _successMutate.Dequeue()
 
                 '1/5 rule
-                Dim successCount = _successMutate.Sum()
+                Dim successCount As Integer = 0
+                For Each tempVal In _successMutate
+                    successCount += tempVal
+                Next
                 Dim updateSuccessRatio = successCount / n
                 If updateSuccessRatio < 0.2 Then
                     _variance = _variance * C

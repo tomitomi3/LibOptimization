@@ -26,6 +26,17 @@ Module Module1
         'End With
 
         With Nothing
+            Dim optimization As New Optimization.clsOptSteepestDescent(New clsBenchSphereNumericDiff(2))
+            optimization.Init()
+            clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            clsUtil.DebugValue(optimization)
+            While (optimization.DoIteration(10) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+        End With
+
+        With Nothing
             Dim optimization As New Optimization.clsOptES(New clsBenchRosenblock(20))
             optimization.Init()
             clsUtil.DebugValue(optimization, ai_isOutValue:=False)

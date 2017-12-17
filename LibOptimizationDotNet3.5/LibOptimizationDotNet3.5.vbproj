@@ -171,6 +171,9 @@
     <Compile Include="..\LibOptimization\Optimization\clsOptDEJADE.vb">
       <Link>Optimization\clsOptDEJADE.vb</Link>
     </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptES.vb">
+      <Link>Optimization\clsOptES.vb</Link>
+    </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptFA.vb">
       <Link>Optimization\clsOptFA.vb</Link>
     </Compile>

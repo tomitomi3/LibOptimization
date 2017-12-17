@@ -8,8 +8,8 @@ Imports System.Runtime.InteropServices
 
 ' アセンブリ属性の値を確認します。
 
-<Assembly: AssemblyTitle("LibOptimization")> 
-<Assembly: AssemblyDescription("Optimization Library for .NET Framework")> 
+<Assembly: AssemblyTitle("LibOptimization")>
+<Assembly: AssemblyDescription("Numeric Optimization Library for .NET Framework")>
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("LibOptimization")>
 <Assembly: AssemblyCopyright("tomitomi3")>
@@ -18,7 +18,7 @@ Imports System.Runtime.InteropServices
 <Assembly: ComVisible(False)>
 
 'このプロジェクトが COM に公開される場合、次の GUID がタイプ ライブラリの ID になります。
-<Assembly: Guid("105fc542-76fe-4fde-92b2-ca41999ae378")> 
+<Assembly: Guid("105fc542-76fe-4fde-92b2-ca41999ae378")>
 
 ' アセンブリのバージョン情報は、以下の 4 つの値で構成されています:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' 既定値にすることができます:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.9.0.0")> 
-<Assembly: AssemblyFileVersion("1.9.0.0")> 
+<Assembly: AssemblyVersion("1.10.0.0")>
+<Assembly: AssemblyFileVersion("1.10.0.0")>
