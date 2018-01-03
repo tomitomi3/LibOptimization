@@ -15,8 +15,8 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptPSOLDIW : Inherits absOptimization
 #Region "Member"
-        ''' <summary>Max iteration count(Default:20000)</summary>
-        Public Property Iteration As Integer = 20000
+        ''' <summary>Max Iteration(Default:20,000)</summary>
+        Public Overrides Property Iteration As Integer = 20000
 
         ''' <summary>Epsilon(Default:0.000001) for Criterion</summary>
         Public Property EPS As Double = 0.000001 '1e-6
@@ -78,40 +78,21 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_swarm.Clear()
 
-                'Set initialize value
+                'init position
                 For i As Integer = 0 To Me.SwarmSize - 1
+                    'position
                     Dim tempPosition = New clsPoint(Me.m_func)
                     Dim tempBestPosition = New clsPoint(Me.m_func)
-                    Dim tempVelocity(Me.m_func.NumberOfVariable - 1) As Double
-                    For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        'position
-                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        tempPosition(j) = value
-                        tempBestPosition(j) = tempPosition(j)
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    tempPosition = New clsPoint(Me.m_func, array)
+                    tempBestPosition = tempPosition.Copy()
 
-                        'velocity
-                        tempVelocity(j) = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    Next
-                    tempPosition.ReEvaluate()
-                    tempBestPosition.ReEvaluate()
+                    'velocity
+                    Dim tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+
+                    'create swarm
                     Me.m_swarm.Add(New clsParticle(tempPosition, tempVelocity, tempBestPosition))
                 Next
-
-                'add initial point
-                If m_swarm IsNot Nothing AndAlso m_swarm.Count > 0 Then
-                    If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                        Dim index As Integer = CInt(m_swarm.Count / 10)
-                        If index < 1 Then
-                            index = 1
-                        End If
-                        For i As Integer = 0 To index - 1
-                            For j As Integer = 0 To m_func.NumberOfVariable - 1
-                                m_swarm(i).Point(j) = InitialPosition(j)
-                            Next
-                            m_swarm(i).Point.ReEvaluate()
-                        Next
-                    End If
-                End If
 
                 'Sort Evaluate
                 Me.m_swarm.Sort()
@@ -149,7 +130,6 @@ Namespace Optimization
                 'check iteration count
                 If Iteration <= m_iteration Then
                     Me.m_swarm.Sort()
-                    Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1

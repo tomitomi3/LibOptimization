@@ -23,7 +23,8 @@ Namespace Optimization
     Public Class clsOptNewtonMethod : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max iteration count(Default:5,000)</summary>
-        Public Property Iteration As Integer = 5000
+        Public Overrides Property Iteration As Integer = 5000
+
 
         ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
         Public Property EPS As Double = 0.00000001
@@ -60,40 +61,15 @@ Namespace Optimization
                 Me.m_vect.Clear()
                 Me.m_error.Clear()
 
-                'Init value
-                For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    Me.m_vect.Add(value)
-                Next
-                Me.m_vect.Direction = clsEasyVector.VectorDirection.COL
-
-                'add initial position
+                'init initial position
                 If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                    Me.m_vect = New clsEasyVector(InitialPosition, clsEasyVector.VectorDirection.COL)
+                    Me.m_vect = New clsEasyVector(InitialPosition)
+                Else
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_vect = New clsEasyVector(array)
                 End If
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
-            End Try
-        End Sub
-
-        ''' <summary>
-        ''' Init
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Overloads Sub Init(ByVal ai_initPoint() As Double)
-            Try
-                'init meber varibles
-                If ai_initPoint.Length <> Me.m_func.NumberOfVariable Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
-                    Return
-                End If
-
-                Me.m_vect = ai_initPoint
-                Me.m_vect.Direction = clsEasyVector.VectorDirection.COL
-            Catch ex As Exception
-                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
-            Finally
-                System.GC.Collect()
             End Try
         End Sub
 
@@ -130,7 +106,6 @@ Namespace Optimization
 
                 'Iteration cuont
                 If Iteration <= m_iteration Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1

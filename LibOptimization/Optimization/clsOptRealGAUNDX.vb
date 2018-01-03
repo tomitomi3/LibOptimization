@@ -20,8 +20,8 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptRealGAUNDX : Inherits absOptimization
 #Region "Member"
-        ''' <summary>Max iteration count(Default:20000)</summary>
-        Public Property Iteration As Integer = 20000 'generation
+        ''' <summary>Max iteration count(Default:20,000)</summary>
+        Public Overrides Property Iteration As Integer = 20000
 
         ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
         Public Property EPS As Double = 0.00000001
@@ -51,7 +51,7 @@ Namespace Optimization
         ''' <summary>Beta(Default:0.35)</summary>
         Public Property BETA As Double = 0.35
 
-        ''' <summary>AlternationStrategy(Default:JGG)</summary>
+        ''' <summary>AlternationStrategy(Default:MGG)</summary>
         Public Property AlternationStrategy As EnumAlternatioType = EnumAlternatioType.MGG
 
         ''' <summary>alternation strategy</summary>
@@ -91,18 +91,11 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
 
-                'Set initialize value
+                'initial position
                 For i As Integer = 0 To Me.PopulationSize - 1
-                    Dim temp As New List(Of Double)
-                    For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        temp.Add(value)
-                    Next
-                    Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_parents.Add(New clsPoint(Me.m_func, array))
                 Next
-
-                'add initial point
-                clsUtil.SetInitialPoint(Me.m_parents, InitialPosition)
 
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -146,7 +139,6 @@ Namespace Optimization
 
                 'Counting generation
                 If Me.Iteration <= Me.m_iteration Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1
@@ -230,42 +222,6 @@ Namespace Optimization
 
             Return 0
         End Function
-
-        ''' <summary>
-        ''' using Elite Strategy
-        ''' </summary>
-        ''' <param name="ai_density">density</param>
-        ''' <remarks>
-        ''' Elite strategy
-        ''' </remarks>
-        Public Sub UseEliteStrategy(ByVal ai_density As Double)
-            If ai_density > 1 Then
-                Return
-            End If
-            If ai_density < 0 Then
-                Return
-            End If
-            Dim index As Integer = CInt(Me.m_parents.Count * ai_density)
-            If index = 0 Then
-                Return
-            End If
-
-            'replace new point
-            For i As Integer = index To Me.PopulationSize - 1
-                Dim temp As New List(Of Double)
-                For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    temp.Add(value)
-                Next
-                Me.m_parents(i) = New clsPoint(MyBase.m_func, temp)
-            Next
-
-            'iteration count reset
-            Me.m_iteration = 0
-
-            'reset error
-            Me.m_error.Clear()
-        End Sub
 
         ''' <summary>
         ''' Best result
@@ -365,14 +321,14 @@ Namespace Optimization
                 If clsUtil.CheckOverflow(temp1) = True Then
                     For i As Integer = 0 To ObjectiveFunction.NumberOfVariable - 1
                         'temp1(i) = Util.Util.NormRand(g(i), 0.1)
-                        temp1(i) = clsUtil.GenRandomRange(Random, -InitialValueRange, InitialValueRange)
+                        temp1(i) = clsUtil.GenRandomRange(Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                     Next
                     temp1.ReEvaluate()
                 End If
                 Dim temp2 = New clsPoint(ObjectiveFunction, child2)
                 If clsUtil.CheckOverflow(temp2) = True Then
                     For i As Integer = 0 To ObjectiveFunction.NumberOfVariable - 1
-                        temp2(i) = clsUtil.GenRandomRange(Random, -InitialValueRange, InitialValueRange)
+                        temp2(i) = clsUtil.GenRandomRange(Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                     Next
                     temp2.ReEvaluate()
                 End If

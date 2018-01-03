@@ -17,8 +17,8 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptSimulatedAnnealing : Inherits absOptimization
 #Region "Member"
-        ''' <summary>Max iteration count(Default:20000)</summary>
-        Public Property Iteration As Integer = 20000 'generation
+        ''' <summary>Max iteration count(Default:20,000)</summary>
+        Public Overrides Property Iteration As Integer = 20000
 
         ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
         Public Property EPS As Double = 0.00000001
@@ -60,18 +60,18 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
+                Me.m_iteration = 0
                 Me.m_point.Clear()
-                For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                        value += Me.InitialPosition(i)
-                    End If
-                    Me.m_point.Add(value)
-                Next
-                Me.m_point.ReEvaluate()
+
+                'init initial position
+                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                    Me.m_point = New clsPoint(Me.m_func, InitialPosition)
+                Else
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_point = New clsPoint(Me.m_func, array)
+                End If
 
                 Me.m_Bestpoint = Me.m_point.Copy()
-
             Catch ex As Exception
                 Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
             Finally
@@ -96,7 +96,6 @@ Namespace Optimization
             For iterate As Integer = 0 To ai_iteration
                 'iteration count
                 If Iteration <= Me.m_iteration Then
-                    Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 Me.m_iteration += 1

@@ -18,12 +18,19 @@ Namespace Optimization
         ''' <summary>Error manage class</summary>
         Protected m_error As New clsError
 
-        ''' <summary>Range of initial value</summary>
-        ''' <remarks>This parameters to use when generate a variable</remarks>
-        Public Property InitialValueRange As Double = 5 'parameter range
-
         ''' <summary>Initial position</summary>
         Public Property InitialPosition As Double() = Nothing
+
+        ''' <summary>Upper range of initial value</summary>
+        ''' <remarks>This parameters to use when generate a variable</remarks>
+        Public Property InitialValueRangeUpper As Double = 5 'parameter range
+
+        ''' <summary>Lower range of initial value</summary>
+        ''' <remarks>This parameters to use when generate a variable</remarks>
+        Public Property InitialValueRangeLower As Double = -5 'parameter range
+
+        ''' <summary>Memo</summary>
+        Public Property Memo As String = String.Empty
 
         ''' <summary>
         ''' Objective function Property
@@ -93,6 +100,12 @@ Namespace Optimization
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public MustOverride Function IsRecentError() As Boolean
+
+        ''' <summary>
+        ''' Max Iteration
+        ''' </summary>
+        ''' <returns></returns>
+        Public MustOverride Property Iteration As Integer
 
         ''' <summary>
         ''' Iteration count 

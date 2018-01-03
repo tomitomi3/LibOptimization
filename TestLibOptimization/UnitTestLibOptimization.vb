@@ -244,7 +244,7 @@ Imports LibOptimization.Util
         errorFlg = opt.IsRecentError()
         Assert.IsFalse(errorFlg)
 
-        'Eval   
+        'Eval
         If Math.Abs(opt.Result.Eval) > 0.05 Then
             Assert.Fail(String.Format("fail Eval {0}", opt.Result.Eval))
         End If

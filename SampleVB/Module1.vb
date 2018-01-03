@@ -32,7 +32,8 @@ Module Module1
             Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
 
             'Initial value is generated in the range of -3 to 3.
-            optimization.InitialValueRange = 3
+            optimization.InitialValueRangeLower = -3
+            optimization.InitialValueRangeLower = 3
 
             'init
             optimization.Init()
@@ -128,7 +129,8 @@ Module Module1
             clsUtil.DebugValue(optimization)
 
             '2nd try reuse
-            optimization.UseEliteStrategy(0.2)
+            optimization.InitialPosition = optimization.Result().ToArray()
+            optimization.Init()
             While (optimization.DoIteration(100) = False)
                 clsUtil.DebugValue(optimization, ai_isOutValue:=False)
             End While

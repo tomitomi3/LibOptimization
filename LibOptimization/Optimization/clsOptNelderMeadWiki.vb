@@ -19,7 +19,7 @@ Namespace Optimization
     Public Class clsOptNelderMeadWiki : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max iteration count(Default:5,000)</summary>
-        Public Property Iteration As Integer = 5000
+        Public Overrides Property Iteration As Integer = 5000
 
         ''' <summary>Epsilon(Default:0.000001) for Criterion</summary>
         Public Property EPS As Double = 0.000001
@@ -67,23 +67,12 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_points.Clear()
 
-                'Make simplex from random vertex
+                'initial position
                 Dim tempSimplex()() As Double = Nothing
                 ReDim tempSimplex(MyBase.m_func.NumberOfVariable)
                 For i As Integer = 0 To tempSimplex.Length - 1
-                    ReDim tempSimplex(i)(MyBase.m_func.NumberOfVariable - 1)
-                    For j As Integer = 0 To m_func.NumberOfVariable - 1
-                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        tempSimplex(i)(j) = value
-                    Next
+                    tempSimplex(i) = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                 Next
-
-                'add initial position
-                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                    For j As Integer = 0 To m_func.NumberOfVariable - 1
-                        tempSimplex(0)(j) = MyBase.InitialPosition(j)
-                    Next
-                End If
 
                 Me.Init(tempSimplex)
             Catch ex As Exception
@@ -148,7 +137,6 @@ Namespace Optimization
             For iterate As Integer = 0 To ai_iteration
                 'Counting Iteration
                 If Iteration <= m_iteration Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 Me.m_iteration += 1

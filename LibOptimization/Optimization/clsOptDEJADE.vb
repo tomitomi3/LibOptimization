@@ -24,6 +24,9 @@ Namespace Optimization
         '----------------------------------------------------------------
         'Common parameters
         '----------------------------------------------------------------
+        ''' <summary>Max iteration count</summary>
+        Public Overrides Property Iteration As Integer = 20000
+
         ''' <summary>epsilon(Default:1e-8) for Criterion</summary>
         Public Property EPS As Double = 0.000000001
 
@@ -36,11 +39,6 @@ Namespace Optimization
         ''' </summary>
         Public Property HigherNPercent As Double = 0.8 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
-
-        ''' <summary>
-        ''' Max iteration count
-        ''' </summary>
-        Public Property Iteration As Integer = 50000
 
         ''' <summary>Upper bound(limit solution space)</summary>
         Public Property UpperBounds As Double() = Nothing
@@ -109,15 +107,11 @@ Namespace Optimization
 
                 'generate population
                 For i As Integer = 0 To Me.PopulationSize - 1
-                    'initialize
-                    Dim temp As New List(Of Double)
-                    For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        temp.Add(value)
-                    Next
+                    'initial position
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
 
                     'bound check
-                    Dim tempPoint = New clsPoint(MyBase.m_func, temp)
+                    Dim tempPoint = New clsPoint(MyBase.m_func, array)
                     If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
                         clsUtil.LimitSolutionSpace(tempPoint, Me.LowerBounds, Me.UpperBounds)
                     End If
@@ -125,9 +119,6 @@ Namespace Optimization
                     'save point
                     Me.m_parents.Add(tempPoint)
                 Next
-
-                'add initial point
-                clsUtil.SetInitialPoint(Me.m_parents, InitialPosition)
 
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -171,7 +162,6 @@ Namespace Optimization
 
                 'Counting generation
                 If Me.Iteration <= Me.m_iteration Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1

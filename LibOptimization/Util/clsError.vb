@@ -10,7 +10,7 @@
         Enum ErrorType
             NO_ERR
             ERR_INIT
-            ERR_OPT_MAXITERATION
+            'ERR_OPT_MAXITERATION
             ERR_UNKNOWN
         End Enum
 

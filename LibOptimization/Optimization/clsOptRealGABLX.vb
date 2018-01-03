@@ -19,8 +19,8 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptRealGABLX : Inherits absOptimization
 #Region "Member"
-        ''' <summary>Max iteration count(Default:20000)</summary>
-        Public Property Iteration As Integer = 20000 'generation
+        ''' <summary>Max iteration count(Default:20,000)</summary>
+        Public Overrides Property Iteration As Integer = 20000
 
         ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
         Public Property EPS As Double = 0.00000001
@@ -78,18 +78,11 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
 
-                'Set initialize value
+                'initial position
                 For i As Integer = 0 To Me.PopulationSize - 1
-                    Dim temp As New List(Of Double)
-                    For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        temp.Add(value)
-                    Next
-                    Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_parents.Add(New clsPoint(Me.m_func, array))
                 Next
-
-                'add initial point
-                clsUtil.SetInitialPoint(Me.m_parents, InitialPosition)
 
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -133,7 +126,6 @@ Namespace Optimization
 
                 'Counting generation
                 If Me.Iteration <= Me.m_iteration Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1
@@ -161,7 +153,7 @@ Namespace Optimization
                             min = p1(i)
                             max = p2(i)
                         End If
-                        children(numChild)(i) = clsUtil.GenRandomRange(Me.m_rand, min - Me.Alpha * range, max + Me.Alpha * range)
+                        children(numChild)(i) = clsUtil.GenRandomRange(min - Me.Alpha * range, max + Me.Alpha * range)
                     Next
                     children(numChild).ReEvaluate()
                 Next
@@ -174,42 +166,6 @@ Namespace Optimization
 
             Return False
         End Function
-
-        ''' <summary>
-        ''' using Elite Strategy
-        ''' </summary>
-        ''' <param name="ai_density">density</param>
-        ''' <remarks>
-        ''' Elite strategy
-        ''' </remarks>
-        Public Sub UseEliteStrategy(ByVal ai_density As Double)
-            If ai_density > 1 Then
-                Return
-            End If
-            If ai_density < 0 Then
-                Return
-            End If
-            Dim index As Integer = CInt(Me.m_parents.Count * ai_density)
-            If index = 0 Then
-                Return
-            End If
-
-            'replace new point
-            For i As Integer = index To Me.PopulationSize - 1
-                Dim temp As New List(Of Double)
-                For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    temp.Add(value)
-                Next
-                Me.m_parents(i) = New clsPoint(MyBase.m_func, temp)
-            Next
-
-            'iteration count reset
-            Me.m_iteration = 0
-
-            'reset error
-            Me.m_error.Clear()
-        End Sub
 
         ''' <summary>
         ''' Best result

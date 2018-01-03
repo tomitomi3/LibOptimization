@@ -107,14 +107,14 @@ Namespace Optimization
             End If
 
             'Compare
-            Dim mineValue As Double = Me.m_evaluateValue
+            Dim mineValue As Double = Me.Eval
             Dim compareValue As Double = DirectCast(ai_obj, clsFireFly).Eval
-            If mineValue = compareValue Then
-                Return 0
-            ElseIf mineValue < compareValue Then
+            If mineValue < compareValue Then
                 Return -1
-            Else
+            ElseIf mineValue > compareValue Then
                 Return 1
+            Else
+                Return 0
             End If
         End Function
 

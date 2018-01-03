@@ -17,8 +17,8 @@ Namespace Optimization
     ''' </remarks>
     Public Class clsOptPatternSearch : Inherits absOptimization
 #Region "Member"
-        ''' <summary>Max iteration count(Default:20000)</summary>
-        Public Property Iteration As Integer = 20000
+        ''' <summary>Max iteration count(Default:20,000)</summary>
+        Public Overrides Property Iteration As Integer = 20000
 
         ''' <summary>Epsilon(Default:0.000001) for Criterion</summary>
         Public Property EPS As Double = 0.000001
@@ -63,19 +63,13 @@ Namespace Optimization
                 Me.m_stepLength = Me.StepLength
                 Me.m_base = Nothing
 
-                'Initialize
-                Me.m_base = New clsPoint(MyBase.m_func)
-                For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                    Me.m_base(i) = value
-                Next
-                Me.m_base.ReEvaluate()
-
-                'add initial position
+                'init position
                 If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                    Me.m_base = New clsPoint(MyBase.m_func, InitialPosition)
+                    Me.m_base = New clsPoint(Me.m_func, InitialPosition)
+                Else
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_base = New clsPoint(Me.m_func, array)
                 End If
-
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             Finally
@@ -126,7 +120,6 @@ Namespace Optimization
             For iterate As Integer = 0 To ai_iteration
                 'Counting Iteration
                 If Iteration <= m_iteration Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION, "")
                     Return True
                 End If
                 m_iteration += 1

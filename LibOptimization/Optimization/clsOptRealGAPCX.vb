@@ -23,6 +23,9 @@ Namespace Optimization
         '----------------------------------------------------------------
         'Common parameters
         '----------------------------------------------------------------
+        ''' <summary>Max iteration count(Default:10,000)</summary>
+        Public Overrides Property Iteration As Integer = 10000
+
         ''' <summary>epsilon(Default:1e-8) for Criterion</summary>
         Public Property EPS As Double = 0.000000001
 
@@ -35,9 +38,6 @@ Namespace Optimization
         ''' </summary>
         Public Property HigherNPercent As Double = 0.8 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
-
-        ''' <summary>Max iteration count</summary>
-        Public Property Iteration As Integer = 10000
 
         '----------------------------------------------------------------
         'Coefficient of GA
@@ -81,21 +81,11 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
 
-                'Set initialize value
+                'initial position
                 For i As Integer = 0 To Me.PopulationSize - 1
-                    Dim temp As New List(Of Double)
-                    For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
-                            value += Me.InitialPosition(j)
-                        End If
-                        temp.Add(value)
-                    Next
-                    Me.m_parents.Add(New clsPoint(MyBase.m_func, temp))
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_parents.Add(New clsPoint(Me.m_func, array))
                 Next
-
-                'add initial point
-                clsUtil.SetInitialPoint(Me.m_parents, InitialPosition)
 
                 'Sort Evaluate
                 Me.m_parents.Sort()
@@ -139,7 +129,6 @@ Namespace Optimization
 
                 'Counting generation
                 If Iteration <= m_iteration Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1

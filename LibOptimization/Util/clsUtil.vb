@@ -215,7 +215,19 @@ Namespace Util
         End Function
 
         ''' <summary>
-        ''' Random generator helper
+        ''' Random position generator
+        ''' </summary>
+        ''' <param name="ai_min"></param>
+        ''' <param name="ai_max"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function GenRandomRange(ByVal ai_min As Double, ByVal ai_max As Double) As Double
+            Dim ret = Math.Abs(ai_max - ai_min) * clsRandomXorshiftSingleton.GetInstance().NextDouble() + ai_min
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Random position generator
         ''' </summary>
         ''' <param name="oRand"></param>
         ''' <param name="ai_min"></param>
@@ -223,7 +235,36 @@ Namespace Util
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Shared Function GenRandomRange(ByVal oRand As System.Random, ByVal ai_min As Double, ByVal ai_max As Double) As Double
-            Return Math.Abs(ai_max - ai_min) * oRand.NextDouble() + ai_min
+            Dim ret = Math.Abs(ai_max - ai_min) * oRand.NextDouble() + ai_min
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Random position generator(array)
+        ''' </summary>
+        ''' <param name="func"></param>
+        ''' <param name="initp"></param>
+        ''' <param name="lower"></param>
+        ''' <param name="upper"></param>
+        ''' <returns></returns>
+        Public Shared Function GenRandomPositionArray(ByVal func As absObjectiveFunction, ByVal initp() As Double, ByVal lower As Double, ByVal upper As Double) As Double()
+            Dim ret(func.NumberOfVariable - 1) As Double
+            If initp IsNot Nothing AndAlso initp.Length = func.NumberOfVariable Then
+                'using InitialPosition
+                Dim temp As New List(Of Double)
+                For j As Integer = 0 To func.NumberOfVariable - 1
+                    Dim value As Double = GenRandomRange(lower, upper) + initp(j)
+                    ret(j) = value
+                Next
+            Else
+                'not using InitialPosition
+                Dim temp As New List(Of Double)
+                For j As Integer = 0 To func.NumberOfVariable - 1
+                    Dim value As Double = GenRandomRange(lower, upper)
+                    ret(j) = value
+                Next
+            End If
+            Return ret
         End Function
 
         ''' <summary>
@@ -438,7 +479,7 @@ Namespace Util
         ''' </summary>
         ''' <param name="pupulation"></param>
         ''' <param name="initialPosition"></param>
-        Public Shared Sub SetInitialPoint(ByVal pupulation As List(Of clsPoint), ByVal initialPosition() As Double)
+        Public Shared Sub SetInitialPoint2(ByVal pupulation As List(Of clsPoint), ByVal initialPosition() As Double)
             If pupulation IsNot Nothing AndAlso pupulation.Count > 0 Then
                 Dim func = pupulation(0).GetFunc()
 

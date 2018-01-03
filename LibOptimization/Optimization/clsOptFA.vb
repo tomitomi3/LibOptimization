@@ -22,6 +22,9 @@ Namespace Optimization
         '----------------------------------------------------------------
         'Common parameters
         '----------------------------------------------------------------
+        ''' <summary>Max iteration count(Default:5,000)</summary>
+        Public Overrides Property Iteration As Integer = 5000
+
         ''' <summary>
         ''' epsilon(Default:1e-8) for Criterion
         ''' </summary>
@@ -38,11 +41,6 @@ Namespace Optimization
         ''' </summary>
         Public Property HigherNPercent As Double = 0.8 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
-
-        ''' <summary>
-        ''' Max iteration count(Default:5,000)
-        ''' </summary>
-        Public Property Iteration As Integer = 5000
 
         '----------------------------------------------------------------
         'Peculiar parameter
@@ -97,32 +95,12 @@ Namespace Optimization
                 Me.m_fireflies.Clear()
                 Me.m_error.Clear()
 
-                'Set initialize value
+                'initial position
                 For i As Integer = 0 To Me.PopulationSize - 1
-                    Dim temp As New List(Of Double)
-                    For j As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        Dim value As Double = clsUtil.GenRandomRange(Me.m_rand, -Me.InitialValueRange, Me.InitialValueRange)
-                        temp.Add(value)
-                    Next
-                    Me.m_fireflies.Add(New clsFireFly(MyBase.m_func, temp))
+                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_fireflies.Add(New clsFireFly(MyBase.m_func, array))
                     Me.m_fireflies(i).ReEvaluate() 'with update intensity
                 Next
-
-                'add initial point
-                If m_fireflies IsNot Nothing AndAlso m_fireflies.Count > 0 Then
-                    If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                        Dim index As Integer = CInt(m_fireflies.Count / 10)
-                        If index < 1 Then
-                            index = 1
-                        End If
-                        For i As Integer = 0 To index - 1
-                            For j As Integer = 0 To m_func.NumberOfVariable - 1
-                                m_fireflies(i)(j) = InitialPosition(j)
-                            Next
-                            m_fireflies(i).ReEvaluate()
-                        Next
-                    End If
-                End If
 
                 'Sort Evaluate
                 Me.m_fireflies.Sort()
@@ -166,7 +144,6 @@ Namespace Optimization
 
                 'Counting generation
                 If Me.Iteration <= Me.m_iteration Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_OPT_MAXITERATION)
                     Return True
                 End If
                 m_iteration += 1
