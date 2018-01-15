@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("Numeric Optimization Library for .NET Framework")>
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("LibOptimization")>
-<Assembly: AssemblyCopyright("tomitomi3")>
+<Assembly: AssemblyCopyright("tomitomi3 (https://github.com/tomitomi3/LibOptimization)")>
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>

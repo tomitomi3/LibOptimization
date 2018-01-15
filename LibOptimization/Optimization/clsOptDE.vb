@@ -22,6 +22,7 @@ Namespace Optimization
     ''' [1]Storn, R., Price, K., "Differential Evolution – A Simple and Efficient Heuristic for Global Optimization over Continuous Spaces", Journal of Global Optimization 11: 341–359.
     ''' [2]Price, K. and Storn, R., "Minimizing the Real Functions of the ICEC’96 contest by Differential Evolution", IEEE International Conference on Evolutionary Computation (ICEC’96), may 1996, pp. 842–844.
     ''' [3]Sk. Minhazul Islam, Swagatam Das, "An Adaptive Differential Evolution Algorithm With Novel Mutation and Crossover Strategies for Global Numerical Optimization", IEEE TRANSACTIONS ON SYSTEMS, MAN, AND CYBERNETICS—PART B: CYBERNETICS, VOL. 42, NO. 2, APRIL 2012, pp482-500.
+    ''' [4]田邊遼司, and 福永Alex. "自動チューナーを用いた異なる最大評価回数における Differential Evolution アルゴリズムのパラメータ設定の調査." 進化計算学会論文誌 6.2 (2015): 67-81.
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
@@ -67,12 +68,6 @@ Namespace Optimization
         Public Property F As Double = 0.5
 
         ''' <summary>
-        ''' Differential weight(Scaling factor)(Default:0.5)
-        ''' CurrentToBest, randToBest
-        ''' </summary>
-        Public Property Fdash As Double = 0.5
-
-        ''' <summary>
         ''' Cross over ratio(Default:0.9)
         ''' </summary>
         Public Property CrossOverRatio As Double = 0.9
@@ -83,23 +78,23 @@ Namespace Optimization
         Public Property DEStrategy As EnumDEStrategyType = EnumDEStrategyType.DE_rand_1_bin
 
         ''' <summary>
-        ''' Enum Differential Evolution Strategy
+        ''' Enum Differential Evolution Strategy[3][4]
         ''' </summary>
         Public Enum EnumDEStrategyType
-            ''' <summary>DE/rand/1/bin 強い大域検索</summary>
+            ''' <summary>DE/rand/1/bin - global searchability(大域検索)</summary>
             DE_rand_1_bin
-            ''' <summary>DE/rand/2/bin 強い大域検索</summary>
+            ''' <summary>DE/rand/2/bin - Strong global searchability(強い大域検索)</summary>
             DE_rand_2_bin
-            ''' <summary>DE/best/1/bin 強い局所検索</summary>
+            ''' <summary>DE/best/1/bin - local searchability(局所検索)</summary>
             DE_best_1_bin
-            ''' <summary>DE/best/2/bin 強い局所検索</summary>
+            ''' <summary>DE/best/2/bin - Strong local searchability(強い局所検索)</summary>
             DE_best_2_bin
-            ''' <summary>DE/current/1/bin 弱い大域検索</summary>
-            DE_current_1_bin
-            ''' <summary>DE/currentToBest/1/bin 弱い局所検索</summary>
+            ''' <summary>DE/currentToRand/1/bin</summary>
+            DE_current_to_rand_1_bin
+            ''' <summary>DE/currentToBest/1/bin - local searchability(局所検索)</summary>
             DE_current_to_Best_1_bin
-            ''' <summary>DE/randToBest/1/bin 大域・局所検索</summary>
-            DE_rand_to_Best_1_bin
+            ''' <summary>DE/currentToBest/2/bin - local searchability(局所検索)</summary>
+            DE_current_to_Best_2_bin
         End Enum
 
         ''' <summary>population</summary>
@@ -230,77 +225,79 @@ Namespace Optimization
                     Dim child = New clsPoint(Me.m_func)
                     Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
                     Dim D = Me.m_func.NumberOfVariable - 1
-                    If Me.DEStrategy = EnumDEStrategyType.DE_rand_1_bin Then
-                        'DE/rand/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = p1(j) + Me.F * (p2(j) - p3(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_rand_2_bin Then
-                        'DE/rand/2/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = p1(j) + Me.F * (p2(j) + p3(j) - p4(j) - p5(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_best_1_bin Then
-                        'DE/best/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = best(j) + Me.F * (p1(j) - p2(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_best_2_bin Then
-                        'DE/best/2/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = best(j) + Me.F * (p1(j) + p2(j) - p3(j) - p4(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_current_1_bin Then
-                        'DE/current-to(target-to)/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = xi(j) + Me.F * (p2(j) - p3(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_current_to_Best_1_bin Then
-                        'DE/current-to-best/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = xi(j) + Me.Fdash * (best(j) - p1(j)) + Me.F * (p2(j) - p3(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    ElseIf Me.DEStrategy = EnumDEStrategyType.DE_rand_to_Best_1_bin Then
-                        'DE/rand-to-best/1/bin
-                        For k = 0 To Me.m_func.NumberOfVariable - 1
-                            If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
-                                child(j) = p1(j) + Me.Fdash * (best(j) - p1(j)) + Me.F * (p2(j) - p3(j))
-                            Else
-                                child(j) = xi(k)
-                            End If
-                            j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
-                        Next
-                    End If
+
+                    Select Case Me.DEStrategy
+                        Case EnumDEStrategyType.DE_best_1_bin
+                            'DE/best/1/bin
+                            For k = 0 To Me.m_func.NumberOfVariable - 1
+                                If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
+                                    child(j) = best(j) + Me.F * (p1(j) - p2(j))
+                                Else
+                                    child(j) = xi(k)
+                                End If
+                                j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
+                            Next
+                        Case EnumDEStrategyType.DE_best_2_bin
+                            'DE/best/2/bin
+                            For k = 0 To Me.m_func.NumberOfVariable - 1
+                                If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
+                                    child(j) = best(j) + Me.F * (p1(j) + p2(j) - p3(j) - p4(j))
+                                Else
+                                    child(j) = xi(k)
+                                End If
+                                j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
+                            Next
+                        Case EnumDEStrategyType.DE_current_to_Best_1_bin
+                            'DE/current-to-best/1/bin
+                            For k = 0 To Me.m_func.NumberOfVariable - 1
+                                If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
+                                    child(j) = xi(j) + Me.F * (best(j) - p1(j)) + Me.F * (p2(j) - p3(j))
+                                Else
+                                    child(j) = xi(k)
+                                End If
+                                j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
+                            Next
+                        Case EnumDEStrategyType.DE_current_to_Best_2_bin
+                            'DE/current-to-best/2/bin
+                            For k = 0 To Me.m_func.NumberOfVariable - 1
+                                If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
+                                    child(j) = xi(j) + Me.F * (best(j) - p1(j)) + Me.F * (p2(j) - p3(j)) + Me.F * (p4(j) - p5(j))
+                                Else
+                                    child(j) = xi(k)
+                                End If
+                                j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
+                            Next
+                        Case EnumDEStrategyType.DE_current_to_rand_1_bin
+                            'DE/current-to-rand/1/bin
+                            For k = 0 To Me.m_func.NumberOfVariable - 1
+                                If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
+                                    child(j) = xi(j) + Me.F * (p2(j) - p3(j))
+                                Else
+                                    child(j) = xi(k)
+                                End If
+                                j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
+                            Next
+                        Case EnumDEStrategyType.DE_rand_1_bin
+                            'DE/rand/1/bin
+                            For k = 0 To Me.m_func.NumberOfVariable - 1
+                                If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
+                                    child(j) = p1(j) + Me.F * (p2(j) - p3(j))
+                                Else
+                                    child(j) = xi(k)
+                                End If
+                                j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
+                            Next
+                        Case EnumDEStrategyType.DE_rand_2_bin
+                            'DE/rand/2/bin
+                            For k = 0 To Me.m_func.NumberOfVariable - 1
+                                If Me.m_rand.NextDouble() < Me.CrossOverRatio OrElse k = D Then
+                                    child(j) = p1(j) + Me.F * (p2(j) + p3(j) - p4(j) - p5(j))
+                                Else
+                                    child(j) = xi(k)
+                                End If
+                                j = (j + 1) Mod Me.m_func.NumberOfVariable 'next
+                            Next
+                    End Select
                     child.ReEvaluate() 'Evaluate child
 
                     'Limit solution space

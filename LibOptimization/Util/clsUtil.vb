@@ -67,10 +67,19 @@ Namespace Util
         ''' Generate Random permutation
         ''' </summary>
         ''' <param name="ai_max">0 to ai_max-1</param>
+        ''' <returns></returns>
+        Public Shared Function RandomPermutaion(ByVal ai_max As Integer) As List(Of Integer)
+            Return RandomPermutaion(0, ai_max, {})
+        End Function
+
+        ''' <summary>
+        ''' Generate Random permutation
+        ''' </summary>
+        ''' <param name="ai_max">0 to ai_max-1</param>
         ''' <param name="ai_removeIndex">RemoveIndex</param>
         ''' <returns></returns>
-        Public Shared Function RandomPermutaion(ByVal ai_max As Integer, Optional ByVal ai_removeIndex As Integer = -1) As List(Of Integer)
-            Return RandomPermutaion(0, ai_max, ai_removeIndex)
+        Public Shared Function RandomPermutaion(ByVal ai_max As Integer, ByVal ai_removeIndex As Integer) As List(Of Integer)
+            Return RandomPermutaion(0, ai_max, {ai_removeIndex})
         End Function
 
         ''' <summary>
@@ -78,24 +87,36 @@ Namespace Util
         ''' </summary>
         ''' <param name="ai_min">start value</param>
         ''' <param name="ai_max">ai_max-1</param>
-        ''' <param name="ai_removeIndex">RemoveIndex -1 is invalid</param>
+        ''' <param name="ai_removeIndexArray">remove index array</param>
         ''' <returns></returns>
-        Public Shared Function RandomPermutaion(ByVal ai_min As Integer, ByVal ai_max As Integer, ByVal ai_removeIndex As Integer) As List(Of Integer)
+        Public Shared Function RandomPermutaion(ByVal ai_min As Integer, ByVal ai_max As Integer, ByVal ai_removeIndexArray() As Integer) As List(Of Integer)
             Dim nLength As Integer = ai_max - ai_min
             If nLength = 0 OrElse nLength < 0 Then
                 Return New List(Of Integer)
             End If
 
             Dim ary As New List(Of Integer)(CInt(nLength * 1.5))
-            If ai_removeIndex <= -1 Then
+            If ai_removeIndexArray Is Nothing Then
                 For ii As Integer = ai_min To ai_max - 1
                     ary.Add(ii)
                 Next
+            ElseIf ai_removeIndexArray.Length > 0 Then
+                Dim removeArIndexFrom As Integer = 0
+                Dim removeArIndexTo As Integer = ai_removeIndexArray.Length
+                For ii As Integer = ai_min To ai_max - 1
+                    If removeArIndexFrom = removeArIndexTo Then
+                        ary.Add(ii)
+                    Else
+                        If ai_removeIndexArray(removeArIndexFrom) = ii Then
+                            removeArIndexFrom += 1
+                        Else
+                            ary.Add(ii)
+                        End If
+                    End If
+                Next
             Else
                 For ii As Integer = ai_min To ai_max - 1
-                    If ai_removeIndex <> ii Then
-                        ary.Add(ii)
-                    End If
+                    ary.Add(ii)
                 Next
             End If
 
@@ -110,6 +131,22 @@ Namespace Util
             End While
             Return ary
         End Function
+
+        ''' <summary>
+        ''' Random sort
+        ''' </summary>
+        ''' <param name="arPoint"></param>
+        Public Shared Sub RandomizeArray(ByRef arPoint As List(Of clsPoint))
+            'Fisher–Yates shuffle / フィッシャー - イェーツのシャッフル
+            Dim n As Integer = arPoint.Count
+            While n > 1
+                n -= 1
+                Dim k As Integer = clsRandomXorshiftSingleton.GetInstance().Next(0, n + 1)
+                Dim tmp = arPoint(k)
+                arPoint(k) = arPoint(n)
+                arPoint(n) = tmp
+            End While
+        End Sub
 
         ''' <summary>
         ''' For Debug

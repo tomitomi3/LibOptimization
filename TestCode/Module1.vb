@@ -129,6 +129,17 @@ Module Module1
 
     Sub Main()
         With Nothing
+            Dim optimization As New Optimization.clsOptPatternSearch(New clsBenchRosenblock(20))
+            'optimization.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_to_Best_1_bin
+            optimization.Init()
+            clsUtil.DebugValue(optimization)
+            While (optimization.DoIteration(20) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+        End With
+
+        With Nothing
             Dim func As absObjectiveFunction = New clsBenchSphere(10)
 
             Dim aaa = 10

@@ -14,8 +14,8 @@ Namespace Optimization
     ''' Refference:
     '''  [1]Z.-H. Zhan, J. Zhang, Y. Li, and H. Chung, “JADE: Adaptive Differential Evolution With Optional External Archive” IEEE Trans. Systems, Man, and Cybernetics-Part B, vol. 39, no. 6, pp. 1362-1381, Dec. 2009. 
     '''  [2]阪井 節子,高濱 徹行, "パラメータの相関を考慮した適応型差分進化アルゴリズムJADEの改良", 不確実性の下での数理モデルとその周辺 Mathematical Model under Uncertainty and Related Topics RIMS 研究集会報告集
-    '''     (JADEの原著論文が見れなかったので[2]文献を参照)
-    ''' 
+    '''  [3]田邊遼司, and 福永Alex. "自動チューナーを用いた異なる最大評価回数における Differential Evolution アルゴリズムのパラメータ設定の調査." 進化計算学会論文誌 6.2 (2015): 67-81.    ''' 
+    '''  
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
@@ -57,6 +57,9 @@ Namespace Optimization
         ''' <summary>population</summary>
         Private m_parents As New List(Of clsPoint)
 
+        ''' <summary>archive</summary>
+        Private m_archive As New List(Of clsPoint)
+
         ''' <summary>Constant raio 0 to 1(Adaptive paramter for muF, muCR)(Default:0.1)</summary>
         Public Property C As Double = 0.1
 
@@ -90,6 +93,7 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
                 Me.m_error.Clear()
+                Me.m_archive.Clear()
 
                 'init muF, muCR
                 muCR = 0.5
@@ -196,30 +200,45 @@ Namespace Optimization
                         CR = 1.0
                     End If
 
-                    'Sort Evaluate
-                    m_parents.Sort()
+                    'pick pBest
+                    Dim pbest As clsPoint = Nothing
+                    Dim pBestIndex = CInt(Me.PopulationSize * Random.NextDouble())
+                    If pBestIndex <= 2 Then
+                        If Random.NextDouble() > 0.5 Then
+                            pbest = Me.m_parents(0)
+                        Else
+                            pbest = Me.m_parents(1)
+                        End If
+                    ElseIf pBestIndex = Me.PopulationSize Then
+                        pbest = m_parents(PopulationSize - 1) 'worst
+                    Else
+                        pbest = m_parents(Random.Next(0, pBestIndex))
+                    End If
 
-                    'pick different parent without i
-                    Dim randIndex As List(Of Integer) = clsUtil.RandomPermutaion(m_parents.Count, i)
+                    'xi,g
                     Dim xi = m_parents(i)
-                    Dim p1 As clsPoint = m_parents(randIndex(0))
-                    Dim p2 As clsPoint = m_parents(randIndex(1))
+
+                    'pick xr1,g different parent without i
+                    Dim tempIndex1 = clsUtil.RandomPermutaion(m_parents.Count, i)
+                    Dim r1Index = tempIndex1(0)
+                    Dim p1 As clsPoint = m_parents(r1Index)
+
+                    'pick xr2~,g different parent without i, xr1,g
+                    Dim sumIndex = m_parents.Count + m_archive.Count
+                    Dim tempIndex2 = clsUtil.RandomPermutaion(0, sumIndex, {i, r1Index})
+                    Dim r2Index = tempIndex2(0)
+                    Dim p2 As clsPoint = Nothing
+                    If r2Index >= m_parents.Count Then
+                        r2Index = r2Index - m_parents.Count
+                        p2 = m_archive(r2Index)
+                    Else
+                        p2 = m_parents(r2Index)
+                    End If
 
                     'Mutation and Crossover
                     Dim child = New clsPoint(ObjectiveFunction)
                     Dim j = Random.Next() Mod ObjectiveFunction.NumberOfVariable
                     Dim D = ObjectiveFunction.NumberOfVariable - 1
-
-                    'DE/current-to-pbest/1 for JADE Strategy. current 100p% p<-(0,1)
-                    Dim p = CInt(Me.PopulationSize * Random.NextDouble()) 'range is 0 to PopulationSize
-                    Dim pbest As clsPoint = Nothing
-                    If p = 0 Then
-                        pbest = m_parents(0) 'best
-                    ElseIf p >= Me.PopulationSize Then
-                        pbest = m_parents(PopulationSize - 1) 'worst
-                    Else
-                        pbest = m_parents(Random.Next(0, p))
-                    End If
 
                     'crossover
                     For k = 0 To ObjectiveFunction.NumberOfVariable - 1
@@ -237,6 +256,9 @@ Namespace Optimization
 
                     'Survive
                     If child.Eval < m_parents(i).Eval Then
+                        'add archive
+                        m_archive.Add(m_parents(i).Copy)
+
                         'replace
                         m_parents(i) = child
 
@@ -245,18 +267,29 @@ Namespace Optimization
                         sumFSquare += F ^ 2
                         sumCR += CR
                         countSuccess += 1
+                    Else
+
                     End If
                 Next 'population iteration
 
+                'remove archive
+                Dim removeCount = m_archive.Count - PopulationSize
+                If removeCount > 0 Then
+                    clsUtil.RandomizeArray(m_archive)
+                    m_archive.RemoveRange(m_archive.Count - removeCount, removeCount)
+                End If
+
                 'calc muF, muCR
                 If countSuccess > 0 Then
-                    muCR = (1 - C) * muCR + C * (sumCR / countSuccess) '(1-c) * muCR + c * meanA(CRs)
+                    'μCR = (1 − c) · μCR + c · meanA(SCR)
+                    muCR = (1 - C) * muCR + C * (sumCR / countSuccess)
+                    'μF = (1 − c) · μF + c · meanL (SF)
                     muF = (1 - C) * muF + C * (sumFSquare / sumF)
                 Else
                     muCR = (1 - C) * muCR
                     muF = (1 - C) * muF
-                    'Console.WriteLine("muF={0}, muCR={1}", muF, muCR)
                 End If
+                'Console.WriteLine("muF={0}, muCR={1}", muF, muCR)
             Next
 
             Return False
