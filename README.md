@@ -1,28 +1,24 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/master?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/master)
 
+LibOptimization
+===============
+
+LibOptimization is optimization algorithm library for .NET Framework. This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.
+
+LibOptimizationは制約条件の無い最適化を行う.NET Framework用のライブラリです。実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
+
 I may miss your Issues. When a reply is slow, please give me e-mail.
 <pre>
 tomi.nori+github atmark gmail.com
 </pre>
 
-LibOptimization
-===============
-
-![LibOptimization Log](https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png)
-
 # Recent change
 
-Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0.
-
-Refactoring LibOptimization code with development branch. In the future, I will add new function to the new branch.
+Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0. Refactoring LibOptimization code with development branch. In the future, I will add new function to the new branch.
 
 # Introduction
 
-LibOptimization is optimization algorithm library for .NET Framework.
-This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.
-
-LibOptimizationは制約条件の無い最適化を行う.NET Framework用のライブラリです。
-実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
+![LibOptimization Log](https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png)
 
 ## Implement Optimization algorithm
 
