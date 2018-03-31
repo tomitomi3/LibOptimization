@@ -47,6 +47,27 @@ namespace SampleCSharp
                 }
                 clsUtil.DebugValue(opt);
             }
+
+            //Evaluate optimization result per 100 iteration with check
+            {
+                var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(10));
+                opt.Init();
+                clsUtil.DebugValue(opt);
+
+                while (opt.DoIteration(100) == false)
+                {
+                    var eval = opt.Result.Eval;
+                    if (eval < 0.01)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        clsUtil.DebugValue(opt, ai_isOutValue: false);
+                    }
+                }
+                clsUtil.DebugValue(opt);
+            }
         }
     }
 }

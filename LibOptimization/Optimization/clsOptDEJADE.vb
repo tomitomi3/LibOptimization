@@ -289,7 +289,7 @@ Namespace Optimization
                     MuCR = (1 - C) * MuCR
                     MuF = (1 - C) * MuF
                 End If
-                Console.WriteLine("muF={0}, muCR={1}", MuF, MuCR)
+                'Console.WriteLine("muF={0}, muCR={1}", MuF, MuCR)
             Next
 
             Return False
@@ -302,7 +302,8 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result() As clsPoint
             Get
-                Return Me.m_parents(0)
+                Dim temp = clsUtil.GetBestPoint(m_parents, True)
+                Return temp
             End Get
         End Property
 
