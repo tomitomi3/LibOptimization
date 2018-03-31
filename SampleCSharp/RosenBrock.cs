@@ -10,15 +10,31 @@ namespace SampleCSharp
     /// </summary>
     class RosenBrock : LibOptimization.Optimization.absObjectiveFunction
     {
-        public override double F(List<double> ai_var)
+        private int _dim = 0;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dim"></param>
+        public RosenBrock(int dim)
         {
-            if (ai_var == null)
+            if(dim <=1)
             {
-                return 0.0;
+                throw new NotImplementedException();
             }
-            double x1 = ai_var[0];
-            double x2 = ai_var[1];
-            return 100 * (x2 - x1 * x1) * (x2 - x1 * x1) + (1 - x1) * (1 - x1);
+            this._dim = dim;
+        }
+
+        public override double F(List<double> x)
+        {
+            double ret = 0.0;
+            for(int i=0;i<_dim-1;i++)
+            {
+                var temp1 = x[i + 1] - x[i] * x[i];
+                var temp2 = x[i] - 1;
+                ret += 100 * temp1* temp1 + temp2*temp2;
+            }
+            return ret;
         }
 
         public override List<double> Gradient(List<double> aa)
@@ -33,7 +49,7 @@ namespace SampleCSharp
 
         public override int NumberOfVariable()
         {
-            return 2;
+            return this._dim;
         }
     }
 }

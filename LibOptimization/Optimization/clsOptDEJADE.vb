@@ -63,11 +63,11 @@ Namespace Optimization
         ''' <summary>Constant raio 0 to 1(Adaptive paramter for muF, muCR)(Default:0.1)</summary>
         Public Property C As Double = 0.1
 
-        ''' <summary>Adapative cross over ratio</summary>
-        Private muCR As Double = 0.5
+        ''' <summary>Adapative cross over ratio(Default:0.5)</summary>
+        Public Property MuCR As Double = 0.5
 
-        ''' <summary>Adapative F</summary>
-        Private muF As Double = 0.5
+        ''' <summary>Adapative F(Default:0.5)</summary>
+        Public Property MuF As Double = 0.5
 #End Region
 
 #Region "Constructor"
@@ -96,8 +96,8 @@ Namespace Optimization
                 Me.m_archive.Clear()
 
                 'init muF, muCR
-                muCR = 0.5
-                muF = 0.5
+                MuCR = 0.5
+                MuF = 0.5
 
                 'bound check
                 If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
@@ -182,7 +182,7 @@ Namespace Optimization
                     'update F
                     Dim F As Double = 0.0
                     While True
-                        F = clsUtil.CauchyRand(muF, 0.1)
+                        F = clsUtil.CauchyRand(MuF, 0.1)
                         If F < 0 Then
                             Continue While
                         End If
@@ -193,7 +193,7 @@ Namespace Optimization
                     End While
 
                     'update CR 0 to 1
-                    Dim CR As Double = clsUtil.NormRand(muCR, 0.1)
+                    Dim CR As Double = clsUtil.NormRand(MuCR, 0.1)
                     If CR < 0 Then
                         CR = 0.0
                     ElseIf CR > 1 Then
@@ -282,14 +282,14 @@ Namespace Optimization
                 'calc muF, muCR
                 If countSuccess > 0 Then
                     'μCR = (1 − c) · μCR + c · meanA(SCR)
-                    muCR = (1 - C) * muCR + C * (sumCR / countSuccess)
+                    MuCR = (1 - C) * MuCR + C * (sumCR / countSuccess)
                     'μF = (1 − c) · μF + c · meanL (SF)
-                    muF = (1 - C) * muF + C * (sumFSquare / sumF)
+                    MuF = (1 - C) * MuF + C * (sumFSquare / sumF)
                 Else
-                    muCR = (1 - C) * muCR
-                    muF = (1 - C) * muF
+                    MuCR = (1 - C) * MuCR
+                    MuF = (1 - C) * MuF
                 End If
-                'Console.WriteLine("muF={0}, muCR={1}", muF, muCR)
+                Console.WriteLine("muF={0}, muCR={1}", MuF, MuCR)
             Next
 
             Return False

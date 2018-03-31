@@ -14,7 +14,7 @@ namespace SampleCSharp
             //Typical use
             {
                 //Target Function
-                var func = new RosenBrock();
+                var func = new RosenBrock(2);
 
                 //Set Function
                 var opt = new LibOptimization.Optimization.clsOptNelderMead(func);
@@ -33,6 +33,19 @@ namespace SampleCSharp
                     //Get Result
                     clsUtil.DebugValue(opt);
                 }
+            }
+
+            //Evaluate optimization result per 100 iteration
+            {
+                var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(10));
+                opt.Init();
+                clsUtil.DebugValue(opt);
+
+                while (opt.DoIteration(100)==false)
+                {
+                    clsUtil.DebugValue(opt, ai_isOutValue: false);
+                }
+                clsUtil.DebugValue(opt);
             }
         }
     }

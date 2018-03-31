@@ -106,7 +106,7 @@ Module Module1
             clsUtil.DebugValue(optimization)
         End With
 
-        'When you want result every 5 times.
+        'Evaluate optimization result per 5 iteration.
         With Nothing
             Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
             optimization.Init()
