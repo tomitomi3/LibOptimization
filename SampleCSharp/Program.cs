@@ -53,10 +53,45 @@ namespace SampleCSharp
                 var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(10));
                 //Disable Internal criterion
                 opt.IsUseCriterion = false;
+
                 //Init
                 opt.Init();
                 clsUtil.DebugValue(opt);
 
+                //do optimization!
+                while (opt.DoIteration(100) == false)
+                {
+                    var eval = opt.Result.Eval;
+
+                    //my criterion
+                    if (eval < 0.01)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        clsUtil.DebugValue(opt, ai_isOutValue: false);
+                    }
+                }
+                clsUtil.DebugValue(opt);
+            }
+
+            //Set boundary variable.
+            //-20<x1<-1, -15<x2<0
+            {
+                var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(2));
+                //move initial position
+                opt.InitialPosition = new double[] { -10, -10 };
+
+                //Set boundary variable
+                opt.LowerBounds = new double[] { -20, -15 };
+                opt.UpperBounds = new double[] { -1, 0 };
+
+                //Init
+                opt.Init();
+                clsUtil.DebugValue(opt);
+
+                //do optimization!
                 while (opt.DoIteration(100) == false)
                 {
                     var eval = opt.Result.Eval;
