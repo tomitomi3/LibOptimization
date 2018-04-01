@@ -200,8 +200,16 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result As Optimization.clsPoint
             Get
-                Me.m_swarm.Sort()
-                Return Me.m_swarm(0).BestPoint
+                'find best index
+                Dim bestIndex As Integer = 0
+                Dim bestEval = Me.m_swarm(0).BestPoint.Eval
+                For i = 0 To Me.m_swarm.Count - 1
+                    If Me.m_swarm(i).BestPoint.Eval < bestEval Then
+                        bestEval = Me.m_swarm(i).BestPoint.Eval
+                        bestIndex = i
+                    End If
+                Next
+                Return Me.m_swarm(0).BestPoint.Copy()
             End Get
         End Property
 

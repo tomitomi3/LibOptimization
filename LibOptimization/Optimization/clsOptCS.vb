@@ -123,7 +123,7 @@ Namespace Optimization
             End If
 
             'current best
-            Me.m_currentBest = Me.m_nests(Me.FindCurrentIndex(Me.m_nests))
+            Me.m_currentBest = Me.m_nests(clsUtil.FindCurrentIndex(Me.m_nests))
 
             'levy flight parameter
             Dim sigma = (Me.Gamma(1 + Beta) * Math.Sin(Math.PI * Beta / 2) / (Me.Gamma((1 + Beta) / 2) * Beta * 2 ^ ((Beta - 1) / 2))) ^ (1 / Beta)
@@ -168,7 +168,7 @@ Namespace Optimization
                 Next
 
                 'Find current best
-                Dim candidateBest = newNests(Me.FindCurrentIndex(newNests))
+                Dim candidateBest = newNests(clsUtil.FindCurrentIndex(newNests))
                 If candidateBest.Eval < Me.m_currentBest.Eval Then
                     Me.m_currentBest = candidateBest.Copy()
                 End If
@@ -198,7 +198,7 @@ Namespace Optimization
                 Next
 
                 'Find current best
-                candidateBest = newNests(Me.FindCurrentIndex(newNests))
+                candidateBest = newNests(clsUtil.FindCurrentIndex(newNests))
                 If candidateBest.Eval < Me.m_currentBest.Eval Then
                     Me.m_currentBest = candidateBest.Copy()
                 End If
@@ -219,9 +219,9 @@ Namespace Optimization
         ''' </summary>
         ''' <returns>Best point class</returns>
         ''' <remarks></remarks>
-        Public Overrides ReadOnly Property Result() As clsPoint
+        Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return Me.m_nests(Me.FindCurrentIndex(Me.m_nests))
+                Return clsUtil.GetBestPoint(Me.m_nests, True)
             End Get
         End Property
 
@@ -303,24 +303,6 @@ Namespace Optimization
                 Return Math.PI / (Math.Sin(Math.PI * x) * Math.Exp(LogGamma(1 - x)))
             End If
             Return Math.Exp(LogGamma(x))
-        End Function
-
-        ''' <summary>
-        ''' Find current best index from List(of clsPoint)
-        ''' </summary>
-        ''' <param name="ai_nests"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function FindCurrentIndex(ByVal ai_nests As List(Of clsPoint)) As Integer
-            Dim bestIndex As Integer = 0
-            Dim bestEval = ai_nests(0).Eval
-            For i = 0 To ai_nests.Count - 1
-                If ai_nests(i).Eval < bestEval Then
-                    bestEval = ai_nests(i).Eval
-                    bestIndex = i
-                End If
-            Next
-            Return bestIndex
         End Function
 #End Region
     End Class

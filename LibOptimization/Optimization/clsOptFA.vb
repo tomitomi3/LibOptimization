@@ -175,9 +175,18 @@ Namespace Optimization
         ''' </summary>
         ''' <returns>Best point class</returns>
         ''' <remarks></remarks>
-        Public Overrides ReadOnly Property Result() As clsPoint
+        Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return New clsPoint(Me.m_func, Me.m_fireflies(0).ToArray)
+                'find best index
+                Dim bestIndex As Integer = 0
+                Dim bestEval = Me.m_fireflies(0).Eval
+                For i = 0 To Me.m_fireflies.Count - 1
+                    If Me.m_fireflies(i).Eval < bestEval Then
+                        bestEval = Me.m_fireflies(i).Eval
+                        bestIndex = i
+                    End If
+                Next
+                Return New clsPoint(Me.m_func, Me.m_fireflies(bestIndex).ToArray)
             End Get
         End Property
 

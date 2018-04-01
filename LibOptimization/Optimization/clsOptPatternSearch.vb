@@ -203,9 +203,9 @@ Namespace Optimization
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides ReadOnly Property Result() As clsPoint
+        Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return Me.m_base
+                Return Me.m_base.Copy()
             End Get
         End Property
 

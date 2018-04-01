@@ -122,7 +122,7 @@ Namespace Optimization
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides ReadOnly Property Result() As clsPoint
+        Public Overrides ReadOnly Property Result As clsPoint
             Get
                 Return New clsPoint(MyBase.m_func, Me.m_vect)
             End Get

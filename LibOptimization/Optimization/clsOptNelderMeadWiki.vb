@@ -185,9 +185,9 @@ Namespace Optimization
         ''' </summary>
         ''' <returns>Best point class</returns>
         ''' <remarks></remarks>
-        Public Overrides ReadOnly Property Result() As clsPoint
+        Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return Me.BestPoint
+                Return clsUtil.GetBestPoint(Me.m_points, True)
             End Get
         End Property
 

@@ -384,6 +384,24 @@ Namespace Util
         End Function
 
         ''' <summary>
+        ''' Find current best index from List(of clsPoint)
+        ''' </summary>
+        ''' <param name="ai_points"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function FindCurrentIndex(ByVal ai_points As List(Of clsPoint)) As Integer
+            Dim bestIndex As Integer = 0
+            Dim bestEval = ai_points(0).Eval
+            For i = 0 To ai_points.Count - 1
+                If ai_points(i).Eval < bestEval Then
+                    bestEval = ai_points(i).Eval
+                    bestIndex = i
+                End If
+            Next
+            Return bestIndex
+        End Function
+
+        ''' <summary>
         ''' Limit solution space
         ''' </summary>
         ''' <param name="temp"></param>

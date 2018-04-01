@@ -48,15 +48,20 @@ namespace SampleCSharp
                 clsUtil.DebugValue(opt);
             }
 
-            //Evaluate optimization result per 100 iteration with check
+            //Evaluate optimization result per 100 iteration with check my criterion.
             {
                 var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(10));
+                //Disable Internal criterion
+                opt.IsUseCriterion = false;
+                //Init
                 opt.Init();
                 clsUtil.DebugValue(opt);
 
                 while (opt.DoIteration(100) == false)
                 {
                     var eval = opt.Result.Eval;
+
+                    //my criterion
                     if (eval < 0.01)
                     {
                         break;
