@@ -133,7 +133,6 @@ x2 -> 1.0 to 4.0
 
 for VB.NET
 ```vb
-Dim opt As New clsOptDEJADE(New clsBenchTest2())
 'Set boundary variable
 opt.LowerBounds = New Double() {0, 1.0}
 opt.UpperBounds = New Double() {5, 4.0}
@@ -150,10 +149,12 @@ opt.UpperBounds = new double[] {5, 4.0};
 opt.Init();
 ```
 
-## set initial point
+## set initial position
+
+Generate initial positions around x1=10 and x2=10.
+
 for VB.NET
 ```vb
-Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
 optimization.InitialPosition = {10, 10}
 optimization.Init()
 optimization.DoIteration()
@@ -162,8 +163,6 @@ clsUtil.DebugValue(optimization)
 
 for C#
 ```c#
-var func = new RosenBrock(2);
-var opt = new LibOptimization.Optimization.clsOptPSO(func);
 opt.InitialPosition = new double[] { 10, 10 };
 optimization.Init()
 optimization.DoIteration()
@@ -221,6 +220,57 @@ while (opt.DoIteration(100)==false)
     clsUtil.DebugValue(opt, ai_isOutValue: false);
 }
 clsUtil.DebugValue(opt);
+```
+## fix Random Number Generator(RNG)
+
+for VB.NET
+```vb
+//fix RND for random sequence
+Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+
+Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
+//fix RND for generate position
+optimization.Random = New Util.clsRandomXorshift()
+
+'init
+optimization.Init()
+
+```
+
+for C#
+```c#
+//fix RND for random sequence
+LibOptimization.Util.clsRandomXorshiftSingleton.GetInstance().SetDefaultSeed();
+
+var func = new RosenBrock(2);
+var opt = new LibOptimization.Optimization.clsOptPSO(func);
+//fix RND for generate position
+opt.Random = new LibOptimization.Util.clsRandomXorshift();
+
+//init
+opt.Init();
+
+```
+## Retry optmization(Elite strategy).
+
+for VB.NET
+```vb
+Dim optimization As New Optimization.clsOptRealGAREX(New clsBenchDeJongFunction3())
+
+'1st try
+optimization.Init()
+While (optimization.DoIteration(100) = False)
+    clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+End While
+clsUtil.DebugValue(optimization)
+
+'2nd try reuse
+optimization.InitialPosition = optimization.Result().ToArray()
+optimization.Init()
+While (optimization.DoIteration(100) = False)
+    clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+End While
+clsUtil.DebugValue(optimization)
 ```
 
 ## You can use other optimization method(inherit absObjctiveFcuntion).
