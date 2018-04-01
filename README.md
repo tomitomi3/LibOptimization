@@ -149,6 +149,38 @@ opt.UpperBounds = new double[] {5, 4.0};
 opt.Init();
 ```
 
+## Using my criterion
+
+When using a typical code, internal criteria are enabled. For details, see EPS property, clsUtil.IsCriterion.
+
+for C#
+```c#
+var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(10));
+//Disable Internal criterion
+opt.IsUseCriterion = false;
+
+//Init
+opt.Init();
+clsUtil.DebugValue(opt);
+
+//do optimization!
+while (opt.DoIteration(100) == false)
+{
+    var eval = opt.Result.Eval;
+
+    //my criterion
+    if (eval < 0.01)
+    {
+        break;
+    }
+    else
+    {
+        clsUtil.DebugValue(opt, ai_isOutValue: false);
+    }
+}
+clsUtil.DebugValue(opt);
+```
+
 ## set initial position
 
 Generate initial positions around x1=10 and x2=10.
