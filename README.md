@@ -3,9 +3,11 @@
 LibOptimization
 ===============
 
-LibOptimization is optimization algorithm library for .NET Framework. This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.
+LibOptimization is numerical optimization library for .NET Framework. This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language. This library is used by people who need optimization such as science (physics etc), engineering, acoustics, finance, statistics, medical care, structural design etc.
 
-LibOptimizationは制約条件の無い最適化を行う.NET Framework用のライブラリです。実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
+LibOptimizationは制約条件の無い最適化を行う.NET Frameworkのライブラリです。科学 (物理学など)、エンジニアリング、音響、金融、統計、医療、構造設計などの最適化を必要とする人に使用されているようです。
+
+実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
 
 I may miss your Issues. When a reply is slow, please give me e-mail.
 <pre>
