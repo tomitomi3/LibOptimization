@@ -3,9 +3,11 @@
 LibOptimization
 ===============
 
-LibOptimization is optimization algorithm library for .NET Framework. This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.
+LibOptimization is numerical optimization library for .NET Framework. This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language. This library is used by people who need optimization such as science (physics etc), engineering, acoustics, finance, statistics, medical care, structural design etc.
 
-LibOptimizationは制約条件の無い最適化を行う.NET Framework用のライブラリです。実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
+LibOptimizationは制約条件の無い最適化を行う.NET Frameworkのライブラリです。科学 (物理学など)、エンジニアリング、音響、金融、統計、医療、構造設計などの最適化を必要とする人に使用されているようです。
+
+実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法です。
 
 I may miss your Issues. When a reply is slow, please give me e-mail.
 <pre>
@@ -78,10 +80,9 @@ Typical Use
 
 # Sample code
 
-* Typical use code
+## Typical use code
 
 for VB.NET
-
 ```vb
 'Instantiation optimization class and set objective function.
 Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(1))
@@ -98,7 +99,6 @@ End If
 ```
 
 for C#
-
 ```c#
 //Instantiation objective Function
 var func = new RosenBlock();
@@ -119,65 +119,193 @@ else
 }
 ```
 
-* Set boundary value for each variable.
+## Set boundary value for each variable.
 
-Problem setting
+* Problem setting
 
 objective function : clsBenchTest2(x1,x2) = x1^4 - 20*x1^2 + 20*x1 + x2^4 - 20*x2^2 + 20*x2
 
-boundary
+* boundary variables
 
 x1 -> 0.0 to 5.0
 
-x2 -> 0.0 to 5.0
+x2 -> 1.0 to 4.0
 
 for VB.NET
-
 ```vb
-Dim optimization As New clsOptDEJADE(New clsBenchTest2())
-optimization.LowerBounds = New Double() {0, 0}
-optimization.UpperBounds = New Double() {5, 5}
+'Set boundary variable
+opt.LowerBounds = New Double() {0, 1.0}
+opt.UpperBounds = New Double() {5, 4.0}
+'Init
+opt.Init()
+```
+
+for C#
+```c#
+//Set boundary variable
+opt.LowerBounds = new double[] {0, 1.0};
+opt.UpperBounds = new double[] {5, 4.0};
+//Init
+opt.Init();
+```
+
+## Using my criterion
+
+When using a typical code, internal criteria are enabled. For details, see EPS property, clsUtil.IsCriterion.
+
+for C#
+```c#
+var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(10));
+//Disable Internal criterion
+opt.IsUseCriterion = false;
+
+//Init
+opt.Init();
+clsUtil.DebugValue(opt);
+
+//do optimization!
+while (opt.DoIteration(100) == false)
+{
+    var eval = opt.Result.Eval;
+
+    //my criterion
+    if (eval < 0.01)
+    {
+        break;
+    }
+    else
+    {
+        clsUtil.DebugValue(opt, ai_isOutValue: false);
+    }
+}
+clsUtil.DebugValue(opt);
+```
+
+## set initial position
+
+Generate initial positions around x1=10 and x2=10.
+
+for VB.NET
+```vb
+optimization.InitialPosition = {10, 10}
 optimization.Init()
+optimization.DoIteration()
 clsUtil.DebugValue(optimization)
 ```
 
-* Set of initial value and the initial position. Initial value is generated in the range of 2.5 and 3.5.
-```vb
-        With Nothing
-            Dim optimization As New clsOptRealGASPX(New clsBenchSphere(2))
-            optimization.InitialPosition = {3, 3}
-            optimization.InitialValueRange = 0.5
-            optimization.Init()
-            While (optimization.DoIteration(5) = False)
-                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-            End While
-            clsUtil.DebugValue(optimization)
-        End With
-```
-
-* When you want result every 5 times.
-```vb
-With Nothing
-    Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
-    optimization.Init()
-    While (optimization.DoIteration(5) = False)
+for C#
+```c#
+opt.InitialPosition = new double[] { 10, 10 };
+optimization.Init()
+optimization.DoIteration()
 clsUtil.DebugValue(optimization)
-    End While
-    clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
-End With
 ```
 
-* set initial point
+## Set inital position and inital value range
+
+Generate the initial position in the range of 7 to 10.
+
+for VB.NET
+```vb
+Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
+'set initialposition
+optimization.InitialPosition = New Double() {10, 10}
+'Initial value is generated in the range of -3 to 3.
+optimization.InitialValueRangeLower = -3
+optimization.InitialValueRangeLower = 3
+'init and do optimization
+optimization.Init()
+optimization.DoIteration()
+clsUtil.DebugValue(optimization)
+```
+
+for C#
+```c#
+var func = new RosenBrock(2);
+var opt = new LibOptimization.Optimization.clsOptPSO(func);
+opt.InitialPosition = new double[] { -10, -10 };
+opt.InitialValueRangeLower = -3;
+opt.InitialValueRangeUpper  = 3;
+opt.Init();
+opt.DoIteration();
+```
+
+## Evaluate optimization result per N iteration
+
+for VB.NET
 ```vb
 Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
-optimization.Init(New Double() {-10, 10})
+optimization.Init()
+//per 5 iteration
 While (optimization.DoIteration(5) = False)
     clsUtil.DebugValue(optimization)
 End While
 clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+End With
 ```
 
-* You can use other optimization method(inherit absObjctiveFcuntion).
+for C#
+```c#
+//per 100 iteration
+while (opt.DoIteration(100)==false)
+{
+    clsUtil.DebugValue(opt, ai_isOutValue: false);
+}
+clsUtil.DebugValue(opt);
+```
+## fix Random Number Generator(RNG)
+
+for VB.NET
+```vb
+//fix RND for random sequence
+Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+
+Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
+//fix RND for generate position
+optimization.Random = New Util.clsRandomXorshift()
+
+'init
+optimization.Init()
+
+```
+
+for C#
+```c#
+//fix RND for random sequence
+LibOptimization.Util.clsRandomXorshiftSingleton.GetInstance().SetDefaultSeed();
+
+var func = new RosenBrock(2);
+var opt = new LibOptimization.Optimization.clsOptPSO(func);
+//fix RND for generate position
+opt.Random = new LibOptimization.Util.clsRandomXorshift();
+
+//init
+opt.Init();
+
+```
+## Retry optmization(Elite strategy).
+
+for VB.NET
+```vb
+Dim optimization As New Optimization.clsOptRealGAREX(New clsBenchDeJongFunction3())
+
+'1st try
+optimization.Init()
+While (optimization.DoIteration(100) = False)
+    clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+End While
+clsUtil.DebugValue(optimization)
+
+'2nd try reuse
+optimization.InitialPosition = optimization.Result().ToArray()
+optimization.Init()
+While (optimization.DoIteration(100) = False)
+    clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+End While
+clsUtil.DebugValue(optimization)
+```
+
+## You can use other optimization method(inherit absObjctiveFcuntion).
 ```vb
 Dim optimization As New clsOptRealGASPX(New clsBenchRastriginFunction(20))
 optimization.Init()
@@ -194,7 +322,7 @@ End If
 clsUtil.DebugValue(optimization)
 ```
 
-* Multi point and MultiThread. Multipoint avoids Local minimum by preparing many values.
+## Multi point and MultiThread. Multipoint avoids Local minimum by preparing many values.
 ```vb
 'prepare many optimization class.
 Dim multipointNumber As Integer = 30
@@ -228,23 +356,23 @@ Else
 End If
 ```
 
-* Least squares method (最小二乗法)
+## Least squares method (最小二乗法)
 
 You design the evaluation function to minimize residual sum of squares. The following example estimate a parameter of the multinomial expression.
 
 ```vb
-    Public Overrides Function F(x As List(Of Double)) As Double
-        Dim sumDiffSquare As Double = 0
+Public Overrides Function F(x As List(Of Double)) As Double
+    Dim sumDiffSquare As Double = 0
 
-        For Each temp In Me.datas
-            'e.g a * x^4 + b * x^3 + c * x^2 + d * x^4 + e
-            Dim predict = x(0) * temp(0) ^ 4 + x(1) * temp(0) ^ 3 + x(2) * temp(0) ^ 2 + x(3) * temp(0) + x(4)
-            Dim diffSquare = (temp(1) - predict) ^ 2
-            sumDiffSquare += diffSquare
-        Next
+    For Each temp In Me.datas
+        'e.g a * x^4 + b * x^3 + c * x^2 + d * x^4 + e
+        Dim predict = x(0) * temp(0) ^ 4 + x(1) * temp(0) ^ 3 + x(2) * temp(0) ^ 2 + x(3) * temp(0) + x(4)
+        Dim diffSquare = (temp(1) - predict) ^ 2
+        sumDiffSquare += diffSquare
+    Next
 
-        Return sumDiffSquare
-    End Function
+    Return sumDiffSquare
+End Function
 ```
 
 # License
