@@ -30,10 +30,12 @@ Module Module1
         'set inital position and inital value range
         With Nothing
             Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
+            'set initialposition
+            optimization.InitialPosition = New Double() {10, 10}
 
             'Initial value is generated in the range of -3 to 3.
             optimization.InitialValueRangeLower = -3
-            optimization.InitialValueRangeLower = 3
+            optimization.InitialValueRangeUpper = 3
 
             'init
             optimization.Init()
@@ -67,6 +69,9 @@ Module Module1
             If optimization.IsRecentError() = True Then
                 Return
             End If
+
+            'get result
+            clsUtil.DebugValue(optimization)
         End With
 
         'use boundary
