@@ -80,10 +80,9 @@ Typical Use
 
 # Sample code
 
-* Typical use code
+## Typical use code
 
 for VB.NET
-
 ```vb
 'Instantiation optimization class and set objective function.
 Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(1))
@@ -100,7 +99,6 @@ End If
 ```
 
 for C#
-
 ```c#
 //Instantiation objective Function
 var func = new RosenBlock();
@@ -121,65 +119,111 @@ else
 }
 ```
 
-* Set boundary value for each variable.
+## Set boundary value for each variable.
 
-Problem setting
+* Problem setting
 
 objective function : clsBenchTest2(x1,x2) = x1^4 - 20*x1^2 + 20*x1 + x2^4 - 20*x2^2 + 20*x2
 
-boundary
+* boundary variables
 
 x1 -> 0.0 to 5.0
 
-x2 -> 0.0 to 5.0
+x2 -> 1.0 to 4.0
 
 for VB.NET
-
 ```vb
-Dim optimization As New clsOptDEJADE(New clsBenchTest2())
-optimization.LowerBounds = New Double() {0, 0}
-optimization.UpperBounds = New Double() {5, 5}
-optimization.Init()
-clsUtil.DebugValue(optimization)
+Dim opt As New clsOptDEJADE(New clsBenchTest2())
+'Set boundary variable
+opt.LowerBounds = New Double() {0, 1.0}
+opt.UpperBounds = New Double() {5, 4.0}
+'Init
+opt.Init()
 ```
 
-* Set of initial value and the initial position. Initial value is generated in the range of 2.5 and 3.5.
-```vb
-        With Nothing
-            Dim optimization As New clsOptRealGASPX(New clsBenchSphere(2))
-            optimization.InitialPosition = {3, 3}
-            optimization.InitialValueRange = 0.5
-            optimization.Init()
-            While (optimization.DoIteration(5) = False)
-                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-            End While
-            clsUtil.DebugValue(optimization)
-        End With
+for C#
+```c#
+//Set boundary variable
+opt.LowerBounds = new double[] {0, 1.0};
+opt.UpperBounds = new double[] {5, 4.0};
+//Init
+opt.Init();
 ```
 
-* When you want result every 5 times.
-```vb
-With Nothing
-    Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
-    optimization.Init()
-    While (optimization.DoIteration(5) = False)
-clsUtil.DebugValue(optimization)
-    End While
-    clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
-End With
-```
-
-* set initial point
+## set initial point
+for VB.NET
 ```vb
 Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
-optimization.Init(New Double() {-10, 10})
+optimization.InitialPosition = {10, 10}
+optimization.Init()
+optimization.DoIteration()
+clsUtil.DebugValue(optimization)
+```
+
+for C#
+```c#
+var func = new RosenBrock(2);
+var opt = new LibOptimization.Optimization.clsOptPSO(func);
+opt.InitialPosition = new double[] { 10, 10 };
+optimization.Init()
+optimization.DoIteration()
+clsUtil.DebugValue(optimization)
+```
+
+## Set inital position and inital value range
+
+Generate the initial position in the range of 7 to 10.
+
+for VB.NET
+```vb
+Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
+'set initialposition
+optimization.InitialPosition = New Double() {10, 10}
+'Initial value is generated in the range of -3 to 3.
+optimization.InitialValueRangeLower = -3
+optimization.InitialValueRangeLower = 3
+'init and do optimization
+optimization.Init()
+optimization.DoIteration()
+clsUtil.DebugValue(optimization)
+```
+
+for C#
+```c#
+var func = new RosenBrock(2);
+var opt = new LibOptimization.Optimization.clsOptPSO(func);
+opt.InitialPosition = new double[] { -10, -10 };
+opt.InitialValueRangeLower = -3;
+opt.InitialValueRangeUpper  = 3;
+opt.Init();
+opt.DoIteration();
+```
+
+## Evaluate optimization result per N iteration
+
+for VB.NET
+```vb
+Dim optimization As New clsOptSteepestDescent(New clsBenchSphere(2))
+optimization.Init()
+//per 5 iteration
 While (optimization.DoIteration(5) = False)
     clsUtil.DebugValue(optimization)
 End While
 clsUtil.DebugValue(optimization, ai_isOnlyIterationCount:=True)
+End With
 ```
 
-* You can use other optimization method(inherit absObjctiveFcuntion).
+for C#
+```c#
+//per 100 iteration
+while (opt.DoIteration(100)==false)
+{
+    clsUtil.DebugValue(opt, ai_isOutValue: false);
+}
+clsUtil.DebugValue(opt);
+```
+
+## You can use other optimization method(inherit absObjctiveFcuntion).
 ```vb
 Dim optimization As New clsOptRealGASPX(New clsBenchRastriginFunction(20))
 optimization.Init()
@@ -196,7 +240,7 @@ End If
 clsUtil.DebugValue(optimization)
 ```
 
-* Multi point and MultiThread. Multipoint avoids Local minimum by preparing many values.
+## Multi point and MultiThread. Multipoint avoids Local minimum by preparing many values.
 ```vb
 'prepare many optimization class.
 Dim multipointNumber As Integer = 30
@@ -230,23 +274,23 @@ Else
 End If
 ```
 
-* Least squares method (最小二乗法)
+## Least squares method (最小二乗法)
 
 You design the evaluation function to minimize residual sum of squares. The following example estimate a parameter of the multinomial expression.
 
 ```vb
-    Public Overrides Function F(x As List(Of Double)) As Double
-        Dim sumDiffSquare As Double = 0
+Public Overrides Function F(x As List(Of Double)) As Double
+    Dim sumDiffSquare As Double = 0
 
-        For Each temp In Me.datas
-            'e.g a * x^4 + b * x^3 + c * x^2 + d * x^4 + e
-            Dim predict = x(0) * temp(0) ^ 4 + x(1) * temp(0) ^ 3 + x(2) * temp(0) ^ 2 + x(3) * temp(0) + x(4)
-            Dim diffSquare = (temp(1) - predict) ^ 2
-            sumDiffSquare += diffSquare
-        Next
+    For Each temp In Me.datas
+        'e.g a * x^4 + b * x^3 + c * x^2 + d * x^4 + e
+        Dim predict = x(0) * temp(0) ^ 4 + x(1) * temp(0) ^ 3 + x(2) * temp(0) ^ 2 + x(3) * temp(0) + x(4)
+        Dim diffSquare = (temp(1) - predict) ^ 2
+        sumDiffSquare += diffSquare
+    Next
 
-        Return sumDiffSquare
-    End Function
+    Return sumDiffSquare
+End Function
 ```
 
 # License
