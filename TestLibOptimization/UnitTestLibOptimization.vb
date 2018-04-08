@@ -296,6 +296,11 @@ Imports LibOptimization.Util
         Me.CheckOptUsingSphere(opt)
     End Sub
 
+    <TestMethod()> Public Sub TestOptimizationHillClimbing()
+        Dim opt = New clsOptHillClimbing(New clsBenchSphere(2))
+        Me.CheckOptUsingSphere(opt)
+    End Sub
+
     <TestMethod()> Public Sub TestOptimizationNM()
         Dim opt = New clsOptNelderMead(New clsBenchSphere(2))
         Me.CheckOptUsingSphere(opt)

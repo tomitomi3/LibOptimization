@@ -177,6 +177,9 @@
     <Compile Include="..\LibOptimization\Optimization\clsOptFA.vb">
       <Link>Optimization\clsOptFA.vb</Link>
     </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptHillClimbing.vb">
+      <Link>Optimization\clsOptHillClimbing.vb</Link>
+    </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptNelderMead.vb">
       <Link>Optimization\clsOptNelderMead.vb</Link>
     </Compile>

@@ -7,10 +7,87 @@ using LibOptimization.Util;
 
 namespace SampleCSharp
 {
+    class MyObjectiveFunction : LibOptimization.Optimization.absObjectiveFunction
+    {
+        private double _maxEval = 0.0;
+        private bool _oneShot = true;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dim"></param>
+        public MyObjectiveFunction()
+        {
+        }
+
+        /// <summary>
+        /// eval
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public override double F(List<double> x)
+        {
+            double ret = 0.0;
+            for (int i = 0; i < this.NumberOfVariable(); i++)
+            {
+                //When even one variable has a negative value, use the recent large evaluation value
+                if (x[i] < 0 && _oneShot == false)
+                {
+                    ret = _maxEval;
+                    break;
+                }
+
+                //model(sphere)
+                ret += x[i] * x[i];
+            }
+
+            //update max eval
+            if (_oneShot == true)
+            {
+                _maxEval = ret; //one shot
+                _oneShot = false;
+            }
+            if (_maxEval < ret)
+            {
+                _maxEval = ret;
+            }
+
+            return ret;
+        }
+
+        public override List<double> Gradient(List<double> aa)
+        {
+            return null;
+        }
+
+        public override List<List<double>> Hessian(List<double> aa)
+        {
+            return null;
+        }
+
+        public override int NumberOfVariable()
+        {
+            return 5;
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
+            {
+                var func = new RosenBrock(2);
+                var opt = new LibOptimization.Optimization.clsOptHillClimbing(func);
+                opt.InitialPosition = new double[] { 10.0, -10.0 };
+                opt.Iteration = 1000;
+                //opt.IsUseCriterion = false;
+                opt.Init();
+                clsUtil.DebugValue(opt);
+                opt.DoIteration();
+                clsUtil.DebugValue(opt);
+                return;
+            }
+
             //Typical use
             {
                 //Target Function
@@ -24,7 +101,7 @@ namespace SampleCSharp
                 opt.DoIteration();
 
                 //Check Error
-                if(opt.IsRecentError()==true)
+                if (opt.IsRecentError() == true)
                 {
                     return;
                 }
@@ -41,7 +118,7 @@ namespace SampleCSharp
                 opt.Init();
                 clsUtil.DebugValue(opt);
 
-                while (opt.DoIteration(100)==false)
+                while (opt.DoIteration(100) == false)
                 {
                     clsUtil.DebugValue(opt, ai_isOutValue: false);
                 }
@@ -107,6 +184,49 @@ namespace SampleCSharp
                     }
                 }
                 clsUtil.DebugValue(opt);
+            }
+
+            //Optimiztion problem using MyObjectiveFunction
+            // min f(x)
+            //  s.t. x>0, 170<=x1<=200, 200<=x2<=300, 250<=x3<=400, 370<=x4<=580, 380<=x5<=600
+            {
+                var func = new MyObjectiveFunction();
+                var opt = new LibOptimization.Optimization.clsOptDEJADE(func);
+
+                //Set boundary variable                
+                opt.LowerBounds = new double[] { 170, 200, 250, 370, 380 };
+                opt.UpperBounds = new double[] { 200, 300, 400, 580, 600 };
+
+                //move initial position
+                double[] initialPosition = new double[] { 0, 0, 0, 0, 0 };
+                for (int i = 0; i < initialPosition.Length; i++)
+                {
+                    //center of boundary range.
+                    initialPosition[i] = (opt.LowerBounds[i] + opt.UpperBounds[i]) / 2.0;
+                }
+                opt.InitialPosition = initialPosition;
+
+                //Init
+                opt.Init();
+                clsUtil.DebugValue(opt);
+
+                //do optimization!
+                while (opt.DoIteration(100) == false)
+                {
+                    var eval = opt.Result.Eval;
+
+                    //my criterion
+                    if (eval < 0.01)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Eval:{0}", opt.Result.Eval);
+                    }
+                }
+                clsUtil.DebugValue(opt);
+                return;
             }
         }
     }

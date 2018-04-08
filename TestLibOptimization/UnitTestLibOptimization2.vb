@@ -17,6 +17,7 @@ Imports LibOptimization.Util
         optimizers.Add(New clsOptDEJADE(New clsBenchSphere(2)))
         optimizers.Add(New clsOptES(New clsBenchSphere(2)))
         optimizers.Add(New clsOptFA(New clsBenchSphere(2)))
+        optimizers.Add(New clsOptHillClimbing(New clsBenchSphere(2)))
         optimizers.Add(New clsOptNelderMead(New clsBenchSphere(2)))
         optimizers.Add(New clsOptNelderMeadWiki(New clsBenchSphere(2)))
         optimizers.Add(New clsOptNewtonMethod(New clsBenchSphere(2)))

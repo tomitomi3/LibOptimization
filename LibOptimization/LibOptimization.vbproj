@@ -115,6 +115,7 @@
     <Compile Include="Optimization\clsOptDEJADE.vb" />
     <Compile Include="Optimization\clsOptFA.vb" />
     <Compile Include="Optimization\clsOptDE.vb" />
+    <Compile Include="Optimization\clsOptHillClimbing.vb" />
     <Compile Include="Optimization\clsOptNelderMeadWiki.vb" />
     <Compile Include="Optimization\clsOptPSOChaoticIW.vb" />
     <Compile Include="Optimization\clsOptPSOLDIW.vb" />
