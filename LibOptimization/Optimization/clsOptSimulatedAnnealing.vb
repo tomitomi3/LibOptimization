@@ -92,13 +92,10 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
+            ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
             For iterate As Integer = 0 To ai_iteration
-                'iteration count
-                If Iteration <= Me.m_iteration Then
-                    Return True
-                End If
-                Me.m_iteration += 1
+                'Counting Iteration
+                m_iteration += 1
 
                 'neighbor function
                 Dim temp As clsPoint = Neighbor(Me.m_point)

@@ -94,8 +94,11 @@ Namespace Optimization
 
             'Do Iterate
             Dim grad As New clsEasyVector(MyBase.m_func.NumberOfVariable)
-            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
+            ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
             For iterate As Integer = 0 To ai_iteration
+                'Counting Iteration
+                m_iteration += 1
+
                 'Calculate Gradient vector
                 grad.RawVector = Me.m_func.Gradient(Me.m_vect)
 
@@ -106,12 +109,6 @@ Namespace Optimization
                 If grad.NormL1() < EPS Then
                     Return True
                 End If
-
-                'Iteration count
-                If Iteration <= m_iteration Then
-                    Return True
-                End If
-                m_iteration += 1
             Next
 
             Return False

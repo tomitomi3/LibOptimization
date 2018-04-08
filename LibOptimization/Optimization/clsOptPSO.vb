@@ -120,12 +120,9 @@ Namespace Optimization
             End If
 
             'do iterate
-            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
+            ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
             For iterate As Integer = 0 To ai_iteration
-                'check iteration count
-                If Iteration <= m_iteration Then
-                    Return True
-                End If
+                'Counting Iteration
                 m_iteration += 1
 
                 'check criterion

@@ -79,13 +79,25 @@ namespace SampleCSharp
                 var func = new RosenBrock(2);
                 var opt = new LibOptimization.Optimization.clsOptHillClimbing(func);
                 opt.InitialPosition = new double[] { 10.0, -10.0 };
-                opt.Iteration = 1000;
+                opt.Iteration = 10;
                 //opt.IsUseCriterion = false;
                 opt.Init();
+                opt.Count = 0;
+                clsUtil.DebugValue(opt);
+                opt.DoIteration(3);
+                clsUtil.DebugValue(opt);
+                opt.DoIteration(3);
                 clsUtil.DebugValue(opt);
                 opt.DoIteration();
                 clsUtil.DebugValue(opt);
-                return;
+                //
+                Console.WriteLine("=========================");
+                opt.Init();
+                opt.Count = 0;
+                clsUtil.DebugValue(opt);
+                opt.DoIteration();
+                clsUtil.DebugValue(opt);
+                //return;
             }
 
             //Typical use

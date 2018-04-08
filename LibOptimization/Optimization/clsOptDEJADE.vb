@@ -151,8 +151,11 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If(ai_iteration = 0, Me.Iteration - 1, ai_iteration - 1)
+            ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
             For iterate As Integer = 0 To ai_iteration
+                'Counting generation
+                m_iteration += 1
+
                 'Sort Evaluate
                 Me.m_parents.Sort()
 
@@ -163,12 +166,6 @@ Namespace Optimization
                         Return True
                     End If
                 End If
-
-                'Counting generation
-                If Me.Iteration <= Me.m_iteration Then
-                    Return True
-                End If
-                m_iteration += 1
 
                 '--------------------------------------------------------------------------------------------
                 'DE process

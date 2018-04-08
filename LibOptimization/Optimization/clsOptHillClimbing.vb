@@ -3,44 +3,43 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' optimize template
+    ''' Hill-Climbing algorithm(山登り法)
     ''' </summary>
-    ''' <remarks></remarks>
-    Public Class clsOptTemplate : Inherits absOptimization
+    ''' <remarks>
+    ''' Features:
+    '''  -Randomized algorithm for optimization.
+    ''' 
+    ''' Reffrence:
+    ''' https://en.wikipedia.org/wiki/Hill_climbing
+    ''' 
+    ''' Implment:
+    ''' N.Tomi(tomi.nori+github at gmail.com)
+    ''' </remarks>
+    Public Class clsOptHillClimbing : Inherits absOptimization
 #Region "Member"
         '----------------------------------------------------------------
         'Common parameters
         '----------------------------------------------------------------
-        ''' <summary>
-        ''' epsilon(Default:1e-8) for Criterion
-        ''' </summary>
-        Public Property EPS As Double = 0.000000001
+        ''' <summary>point</summary>
+        Private _populations As New List(Of clsPoint)
 
-        ''' <summary>
-        ''' Use criterion
-        ''' </summary>
-        Public Property IsUseCriterion As Boolean = True
-
-        ''' <summary>
-        ''' higher N percentage particles are finished at the time of same evaluate value.
-        ''' This parameter is valid is when IsUseCriterion is true.
-        ''' </summary>
-        Public Property HigherNPercent As Double = 0.8 'for IsCriterion()
-        Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
-
-        ''' <summary>Max Iteration(Default:10,000)</summary>
+        ''' <summary>Max iteration count</summary>
         Public Overrides Property Iteration As Integer = 10000
 
-        '----------------------------------------------------------------
-        'Peculiar parameter
-        '----------------------------------------------------------------
-        ''' <summary>
-        ''' Population Size(Default:100)
-        ''' </summary>
-        Public Property PopulationSize As Integer = 100
+        ''' <summary>Upper bound(limit solution space)</summary>
+        Public Property UpperBounds As Double() = Nothing
 
-        'population
-        Private m_populations As New List(Of clsPoint)
+        ''' <summary>Lower bound(limit solution space)</summary>
+        Public Property LowerBounds As Double() = Nothing
+
+        '----------------------------------------------------------------
+        'Hill-Climbing parameters
+        '----------------------------------------------------------------
+        ''' <summary>range of neighbor search</summary>
+        Public Property NeighborRange As Double = 0.1
+
+        ''' <summary>range of neighbor search</summary>
+        Public Property NeighborSize As Integer = 50
 #End Region
 
 #Region "Constructor"
@@ -62,29 +61,24 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init varibles
+                'init meber varibles
                 Me.m_iteration = 0
-                Me.m_populations.Clear()
+                Me._populations.Clear()
                 Me.m_error.Clear()
 
-                'initial position
-                For i As Integer = 0 To Me.PopulationSize - 1
+                'init initial position
+                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                    Me._populations.Add(New clsPoint(Me.m_func, InitialPosition))
+                Else
                     Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                    Me.m_populations.Add(New clsPoint(Me.m_func, array))
-                Next
-
-                'Sort Evaluate
-                Me.m_populations.Sort()
-
-                'Detect HigherNPercentIndex
-                Me.HigherNPercentIndex = CInt(Me.m_populations.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_populations.Count OrElse Me.HigherNPercentIndex >= Me.m_populations.Count Then
-                    Me.HigherNPercentIndex = Me.m_populations.Count - 1
+                    Me._populations.Add(New clsPoint(Me.m_func, array))
                 End If
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try
         End Sub
+
+        Public Count As Integer = 0
 
         ''' <summary>
         ''' Do Iteration
@@ -101,24 +95,19 @@ Namespace Optimization
             'Do Iterate
             ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
             For iterate As Integer = 0 To ai_iteration
-                'Counting generation
-                If Me.Iteration <= Me.m_iteration Then
-                    Return True
-                End If
+                'Iteration count
                 m_iteration += 1
 
-                'Sort Evaluate
-                Me.m_populations.Sort()
+                'neighbor function
+                Dim nextPoint = Neighbor(_populations(0))
 
-                'check criterion
-                If Me.IsUseCriterion = True Then
-                    'higher N percentage particles are finished at the time of same evaluate value.
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_populations(0).Eval, Me.m_populations(Me.HigherNPercentIndex).Eval) Then
-                        Return True
-                    End If
+                'limit solution space
+                clsUtil.LimitSolutionSpace(nextPoint, LowerBounds, UpperBounds)
+
+                'evaluate
+                If _populations(0).Eval > nextPoint.Eval Then
+                    _populations(0) = nextPoint
                 End If
-
-                'add logic
             Next
 
             Return False
@@ -131,7 +120,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return Me.m_populations(0)
+                Return _populations(0)
             End Get
         End Property
 
@@ -154,13 +143,32 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
-                Return Me.m_populations
+                Return _populations
             End Get
         End Property
 #End Region
 
 #Region "Private"
+        ''' <summary>
+        ''' Neighbor function for local search
+        ''' </summary>
+        ''' <param name="base"></param>
+        ''' <returns></returns>
+        Private Function Neighbor(ByVal base As clsPoint) As clsPoint
+            Dim ret As New List(Of clsPoint)
+            For k As Integer = 0 To Me.NeighborSize - 1
+                Dim temp As New clsPoint(base)
+                For i As Integer = 0 To temp.Count - 1
+                    Dim tempNeighbor = Math.Abs(2.0 * NeighborRange) * MyBase.Random.NextDouble() - NeighborRange
+                    temp(i) += tempNeighbor
+                Next
+                temp.ReEvaluate()
+                ret.Add(temp)
+            Next
+            ret.Sort()
 
+            Return ret(0)
+        End Function
 #End Region
     End Class
 End Namespace
