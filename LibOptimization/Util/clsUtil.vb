@@ -552,5 +552,151 @@ Namespace Util
                 End If
             End If
         End Sub
+
+        ''' <summary>
+        ''' optimizer for UnitTest
+        ''' </summary>
+        ''' <param name="func"></param>
+        ''' <returns></returns>
+        Public Shared Function GetOptimizersForUnitTest(ByVal func As absObjectiveFunction) As List(Of absOptimization)
+            Dim optimizers As New List(Of absOptimization)
+            With Nothing
+                Dim optCs = New clsOptCS(func)
+                optimizers.Add(optCs)
+            End With
+            With Nothing
+                Dim optDE_b_1_b = New clsOptDE(func)
+                optDE_b_1_b.DEStrategy = clsOptDE.EnumDEStrategyType.DE_best_1_bin
+                optimizers.Add(optDE_b_1_b)
+            End With
+            With Nothing
+                Dim opt = New clsOptDE(func)
+                opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_best_2_bin
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptDE(func)
+                opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_to_Best_1_bin
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptDE(func)
+                opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_to_Best_2_bin
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptDE(func)
+                opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_to_rand_1_bin
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptDE(func)
+                opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_rand_1_bin
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptDE(func)
+                opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_rand_2_bin
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptDEJADE(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptES(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptFA(func)
+                opt.Iteration = 300
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptHillClimbing(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptNelderMead(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptCS(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptPatternSearch(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptPSO(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptPSOAIW(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptPSOChaoticIW(func)
+                opt.ChaoticMode = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CDIW
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptPSOChaoticIW(func)
+                opt.ChaoticMode = clsOptPSOChaoticIW.EnumChaoticInertiaWeightMode.CRIW
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptPSOLDIW(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptRealGABLX(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptRealGAPCX(func)
+                opt.Iteration = 1000
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptRealGAREX(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptRealGASPX(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptRealGAUNDX(func)
+                opt.ALPHA = 0.6
+                opt.PopulationSize = 100
+                opt.ChildrenSize = 50
+                opt.Iteration = 700
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptSimulatedAnnealing(func)
+                opt.NeighborRange = 0.1
+                opt.Iteration *= 2
+                optimizers.Add(opt)
+            End With
+
+            '--------------------------------------------------------------
+            '微分が必要
+            '--------------------------------------------------------------
+            With Nothing
+                If TryCast(func, BenchmarkFunction.clsBenchSphere) IsNot Nothing Then
+                    optimizers.Add(New clsOptNewtonMethod(func))
+                End If
+            End With
+            With Nothing
+                If TryCast(func, BenchmarkFunction.clsBenchSphere) IsNot Nothing Then
+                    optimizers.Add(New clsOptSteepestDescent(func))
+                End If
+            End With
+
+            Return optimizers
+        End Function
     End Class
 End Namespace

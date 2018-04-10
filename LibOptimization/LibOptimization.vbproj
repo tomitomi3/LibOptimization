@@ -126,9 +126,9 @@
     <Compile Include="Optimization\clsOptPSO.vb" />
     <Compile Include="Optimization\clsOptRealGAUNDX.vb" />
     <Compile Include="Optimization\clsOptSimulatedAnnealing.vb" />
-    <Compile Include="Optimization\clsOptTemplate.vb" />
-    <Compile Include="Optimization\clsParticle.vb" />
-    <Compile Include="Optimization\clsFireFly.vb" />
+    <Compile Include="Optimization\parts\clsOptTemplate.vb" />
+    <Compile Include="Optimization\parts\clsParticle.vb" />
+    <Compile Include="Optimization\parts\clsFireFly.vb" />
     <Compile Include="Util\clsEval.vb" />
     <Compile Include="EasyLinearAlgebra\clsException.vb" />
     <Compile Include="EasyLinearAlgebra\clsEasyMatrix.vb" />
@@ -153,7 +153,7 @@
     <Compile Include="Optimization\clsOptPatternSearch.vb" />
     <Compile Include="Optimization\clsOptNelderMead.vb" />
     <Compile Include="Optimization\clsOptRealGAREX.vb" />
-    <Compile Include="Optimization\clsPoint.vb" />
+    <Compile Include="Optimization\parts\clsPoint.vb" />
     <Compile Include="Optimization\clsOptSteepestDescent.vb" />
     <Compile Include="Optimization\clsOptNewtonMethod.vb" />
     <Compile Include="Util\clsUtil.vb" />

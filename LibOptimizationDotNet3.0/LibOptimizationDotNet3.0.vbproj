@@ -151,8 +151,8 @@
     <Compile Include="..\LibOptimization\EasyLinearAlgebra\clsException.vb">
       <Link>EasyLinearAlgebra\clsException.vb</Link>
     </Compile>
-    <Compile Include="..\LibOptimization\Optimization\clsFireFly.vb">
-      <Link>Optimization\clsFireFly.vb</Link>
+    <Compile Include="..\LibOptimization\Optimization\parts\clsFireFly.vb">
+      <Link>Optimization\parts\clsFireFly.vb</Link>
     </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptCS.vb">
       <Link>Optimization\clsOptCS.vb</Link>
@@ -217,14 +217,14 @@
     <Compile Include="..\LibOptimization\Optimization\clsOptSteepestDescent.vb">
       <Link>Optimization\clsOptSteepestDescent.vb</Link>
     </Compile>
-    <Compile Include="..\LibOptimization\Optimization\clsOptTemplate.vb">
-      <Link>Optimization\clsOptTemplate.vb</Link>
+    <Compile Include="..\LibOptimization\Optimization\parts\clsOptTemplate.vb">
+      <Link>Optimization\parts\clsOptTemplate.vb</Link>
     </Compile>
-    <Compile Include="..\LibOptimization\Optimization\clsParticle.vb">
-      <Link>Optimization\clsParticle.vb</Link>
+    <Compile Include="..\LibOptimization\Optimization\parts\clsParticle.vb">
+      <Link>Optimization\parts\clsParticle.vb</Link>
     </Compile>
-    <Compile Include="..\LibOptimization\Optimization\clsPoint.vb">
-      <Link>Optimization\clsPoint.vb</Link>
+    <Compile Include="..\LibOptimization\Optimization\parts\clsPoint.vb">
+      <Link>Optimization\parts\clsPoint.vb</Link>
     </Compile>
     <Compile Include="..\LibOptimization\Util\clsError.vb">
       <Link>Util\clsError.vb</Link>

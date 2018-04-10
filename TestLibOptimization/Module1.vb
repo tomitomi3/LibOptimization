@@ -1,6 +1,10 @@
 ﻿Imports LibOptimization
 Imports LibOptimization.MathUtil
 
+'
+'あとでテストにする
+'
+
 Module Module1
 
     Sub Main()
@@ -108,9 +112,9 @@ Module Module1
             '0.5	-0.5	1
             '0.5	 0.5	-2
             '-1      1  	-1
-            Dim matInv As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1, 3}, _
-                                                                                    New Double() {2, 2, 5, -5}, _
-                                                                                     New Double() {3, 10, 3, 2}, _
+            Dim matInv As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1, 3},
+                                                                                    New Double() {2, 2, 5, -5},
+                                                                                     New Double() {3, 10, 3, 2},
                                                                                      New Double() {4, 20, 40, 4}})
 
             'Experiment LU
@@ -198,9 +202,9 @@ Module Module1
             matT2.T().PrintValue()
             Console.WriteLine("----------------------------------------------")
             'determinant
-            Dim detMat As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1, 2}, _
-                                                                        New Double() {5, 1, 3, 4}, _
-                                                                        New Double() {2, 0, 1, 0}, _
+            Dim detMat As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1, 2},
+                                                                        New Double() {5, 1, 3, 4},
+                                                                        New Double() {2, 0, 1, 0},
                                                                         New Double() {1, 3, 2, 1}})
             detMat.PrintValue()
             Dim d As Double = detMat.Det()
@@ -210,8 +214,8 @@ Module Module1
             '0.5	-0.5	1
             '0.5	 0.5	-2
             '-1      1  	-1
-            Dim matInv As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1}, _
-                                                                        New Double() {5, 1, 3}, _
+            Dim matInv As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1},
+                                                                        New Double() {5, 1, 3},
                                                                         New Double() {2, 0, 1}})
             Dim matPivotInv As clsEasyMatrix = matInv.Inverse()
             matInv.PrintValue()
@@ -220,8 +224,8 @@ Module Module1
             matPivotInv.PrintValue()
             Console.WriteLine("----------------------------------------------")
             Dim matPA As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3}})
-            Dim matPB As New clsEasyMatrix(New Double()() {New Double() {1}, _
-                                                                       New Double() {4}, _
+            Dim matPB As New clsEasyMatrix(New Double()() {New Double() {1},
+                                                                       New Double() {4},
                                                                        New Double() {7}})
             matPA.PrintValue()
             matPB.PrintValue()
@@ -229,8 +233,8 @@ Module Module1
             matPA.PrintValue()
             Console.WriteLine("----------------------------------------------")
             Dim vecA As New clsEasyVector(New Double() {1, 2, 3})
-            Dim matC As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3}, _
-                                                                       New Double() {4, 5, 6}, _
+            Dim matC As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3},
+                                                                       New Double() {4, 5, 6},
                                                                        New Double() {7, 8, 9}})
             'vecA.PrintValue()
             'matC.PrintValue()
