@@ -80,35 +80,35 @@ Imports LibOptimization.Util
     ''' <summary>
     ''' 最適化アルゴリズムの確認 ローゼンブロック
     ''' </summary>
-    <TestMethod()> Public Sub TestOptimizationRosenblock()
-        Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchRosenblock(2))
-        For Each opt In optimizers
-            Console.WriteLine("Test optimize algo : {0}", opt.GetType().Name)
+    '<TestMethod()> Public Sub TestOptimizationRosenblock()
+    '    Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchRosenblock(2))
+    '    For Each opt In optimizers
+    '        Console.WriteLine("Test optimize algo : {0}", opt.GetType().Name)
 
-            'check init
-            opt.InitialPosition = {1, 1}
-            opt.Init()
-            Dim errorFlg = opt.IsRecentError()
-            Assert.IsFalse(errorFlg)
+    '        'check init
+    '        opt.InitialPosition = {1, 1}
+    '        opt.Init()
+    '        Dim errorFlg = opt.IsRecentError()
+    '        Assert.IsFalse(errorFlg)
 
-            'check iterate
-            opt.DoIteration()
-            errorFlg = opt.IsRecentError()
-            Assert.IsFalse(errorFlg)
+    '        'check iterate
+    '        opt.DoIteration()
+    '        errorFlg = opt.IsRecentError()
+    '        Assert.IsFalse(errorFlg)
 
-            'Eval
-            If Math.Abs(opt.Result.Eval) > 5 Then
-                Assert.Fail(String.Format("fail:{0} Eval:{1}", opt.GetType().Name, opt.Result.Eval))
-            End If
-            Console.WriteLine(String.Format("Success Eval {0}", opt.Result.Eval))
+    '        'Eval
+    '        If Math.Abs(opt.Result.Eval) > 5 Then
+    '            Assert.Fail(String.Format("fail:{0} Eval:{1}", opt.GetType().Name, opt.Result.Eval))
+    '        End If
+    '        Console.WriteLine(String.Format("Success Eval {0}", opt.Result.Eval))
 
-            'Result
-            If Math.Abs(opt.Result(0) - 1.0) > 0.5 OrElse Math.Abs(opt.Result(1) - 1.0) > 0.5 Then
-                Assert.Fail(String.Format("fail:{0} Result:{1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
-            End If
-            Console.WriteLine(String.Format("Success Result {0} {1}", opt.Result(0), opt.Result(1)))
-        Next
-    End Sub
+    '        'Result
+    '        If Math.Abs(opt.Result(0) - 1.0) > 0.5 OrElse Math.Abs(opt.Result(1) - 1.0) > 0.5 Then
+    '            Assert.Fail(String.Format("fail:{0} Result:{1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
+    '        End If
+    '        Console.WriteLine(String.Format("Success Result {0} {1}", opt.Result(0), opt.Result(1)))
+    '    Next
+    'End Sub
 
     ''' <summary>
     ''' リトライ確認
