@@ -29,6 +29,9 @@ Namespace Optimization
         ''' <remarks>This parameters to use when generate a variable</remarks>
         Public Property InitialValueRangeLower As Double = -5 'parameter range
 
+        ''' <summary>Use criterion</summary>
+        Public Property IsUseCriterion As Boolean = True
+
         ''' <summary>Memo</summary>
         Public Property Memo As String = String.Empty
 

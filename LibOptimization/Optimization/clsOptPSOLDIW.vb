@@ -21,9 +21,6 @@ Namespace Optimization
         ''' <summary>Epsilon(Default:0.000001) for Criterion</summary>
         Public Property EPS As Double = 0.000001 '1e-6
 
-        ''' <summary>Use criterion</summary>
-        Public Property IsUseCriterion As Boolean = True
-
         ''' <summary>
         ''' higher N percentage particles are finished at the time of same evaluate value.
         ''' This parameter is valid is when IsUseCriterion is true.
@@ -125,9 +122,13 @@ Namespace Optimization
             End If
 
             'do iterate
-            ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
+            If Me.Iteration <= m_iteration Then
+                Return True
+            Else
+                ai_iteration = If(ai_iteration = 0, Iteration - m_iteration - 1, Math.Min(ai_iteration, Iteration - m_iteration) - 1)
+            End If
             For iterate As Integer = 0 To ai_iteration
-                'Counting Iteration
+                'Counting generation
                 m_iteration += 1
 
                 'check criterion

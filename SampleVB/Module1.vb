@@ -10,6 +10,51 @@ Module Module1
     'This library will probably simplify the optimization using C# and VB.Net and other .NET Framework language.
     '------------------------------------------------------------------------------------------------------------------
     Sub Main()
+        With Nothing
+            Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(2))
+            For Each opt In optimizers
+                opt.IsUseCriterion = False
+                opt.InitialPosition = New Double() {100, 100}
+                opt.Iteration = 2
+                opt.Init()
+                opt.DoIteration()
+                If opt.IterationCount <> opt.Iteration Then
+                    clsUtil.DebugValue(opt)
+                Else
+                    clsUtil.DebugValue(opt)
+                End If
+            Next
+        End With
+        With Nothing
+            Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(2))
+            For Each opt In optimizers
+                opt.IsUseCriterion = False
+                opt.InitialPosition = New Double() {100, 100}
+                opt.Iteration = 3
+                opt.Init()
+                While (opt.DoIteration(1) = False)
+                    'done
+                End While
+                If opt.IterationCount <> opt.Iteration Then
+                    clsUtil.DebugValue(opt)
+                Else
+                    clsUtil.DebugValue(opt)
+                End If
+            Next
+        End With
+        With Nothing
+            Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
+            optimization.Iteration = 10
+            optimization.IsUseCriterion = False
+            optimization.Init()
+            clsUtil.DebugValue(optimization)
+            While (optimization.DoIteration(3) = False)
+                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
+            End While
+            clsUtil.DebugValue(optimization)
+            Return
+        End With
+
         'Typical use
         With Nothing
             'How to use

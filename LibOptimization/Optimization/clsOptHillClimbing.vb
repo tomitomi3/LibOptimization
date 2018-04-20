@@ -93,9 +93,13 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
+            If Me.Iteration <= m_iteration Then
+                Return True
+            Else
+                ai_iteration = If(ai_iteration = 0, Iteration - m_iteration - 1, Math.Min(ai_iteration, Iteration - m_iteration) - 1)
+            End If
             For iterate As Integer = 0 To ai_iteration
-                'Iteration count
+                'Counting generation
                 m_iteration += 1
 
                 'neighbor function

@@ -77,9 +77,9 @@ Imports LibOptimization.Util
         Next
     End Sub
 
-    ''' <summary>
-    ''' 最適化アルゴリズムの確認 ローゼンブロック
-    ''' </summary>
+    '''' <summary>
+    '''' 最適化アルゴリズムの確認 ローゼンブロック
+    '''' </summary>
     '<TestMethod()> Public Sub TestOptimizationRosenblock()
     '    Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchRosenblock(2))
     '    For Each opt In optimizers
@@ -207,6 +207,87 @@ Imports LibOptimization.Util
         Console.WriteLine(String.Format("Success Result {0} {1}", opt.Result(0), opt.Result(1)))
     End Sub
 
+    Public Class nothingFunc : Inherits LibOptimization.Optimization.absObjectiveFunction
+        Public Overrides Function F(x As List(Of Double)) As Double
+            Return clsRandomXorshiftSingleton.GetInstance().NextDouble * 10
+        End Function
+
+        Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
+            Dim aa = New List(Of Double)
+            aa.Add(clsRandomXorshiftSingleton.GetInstance().NextDouble * 10)
+            aa.Add(clsRandomXorshiftSingleton.GetInstance().NextDouble * 10)
+            Return aa
+        End Function
+
+        Public Overrides Function Hessian(x As List(Of Double)) As List(Of List(Of Double))
+            Throw New NotImplementedException()
+        End Function
+
+        Public Overrides Function NumberOfVariable() As Integer
+            Return 2
+        End Function
+    End Class
+
+    ''' <summary>
+    ''' 回数のテスト
+    ''' </summary>
+    <TestMethod()> Public Sub TestOptimizationIterationCheckAll()
+        Dim optimizers = clsUtil.GetOptimizersForUnitTest(New nothingFunc())
+        For Each opt In optimizers
+            opt.IsUseCriterion = False
+            opt.InitialPosition = New Double() {100, 100}
+            opt.Iteration = 2
+            opt.Init()
+            opt.DoIteration()
+            If opt.IterationCount <> opt.Iteration Then
+                Assert.Fail(String.Format("{0} : IterationCount : {1}", opt.GetType().Name, opt.IterationCount))
+            Else
+                Console.WriteLine("Success : {0}", opt.GetType().Name)
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' 回数のテスト 1回ずつ
+    ''' </summary>
+    <TestMethod()> Public Sub TestOptimizationIterationCheck1Iteration()
+        Dim optimizers = clsUtil.GetOptimizersForUnitTest(New nothingFunc())
+        For Each opt In optimizers
+            opt.IsUseCriterion = False
+            opt.InitialPosition = New Double() {100, 100}
+            opt.Iteration = 3
+            opt.Init()
+            While (opt.DoIteration(1) = False)
+                'done
+            End While
+            If opt.IterationCount <> opt.Iteration Then
+                Assert.Fail(String.Format("Fail! {0} : IterationCount : {1}", opt.GetType().Name, opt.IterationCount))
+            Else
+                Console.WriteLine("Success : {0}", opt.GetType().Name)
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' 回数のテスト 1回ずつ
+    ''' </summary>
+    <TestMethod()> Public Sub TestOptimizationIterationCheck2Iteration()
+        Dim optimizers = clsUtil.GetOptimizersForUnitTest(New nothingFunc())
+        For Each opt In optimizers
+            opt.IsUseCriterion = False
+            opt.InitialPosition = New Double() {100, 100}
+            opt.Iteration = 3
+            opt.Init()
+            While (opt.DoIteration(2) = False)
+                'done
+            End While
+            If opt.IterationCount <> opt.Iteration Then
+                Assert.Fail(String.Format("{0} : IterationCount : {1}", opt.GetType().Name, opt.IterationCount))
+            Else
+                Console.WriteLine("Success : {0}", opt.GetType().Name)
+            End If
+        Next
+    End Sub
 
 #End Region
 End Class

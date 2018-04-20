@@ -26,9 +26,6 @@ Namespace Optimization
         ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
         Public Property EPS As Double = 0.00000001
 
-        ''' <summary>Use criterion</summary>
-        Public Property IsUseCriterion As Boolean = True
-
         ''' <summary>
         ''' higher N percentage particles are finished at the time of same evaluate value.
         ''' This parameter is valid is when IsUseCriterion is true.
@@ -122,16 +119,20 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
+            If Me.Iteration <= m_iteration Then
+                Return True
+            Else
+                ai_iteration = If(ai_iteration = 0, Iteration - m_iteration - 1, Math.Min(ai_iteration, Iteration - m_iteration) - 1)
+            End If
             For iterate As Integer = 0 To ai_iteration
-                'Counting Iteration
+                'Counting generation
                 m_iteration += 1
 
                 'Sort Evaluate
                 Me.m_parents.Sort()
 
                 'check criterion
-                If Me.IsUseCriterion = True Then
+                If IsUseCriterion = True Then
                     'higher N percentage particles are finished at the time of same evaluate value.
                     If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(Me.HigherNPercentIndex).Eval) Then
                         Return True
@@ -188,8 +189,8 @@ Namespace Optimization
         ''' REX(N, n+k) -> N is NormalDistribution
         ''' "n+k" is parents size.
         ''' </remarks>
-        Private Function CrossOverREX(ByVal ai_randomMode As RexRandomMode, _
-                             ByVal ai_childNum As Integer, _
+        Private Function CrossOverREX(ByVal ai_randomMode As RexRandomMode,
+                             ByVal ai_childNum As Integer,
                              ByVal ai_parents As List(Of KeyValuePair(Of Integer, clsPoint))) As List(Of clsPoint)
             'Calc Centroid
             Dim xg As New clsEasyVector(MyBase.m_func.NumberOfVariable)

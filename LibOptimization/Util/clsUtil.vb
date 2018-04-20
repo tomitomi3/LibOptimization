@@ -621,7 +621,7 @@ Namespace Util
                 optimizers.Add(opt)
             End With
             With Nothing
-                Dim opt = New clsOptCS(func)
+                Dim opt = New clsOptNelderMeadWiki(func)
                 optimizers.Add(opt)
             End With
             With Nothing
