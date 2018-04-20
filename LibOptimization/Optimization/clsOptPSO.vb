@@ -120,7 +120,9 @@ Namespace Optimization
             End If
 
             'do iterate
-            ai_iteration = If((Iteration - m_iteration) > ai_iteration, Iteration - m_iteration - 1, If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1))
+            ai_iteration = If((Iteration - m_iteration) > ai_iteration, ai_iteration - 1, Iteration - m_iteration - 1)
+            ' equivalent to:
+            ' ai_iteration = Math.Min(ai_iteration, Iteration - m_iteration) - 1
             For iterate As Integer = 0 To ai_iteration
                 'Counting Iteration
                 m_iteration += 1
