@@ -1,4 +1,6 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/master?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/master)
+|  appveyor  |  nuget  |
+| ---- | ---- |
+| [![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/master?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/master) | [![NuGet](https://img.shields.io/nuget/dt/LibOptimization.svg)](https://www.nuget.org/packages/LibOptimization/) |
 
 LibOptimization
 ===============
