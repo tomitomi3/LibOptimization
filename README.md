@@ -16,6 +16,18 @@ I may miss your Issues. When a reply is slow, please give me e-mail.
 tomi.nori+github atmark gmail.com
 </pre>
 
+# Cite
+
+If you use LibOptimization for a publication, please cite it as:
+
+<pre>
+@misc{LibOptimization,
+  author = "N.Tomita",
+  title = "LibOptimization",
+  howpublished = "\url{https://github.com/tomitomi3/LibOptimization}",
+}
+</pre>
+
 # Recent change
 
 Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0. Refactoring LibOptimization code with development branch. In the future, I will add new function to the new branch.
