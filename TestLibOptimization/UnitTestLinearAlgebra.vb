@@ -200,5 +200,29 @@ Imports LibOptimization.Util
         Assert.AreEqual(temp(1), CType(0, Double), "mat - v")
         Assert.AreEqual(temp(2), CType(2, Double), "mat - v")
     End Sub
+
+    ''' <summary>
+    ''' test code Cholesky decomposition
+    ''' </summary>
+    <TestMethod()> Public Sub TestCholesky()
+        Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                New Double() {1, 4, 2},
+                New Double() {4, 41, 23},
+                New Double() {2, 23, 22}})
+
+        'A = LL^T
+        Dim check = mat.Cholesky() * mat.Cholesky().T()
+
+        'check
+        For i As Integer = 0 To mat.ColCount - 1
+            For j As Integer = 0 To mat.ColCount - 1
+                If (check(i)(j) = mat(i)(j)) Then
+                    'nop
+                Else
+                    Assert.Fail()
+                End If
+            Next
+        Next
+    End Sub
 #End Region
 End Class

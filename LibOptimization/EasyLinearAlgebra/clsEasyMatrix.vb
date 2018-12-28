@@ -235,11 +235,17 @@
         Public Shared Operator *(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
             If IsSameDimension(ai_source, ai_dest) = True Then
                 '[M*M] X [M*M]
-                Dim ret As New clsEasyMatrix(ai_source.RowCount)
-                For i As Integer = 0 To ret.RowCount - 1
-                    For j As Integer = 0 To ret.ColCount - 1
-                        For k As Integer = 0 To ret.ColCount - 1
-                            ret(i)(j) += ai_source(k)(i) * ai_dest(j)(k)
+                Dim size = ai_source.RowCount
+                Dim ret As New clsEasyMatrix(size)
+                For i As Integer = 0 To size - 1
+                    For j As Integer = 0 To size - 1
+                        For k As Integer = 0 To size - 1
+                            Dim tempA = ai_source(i)(k)
+                            Dim tempB = ai_dest(k)(j)
+                            'Dim tempA = ai_source(k)(i)
+                            'Dim tempB = ai_dest(j)(k)
+
+                            ret(i)(j) += tempA * tempB
                         Next
                     Next
                 Next
@@ -535,6 +541,38 @@
             End If
 
             Return False
+        End Function
+
+        ''' <summary>
+        ''' Cholesky decomposition
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function Cholesky() As clsEasyMatrix
+            If Me.IsSquare() = False Then
+                Throw New clsException(clsException.Series.NotComputable, "Cholesky")
+            End If
+
+            Dim ret As New MathUtil.clsEasyMatrix(Me.RowCount)
+            Dim n = CInt(Math.Sqrt(ret.RowCount * ret.ColCount))
+            For i As Integer = 0 To n - 1
+                For j As Integer = 0 To i
+                    If j = i Then
+                        Dim sum = 0.0
+                        For k As Integer = 0 To j
+                            sum += ret(j)(k) * ret(j)(k)
+                        Next
+                        ret(j)(j) = Math.Sqrt(Me(j)(j) - sum)
+                    Else
+                        Dim sum = 0.0
+                        For k As Integer = 0 To j
+                            sum += ret(i)(k) * ret(j)(k)
+                        Next
+                        ret(i)(j) = 1.0 / ret(j)(j) * (Me(i)(j) - sum)
+                    End If
+                Next
+            Next
+
+            Return ret
         End Function
 #End Region
 
