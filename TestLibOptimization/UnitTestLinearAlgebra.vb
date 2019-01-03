@@ -9,24 +9,49 @@ Imports LibOptimization.BenchmarkFunction
 Imports LibOptimization.Util
 
 ''' <summary>
-''' 単体テスト 線形代数
+''' unit test for my Linear Algebra  lib
 ''' </summary>
 <TestClass()> Public Class UnitTestLinearAlgebra
 #Region "Vector, Matrix"
     ''' <summary>
-    ''' check Matric initialize
+    ''' check Matrix initialize
     ''' </summary>
-    <TestMethod()> Public Sub TestVector()
+    <TestMethod()> Public Sub Init_Vector()
         Dim v As New clsEasyVector(New Double() {1, 2, 3})
         For i As Integer = 0 To 3 - 1
             Assert.AreEqual(v(i), CType(i + 1, Double))
         Next
     End Sub
 
+    <TestMethod()> Public Sub Init_Matrix()
+        Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0, 0},
+                                                  New Double() {0, 1, 0},
+                                                  New Double() {0, 0, 1}})
+
+        If mat.RowCount <> 3 Then
+            Assert.Fail("Row Error")
+        End If
+
+        If mat.ColCount <> 3 Then
+            Assert.Fail("Col Error")
+        End If
+
+        For i As Integer = 0 To 3 - 1
+            For j As Integer = 0 To 3 - 1
+                If i = j Then
+                    Assert.AreEqual(mat(i)(j), 1.0)
+                Else
+                    Assert.AreEqual(mat(i)(j), 0.0)
+                End If
+            Next
+        Next
+    End Sub
+
     ''' <summary>
     ''' Vector + Matrix
     ''' </summary>
-    <TestMethod()> Public Sub TestVectorMatrix_AddVectorMatrix()
+    <TestMethod()> Public Sub Add_VectorMatrix()
         Dim v As New clsEasyVector(New Double() {1, 1, 1})
         Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
         Try
@@ -44,7 +69,7 @@ Imports LibOptimization.Util
     ''' <summary>
     ''' Matrix + vector
     ''' </summary>
-    <TestMethod()> Public Sub TestVectorMatrix_AddMatrixVector()
+    <TestMethod()> Public Sub Add_MatrixVector()
         Dim v As New clsEasyVector(New Double() {1, 1, 1})
         Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
         Try
@@ -62,7 +87,7 @@ Imports LibOptimization.Util
     ''' <summary>
     ''' Vector - Matrix
     ''' </summary>
-    <TestMethod()> Public Sub TestVectorMatrix_SubVectorMatrix()
+    <TestMethod()> Public Sub Sub_VectorMatrix()
         Dim v As New clsEasyVector(New Double() {1, 1, 1})
         Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
         Try
@@ -80,7 +105,7 @@ Imports LibOptimization.Util
     ''' <summary>
     ''' Matrix - Vector
     ''' </summary>
-    <TestMethod()> Public Sub TestVectorMatrix_SubMatrixVector()
+    <TestMethod()> Public Sub Sub_MatrixVector()
         Dim v As New clsEasyVector(New Double() {1, 1, 1})
         Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
         Try
@@ -95,46 +120,335 @@ Imports LibOptimization.Util
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Matrix * Vector
-    ''' </summary>
-    <TestMethod()> Public Sub TestVectorMatrix_ProductMatrixVector()
-        Dim v As New clsEasyVector(New Double() {1, 2, 3})
-        Dim mat As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
-        Try
-            v.Direction = clsEasyVector.VectorDirection.COL
-            Dim temp = mat * v
-            temp.PrintValue()
-        Catch ex As Exception
+    <TestMethod()> Public Sub Product_MatrixVector_bad()
+        '---------------------------------------------
+        'Matrix * Vector
+        '---------------------------------------------
+        'bad
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0, 0},
+                                                  New Double() {0, 1, 0},
+                                                  New Double() {0, 0, 1}})
+            Dim v As New clsEasyVector(New Double() {2, 2}, clsEasyVector.VectorDirection.ROW)
+            Try
+                Dim temp = mat * v
+            Catch myex As clsException
+                'OK
+                Return
+            End Try
             Assert.Fail()
-        End Try
+        End With
+
+        'bad
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0},
+                                                  New Double() {0, 1},
+                                                  New Double() {0, 0}})
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+            Try
+                Dim temp = mat * v
+            Catch myex As clsException
+                'OK
+                Return
+            End Try
+            Assert.Fail()
+        End With
+
+        'bad
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0, 0},
+                                                  New Double() {0, 0, 1}})
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+            Try
+                Dim temp = mat * v
+            Catch myex As clsException
+                'OK
+                Return
+            End Try
+            Assert.Fail()
+        End With
+    End Sub
+
+    <TestMethod()> Public Sub Product_VectorMatrix_bad()
+        '---------------------------------------------
+        'Vector * Matrix
+        '---------------------------------------------
+        'bad
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0, 0},
+                                                  New Double() {0, 1, 0},
+                                                  New Double() {0, 0, 1}})
+            Dim v As New clsEasyVector(New Double() {2, 2}, clsEasyVector.VectorDirection.ROW)
+            Try
+                Dim temp = v * mat
+            Catch myex As clsException
+                'OK
+                Return
+            End Try
+            Assert.Fail()
+        End With
+
+        'bad
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0},
+                                                  New Double() {0, 1},
+                                                  New Double() {0, 0}})
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+            Try
+                Dim temp = v * mat
+            Catch myex As clsException
+                'OK
+                Return
+            End Try
+            Assert.Fail()
+        End With
+
+        'bad
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0, 0},
+                                                  New Double() {0, 0, 1}})
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+            Try
+                Dim temp = v * mat
+            Catch myex As clsException
+                'OK
+                Return
+            End Try
+            Assert.Fail()
+        End With
     End Sub
 
     ''' <summary>
-    ''' Vector * Matrix
+    ''' 行列 x ベクトル OK
     ''' </summary>
-    <TestMethod()> Public Sub TestVectorMatrix_ProductVectorMatrix_OK()
-        Dim v As New clsEasyVector(New Double() {1, 2, 3})
-        Dim mat As New clsEasyMatrix(New Double()() {New Double() {4, 5, 6}})
-        Try
-            v.Direction = clsEasyVector.VectorDirection.COL
-            Dim temp = v * mat
-            Dim temp2 = mat * v
-        Catch ex As Exception
-            Assert.Fail()
-        End Try
+    <TestMethod()> Public Sub Product_MatrixVector_OK()
+        '---------------------------------------------
+        'Matrix * Vector ok
+        '---------------------------------------------
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0, 0},
+                                                  New Double() {0, 1, 0},
+                                                  New Double() {0, 0, 1}})
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.COL)
+            Try
+                mat.PrintValue()
+                Dim temp = mat * v
+
+                'size check
+                If temp.Count <> mat.RowCount Then
+                    Assert.Fail()
+                End If
+
+                'dirction check
+                If temp.Direction = clsEasyVector.VectorDirection.ROW Then
+                    Assert.Fail()
+                End If
+
+                'value check
+                For Each val As Double In temp
+                    If val <> 2.0 Then
+                        Assert.Fail()
+                    End If
+                Next
+            Catch ex As Exception
+                Assert.Fail()
+            End Try
+        End With
+
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 2, 3}})
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.COL)
+            Try
+                Dim temp = mat * v
+
+                'size check
+                If temp.Count <> mat.RowCount Then
+                    Assert.Fail()
+                End If
+
+                'dirction check
+                If temp.Direction = clsEasyVector.VectorDirection.ROW Then
+                    Assert.Fail()
+                End If
+
+                'value check
+                For Each val As Double In temp
+                    If val <> 12 Then
+                        Assert.Fail()
+                    End If
+                Next
+            Catch ex As Exception
+                Assert.Fail()
+            End Try
+        End With
+
+        With Nothing
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0},
+                                                  New Double() {1, 0},
+                                                  New Double() {1, 0}})
+            Dim v As New clsEasyVector(New Double() {2, 2}, clsEasyVector.VectorDirection.COL)
+            Try
+                Dim temp = mat * v
+
+                'size check
+                If temp.Count <> mat.RowCount Then
+                    Assert.Fail()
+                End If
+
+                'dirction check
+                If temp.Direction = clsEasyVector.VectorDirection.ROW Then
+                    Assert.Fail()
+                End If
+
+                'value check
+                For Each val As Double In temp
+                    If val <> 2.0 Then
+                        Assert.Fail()
+                    End If
+                Next
+            Catch ex As Exception
+                Assert.Fail()
+            End Try
+        End With
     End Sub
 
-    <TestMethod()> Public Sub TestVectorMatrix_ProductMatrixVectorFail()
-        Dim v As New clsEasyVector(New Double() {1, 2, 3})
-        Dim mat As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {2, 1, 1}, New Double() {3, 1, 1}})
-        Try
-            v.Direction = clsEasyVector.VectorDirection.ROW
-            Dim temp = mat * v
-            Assert.Fail()
-        Catch ex As Exception
-            '例外が投げられるのが正解
-        End Try
+    ''' <summary>
+    ''' ベクトル x 行列
+    ''' </summary>
+    <TestMethod()> Public Sub Product_VectorMatrix()
+        '---------------------------------------------
+        'Vector * Matrix
+        '---------------------------------------------
+        With Nothing
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 0, 0},
+                                                  New Double() {0, 1, 0},
+                                                  New Double() {0, 0, 1}})
+            Try
+                Dim temp = v * mat
+
+                'size check
+                If temp.Count <> mat.ColCount Then
+                    Assert.Fail()
+                End If
+
+                'dirction check
+                If temp.Direction <> clsEasyVector.VectorDirection.ROW Then
+                    Assert.Fail()
+                End If
+
+                'value check
+                For Each val As Double In temp
+                    If val <> 2.0 Then
+                        Assert.Fail()
+                    End If
+                Next
+            Catch ex As Exception
+                Assert.Fail()
+            End Try
+        End With
+
+        With Nothing
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1},
+                                                  New Double() {1},
+                                                  New Double() {1}})
+
+            Try
+                Dim temp = v * mat
+
+                'size check
+                If temp.Count <> mat.ColCount Then
+                    Assert.Fail()
+                End If
+
+                'dirction check
+                If temp.Direction <> clsEasyVector.VectorDirection.ROW Then
+                    Assert.Fail()
+                End If
+
+                'value check
+                For Each val As Double In temp
+                    If val <> 6.0 Then
+                        Assert.Fail()
+                    End If
+                Next
+            Catch ex As Exception
+                Assert.Fail()
+            End Try
+        End With
+
+        With Nothing
+            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {1, 1},
+                                                  New Double() {1, 1},
+                                                  New Double() {1, 1}})
+            Try
+                Dim temp = v * mat
+
+                'size check
+                If temp.Count <> mat.ColCount Then
+                    Assert.Fail()
+                End If
+
+                'dirction check
+                If temp.Direction <> clsEasyVector.VectorDirection.ROW Then
+                    Assert.Fail()
+                End If
+
+                'value check
+                For Each val As Double In temp
+                    If val <> 6.0 Then
+                        Assert.Fail()
+                    End If
+                Next
+            Catch ex As Exception
+                Assert.Fail()
+            End Try
+        End With
+
+
+        With Nothing
+            Dim v As New clsEasyVector(New Double() {2, 2}, clsEasyVector.VectorDirection.ROW)
+            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+                                                  New Double() {2, 2, 2},
+                                                  New Double() {0, 0, 0}})
+            Try
+                Dim temp = v * mat
+
+                'size check
+                If temp.Count <> mat.ColCount Then
+                    Assert.Fail()
+                End If
+
+                'dirction check
+                If temp.Direction <> clsEasyVector.VectorDirection.ROW Then
+                    Assert.Fail()
+                End If
+
+                'value check
+                For Each val As Double In temp
+                    If val <> 4.0 Then
+                        Assert.Fail()
+                    End If
+                Next
+            Catch ex As Exception
+                Assert.Fail()
+            End Try
+        End With
+
     End Sub
 
     <TestMethod()> Public Sub TestMatrix()
@@ -148,7 +462,7 @@ Imports LibOptimization.Util
         Next
     End Sub
 
-    <TestMethod()> Public Sub TestMatrixInverse()
+    <TestMethod()> Public Sub InverseMatrix()
         Dim mat As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1},
                                                      New Double() {5, 1, 3},
                                                      New Double() {2, 0, 1}})
@@ -176,35 +490,11 @@ Imports LibOptimization.Util
         Next
     End Sub
 
-    <TestMethod()> Public Sub TestVectorMatrix()
-        Dim v As New clsEasyVector(New Double() {3, 2, 1})
-        Dim mat As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
-
-        Dim temp = v + mat
-        For i As Integer = 0 To temp.Count - 1
-            Assert.AreEqual(temp(i), CType(4, Double), "v + mat")
-        Next
-
-        temp = mat + v
-        For i As Integer = 0 To temp.Count - 1
-            Assert.AreEqual(temp(i), CType(4, Double), "mat + v")
-        Next
-
-        temp = v - mat
-        Assert.AreEqual(temp(0), CType(2, Double), "v - mat")
-        Assert.AreEqual(temp(1), CType(0, Double), "v - mat")
-        Assert.AreEqual(temp(2), CType(-2, Double), "v - mat")
-
-        temp = mat - v
-        Assert.AreEqual(temp(0), CType(-2, Double), "mat - v")
-        Assert.AreEqual(temp(1), CType(0, Double), "mat - v")
-        Assert.AreEqual(temp(2), CType(2, Double), "mat - v")
-    End Sub
-
     ''' <summary>
     ''' test code Cholesky decomposition
     ''' </summary>
-    <TestMethod()> Public Sub TestCholesky()
+    <TestMethod()> Public Sub Cholesky()
+        '対称行列
         Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
                 New Double() {1, 4, 2},
                 New Double() {4, 41, 23},

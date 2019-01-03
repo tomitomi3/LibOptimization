@@ -169,6 +169,32 @@
         End Operator
 
         ''' <summary>
+        ''' Product
+        ''' </summary>
+        ''' <param name="ai_source"></param>
+        ''' <param name="ai_dest"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Operator *(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyVector) As clsEasyVector
+            'OK
+            '|v1 v2| * |v3|
+            '          |v4|
+            If ai_source.Direction = VectorDirection.ROW AndAlso ai_dest.Direction = VectorDirection.COL Then
+                Throw New clsException(clsException.Series.NotComputable, "Vector * Vector - direction error")
+            End If
+            Dim size = ai_source.Count
+            If size <> ai_dest.Count Then
+                Throw New clsException(clsException.Series.NotComputable, "Vector * Vector - size error")
+            End If
+
+            Dim ret As Double = 0.0
+            For i As Integer = 0 To size - 1
+                ret += ai_source(i) * ai_dest(i)
+            Next
+            Return New clsEasyVector(New Double() {ret})
+        End Operator
+
+        ''' <summary>
         ''' Divide
         ''' </summary>
         ''' <param name="ai_source"></param>
@@ -346,8 +372,13 @@
         ''' </summary>
         ''' <param name="ai_preci"></param>
         ''' <remarks></remarks>
-        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 3)
+        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 4, Optional ByVal name As String = "")
             Dim str As New System.Text.StringBuilder()
+            If String.IsNullOrEmpty(name) = False Then
+                str.Append(String.Format("{0} =", name) & Environment.NewLine)
+            Else
+                str.Append("Vec =" & Environment.NewLine)
+            End If
             If Me.m_direcition = VectorDirection.ROW Then
                 For i As Integer = 0 To Me.Count - 1
                     str.Append(Me(i).ToString("F" & ai_preci.ToString()) & ControlChars.Tab)
@@ -359,8 +390,21 @@
                     str.AppendLine("")
                 Next
             End If
+            str.Append(Environment.NewLine)
             Console.Write(str.ToString())
         End Sub
+
+        ''' <summary>
+        ''' ベクトルを対角行列を作る
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function ToDiagonalMatrix() As clsEasyMatrix
+            Dim ret = New clsEasyMatrix(Me.Count)
+            For i As Integer = 0 To ret.Count - 1
+                ret(i)(i) = Me(i)
+            Next
+            Return ret
+        End Function
 #End Region
 
 #Region "Property"
@@ -404,7 +448,7 @@
         ''' <param name="ai_vec2"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared Function IsSameDimension(ByVal ai_vec1 As clsEasyVector, ByVal ai_vec2 As clsEasyVector) As Boolean
+        Private Shared Function IsSameDimension(ByVal ai_vec1 As clsEasyVector, ByVal ai_vec2 As clsEasyVector, Optional ByVal isCheckDirection As Boolean = False) As Boolean
             If ai_vec1 Is Nothing Then
                 Return False
             End If
@@ -414,8 +458,10 @@
             If ai_vec1.Count <> ai_vec2.Count Then
                 Return False
             End If
-            If ai_vec1.Direction <> ai_vec2.Direction Then
-                Return False
+            If isCheckDirection = True Then
+                If ai_vec1.Direction <> ai_vec2.Direction Then
+                    Return False
+                End If
             End If
 
             Return True

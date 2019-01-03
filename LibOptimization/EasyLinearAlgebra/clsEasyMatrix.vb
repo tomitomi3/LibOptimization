@@ -10,6 +10,7 @@
     ''' </remarks>
     Public Class clsEasyMatrix : Inherits List(Of List(Of Double))
         Public Const SAME_ZERO As Double = 2.0E-50 '2^-50
+        Public Const Epsiton As Double = 0.0000000000000001 '1.0^-16
 
 #Region "Constructor"
         ''' <summary>
@@ -237,29 +238,40 @@
                 '[M*M] X [M*M]
                 Dim size = ai_source.RowCount
                 Dim ret As New clsEasyMatrix(size)
+
+                '並列化 .NET4
+                'Threading.Tasks.Parallel.For(0, size - 1,
+                '                             Sub(i)
+                '                                 For j As Integer = 0 To size - 1
+                '                                     For k As Integer = 0 To size - 1
+                '                                         Dim tempA = ai_source(i)(k)
+                '                                         Dim tempB = ai_dest(k)(j)
+                '                                         ret(i)(j) += tempA * tempB
+                '                                     Next
+                '                                 Next
+                '                             End Sub)
+
                 For i As Integer = 0 To size - 1
                     For j As Integer = 0 To size - 1
                         For k As Integer = 0 To size - 1
                             Dim tempA = ai_source(i)(k)
                             Dim tempB = ai_dest(k)(j)
-                            'Dim tempA = ai_source(k)(i)
-                            'Dim tempB = ai_dest(j)(k)
-
                             ret(i)(j) += tempA * tempB
                         Next
                     Next
                 Next
+
                 Return ret
             ElseIf ai_source.ColCount = ai_dest.RowCount Then
                 '[M*N] X [N*O]
                 Dim ret As New clsEasyMatrix(ai_source.RowCount, ai_dest.ColCount)
-                For mIndex As Integer = 0 To ret.RowCount - 1
-                    For nIndex As Integer = 0 To ret.ColCount - 1
+                For i As Integer = 0 To ret.RowCount - 1
+                    For j As Integer = 0 To ret.ColCount - 1
                         Dim temp As Double = 0.0
-                        For i As Integer = 0 To ai_source.ColCount - 1
-                            temp += ai_source(mIndex)(i) * ai_dest(i)(nIndex)
+                        For k As Integer = 0 To ai_source.ColCount - 1
+                            temp += ai_source(i)(k) * ai_dest(k)(j)
                         Next
-                        ret(mIndex)(nIndex) = temp
+                        ret(i)(j) = temp
                     Next
                 Next
                 Return ret
@@ -271,48 +283,79 @@
         ''' <summary>
         ''' Product( Matrix * Vector )
         ''' </summary>
-        ''' <param name="ai_source"></param>
-        ''' <param name="ai_dest"></param>
+        ''' <param name="mat">Matrix</param>
+        ''' <param name="vec">Vector</param>
         ''' <returns></returns>
         ''' <remarks>
         ''' </remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyVector) As clsEasyMatrix
-            '列 ＝ 行
-            Dim col As Integer = 1
-            Dim row As Integer = ai_dest.Count
-            If ai_dest.Direction = clsEasyVector.VectorDirection.ROW Then
-                col = ai_dest.Count
-                row = 1
+        Public Shared Operator *(ByVal mat As clsEasyMatrix, ByVal vec As clsEasyVector) As clsEasyVector
+            'ベクトルと行列のサイズ確認
+            'OK
+            ' |a11 a12| * |v1| = cv1
+            ' |a21 a22|   |v2|   cv2
+            '
+            ' |a11 a12| * |v1| = cv1
+            '             |v2|
+            '
+            ' |a11 a12| * |v1| = cv1
+            ' |a21 a22|   |v2|   cv2
+            ' |a31 a32|          cv3
+            '
+            If mat.ColCount <> vec.Count Then
+                Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector - size error")
             End If
-            If ai_source.ColCount <> row Then
-                Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector")
+            If vec.Direction <> clsEasyVector.VectorDirection.COL Then
+                Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector - size error")
             End If
 
-            Dim temp As clsEasyMatrix = ai_source * ai_dest.ToMatrix()
-            Return temp
+            '計算
+            Dim vSize As Integer = mat.RowCount '行列の行サイズ
+            Dim ret As New clsEasyVector(vSize, clsEasyVector.VectorDirection.COL)
+            For i As Integer = 0 To vSize - 1
+                Dim sum As Double = 0.0
+                For j As Integer = 0 To mat.ColCount - 1
+                    sum += mat(i)(j) * vec(j)
+                Next
+                ret(i) = sum
+            Next
+            Return ret
         End Operator
 
         ''' <summary>
-        ''' Product(Vector * Matrix)
+        ''' Product( Vector * Matrix)
         ''' </summary>
-        ''' <param name="ai_source"></param>
-        ''' <param name="ai_dest"></param>
+        ''' <param name="vec">Vector</param>
+        ''' <param name="mat">Matrix</param>
         ''' <returns></returns>
         ''' <remarks>
         ''' </remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
-            Dim col As Integer = 1
-            Dim row As Integer = ai_source.Count
-            If ai_source.Direction = clsEasyVector.VectorDirection.ROW Then
-                col = ai_source.Count
-                row = 1
-            End If
-            If col <> ai_dest.RowCount Then
-                Throw New clsException(clsException.Series.NotComputable, "Vector * Matrix")
+        Public Shared Operator *(ByVal vec As clsEasyVector, ByVal mat As clsEasyMatrix) As clsEasyVector
+            'ベクトルと行列のサイズ確認
+            'OK
+            ' |v1 v2| * |a11| = |c1|
+            '           |a12|   
+            '
+            ' |v1 v2| * |a11 a12| = |c1 c2|
+            '           |a11 a22|   
+            '
+            ' |v1 v2| * |a11 a12 a13| = |c1 c2 c3|
+            '           |a21 a22 a23|   
+            '
+            If vec.Count <> mat.RowCount Then
+                Throw New clsException(clsException.Series.NotComputable, "Vector * Matrix - size error")
             End If
 
-            Dim temp As clsEasyMatrix = ai_source.ToMatrix() * ai_dest
-            Return temp
+            '計算
+            Dim vSize As Integer = mat.ColCount '行列の行サイズ
+            Dim ret As New clsEasyVector(vSize, clsEasyVector.VectorDirection.ROW)
+            For j As Integer = 0 To vSize - 1
+                Dim sum As Double = 0.0
+                For i As Integer = 0 To mat.RowCount - 1
+                    sum += vec(i) * mat(i)(j)
+                Next
+                ret(j) = sum
+            Next
+            Return ret
         End Operator
 
         ''' <summary>
@@ -369,14 +412,33 @@
         End Function
 
         ''' <summary>
-        ''' Diagonal matrix
+        ''' conversion Diagonal matrix
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function Diag() As clsEasyMatrix
-            Dim ret As New clsEasyMatrix(Me.Count)
+        Public Function ToDiagonalMatrix() As clsEasyMatrix
+            If Me.RowCount <> Me.ColCount Then
+                Throw New clsException(clsException.Series.NotComputable, "ToDiagonalMatrix()")
+            End If
+            Dim ret As New clsEasyMatrix(Me.RowCount)
             For i As Integer = 0 To Me.Count - 1
                 ret(i)(i) = Me(i)(i)
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' 対角成分をベクトルに変換
+        ''' </summary>
+        ''' <param name="direction">direction of vector</param>
+        ''' <returns></returns>
+        Public Function ToVectorFromDiagonal(Optional ByVal direction As clsEasyVector.VectorDirection = clsEasyVector.VectorDirection.ROW) As clsEasyVector
+            If Me.RowCount <> Me.ColCount Then
+                Throw New clsException(clsException.Series.NotComputable, "ToVectorFromDiagonal")
+            End If
+            Dim ret As New clsEasyVector(Me.RowCount, direction)
+            For i As Integer = 0 To Me.Count - 1
+                ret(i) = Me(i)(i)
             Next
             Return ret
         End Function
@@ -499,16 +561,21 @@
         ''' </summary>
         ''' <param name="ai_preci"></param>
         ''' <remarks></remarks>
-        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 3)
+        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 4, Optional ByVal name As String = "")
+            Dim str As New System.Text.StringBuilder()
+            If String.IsNullOrEmpty(name) = False Then
+                str.Append(String.Format("{0} =", name) & Environment.NewLine)
+            Else
+                str.Append("Mat =" & Environment.NewLine)
+            End If
             For Each vec As clsEasyVector In Me
-                Dim str As New System.Text.StringBuilder()
                 For i As Integer = 0 To vec.Count - 1
                     str.Append(vec(i).ToString("F" & ai_preci.ToString()) & ControlChars.Tab)
                 Next
-                Str.AppendLine("")
-                Console.Write(Str.ToString())
+                str.Append(Environment.NewLine)
             Next
-            Console.WriteLine()
+            str.Append(Environment.NewLine)
+            Console.Write(str.ToString())
         End Sub
 
         ''' <summary>
@@ -544,12 +611,25 @@
         End Function
 
         ''' <summary>
-        ''' Cholesky decomposition
+        ''' 対角成分で行列を作る
+        ''' </summary>
+        ''' <param name="vec"></param>
+        ''' <returns></returns>
+        Public Shared Function ToDiaglonalMatrix(ByVal vec As clsEasyVector) As clsEasyMatrix
+            Dim ret = New clsEasyMatrix(vec.Count)
+            For i As Integer = 0 To ret.Count - 1
+                ret(i)(i) = vec(i)
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Cholesky decomposition A=LL^T
         ''' </summary>
         ''' <returns></returns>
         Public Function Cholesky() As clsEasyMatrix
             If Me.IsSquare() = False Then
-                Throw New clsException(clsException.Series.NotComputable, "Cholesky")
+                Throw New clsException(clsException.Series.NotComputable, "Cholesky() not Square")
             End If
 
             Dim ret As New MathUtil.clsEasyMatrix(Me.RowCount)
@@ -573,6 +653,140 @@
             Next
 
             Return ret
+        End Function
+
+        ''' <summary>
+        ''' Eigen decomposition using Jacobi Method.
+        ''' Memo: A = VDV−1, D is diag(eigen value 1 ... eigen value n), V is eigen vectors
+        ''' </summary>
+        ''' <param name="inMat">source matrix</param>
+        ''' <param name="eigenvalues">eigen vaues(Vector)</param>
+        ''' <param name="eigenVectors">eigen vectors(Matrix)</param>
+        ''' <param name="Iteration">default iteration:1000</param>
+        ''' <param name="Conversion">default conversion:1.0e-16</param>
+        ''' <returns>True:success conversion. False:not conversion</returns>
+        Public Shared Function Eigen(ByRef inMat As clsEasyMatrix,
+                                     ByRef eigenvalues As clsEasyVector, ByRef eigenVectors As clsEasyMatrix,
+                                     Optional ByVal Iteration As Integer = 1000,
+                                     Optional ByVal Conversion As Double = 0.0000000000000001,
+                                     Optional ByRef SuspendMat As clsEasyMatrix = Nothing) As Boolean
+            Dim size = inMat.ColCount()
+            Dim retEigenMat = New clsEasyMatrix(inMat)
+            Dim rotate = New clsEasyMatrix(size, True)
+
+            Dim rowIdx() = New Integer(size * 4 - 1) {}
+            Dim colIdx() = New Integer(size * 4 - 1) {}
+            Dim value() = New Double(size * 4 - 1) {}
+
+            'iteration (Iteration+1)
+            Dim isConversion As Boolean = False
+            For itr As Integer = 0 To Iteration - 1
+                'find abs max value without diag
+                Dim max = Math.Abs(retEigenMat(0)(1))
+                Dim p As Integer = 0
+                Dim q As Integer = 1
+                For i As Integer = 0 To size - 1
+                    For j As Integer = i + 1 To size - 1
+                        If max < Math.Abs(retEigenMat(i)(j)) Then
+                            max = Math.Abs(retEigenMat(i)(j))
+                            p = i
+                            q = j
+                        End If
+                    Next
+                Next
+
+                'check conversion
+                If max < Conversion Then
+                    isConversion = True
+                    Exit For
+                End If
+
+                'debug
+                'Console.WriteLine("Itr = {0} Max = {1} p={2} q={3}", itr, max, p, q)
+                'B.PrintValue(name:="B")
+                'R.PrintValue(name:="R")
+
+                Dim theta = 0.0
+                Dim diff = retEigenMat(p)(p) - retEigenMat(q)(q)
+                If Math.Abs(diff) = 0.0 Then
+                    theta = Math.PI / 4.0
+                Else
+                    theta = Math.Atan(-2.0 * retEigenMat(p)(q) / diff) * 0.5
+                End If
+
+                Dim D = New clsEasyMatrix(retEigenMat)
+                Dim cosTheta = Math.Cos(theta)
+                Dim sinTheta = Math.Sin(theta)
+                For i As Integer = 0 To size - 1
+                    Dim temp = 0.0
+                    temp = retEigenMat(p)(i) * cosTheta - retEigenMat(q)(i) * sinTheta
+                    D(p)(i) = temp
+                    D(i)(p) = temp
+                    temp = retEigenMat(p)(i) * sinTheta + retEigenMat(q)(i) * cosTheta
+                    D(i)(q) = temp
+                    D(q)(i) = temp
+                Next
+                Dim cosThetasinTheta = cosTheta * cosTheta - sinTheta * sinTheta
+                Dim tempA = (retEigenMat(p)(p) + retEigenMat(q)(q)) / 2.0
+                Dim tempB = (retEigenMat(p)(p) - retEigenMat(q)(q)) / 2.0
+                Dim tempC = retEigenMat(p)(q) * (sinTheta * cosTheta) * 2.0
+                D(p)(p) = tempA + tempB * cosThetasinTheta - tempC
+                D(q)(q) = tempA - tempB * cosThetasinTheta + tempC
+                D(p)(q) = 0.0
+                D(q)(p) = 0.0
+                retEigenMat = D
+
+                'expand
+                'Dim cosTheta = Math.Cos(theta)
+                'Dim sinTheta = Math.Sin(theta)
+                'For k As Integer = 0 To size - 1
+                '    Dim idx As Integer = k * 4
+                '    'store value
+                '    Dim temp = 0.0
+                '    temp = retEigenMat(p)(k) * cosTheta - retEigenMat(q)(k) * sinTheta
+                '    value(idx) = temp
+                '    value(idx + 1) = temp
+                '    rowIdx(idx) = p
+                '    colIdx(idx) = k
+                '    rowIdx(idx + 1) = k
+                '    colIdx(idx + 1) = p
+                '    temp = retEigenMat(p)(k) * sinTheta + retEigenMat(q)(k) * cosTheta
+                '    value(idx + 2) = temp
+                '    value(idx + 3) = temp
+                '    rowIdx(idx + 2) = k
+                '    colIdx(idx + 2) = q
+                '    rowIdx(idx + 3) = q
+                '    colIdx(idx + 3) = k
+                'Next
+                'Dim cosThetasinTheta = cosTheta * cosTheta - sinTheta * sinTheta
+                'Dim tempA = (retEigenMat(p)(p) + retEigenMat(q)(q)) / 2.0
+                'Dim tempB = (retEigenMat(p)(p) - retEigenMat(q)(q)) / 2.0
+                'Dim tempC = retEigenMat(p)(q) * (sinTheta * cosTheta) * 2.0
+                'For k As Integer = 0 To value.Length - 1
+                '    retEigenMat(rowIdx(k))(colIdx(k)) = value(k)
+                'Next
+                'retEigenMat(p)(p) = tempA + tempB * cosThetasinTheta - tempC
+                'retEigenMat(q)(q) = tempA - tempB * cosThetasinTheta + tempC
+                'retEigenMat(p)(q) = 0.0
+                'retEigenMat(q)(p) = 0.0
+
+                'rotate
+                Dim rotateNew = New clsEasyMatrix(size, True)
+                rotateNew(p)(p) = Math.Cos(theta)
+                rotateNew(p)(q) = Math.Sin(theta)
+                rotateNew(q)(p) = -Math.Sin(theta)
+                rotateNew(q)(q) = Math.Cos(theta)
+                rotate = rotate * rotateNew
+            Next
+
+            '途中結果
+            SuspendMat = retEigenMat
+
+            '値を代入
+            eigenvalues = retEigenMat.ToVectorFromDiagonal()
+            eigenVectors = rotate
+
+            Return isConversion
         End Function
 #End Region
 
@@ -699,7 +913,7 @@
         ''' <param name="ai_isDebug"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function CalcDeterminant(ByVal ai_clsMatrix As clsEasyMatrix, _
+        Private Function CalcDeterminant(ByVal ai_clsMatrix As clsEasyMatrix,
                                          ByVal ai_dim As Integer, Optional ai_isDebug As Boolean = False) As Double
             If ai_dim = 1 Then
                 Return ai_clsMatrix(0)(0)
