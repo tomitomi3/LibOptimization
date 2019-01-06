@@ -16,7 +16,7 @@ Imports LibOptimization.Util
     ''' <summary>
     ''' check random lib
     ''' </summary>
-    <TestMethod()> Public Sub TestRandom()
+    <TestMethod()> Public Sub Other_Random()
         Dim rand As System.Random = Nothing
         Try
             rand = New clsRandomXorshift()

@@ -60,5 +60,33 @@
 
             Return True
         End Function
+
+        ''' <summary>
+        ''' check eaual matrix
+        ''' </summary>
+        ''' <param name="matA"></param>
+        ''' <param name="matB"></param>
+        ''' <param name="eps">default:1E-8</param>
+        ''' <returns></returns>
+        Public Shared Function IsNearyEqualMatrix(ByVal matA As clsEasyMatrix, ByVal matB As clsEasyMatrix,
+                                                  Optional ByVal eps As Double = 0.00000001) As Boolean
+            Try
+                For i As Integer = 0 To matA.RowCount - 1
+                    For j As Integer = 0 To matA.ColCount - 1
+                        Dim tempValA = matA(i)(j)
+                        Dim tempValB = matB(i)(j)
+                        Dim diff = Math.Abs(tempValA) - Math.Abs(tempValB)
+                        If diff > eps Then
+                            '指定した誤差より大きかったら
+                            Return False
+                        End If
+                    Next
+                Next
+                Return True
+            Catch ex As Exception
+                Return False
+            End Try
+        End Function
+
     End Class
 End Namespace

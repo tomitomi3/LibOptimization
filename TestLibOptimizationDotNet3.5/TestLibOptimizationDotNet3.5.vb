@@ -8,7 +8,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' <summary>
     ''' 最適化アルゴリズムの確認 球面関数
     ''' </summary>
-    <TestMethod()> Public Sub TestOptimizationSphere2DDotNet35()
+    <TestMethod()> Public Sub Opt_OptimizationSphere2DDotNet35()
         Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(2))
         For Each opt In optimizers
             Console.WriteLine("Test optimize algo : {0}", opt.GetType().Name)

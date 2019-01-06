@@ -116,7 +116,7 @@
         End Sub
 #End Region
 
-#Region "Public"
+#Region "Public Operator"
         ''' <summary>
         ''' Add(Matrix + Matrix)
         ''' </summary>
@@ -387,7 +387,9 @@
             Next
             Return ret
         End Operator
+#End Region
 
+#Region "Public func"
         ''' <summary>
         ''' Transpose
         ''' </summary>
@@ -657,7 +659,7 @@
 
         ''' <summary>
         ''' Eigen decomposition using Jacobi Method.
-        ''' Memo: A = VDV−1, D is diag(eigen value 1 ... eigen value n), V is eigen vectors
+        ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
         ''' </summary>
         ''' <param name="inMat">source matrix</param>
         ''' <param name="eigenvalues">eigen vaues(Vector)</param>
@@ -678,7 +680,7 @@
             Dim colIdx() = New Integer(size * 4 - 1) {}
             Dim value() = New Double(size * 4 - 1) {}
 
-            'iteration (Iteration+1)
+            'iteration
             Dim isConversion As Boolean = False
             For itr As Integer = 0 To Iteration - 1
                 'find abs max value without diag
