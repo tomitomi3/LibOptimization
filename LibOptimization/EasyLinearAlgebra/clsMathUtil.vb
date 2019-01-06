@@ -28,6 +28,25 @@
         End Function
 
         ''' <summary>
+        ''' Create random Asymmetric matrix(for Debug)
+        ''' </summary>
+        ''' <param name="size"></param>
+        ''' <param name="rngSeed"></param>
+        ''' <returns></returns>
+        Public Shared Function CreateRandomASymmetricMatrix(ByVal size As Integer, Optional ByVal rngSeed As Integer = 123456) As clsEasyMatrix
+            Dim rng = New System.Random(rngSeed)
+            Dim matTemp = New MathUtil.clsEasyMatrix(size)
+            For i As Integer = 0 To matTemp.Count - 1
+                For j As Integer = 0 To matTemp.Count - 1
+                    Dim r = rng.Next(-10, 10)
+                    matTemp(i)(j) = r
+                Next
+            Next
+
+            Return matTemp
+        End Function
+
+        ''' <summary>
         ''' for Eigen() debug
         ''' </summary>
         ''' <param name="dimNum"></param>

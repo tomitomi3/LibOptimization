@@ -658,6 +658,94 @@
         End Function
 
         ''' <summary>
+        ''' To Tridiagonal matrix using Householder transform
+        ''' </summary>
+        ''' <param name="sourceMat"></param>
+        ''' <returns></returns>
+        Public Shared Function ToTridiagonalMatrix(ByVal sourceMat As clsEasyMatrix) As clsEasyMatrix
+            'ref
+            'ハウスホルダー変換
+            'http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?%B8%C7%CD%AD%C3%CD/%B8%C7%CD%AD%A5%D9%A5%AF%A5%C8%A5%EB
+
+            Dim tempMat = New clsEasyMatrix(sourceMat)
+            Dim n As Integer = tempMat.Count
+            Dim u = New clsEasyVector(n)
+            Dim v = New clsEasyVector(n)
+            Dim q = New clsEasyVector(n)
+
+            For k As Integer = 0 To n - 2
+                's
+                Dim s As Double = 0.0
+                For i = k + 1 To n - 1
+                    s += tempMat(i)(k) * tempMat(i)(k)
+                Next
+
+                ' | -
+                ' |a10 -
+                ' |   a21
+                Dim temp As Double = tempMat(k + 1)(k)
+                If temp >= 0 Then
+                    s = Math.Sqrt(s)
+                Else
+                    s = -Math.Sqrt(s)
+                End If
+
+                ' |x-y|
+                Dim alpha = Math.Sqrt(2.0 * s * (s - temp))
+                If Math.Abs(alpha) < 0.0000000000000001 Then
+                    Continue For
+                End If
+
+                'u
+                u(k + 1) = (temp - s) / alpha
+                For i = k + 2 To n - 1
+                    u(i) = tempMat(i)(k) / alpha
+                Next
+
+                'Au
+                q(k) = alpha / 2.0
+                For i = k + 1 To n - 1
+                    q(i) = 0.0
+                    For j = k + 1 To n - 1
+                        q(i) += tempMat(i)(j) * u(j)
+                    Next
+                Next
+
+                'v=2(Au-uu^T(Au))
+                alpha = 0.0
+                'uu^T
+                For i = k + 1 To n - 1
+                    alpha += u(i) * q(i)
+                Next
+                v(k) = 2.0 * q(k)
+                For i = k + 1 To n - 1
+                    v(i) = 2.0 * (q(i) - alpha * u(i))
+                Next
+
+                'A = PAP
+                ' | -    a02
+                ' |    -
+                ' |a20    -
+                tempMat(k)(k + 1) = s
+                tempMat(k + 1)(k) = s
+                For i = k + 2 To n - 1
+                    tempMat(k)(i) = 0.0
+                    tempMat(i)(k) = 0.0
+                Next
+                For i = k + 1 To n - 1
+                    tempMat(i)(i) = tempMat(i)(i) - 2.0 * u(i) * v(i)
+                    For j = i + 1 To n - 1
+                        Dim tempVal = tempMat(i)(j) - u(i) * v(j) - v(i) * u(j)
+                        tempMat(i)(j) = tempVal
+                        tempMat(j)(i) = tempVal
+                    Next
+                Next
+            Next
+
+            Return tempMat
+        End Function
+
+        ''' <summary>
         ''' Eigen decomposition using Jacobi Method.
         ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
         ''' </summary>
@@ -790,6 +878,7 @@
 
             Return isConversion
         End Function
+
 #End Region
 
 #Region "Property"
