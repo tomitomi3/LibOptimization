@@ -135,7 +135,9 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
-                Return Nothing
+                Dim ret As New List(Of clsPoint)
+                ret.Add(New clsPoint(MyBase.m_func, Me.m_vect))
+                Return ret
             End Get
         End Property
 

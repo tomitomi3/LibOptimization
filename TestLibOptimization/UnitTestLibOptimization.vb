@@ -12,164 +12,146 @@ Imports LibOptimization.Util
 ''' 単体テスト 最適化
 ''' </summary>
 <TestClass()> Public Class UnitTestLibOptimization
+
+    Public Sub New()
+        'fix rng
+        Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+    End Sub
+
 #Region "Optimization"
     ''' <summary>
-    ''' 最適化アルゴリズムの確認 球面関数
+    ''' test Optimization
     ''' </summary>
-    <TestMethod()> Public Sub Opt_OptimizationSphere2D()
-        Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(2))
-        For Each opt In optimizers
-            Console.WriteLine("Test optimize algo : {0}", opt.GetType().Name)
+    <TestMethod()> Public Sub Opt_OptimizeSphere()
+        Dim EVAL As Double = 0.0001
+        For i As Integer = 2 To 3
+            Console.WriteLine("===sphere {0}D===", i)
+            Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(i))
+            For Each opt In optimizers
+                Try
+                    Console.Write("{0,-40}", opt.GetType().Name)
 
-            'check init
-            opt.Init()
-            Dim errorFlg = opt.IsRecentError()
-            Assert.IsFalse(errorFlg)
+                    'fix rng
+                    'opt.Random = New clsRandomXorshift()
 
-            'check iterate
-            opt.DoIteration()
-            errorFlg = opt.IsRecentError()
-            Assert.IsFalse(errorFlg)
+                    Dim sw As New Stopwatch()
+                    sw.Start()
 
-            'Eval
-            If Math.Abs(opt.Result.Eval) > 0.1 Then
-                Assert.Fail(String.Format("fail:{0} Eval:{1}", opt.GetType().Name, opt.Result.Eval))
-            End If
-            Console.WriteLine(String.Format("Success Eval {0}", opt.Result.Eval))
+                    'check init
+                    opt.InitialPosition = New Double() {10, 10}
+                    opt.Init()
+                    Dim errorFlg = opt.IsRecentError()
+                    Assert.IsFalse(errorFlg)
 
-            'Result
-            If Math.Abs(opt.Result(0)) > 0.1 OrElse Math.Abs(opt.Result(1)) > 0.1 Then
-                Assert.Fail(String.Format("fail:{0} Result:{1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
-            End If
-            Console.WriteLine(String.Format("Success Result {0} {1}", opt.Result(0), opt.Result(1)))
+                    'check iterate
+                    opt.DoIteration()
+                    errorFlg = opt.IsRecentError()
+                    Assert.IsFalse(errorFlg)
+
+                    sw.Stop()
+                    Console.Write("ElapsedTime:{0}[ms] ", sw.ElapsedMilliseconds)
+
+                    'Eval
+                    Console.Write("Eval:{0} ", opt.Result.Eval)
+                    Dim isConversion = False
+                    For retry As Integer = 0 To 5
+                        If Math.Abs(opt.Result.Eval) > EVAL Then
+                            Console.Write("{0}Retry! Eval:{1}", Environment.NewLine, opt.Result.Eval)
+                            opt.InitialPosition = opt.Result.ToArray()
+                            opt.InitialValueRangeLower = opt.InitialValueRangeLower / 2
+                            opt.InitialValueRangeUpper = opt.InitialValueRangeUpper / 2
+                            opt.Init()
+                            opt.DoIteration()
+                        Else
+                            isConversion = True
+                            Exit For
+                        End If
+                    Next
+                    If isConversion = False Then
+                        Throw New Exception(String.Format("fail:{0} Eval:{1}", opt.GetType().Name, opt.Result.Eval))
+                    End If
+
+                    'Result
+                    If Math.Abs(opt.Result(0)) > 0.1 OrElse Math.Abs(opt.Result(1)) > 0.1 Then
+                        Throw New Exception(String.Format("fail:{0} Result:{1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
+                    End If
+                    Console.WriteLine(String.Format("Result:{0} {1}", opt.Result(0), opt.Result(1)))
+                Catch ex As Exception
+                    Assert.Fail("Throw Exception! {0} {1}", opt.GetType().Name, ex.Message)
+                End Try
+            Next
         Next
     End Sub
 
     ''' <summary>
-    ''' 最適化アルゴリズムの確認 球面関数
-    ''' </summary>
-    <TestMethod()> Public Sub Opt_OptimizationSphere3D()
-        Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(3))
-        For Each opt In optimizers
-            Console.WriteLine("Test optimize algo : {0}", opt.GetType().Name)
-
-            'check init
-            opt.Init()
-            Dim errorFlg = opt.IsRecentError()
-            Assert.IsFalse(errorFlg)
-
-            'check iterate
-            opt.DoIteration()
-            errorFlg = opt.IsRecentError()
-            Assert.IsFalse(errorFlg)
-
-            'Eval
-            If Math.Abs(opt.Result.Eval) > 0.5 Then
-                Assert.Fail(String.Format("fail:{0} Eval:{1}", opt.GetType().Name, opt.Result.Eval))
-            End If
-            Console.WriteLine(String.Format("Success Eval {0}", opt.Result.Eval))
-
-            'Result
-            If Math.Abs(opt.Result(0)) > 0.2 OrElse Math.Abs(opt.Result(1)) > 0.2 OrElse Math.Abs(opt.Result(2)) > 0.2 Then
-                Assert.Fail(String.Format("fail:{0} Result:{1} {2} {3}", opt.GetType().Name, opt.Result(0), opt.Result(1), opt.Result(2)))
-            End If
-            Console.WriteLine(String.Format("Success Result {0} {1} {2}", opt.Result(0), opt.Result(1), opt.Result(2)))
-        Next
-    End Sub
-
-    '''' <summary>
-    '''' 最適化アルゴリズムの確認 ローゼンブロック
-    '''' </summary>
-    '<TestMethod()> Public Sub Opt_OptimizationRosenblock()
-    '    Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchRosenblock(2))
-    '    For Each opt In optimizers
-    '        Console.WriteLine("Test optimize algo : {0}", opt.GetType().Name)
-
-    '        'check init
-    '        opt.InitialPosition = {1, 1}
-    '        opt.Init()
-    '        Dim errorFlg = opt.IsRecentError()
-    '        Assert.IsFalse(errorFlg)
-
-    '        'check iterate
-    '        opt.DoIteration()
-    '        errorFlg = opt.IsRecentError()
-    '        Assert.IsFalse(errorFlg)
-
-    '        'Eval
-    '        If Math.Abs(opt.Result.Eval) > 5 Then
-    '            Assert.Fail(String.Format("fail:{0} Eval:{1}", opt.GetType().Name, opt.Result.Eval))
-    '        End If
-    '        Console.WriteLine(String.Format("Success Eval {0}", opt.Result.Eval))
-
-    '        'Result
-    '        If Math.Abs(opt.Result(0) - 1.0) > 0.5 OrElse Math.Abs(opt.Result(1) - 1.0) > 0.5 Then
-    '            Assert.Fail(String.Format("fail:{0} Result:{1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
-    '        End If
-    '        Console.WriteLine(String.Format("Success Result {0} {1}", opt.Result(0), opt.Result(1)))
-    '    Next
-    'End Sub
-
-    ''' <summary>
-    ''' リトライ確認
+    ''' test Retry
     ''' </summary>
     <TestMethod()> Public Sub Opt_RetryCheck()
         Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(2))
         For Each opt In optimizers
-            opt.Init()
-            opt.DoIteration()
-            Dim recentCount = opt.IterationCount
-            opt.Init()
-            If opt.IterationCount = recentCount Then
-                Dim str = String.Format("fail {0} : init iteration count", opt.GetType().Name)
-                Console.WriteLine(str)
-                Assert.Fail(str)
-            End If
+            Try
+                Console.WriteLine("{0,-40}", opt.GetType().Name)
+                '1st
+                opt.Init()
+                opt.Iteration = 1
+                opt.DoIteration()
+
+                '2nd
+                Dim recentCount = opt.IterationCount
+                Dim recentEval = opt.Result.Eval
+                opt.InitialPosition = opt.Result.ToArray()
+                opt.Iteration = 100
+                opt.Init()
+
+                'check iteration count
+                If opt.IterationCount <> 0 Then
+                    Assert.Fail("fail {0} : 2nd try init iteration count", opt.GetType().Name)
+                End If
+
+                'do optimize
+                opt.DoIteration()
+                If opt.IterationCount = 0 Then
+                    Assert.Fail("fail {0} : 2nd try DoIteration", opt.GetType().Name)
+                End If
+            Catch ex As Exception
+                Assert.Fail("Throw Exception! {0} {1}", opt.GetType().Name, ex.Message)
+            End Try
         Next
     End Sub
 
     ''' <summary>
-    ''' 初期位置生成確認
+    ''' test initial position range
     ''' </summary>
     <TestMethod()> Public Sub Opt_InitialPositon()
         Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(2))
         For Each opt In optimizers
-            Console.WriteLine("Test optimize algo : {0}", opt.GetType().Name)
+            Try
+                Console.WriteLine("Test optimize algo : {0}", opt.GetType().Name)
 
-            Dim range = 100.0
-
-            'init
-            opt.InitialPosition = {range, range}
-            opt.InitialValueRangeLower /= 10
-            opt.InitialValueRangeUpper /= 10
-            opt.Init()
-
-            'initial position check
-            Dim result = opt.Result.ToArray()
-            Dim minRange = range + opt.InitialValueRangeLower - 0.1
-            Dim maxRange = range + opt.InitialValueRangeUpper + 0.1
-            If minRange > result(0) OrElse maxRange < result(0) OrElse minRange > result(1) OrElse maxRange < result(1) Then
-                Assert.Fail(String.Format("fail {0} : initial posiition {1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
-            End If
-
-            'do opt
-            Console.WriteLine(" Before Result {0} {1}", opt.Result(0), opt.Result(1))
-            opt.DoIteration()
-            Console.WriteLine(" After  Result {0} {1}  Iteration count : {2}", opt.Result(0), opt.Result(1), opt.IterationCount)
-
-            'result check
-            If Math.Abs(opt.Result(0)) > 0.05 OrElse Math.Abs(opt.Result(1)) > 0.05 Then
-                'retry
-                Console.WriteLine(" ---Retry using recent best result---")
-                opt.InitialPosition = opt.Result.ToArray()
+                'init
+                Dim range = 100.0
+                opt.InitialPosition = {range, range}
+                opt.InitialValueRangeLower = -range / 10
+                opt.InitialValueRangeUpper = range / 10
                 opt.Init()
-                Console.WriteLine(" Before Result {0} {1}", opt.Result(0), opt.Result(1))
-                opt.DoIteration()
-                Console.WriteLine(" After  Result {0} {1}  Iteration count : {2}", opt.Result(0), opt.Result(1), opt.IterationCount)
-                If Math.Abs(opt.Result(0)) > 0.05 OrElse Math.Abs(opt.Result(1)) > 0.05 Then
-                    Assert.Fail(String.Format("fail {0} : result {1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
+
+                'initial position check
+                Dim results = opt.Results.ToArray()
+                Dim resultMat As clsEasyMatrix = clsUtil.ToConvertMat(opt.Results)
+                Dim g As New clsEasyVector()
+                For i As Integer = 0 To results(0).Count - 1
+                    Dim ar = resultMat.Column(i)
+                    Dim tempVal = clsUtil.Average(ar)
+                    g.Add(clsUtil.Average(resultMat.Column(i)))
+                Next
+                g.PrintValue(name:="average initial position")
+
+                If Math.Abs(range - g(0)) > 10 OrElse Math.Abs(range - g(1)) > 10 Then
+                    Assert.Fail(String.Format("fail {0}", opt.GetType().Name))
                 End If
-            End If
+            Catch ex As Exception
+                Assert.Fail("Throw {0} object", opt.GetType().Name)
+            End Try
         Next
     End Sub
 

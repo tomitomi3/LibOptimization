@@ -77,7 +77,6 @@
                         Dim tempValB = matB(i)(j)
                         Dim diff = Math.Abs(tempValA) - Math.Abs(tempValB)
                         If diff > eps Then
-                            '指定した誤差より大きかったら
                             Return False
                         End If
                     Next

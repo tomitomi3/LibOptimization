@@ -205,13 +205,27 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides ReadOnly Property Results As List(Of clsPoint)
             Get
-                Return Nothing
+                'create fireflies
+                Return clsOptFA.ToPoints(Me.m_func, Me.m_fireflies)
             End Get
         End Property
+
 #End Region
 
 #Region "Private"
-
+        ''' <summary>
+        ''' create firefiles for Results()
+        ''' </summary>
+        ''' <param name="func"></param>
+        ''' <param name="fflies"></param>
+        ''' <returns></returns>
+        Private Shared Function ToPoints(ByVal func As absObjectiveFunction, ByVal fflies As List(Of clsFireFly)) As List(Of clsPoint)
+            Dim ret = New List(Of clsPoint)
+            For i As Integer = 0 To fflies.Count - 1
+                ret.Add(New clsPoint(func, fflies(i).ToArray()))
+            Next
+            Return ret
+        End Function
 #End Region
     End Class
 End Namespace

@@ -1,4 +1,5 @@
-﻿Imports LibOptimization.Optimization
+﻿Imports LibOptimization.MathUtil
+Imports LibOptimization.Optimization
 Imports LibOptimization.Util
 
 Namespace Util
@@ -697,6 +698,38 @@ Namespace Util
             End With
 
             Return optimizers
+        End Function
+
+        ''' <summary>
+        ''' LibOptimzation.Results() to my Matrix class
+        ''' </summary>
+        ''' <param name="results"></param>
+        ''' <returns></returns>
+        Public Shared Function ToConvertMat(ByVal results As List(Of clsPoint)) As MathUtil.clsEasyMatrix
+            Dim row = results.Count
+            Dim col = results(0).Count
+            Dim ret As New MathUtil.clsEasyMatrix(row, col)
+            For i As Integer = 0 To row - 1
+                For j As Integer = 0 To col - 1
+                    ret(i)(j) = results(i)(j)
+                Next
+            Next
+
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' average
+        ''' Memo: same -> (List(of double)).Average 
+        ''' </summary>
+        ''' <param name="vec"></param>
+        ''' <returns></returns>
+        Public Shared Function Average(ByVal vec As clsEasyVector) As Double
+            Dim ret As Double = 0.0
+            For Each value In vec
+                ret += value
+            Next
+            Return ret / vec.Count
         End Function
     End Class
 End Namespace
