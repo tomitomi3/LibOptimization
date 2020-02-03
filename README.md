@@ -18,7 +18,7 @@ tomi.nori+github atmark gmail.com
 
 # Cite
 
-If you use LibOptimization for a publication, please cite it as:
+If you like, f you use LibOptimization for a publication, please cite it as:
 
 <pre>
 @misc{LibOptimization,
