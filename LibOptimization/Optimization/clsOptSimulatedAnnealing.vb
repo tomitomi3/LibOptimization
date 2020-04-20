@@ -2,6 +2,42 @@
 Imports LibOptimization.MathUtil
 
 Namespace Optimization
+
+    ''' <summary>
+    ''' abstract neighbor function for Simulated Annealing
+    ''' </summary>
+    Public MustInherit Class absNeighbor
+        Public MustOverride Function Neighbor(ByVal base As clsPoint) As clsPoint
+    End Class
+
+    ''' <summary>
+    ''' Local random search (default)
+    ''' </summary>
+    Public Class LocalRandomSearch : Inherits absNeighbor
+        ''' <summary>local search range</summary>
+        Public Property NeighborRange As Double = 0.01
+
+        ''' <summary>random class</summary>
+        Public Property Random As System.Random = New Util.clsRandomXorshift()
+
+        ''' <summary>
+        ''' search function
+        ''' </summary>
+        ''' <param name="base"></param>
+        ''' <returns></returns>
+        Public Overrides Function Neighbor(base As clsPoint) As clsPoint
+            Dim temp As New clsPoint(base)
+            Dim coeff As Double = Math.Abs(2.0 * NeighborRange)
+            For i As Integer = 0 To temp.Count - 1
+                Dim tempNeighbor = coeff * Random.NextDouble() - NeighborRange
+                temp(i) += tempNeighbor
+            Next
+            temp.ReEvaluate()
+
+            Return temp
+        End Function
+    End Class
+
     ''' <summary>
     ''' Simulated Annealing
     ''' </summary>
@@ -20,26 +56,25 @@ Namespace Optimization
         ''' <summary>Max iteration count(Default:20,000)</summary>
         Public Overrides Property Iteration As Integer = 20000
 
-        ''' <summary>Epsilon(Default:1e-8) for Criterion</summary>
-        Public Property EPS As Double = 0.00000001
-
         '-------------------------------------------------------------------
         'Coefficient of SA(Simulated Annealing)
         '-------------------------------------------------------------------
-        ''' <summary>cooling ratio</summary>
+        ''' <summary>start temperature(default:1.0)</summary>
+        Public Property Temperature As Double = 1
+
+        ''' <summary>cooling ratio(default:0.99965)</summary>
         Public Property CoolingRatio As Double = 0.99965
 
-        ''' <summary>range of neighbor search</summary>
-        Public Property NeighborRange As Double = 0.1
+        ''' <summary>stop temperature(default:0.0001)</summary>
+        Public Property StopTemperature As Double = 0.0001
 
-        ''' <summary>start temperature</summary>
-        Public Property Temperature As Double = 1000.0
-
-        ''' <summary>stop temperature</summary>
-        Public Property StopTemperature As Double = 0.00000001
+        ''' <summary>Neighbor</summary>
+        Public Property Neighbor As absNeighbor = New LocalRandomSearch()
 
         Private m_point As clsPoint = Nothing
+
         Private m_Bestpoint As clsPoint = Nothing
+
 #End Region
 
 #Region "Constructor"
@@ -101,33 +136,38 @@ Namespace Optimization
                 'Counting generation
                 m_iteration += 1
 
-                'neighbor function
-                Dim temp As clsPoint = Neighbor(Me.m_point)
-
-                'transition
-                Dim evalNow As Double = Me.m_point.Eval
-                Dim evalNew As Double = temp.Eval
-                Dim r1 As Double = 0.0
-                Dim r2 = MyBase.Random.NextDouble()
-                If evalNew < evalNow Then
-                    r1 = 1.0
-                Else
-                    Dim delta = evalNow - evalNew
-                    r1 = Math.Exp(delta / Temperature)
-                End If
-                If r1 >= r2 Then
-                    Me.m_point = temp 'exchange
-                End If
-
-                'cooling
-                Temperature *= CoolingRatio
-                If Temperature < StopTemperature Then
-                    Return True 'stop iteration
-                End If
+                'neighbor function(genereate neighbor point from now point)
+                Dim tempNext As clsPoint = Me.Neighbor.Neighbor(Me.m_point)
 
                 'reserve best
                 If Me.m_point.Eval < Me.m_Bestpoint.Eval Then
                     Me.m_Bestpoint = Me.m_point.Copy()
+                End If
+
+                'transition
+                Dim evalNow As Double = Me.m_point.Eval
+                Dim evalNext As Double = tempNext.Eval
+
+                'cooling
+                If Me.Temperature > StopTemperature Then
+                    Me.Temperature *= Me.CoolingRatio
+                Else
+                    'debug
+                    'Console.WriteLine()
+                End If
+
+                Dim r1 As Double = 0.0
+                If evalNext < evalNow Then
+                    r1 = 1.0
+                Else
+                    Dim delta = evalNow - evalNext
+                    r1 = Math.Exp(delta / Me.Temperature)
+                End If
+
+                'compare probabilities
+                Dim r2 = MyBase.Random.NextDouble()
+                If r1 >= r2 Then
+                    Me.m_point = tempNext
                 End If
             Next
 
@@ -166,24 +206,6 @@ Namespace Optimization
                 Return New List(Of clsPoint)({Me.m_Bestpoint})
             End Get
         End Property
-#End Region
-
-#Region "Private"
-        ''' <summary>
-        ''' Neighbor function for local search
-        ''' </summary>
-        ''' <param name="base"></param>
-        ''' <returns></returns>
-        Private Function Neighbor(ByVal base As clsPoint) As clsPoint
-            Dim temp As New clsPoint(base)
-            For i As Integer = 0 To temp.Count - 1
-                Dim tempNeighbor = Math.Abs(2.0 * NeighborRange) * MyBase.Random.NextDouble() - NeighborRange
-                temp(i) += tempNeighbor
-            Next
-            temp.ReEvaluate()
-
-            Return temp
-        End Function
 #End Region
     End Class
 End Namespace

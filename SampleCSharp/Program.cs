@@ -15,7 +15,6 @@ namespace SampleCSharp
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="dim"></param>
         public MyObjectiveFunction()
         {
         }
@@ -71,6 +70,50 @@ namespace SampleCSharp
         }
     }
 
+    /// <summary>
+    /// Sphere function inherit absObjectiveFunction
+    /// </summary>
+    class SphereFunction : LibOptimization.Optimization.absObjectiveFunction
+    {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public SphereFunction()
+        {
+        }
+
+        /// <summary>
+        /// eval
+        /// </summary>
+        /// <param name="x">variable</param>
+        /// <returns>eval value</returns>
+        public override double F(List<double> x)
+        {
+            double ret = 0.0;
+            for (int i = 0; i < this.NumberOfVariable(); i++)
+            {
+                //model(sphere)
+                ret += x[i] * x[i];
+            }
+            return ret;
+        }
+
+        public override List<double> Gradient(List<double> aa)
+        {
+            return null;
+        }
+
+        public override List<List<double>> Hessian(List<double> aa)
+        {
+            return null;
+        }
+
+        public override int NumberOfVariable()
+        {
+            return 5;
+        }
+    }
+    
     class Program
     {
         static void Main(string[] args)
@@ -238,7 +281,46 @@ namespace SampleCSharp
                     }
                 }
                 clsUtil.DebugValue(opt);
-                return;
+                //return;
+            }
+
+            //Simulated Annealing
+            {
+                var func = new SphereFunction();
+                var opt = new LibOptimization.Optimization.clsOptSimulatedAnnealing(func);
+
+                //initial position using random
+                var rng = new LibOptimization.Util.clsRandomXorshift((UInt32)DateTime.Now.Millisecond);
+                opt.InitialPosition = new double[] { rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2) };
+
+                //parameter for SA
+                ((LocalRandomSearch)opt.Neighbor).NeighborRange = 0.001; //neghbor function
+                opt.Temperature = 1;
+                opt.StopTemperature = 0.0001;
+                opt.Iteration = 30000; //default 20000
+
+                //init
+                opt.Init();
+                clsUtil.DebugValue(opt);
+
+                //do optimization
+                while (opt.DoIteration(10000) == false)
+                {
+                    clsUtil.DebugValue(opt);
+
+                    //my criterion
+                    /*
+                    if (Result.Eval < 0.01)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Eval:{0}", opt.Result.Eval);
+                    }
+                    */
+                }
+                clsUtil.DebugValue(opt);
             }
         }
     }

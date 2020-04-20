@@ -678,7 +678,7 @@ Namespace Util
             End With
             With Nothing
                 Dim opt = New clsOptSimulatedAnnealing(func)
-                opt.NeighborRange = 0.1
+                'opt.NeighborRange = 0.1
                 opt.Iteration *= 2
                 optimizers.Add(opt)
             End With
