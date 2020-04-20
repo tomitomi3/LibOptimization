@@ -144,8 +144,10 @@ Namespace Optimization
 
                 'Check criterion
                 Me.m_points.Sort()
-                If clsUtil.IsCriterion(Me.EPS, Me.m_points(0).Eval, Me.m_points(Me.m_points.Count - 1).Eval) Then
-                    Return True
+                If Me.IsUseCriterion = True Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_points(0).Eval, Me.m_points(Me.m_points.Count - 1).Eval) Then
+                        Return True
+                    End If
                 End If
 
                 '-----------------------------------------------------

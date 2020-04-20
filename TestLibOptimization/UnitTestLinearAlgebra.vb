@@ -388,16 +388,77 @@ Imports LibOptimization.Util
         End With
     End Sub
 
-    <TestMethod()> Public Sub Determinant()
-        Dim detMat As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1, 2},
-                                                                        New Double() {5, 1, 3, 4},
-                                                                        New Double() {2, 0, 1, 0},
-                                                                        New Double() {1, 3, 2, 1}})
+    ''' <summary>
+    ''' Determinant2Order
+    ''' </summary>
+    <TestMethod()> Public Sub Determinant2Order()
+        Dim detMat As New clsEasyMatrix(New Double()() {New Double() {1, 0},
+                                                        New Double() {0, 1}})
         detMat.PrintValue()
-
-        Dim d As Double = detMat.Det()
+        Dim d As Double = 0
+        d = detMat.Det()
         Console.WriteLine("Determinant:{0}", d)
-        If d <> -22 Then
+        If d <> 1 Then
+            Assert.Fail()
+        End If
+
+        'swap col -> sign *-1
+        detMat.SwapCol(0, 1)
+        detMat.PrintValue()
+        d = detMat.Det()
+        Console.WriteLine("Determinant:{0}", d)
+        If d <> -1 Then
+            Assert.Fail()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Determinant3Order
+    ''' </summary>
+    <TestMethod()> Public Sub Determinant3Order()
+        Dim detMat As New clsEasyMatrix(New Double()() {New Double() {1, 0, 0},
+                                                        New Double() {0, 1, 0},
+                                                        New Double() {0, 0, 1}})
+        detMat.PrintValue()
+        Dim d As Double = 0
+        d = detMat.Det()
+        Console.WriteLine("Determinant:{0}", d)
+        If d <> 1 Then
+            Assert.Fail()
+        End If
+
+        'swap col -> sign *-1
+        detMat.SwapCol(0, 1)
+        detMat.PrintValue()
+        d = detMat.Det()
+        Console.WriteLine("Determinant:{0}", d)
+        If d <> -1 Then
+            Assert.Fail()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Determinant4Order
+    ''' </summary>
+    <TestMethod()> Public Sub Determinant4Order()
+        Dim detMat As New clsEasyMatrix(New Double()() {New Double() {1, 0, 0, 0},
+                                                        New Double() {0, 1, 0, 0},
+                                                        New Double() {0, 0, 1, 0},
+                                                        New Double() {0, 0, 0, 1}})
+        detMat.PrintValue()
+        Dim d As Double = 0
+        d = detMat.Det()
+        Console.WriteLine("Determinant:{0}", d)
+        If d <> 1 Then
+            Assert.Fail()
+        End If
+
+        'swap col -> sign *-1
+        detMat.SwapCol(0, 1)
+        detMat.PrintValue()
+        d = detMat.Det()
+        Console.WriteLine("Determinant:{0}", d)
+        If d <> -1 Then
             Assert.Fail()
         End If
     End Sub
@@ -895,7 +956,7 @@ Imports LibOptimization.Util
     End Sub
 
     ''' <summary>
-    ''' test eigen()
+    ''' test Eigen decomposition
     ''' </summary>
     <TestMethod()> Public Sub Eigen()
         Dim tempMat = clsMathUtil.CreateRandomSymmetricMatrix(5, 123456) '8, 12345 is not calc?
@@ -926,5 +987,24 @@ Imports LibOptimization.Util
         If clsMathUtil.IsNearyEqualMatrix(tempMat, temp) = False Then
             Assert.Fail()
         End If
+    End Sub
+
+    ''' <summary>
+    ''' test Resize()
+    ''' </summary>
+    <TestMethod()> Public Sub ResizeVectorMatrix()
+        Dim tempVec = New clsEasyVector(3)
+        tempVec.Resize(0)
+        Assert.AreEqual(tempVec.Count, 0)
+        tempVec.Resize(1)
+        Assert.AreEqual(tempVec.Count, 1)
+
+        Dim tempMat = New clsEasyMatrix(3)
+        tempMat.Resize(0, 0)
+        Assert.AreEqual(tempMat.RowCount, 0)
+        Assert.AreEqual(tempMat.ColCount, 0)
+        tempMat.Resize(1, 2)
+        Assert.AreEqual(tempMat.RowCount, 1)
+        Assert.AreEqual(tempMat.ColCount, 2)
     End Sub
 End Class

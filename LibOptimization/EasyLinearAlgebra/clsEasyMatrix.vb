@@ -100,8 +100,12 @@
             End If
         End Sub
 
-        Public Sub New(ByVal data As List(Of Double), ByVal order As Integer)
-            Me.Clear()
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="vector"></param>
+        ''' <param name="order"></param>
+        Public Sub New(ByVal vector As List(Of Double), ByVal order As Integer)
             For i As Integer = 0 To order - 1
                 Dim temp(order - 1) As Double
                 Me.Add(New clsEasyVector(temp))
@@ -109,7 +113,7 @@
             Dim index As Integer = 0
             For i As Integer = 0 To order - 1
                 For j As Integer = 0 To order - 1
-                    Me(j)(i) = data(index)
+                    Me(j)(i) = vector(index)
                     index += 1
                 Next
             Next
@@ -879,6 +883,20 @@
             Return isConversion
         End Function
 
+        ''' <summary>
+        ''' Resize matrix dimension
+        ''' </summary>
+        ''' <param name="row">number of row</param>
+        ''' <param name="col">number of col</param>
+        Public Sub Resize(ByVal row As Integer, ByVal col As Integer)
+            Me.Clear()
+            If row = 0 OrElse col = 0 Then
+                Return
+            End If
+            For i As Integer = 0 To row - 1
+                Me.Add(New List(Of Double)(New Double(col - 1) {}))
+            Next
+        End Sub
 #End Region
 
 #Region "Property"
@@ -900,7 +918,11 @@
         ''' <remarks></remarks>
         Public ReadOnly Property ColCount() As Integer
             Get
-                Return Me(0).Count
+                If Me.Count = 0 Then
+                    Return 0
+                Else
+                    Return Me(0).Count
+                End If
             End Get
         End Property
 

@@ -359,12 +359,25 @@
         End Function
 
         ''' <summary>
+        ''' Square Sum ( x1^2 + x2^2... )
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function SquareSum() As Double
+            Dim ret As Double = 0.0
+            For Each value As Double In Me
+                ret += value * value
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
         ''' Average
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function Average() As Double
-            Return Me.Sum / Me.Count
+            Return Me.Sum() / Me.Count
         End Function
 
         ''' <summary>
@@ -395,7 +408,7 @@
         End Sub
 
         ''' <summary>
-        ''' ベクトルを対角行列を作る
+        ''' Convert diagonal matrix from vector
         ''' </summary>
         ''' <returns></returns>
         Public Function ToDiagonalMatrix() As clsEasyMatrix
@@ -405,6 +418,17 @@
             Next
             Return ret
         End Function
+
+        ''' <summary>
+        ''' Resize vector dimension
+        ''' </summary>
+        ''' <param name="vecDim">vector dimension</param>
+        Public Sub Resize(ByVal vecDim As Integer)
+            Me.Clear()
+            If vecDim <> 0 Then
+                Me.AddRange(New Double(vecDim - 1) {})
+            End If
+        End Sub
 #End Region
 
 #Region "Property"
