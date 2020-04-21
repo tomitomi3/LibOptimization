@@ -118,29 +118,46 @@ namespace SampleCSharp
     {
         static void Main(string[] args)
         {
+            //Simulated Annealing
             {
-                var func = new RosenBrock(2);
-                var opt = new LibOptimization.Optimization.clsOptHillClimbing(func);
-                opt.InitialPosition = new double[] { 10.0, -10.0 };
-                opt.Iteration = 10;
-                //opt.IsUseCriterion = false;
+                var func = new SphereFunction();
+                var opt = new LibOptimization.Optimization.clsOptSimulatedAnnealing(func);
+
+                //initial position using random
+                var rng = new LibOptimization.Util.clsRandomXorshift((UInt32)DateTime.Now.Millisecond);
+                opt.InitialPosition = new double[] { rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2) };
+
+                //parameter for SA
+                opt.Temperature = 1;
+                opt.StopTemperature = 0.0001;
+                opt.CoolingRatio = 0.99;
+                opt.Iteration = 30000; //default 20000
+
+                //neighbor
+                ((LocalRandomSearch)opt.Neighbor).NeighborRange = 0.001; //neghbor function
+
+                //init
                 opt.Init();
-                opt.Count = 0;
                 clsUtil.DebugValue(opt);
-                opt.DoIteration(3);
+
+                //do optimization
+                while (opt.DoIteration(2000) == false)
+                {
+                    clsUtil.DebugValue(opt);
+
+                    //my criterion
+                    /*
+                    if (Result.Eval < 0.01)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Eval:{0}", opt.Result.Eval);
+                    }
+                    */
+                }
                 clsUtil.DebugValue(opt);
-                opt.DoIteration(3);
-                clsUtil.DebugValue(opt);
-                opt.DoIteration();
-                clsUtil.DebugValue(opt);
-                //
-                Console.WriteLine("=========================");
-                opt.Init();
-                opt.Count = 0;
-                clsUtil.DebugValue(opt);
-                opt.DoIteration();
-                clsUtil.DebugValue(opt);
-                //return;
             }
 
             //Typical use
@@ -282,45 +299,6 @@ namespace SampleCSharp
                 }
                 clsUtil.DebugValue(opt);
                 //return;
-            }
-
-            //Simulated Annealing
-            {
-                var func = new SphereFunction();
-                var opt = new LibOptimization.Optimization.clsOptSimulatedAnnealing(func);
-
-                //initial position using random
-                var rng = new LibOptimization.Util.clsRandomXorshift((UInt32)DateTime.Now.Millisecond);
-                opt.InitialPosition = new double[] { rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2) };
-
-                //parameter for SA
-                ((LocalRandomSearch)opt.Neighbor).NeighborRange = 0.001; //neghbor function
-                opt.Temperature = 1;
-                opt.StopTemperature = 0.0001;
-                opt.Iteration = 30000; //default 20000
-
-                //init
-                opt.Init();
-                clsUtil.DebugValue(opt);
-
-                //do optimization
-                while (opt.DoIteration(10000) == false)
-                {
-                    clsUtil.DebugValue(opt);
-
-                    //my criterion
-                    /*
-                    if (Result.Eval < 0.01)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Eval:{0}", opt.Result.Eval);
-                    }
-                    */
-                }
-                clsUtil.DebugValue(opt);
             }
         }
     }
