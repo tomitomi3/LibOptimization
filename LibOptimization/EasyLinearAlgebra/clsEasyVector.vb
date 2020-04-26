@@ -359,6 +359,19 @@
         End Function
 
         ''' <summary>
+        ''' Multiply
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function Multiply() As Double
+            Dim ret As Double = Me(1)
+            For i As Integer = 1 To Me.Count - 1
+                ret *= Me(i)
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
         ''' Square Sum ( x1^2 + x2^2... )
         ''' </summary>
         ''' <returns></returns>

@@ -10,7 +10,7 @@
     ''' </remarks>
     Public Class clsEasyMatrix : Inherits List(Of List(Of Double))
         Public Const SAME_ZERO As Double = 2.0E-50 '2^-50
-        Public Const Epsiton As Double = 0.0000000000000001 '1.0^-16
+        Public Const Epsiron As Double = 0.0000000000000001 '1.0^-16
 
 #Region "Constructor"
         ''' <summary>
@@ -567,7 +567,7 @@
         ''' </summary>
         ''' <param name="ai_preci"></param>
         ''' <remarks></remarks>
-        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 4, Optional ByVal name As String = "")
+        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 1, Optional ByVal name As String = "")
             Dim str As New System.Text.StringBuilder()
             If String.IsNullOrEmpty(name) = False Then
                 str.Append(String.Format("{0} =", name) & Environment.NewLine)
@@ -621,7 +621,7 @@
         ''' </summary>
         ''' <param name="vec"></param>
         ''' <returns></returns>
-        Public Shared Function ToDiaglonalMatrix(ByVal vec As clsEasyVector) As clsEasyMatrix
+        Public Shared Function ToDiagonalMatrix(ByVal vec As clsEasyVector) As clsEasyMatrix
             Dim ret = New clsEasyMatrix(vec.Count)
             For i As Integer = 0 To ret.Count - 1
                 ret(i)(i) = vec(i)
@@ -663,6 +663,7 @@
 
         ''' <summary>
         ''' To Tridiagonal matrix using Householder transform
+        ''' 三重対角行列
         ''' </summary>
         ''' <param name="sourceMat"></param>
         ''' <returns></returns>
@@ -1078,6 +1079,10 @@
                 Next
                 Return detVal
             End If
+
+            'other
+            'number of row exchanges
+            'det A = sign * det(L) * det(U)
         End Function
 #End Region
     End Class
