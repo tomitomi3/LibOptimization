@@ -62,8 +62,8 @@ Namespace Optimization
         ''' <summary>start temperature(default:1.0)</summary>
         Public Property Temperature As Double = 1
 
-        ''' <summary>cooling ratio(default:0.99965)</summary>
-        Public Property CoolingRatio As Double = 0.99965
+        ''' <summary>cooling ratio(default:0.9995)</summary>
+        Public Property CoolingRatio As Double = 0.9995
 
         ''' <summary>stop temperature(default:0.0001)</summary>
         Public Property StopTemperature As Double = 0.0001
@@ -138,11 +138,7 @@ Namespace Optimization
 
                 'neighbor function(genereate neighbor point from now point)
                 Dim tempNext As clsPoint = Me.Neighbor.Neighbor(Me.m_point)
-
-                'reserve best
-                If Me.m_point.Eval < Me.m_Bestpoint.Eval Then
-                    Me.m_Bestpoint = Me.m_point.Copy()
-                End If
+                tempNext.ReEvaluate()
 
                 'transition
                 Dim evalNow As Double = Me.m_point.Eval
@@ -152,8 +148,9 @@ Namespace Optimization
                 If Me.Temperature > StopTemperature Then
                     Me.Temperature *= Me.CoolingRatio
                 Else
-                    'debug
-                    'Console.WriteLine()
+                    If Me.IsUseCriterion = True Then
+                        Return True
+                    End If
                 End If
 
                 Dim r1 As Double = 0.0
@@ -168,6 +165,11 @@ Namespace Optimization
                 Dim r2 = MyBase.Random.NextDouble()
                 If r1 >= r2 Then
                     Me.m_point = tempNext
+                End If
+
+                'reserve best
+                If Me.m_point.Eval < Me.m_Bestpoint.Eval Then
+                    Me.m_Bestpoint = Me.m_point.Copy()
                 End If
             Next
 

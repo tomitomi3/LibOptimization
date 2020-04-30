@@ -83,6 +83,7 @@
     <Compile Include="RosenBrock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimulatedAnnealingSample.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -1,5 +1,5 @@
 ﻿''' <summary>
-''' sample conde : inherit objective function
+''' my objective function : inherit objective function
 ''' </summary>
 ''' <remarks></remarks>
 Public Class RosenBrock : Inherits LibOptimization.Optimization.absObjectiveFunction
