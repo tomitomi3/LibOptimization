@@ -466,33 +466,30 @@
             ElseIf n = 1 Then
                 source(0)(0) = 1.0 / source(0)(0)
             ElseIf n = 2 Then
-                'Dim det As Double = source.Det()
-                'If SAME_ZERO > det Then
-                '    Return New clsShoddyMatrix(n, True)
-                'End If
-                retInverse(0)(0) = (1.0 / Det()) * Me(1)(1)
-                retInverse(0)(1) = (1.0 / Det()) * -Me(0)(1)
-                retInverse(1)(0) = (1.0 / Det()) * -Me(1)(0)
-                retInverse(1)(1) = (1.0 / Det()) * Me(0)(0)
+                Dim temp = Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0)
+                If Math.Abs(temp) < SAME_ZERO Then
+                    Throw New clsException(clsException.Series.NotComputable, "Inverse 2x2")
+                End If
+                temp = 1.0 / temp
+                retInverse(0)(0) = temp * Me(1)(1)
+                retInverse(0)(1) = temp * -Me(0)(1)
+                retInverse(1)(0) = temp * -Me(1)(0)
+                retInverse(1)(1) = temp * Me(0)(0)
             ElseIf n = 3 Then
-                'Dim det As Double = source.Det()
-                'If SAME_ZERO > det Then
-                '    Return New clsShoddyMatrix(n, True)
-                'End If
-                retInverse(0)(0) = (1.0 / Det()) * (Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))
-                retInverse(0)(1) = (1.0 / Det()) * (Me(0)(2) * Me(2)(1) - Me(0)(1) * Me(2)(2))
-                retInverse(0)(2) = (1.0 / Det()) * (Me(0)(1) * Me(1)(2) - Me(0)(2) * Me(1)(1))
-                retInverse(1)(0) = (1.0 / Det()) * (Me(1)(2) * Me(2)(0) - Me(1)(0) * Me(2)(2))
-                retInverse(1)(1) = (1.0 / Det()) * (Me(0)(0) * Me(2)(2) - Me(0)(2) * Me(2)(0))
-                retInverse(1)(2) = (1.0 / Det()) * (Me(0)(2) * Me(1)(0) - Me(0)(0) * Me(1)(2))
-                retInverse(2)(0) = (1.0 / Det()) * (Me(1)(0) * Me(2)(1) - Me(1)(1) * Me(2)(0))
-                retInverse(2)(1) = (1.0 / Det()) * (Me(0)(1) * Me(2)(0) - Me(0)(0) * Me(2)(1))
-                retInverse(2)(2) = (1.0 / Det()) * (Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))
+                Dim tempDet = Math.Abs(Det())
+                If tempDet < SAME_ZERO Then
+                    Throw New clsException(clsException.Series.NotComputable, "Inverse 3x3")
+                End If
+                retInverse(0)(0) = (1.0 / tempDet) * (Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))
+                retInverse(0)(1) = (1.0 / tempDet) * (Me(0)(2) * Me(2)(1) - Me(0)(1) * Me(2)(2))
+                retInverse(0)(2) = (1.0 / tempDet) * (Me(0)(1) * Me(1)(2) - Me(0)(2) * Me(1)(1))
+                retInverse(1)(0) = (1.0 / tempDet) * (Me(1)(2) * Me(2)(0) - Me(1)(0) * Me(2)(2))
+                retInverse(1)(1) = (1.0 / tempDet) * (Me(0)(0) * Me(2)(2) - Me(0)(2) * Me(2)(0))
+                retInverse(1)(2) = (1.0 / tempDet) * (Me(0)(2) * Me(1)(0) - Me(0)(0) * Me(1)(2))
+                retInverse(2)(0) = (1.0 / tempDet) * (Me(1)(0) * Me(2)(1) - Me(1)(1) * Me(2)(0))
+                retInverse(2)(1) = (1.0 / tempDet) * (Me(0)(1) * Me(2)(0) - Me(0)(0) * Me(2)(1))
+                retInverse(2)(2) = (1.0 / tempDet) * (Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))
             Else
-                'Dim det As Double = source.Det() 'omoi...
-                'If SAME_ZERO > det Then
-                '    Return New clsShoddyMatrix(n, True)
-                'End If
                 'Gauss elimination with pivot select
                 For i As Integer = 0 To n - 1
                     'diagonal element
@@ -508,7 +505,7 @@
 
                     'check 正則性の判定
                     If amax < SAME_ZERO Then
-                        Return New clsEasyMatrix(Me.ColCount)
+                        Throw New clsException(clsException.Series.NotComputable, "Inverse nxn")
                     End If
 
                     'change row

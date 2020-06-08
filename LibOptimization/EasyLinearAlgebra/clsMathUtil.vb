@@ -13,10 +13,6 @@
             Dim rng = New System.Random(rngSeed)
             Dim matTemp = New MathUtil.clsEasyMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
-                matTemp(i)(i) = rng.Next(-10, 10)
-                matTemp(i)(i) = 1
-            Next
-            For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 1 + i To matTemp.Count - 1
                     Dim r = rng.Next(-10, 10)
                     matTemp(i)(j) = r

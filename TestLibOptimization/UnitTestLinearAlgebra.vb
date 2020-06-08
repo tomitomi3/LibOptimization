@@ -869,59 +869,99 @@ Imports LibOptimization.Util
     End Sub
 
     ''' <summary>
-    ''' test Inverse
+    ''' test Inverse 1x1
     ''' </summary>
-    <TestMethod()> Public Sub InverseMatrix()
-        With Nothing
-            Dim mat As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1},
+    <TestMethod()> Public Sub InverseMatrix_1x1()
+        Dim dimNum = 1
+        Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, 123456)
+        source.PrintValue(name:="Source matrix")
+        source.Inverse().PrintValue(name:="Inverse matrix")
+
+        Dim product = source * source.Inverse()
+        product.PrintValue(name:="S*S^-1")
+
+        'check
+        If clsMathUtil.IsNearyEqualMatrix(product, New clsEasyMatrix(dimNum, True)) = True Then
+            'OK
+        Else
+            Assert.Fail()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' test Inverse 2x2
+    ''' </summary>
+    <TestMethod()> Public Sub InverseMatrix_2x2()
+        Dim mat As New clsEasyMatrix(New Double()() {New Double() {3, 1}, New Double() {-2, 5}})
+        Dim matInv As clsEasyMatrix = mat.Inverse()
+
+        'check Identy matrix
+        ' I = A * A^-1
+        Dim productMat = mat * matInv
+        'check
+        If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
+            'OK
+        Else
+            Assert.Fail("before swap col")
+        End If
+
+        mat.SwapCol(0, 1)
+        matInv = mat.Inverse()
+
+        'check Identy matrix
+        ' I = A * A^-1
+        productMat = mat * matInv
+        'check
+        If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
+            'OK
+        Else
+            Assert.Fail("after swap col")
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' test Inverse 3x3
+    ''' </summary>
+    <TestMethod()> Public Sub InverseMatrix_3x3()
+        Dim mat As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1},
                                                      New Double() {5, 1, 3},
                                                      New Double() {2, 0, 1}})
-            'Inverse
-            '0.5	-0.5	1
-            '0.5	 0.5	-2
-            '-1      1  	-1
-            Dim matInv As clsEasyMatrix = mat.Inverse()
+        'Inverse
+        '0.5	-0.5	1
+        '0.5	 0.5	-2
+        '-1      1  	-1
+        Dim matInv As clsEasyMatrix = mat.Inverse()
 
-            'check Identy matrix
-            ' I = A * A^-1
-            Dim productMat = mat * matInv
-            For i As Integer = 0 To productMat.RowCount - 1
-                For j As Integer = 0 To productMat.ColCount - 1
-                    If i = j Then
-                        If productMat(i)(j) < 0.9999 OrElse productMat(i)(j) > 1.0001 Then
-                            Assert.Fail()
-                        End If
-                    Else
-                        If productMat(i)(j) < -0.0001 OrElse productMat(i)(j) > 0.0001 Then
-                            Assert.Fail()
-                        End If
-                    End If
-                Next
-            Next
-        End With
+        'check Identy matrix
+        ' I = A * A^-1
+        Dim productMat = mat * matInv
+        'check
+        If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
+            'OK
+        Else
+            Assert.Fail("before swap col")
+        End If
 
-        '1*1 - 5*5
-        With Nothing
-            For dimNum As Integer = 1 To 5
-                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, 12345)
-                source.PrintValue(name:="Source matrix")
-                source.Inverse().PrintValue(name:="Inverse matrix")
+        mat.SwapCol(0, 1)
+        matInv = mat.Inverse()
 
-                Dim product = source * source.Inverse()
-                product.PrintValue(name:="S*S^-1")
+        'check Identy matrix
+        ' I = A * A^-1
+        productMat = mat * matInv
+        'check
+        If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
+            'OK
+        Else
+            Assert.Fail("after swap col")
+        End If
+    End Sub
 
-                'check
-                If clsMathUtil.IsNearyEqualMatrix(product, New clsEasyMatrix(dimNum, True)) = True Then
-                    'OK
-                Else
-                    Assert.Fail()
-                End If
-            Next
-        End With
-
-        With Nothing
-            Dim dimNum = 10
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, 12345)
+    ''' <summary>
+    ''' test Inverse 4x4 - 10x10
+    ''' </summary>
+    <TestMethod()> Public Sub InverseMatrix_4to10()
+        For dimNum As Integer = 4 To 10
+            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, 11111)
             source.PrintValue(name:="Source matrix")
             source.Inverse().PrintValue(name:="Inverse matrix")
 
@@ -932,9 +972,9 @@ Imports LibOptimization.Util
             If clsMathUtil.IsNearyEqualMatrix(product, New clsEasyMatrix(dimNum, True)) = True Then
                 'OK
             Else
-                Assert.Fail()
+                Assert.Fail("Dim = {0}", dimNum)
             End If
-        End With
+        Next
     End Sub
 
     ''' <summary>
