@@ -141,6 +141,17 @@ namespace SampleCSharp
                 clsUtil.DebugValue(opt);
             }
             clsUtil.DebugValue(opt);
+
+            //restart
+            opt.Init(opt.Result);
+            clsUtil.DebugValue(opt);
+
+            //do optimization
+            while (opt.DoIteration(2000) == false)
+            {
+                clsUtil.DebugValue(opt);
+            }
+            clsUtil.DebugValue(opt);
         }
         
     }

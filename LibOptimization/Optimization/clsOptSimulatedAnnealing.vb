@@ -71,8 +71,13 @@ Namespace Optimization
         ''' <summary>Neighbor</summary>
         Public Property Neighbor As absNeighbor = New LocalRandomSearch()
 
+        ''' <summary>now temperature</summary>
+        Private _nowTemprature As Double = 0.0
+
+        ''' <summary>best point</summary>
         Private m_point As clsPoint = Nothing
 
+        ''' <summary>best point</summary>
         Private m_Bestpoint As clsPoint = Nothing
 
 #End Region
@@ -98,6 +103,9 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_point.Clear()
 
+                'init Temperature
+                Me._nowTemprature = Me.Temperature
+
                 'init initial position
                 If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
                     Me.m_point = New clsPoint(Me.m_func, InitialPosition)
@@ -107,6 +115,22 @@ Namespace Optimization
                 End If
 
                 Me.m_Bestpoint = Me.m_point.Copy()
+            Catch ex As Exception
+                Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
+            Finally
+                System.GC.Collect()
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' Initialize(for restart)
+        ''' </summary>
+        ''' <param name="point">reserve best point</param>
+        Public Overloads Sub Init(ByVal point As clsPoint)
+            Try
+                Dim tempPoint = point.Copy()
+                Me.Init()
+                Me.m_Bestpoint = tempPoint
             Catch ex As Exception
                 Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
             Finally
@@ -145,8 +169,8 @@ Namespace Optimization
                 Dim evalNext As Double = tempNext.Eval
 
                 'cooling
-                If Me.Temperature > StopTemperature Then
-                    Me.Temperature *= Me.CoolingRatio
+                If Me._nowTemprature > StopTemperature Then
+                    Me._nowTemprature *= Me.CoolingRatio
                 Else
                     If Me.IsUseCriterion = True Then
                         Return True
@@ -158,7 +182,7 @@ Namespace Optimization
                     r1 = 1.0
                 Else
                     Dim delta = evalNow - evalNext
-                    r1 = Math.Exp(delta / Me.Temperature)
+                    r1 = Math.Exp(delta / Me._nowTemprature)
                 End If
 
                 'compare probabilities
