@@ -8,9 +8,14 @@
         ''' </summary>
         ''' <param name="size"></param>
         ''' <param name="rngSeed"></param>
+        ''' <param name="rng"></param>
         ''' <returns></returns>
-        Public Shared Function CreateRandomSymmetricMatrix(ByVal size As Integer, Optional ByVal rngSeed As Integer = 123456) As clsEasyMatrix
-            Dim rng = New System.Random(rngSeed)
+        Public Shared Function CreateRandomSymmetricMatrix(ByVal size As Integer,
+                                                           Optional ByVal rngSeed As Integer = 123456,
+                                                           Optional ByVal rng As Random = Nothing) As clsEasyMatrix
+            If rng Is Nothing Then
+                rng = New System.Random(rngSeed)
+            End If
             Dim matTemp = New MathUtil.clsEasyMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 1 + i To matTemp.Count - 1
@@ -29,8 +34,12 @@
         ''' <param name="size"></param>
         ''' <param name="rngSeed"></param>
         ''' <returns></returns>
-        Public Shared Function CreateRandomASymmetricMatrix(ByVal size As Integer, Optional ByVal rngSeed As Integer = 123456) As clsEasyMatrix
-            Dim rng = New System.Random(rngSeed)
+        Public Shared Function CreateRandomASymmetricMatrix(ByVal size As Integer,
+                                                            Optional ByVal rngSeed As Integer = 123456,
+                                                            Optional ByVal rng As Random = Nothing) As clsEasyMatrix
+            If rng Is Nothing Then
+                rng = New System.Random(rngSeed)
+            End If
             Dim matTemp = New MathUtil.clsEasyMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 0 To matTemp.Count - 1

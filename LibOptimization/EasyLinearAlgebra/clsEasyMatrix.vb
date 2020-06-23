@@ -476,19 +476,19 @@
                 retInverse(1)(0) = temp * -Me(1)(0)
                 retInverse(1)(1) = temp * Me(0)(0)
             ElseIf n = 3 Then
-                Dim tempDet = Math.Abs(Det())
-                If tempDet < SAME_ZERO Then
+                Dim tempDet = Me.Det()
+                If Math.Abs(tempDet) < SAME_ZERO Then
                     Throw New clsException(clsException.Series.NotComputable, "Inverse 3x3")
                 End If
-                retInverse(0)(0) = (1.0 / tempDet) * (Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))
-                retInverse(0)(1) = (1.0 / tempDet) * (Me(0)(2) * Me(2)(1) - Me(0)(1) * Me(2)(2))
-                retInverse(0)(2) = (1.0 / tempDet) * (Me(0)(1) * Me(1)(2) - Me(0)(2) * Me(1)(1))
-                retInverse(1)(0) = (1.0 / tempDet) * (Me(1)(2) * Me(2)(0) - Me(1)(0) * Me(2)(2))
-                retInverse(1)(1) = (1.0 / tempDet) * (Me(0)(0) * Me(2)(2) - Me(0)(2) * Me(2)(0))
-                retInverse(1)(2) = (1.0 / tempDet) * (Me(0)(2) * Me(1)(0) - Me(0)(0) * Me(1)(2))
-                retInverse(2)(0) = (1.0 / tempDet) * (Me(1)(0) * Me(2)(1) - Me(1)(1) * Me(2)(0))
-                retInverse(2)(1) = (1.0 / tempDet) * (Me(0)(1) * Me(2)(0) - Me(0)(0) * Me(2)(1))
-                retInverse(2)(2) = (1.0 / tempDet) * (Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))
+                retInverse(0)(0) = ((Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))) / tempDet
+                retInverse(0)(1) = -((Me(0)(1) * Me(2)(2) - Me(0)(2) * Me(2)(1))) / tempDet
+                retInverse(0)(2) = ((Me(0)(1) * Me(1)(2) - Me(0)(2) * Me(1)(1))) / tempDet
+                retInverse(1)(0) = -((Me(1)(0) * Me(2)(2) - Me(1)(2) * Me(2)(0))) / tempDet
+                retInverse(1)(1) = ((Me(0)(0) * Me(2)(2) - Me(0)(2) * Me(2)(0))) / tempDet
+                retInverse(1)(2) = -((Me(0)(0) * Me(1)(2) - Me(0)(2) * Me(1)(0))) / tempDet
+                retInverse(2)(0) = ((Me(1)(0) * Me(2)(1) - Me(1)(1) * Me(2)(0))) / tempDet
+                retInverse(2)(1) = -((Me(0)(0) * Me(2)(1) - Me(0)(1) * Me(2)(0))) / tempDet
+                retInverse(2)(2) = ((Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))) / tempDet
             Else
                 'Gauss elimination with pivot select
                 For i As Integer = 0 To n - 1

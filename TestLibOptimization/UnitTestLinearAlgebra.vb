@@ -939,7 +939,7 @@ Imports LibOptimization.Util
         If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
             'OK
         Else
-            Assert.Fail("before swap col")
+            Assert.Fail("InverseMatrix_3x3 before swap col")
         End If
 
         mat.SwapCol(0, 1)
@@ -952,8 +952,20 @@ Imports LibOptimization.Util
         If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
             'OK
         Else
-            Assert.Fail("after swap col")
+            Assert.Fail("InverseMatrix_3x3 after swap col")
         End If
+
+        'random
+        Dim rng = New LibOptimization.Util.clsRandomXorshift(1123)
+        For i As Integer = 0 To 5 - 1
+            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(3, 11111, rng)
+            productMat = source * source.Inverse()
+            If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
+                'OK
+            Else
+                Assert.Fail("InverseMatrix_3x3 fail")
+            End If
+        Next
     End Sub
 
     ''' <summary>
