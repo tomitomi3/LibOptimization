@@ -139,7 +139,51 @@
         End Function
 
         ''' <summary>
-        ''' Product
+        ''' Product(Outer product, cross product)
+        ''' </summary>
+        ''' <param name="ai_source"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function OuterProduct(ByVal ai_source As clsEasyVector) As clsEasyVector
+            If IsSameDimension(ai_source, Me) = False Then
+                Throw New clsException(clsException.Series.DifferElementNumber)
+            End If
+
+            Dim ret = New clsEasyVector(ai_source.Count)
+            If ai_source.Count = 0 Then
+                Throw New clsException(clsException.Series.NotComputable, "OuterProduct")
+            ElseIf ai_source.Count = 1 Then
+                Throw New clsException(clsException.Series.NotComputable, "OuterProduct")
+            ElseIf ai_source.Count = 2 Then
+                Throw New clsException(clsException.Series.NotComputable, "2 dim outerproduct is scalar. this value is area.")
+            ElseIf ai_source.Count = 3 Then
+                ret(0) = Me(1) * ai_source(2) - Me(2) * ai_source(1)
+                ret(1) = Me(2) * ai_source(0) - Me(2) * ai_source(2)
+                ret(2) = Me(0) * ai_source(1) - Me(2) * ai_source(0)
+            Else
+                Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
+            End If
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Hadamard product ( a1 * b1, a2 * b2, ... )
+        ''' </summary>
+        ''' <param name="ai_source"></param>
+        ''' <returns></returns>
+        Public Function HadamardProduct(ByVal ai_source As clsEasyVector) As clsEasyVector
+            If IsSameDimension(ai_source, Me) = False Then
+                Throw New clsException(clsException.Series.DifferElementNumber)
+            End If
+            Dim ret = New clsEasyVector(Me.Count)
+            For i As Integer = 0 To Me.Count - 1
+                ret(0) = Me(i) * ai_source(i)
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Product(scalr * vector)
         ''' </summary>
         ''' <param name="ai_source"></param>
         ''' <param name="ai_dest"></param>
@@ -154,7 +198,7 @@
         End Operator
 
         ''' <summary>
-        ''' Product
+        ''' Product(vector * scalar)
         ''' </summary>
         ''' <param name="ai_source"></param>
         ''' <param name="ai_dest"></param>
@@ -168,31 +212,31 @@
             Return ret
         End Operator
 
-        ''' <summary>
-        ''' Product
-        ''' </summary>
-        ''' <param name="ai_source"></param>
-        ''' <param name="ai_dest"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyVector) As clsEasyVector
-            'OK
-            '|v1 v2| * |v3|
-            '          |v4|
-            If ai_source.Direction = VectorDirection.ROW AndAlso ai_dest.Direction = VectorDirection.COL Then
-                Throw New clsException(clsException.Series.NotComputable, "Vector * Vector - direction error")
-            End If
-            Dim size = ai_source.Count
-            If size <> ai_dest.Count Then
-                Throw New clsException(clsException.Series.NotComputable, "Vector * Vector - size error")
-            End If
+        '''' <summary>
+        '''' Product(vector * vector)
+        '''' </summary>
+        '''' <param name="ai_source"></param>
+        '''' <param name="ai_dest"></param>
+        '''' <returns></returns>
+        '''' <remarks></remarks>
+        'Public Shared Operator *(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyVector) As clsEasyVector
+        '    'OK
+        '    '|v1 v2| * |v3|
+        '    '          |v4|
+        '    If ai_source.Direction = VectorDirection.ROW AndAlso ai_dest.Direction = VectorDirection.COL Then
+        '        Throw New clsException(clsException.Series.NotComputable, "Vector * Vector - direction error")
+        '    End If
+        '    Dim size = ai_source.Count
+        '    If size <> ai_dest.Count Then
+        '        Throw New clsException(clsException.Series.NotComputable, "Vector * Vector - size error")
+        '    End If
 
-            Dim ret As Double = 0.0
-            For i As Integer = 0 To size - 1
-                ret += ai_source(i) * ai_dest(i)
-            Next
-            Return New clsEasyVector(New Double() {ret})
-        End Operator
+        '    Dim ret As Double = 0.0
+        '    For i As Integer = 0 To size - 1
+        '        ret += ai_source(i) * ai_dest(i)
+        '    Next
+        '    Return New clsEasyVector(New Double() {ret})
+        'End Operator
 
         ''' <summary>
         ''' Divide

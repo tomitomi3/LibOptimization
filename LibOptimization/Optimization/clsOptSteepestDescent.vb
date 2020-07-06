@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Steepest descent method
+    ''' Steepest descent(gradient) method
     ''' </summary>
     ''' <remarks>
     ''' Features:

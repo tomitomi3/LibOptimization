@@ -53,11 +53,13 @@
         Public Function NumericDerivertive(ByVal x As List(Of Double), Optional ByVal h As Double = 0.0000000001) As List(Of Double)
             Dim df As New List(Of Double)
             For i As Integer = 0 To NumberOfVariable() - 1
-                '中心差分
+                'central differences
                 Dim tempX1 As New List(Of Double)(x)
                 Dim tempX2 As New List(Of Double)(x)
                 tempX1(i) = tempX1(i) + h
                 tempX2(i) = tempX2(i) - h
+
+                'diff
                 Dim tempDf = (F(tempX1) - F(tempX2))
                 tempDf = tempDf / (2.0 * h)
                 df.Add(tempDf)

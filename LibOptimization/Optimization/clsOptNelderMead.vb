@@ -29,16 +29,16 @@ Namespace Optimization
         'Coefficient of Simplex Operator
         '-------------------------------------------------------------------
         ''' <summary>Refrection coeffcient(default:1.0)</summary>
-        Public ReadOnly Refrection As Double = 1.0
+        Public Property Refrection As Double = 1.0
 
         ''' <summary>Expantion coeffcient(default:2.0)</summary>
-        Public ReadOnly Expantion As Double = 2.0
+        Public Property Expantion As Double = 2.0
 
         ''' <summary>Contraction coeffcient(default:0.5)</summary>
-        Public ReadOnly Contraction As Double = 0.5
+        Public Property Contraction As Double = 0.5
 
         ''' <summary>Shrink coeffcient(default:2.0)</summary>
-        Public ReadOnly Shrink As Double = 2.0
+        Public Property Shrink As Double = 2.0
 
         Private m_points As New List(Of clsPoint)
 #End Region

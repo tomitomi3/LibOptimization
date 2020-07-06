@@ -190,6 +190,7 @@ Namespace Optimization
             Else
                 ai_iteration = If(ai_iteration = 0, Iteration - m_iteration - 1, Math.Min(ai_iteration, Iteration - m_iteration) - 1)
             End If
+            Dim blankChild = New clsPoint(Me.m_func)
             For iterate As Integer = 0 To ai_iteration
                 'Counting generation
                 m_iteration += 1
@@ -220,7 +221,7 @@ Namespace Optimization
                     Dim p5 As clsPoint = Me.m_parents(randIndex(4))
 
                     'Mutation and Crossover
-                    Dim child = New clsPoint(Me.m_func)
+                    Dim child = blankChild.Copy()
                     Dim j = Me.m_rand.Next() Mod Me.m_func.NumberOfVariable
                     Dim D = Me.m_func.NumberOfVariable - 1
 

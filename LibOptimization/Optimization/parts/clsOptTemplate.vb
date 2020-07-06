@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' optimize template
+    ''' optimize template not use
     ''' </summary>
     ''' <remarks></remarks>
     Public Class clsOptTemplate : Inherits absOptimization
