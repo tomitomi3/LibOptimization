@@ -452,8 +452,9 @@
         ''' <summary>
         ''' Inverse
         ''' </summary>
-        ''' <remarks></remarks>
-        Public Function Inverse() As clsEasyMatrix
+        ''' <param name="same_zero_value">optional:2.0E-50</param>
+        ''' <returns></returns>
+        Public Function Inverse(Optional ByVal same_zero_value As Double = SAME_ZERO) As clsEasyMatrix
             If Me.RowCount <> Me.ColCount Then
                 Return New clsEasyMatrix(0)
             End If
@@ -467,7 +468,7 @@
                 source(0)(0) = 1.0 / source(0)(0)
             ElseIf n = 2 Then
                 Dim temp = Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0)
-                If Math.Abs(temp) < SAME_ZERO Then
+                If Math.Abs(temp) < same_zero_value Then
                     Throw New clsException(clsException.Series.NotComputable, "Inverse 2x2")
                 End If
                 temp = 1.0 / temp
@@ -477,7 +478,7 @@
                 retInverse(1)(1) = temp * Me(0)(0)
             ElseIf n = 3 Then
                 Dim tempDet = Me.Det()
-                If Math.Abs(tempDet) < SAME_ZERO Then
+                If Math.Abs(tempDet) < same_zero_value Then
                     Throw New clsException(clsException.Series.NotComputable, "Inverse 3x3")
                 End If
                 retInverse(0)(0) = ((Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))) / tempDet
@@ -504,7 +505,7 @@
                     Next
 
                     'check 正則性の判定
-                    If amax < SAME_ZERO Then
+                    If amax < same_zero_value Then
                         Throw New clsException(clsException.Series.NotComputable, "Inverse nxn")
                     End If
 
@@ -659,8 +660,7 @@
         End Function
 
         ''' <summary>
-        ''' To Tridiagonal matrix using Householder transform
-        ''' 三重対角行列
+        ''' To Tridiagonal matrix using Householder transform 三重対角行列
         ''' </summary>
         ''' <param name="sourceMat"></param>
         ''' <returns></returns>
@@ -757,7 +757,7 @@
         ''' <param name="Iteration">default iteration:1000</param>
         ''' <param name="Conversion">default conversion:1.0e-16</param>
         ''' <returns>True:success conversion. False:not conversion</returns>
-        Public Shared Function Eigen(ByRef inMat As clsEasyMatrix,
+        Public Shared Function Eigen(ByVal inMat As clsEasyMatrix,
                                      ByRef eigenvalues As clsEasyVector, ByRef eigenVectors As clsEasyMatrix,
                                      Optional ByVal Iteration As Integer = 1000,
                                      Optional ByVal Conversion As Double = 0.0000000000000001,
@@ -882,6 +882,51 @@
         End Function
 
         ''' <summary>
+        ''' LU decomposition using Crout method
+        ''' </summary>
+        ''' <param name="inMat"></param>
+        ''' <param name="matL"></param>
+        ''' <param name="matU"></param>
+        ''' <param name="same_zero_value">2.0E-50</param>
+        ''' <returns></returns>
+        Public Shared Function LU(ByVal inMat As clsEasyMatrix,
+                                  ByRef matL As clsEasyMatrix,
+                                  ByRef matU As clsEasyMatrix,
+                                  Optional ByVal same_zero_value As Double = SAME_ZERO) As Boolean
+            matU = New clsEasyMatrix(inMat.ColCount, True)
+            matL = New clsEasyMatrix(inMat.ColCount, False)
+            Dim n = inMat.ColCount
+
+            For j As Integer = 0 To n - 1
+                For i = j To n - 1
+                    Dim sum = 0.0
+                    For k = 0 To j - 1
+                        sum = sum + matL(i)(k) * matU(k)(j)
+                    Next
+                    matL(i)(j) = inMat(i)(j) - sum
+                Next
+
+                For i = j To n - 1
+                    Dim sum = 0.0
+                    For k = 0 To j - 1
+                        sum = sum + matL(j)(k) * matU(k)(i)
+                    Next
+
+                    If Math.Abs(matL(j)(j)) < same_zero_value Then
+                        matL.Clear()
+                        matU.Clear()
+                        Return False
+                    End If
+
+                    matU(j)(i) = (inMat(j)(i) - sum) / matL(j)(j)
+                Next
+            Next
+
+            Return True
+        End Function
+
+
+        ''' <summary>
         ''' Resize matrix dimension
         ''' </summary>
         ''' <param name="row">number of row</param>
@@ -895,6 +940,39 @@
                 Me.Add(New List(Of Double)(New Double(col - 1) {}))
             Next
         End Sub
+
+        ''' <summary>
+        ''' find Max value
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function MaxValue() As Double
+            Dim retMax As Double = 0.0
+            For Each vec In Me
+                For Each value In vec
+                    If retMax > value Then
+                        retMax = value
+                    End If
+                Next
+            Next
+            Return retMax
+        End Function
+
+        ''' <summary>
+        ''' find Absolute Max value
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function MaxAbs() As Double
+            Dim retMaxabs As Double = 0.0
+            For Each vec In Me
+                For Each value In vec
+                    Dim absValue = Math.Abs(value)
+                    If retMaxabs > absValue Then
+                        retMaxabs = absValue
+                    End If
+                Next
+            Next
+            Return retMaxabs
+        End Function
 #End Region
 
 #Region "Property"
