@@ -225,6 +225,9 @@
     <Compile Include="..\LibOptimization\Optimization\clsOptPSOChaoticIW.vb">
       <Link>Optimization\clsOptPSOChaoticIW.vb</Link>
     </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptPSOCPSO.vb">
+      <Link>Optimization\clsOptPSOCPSO.vb</Link>
+    </Compile>
     <Compile Include="..\LibOptimization\Optimization\clsOptPSOLDIW.vb">
       <Link>Optimization\clsOptPSOLDIW.vb</Link>
     </Compile>
