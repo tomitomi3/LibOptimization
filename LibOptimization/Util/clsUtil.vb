@@ -390,7 +390,7 @@ Namespace Util
         ''' <param name="ai_points"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function FindCurrentIndex(ByVal ai_points As List(Of clsPoint)) As Integer
+        Public Shared Function FindCurrentBestIndex(ByVal ai_points As List(Of clsPoint)) As Integer
             Dim bestIndex As Integer = 0
             Dim bestEval = ai_points(0).Eval
             For i = 0 To ai_points.Count - 1
@@ -648,6 +648,10 @@ Namespace Util
                 optimizers.Add(opt)
             End With
             With Nothing
+                Dim opt = New clsOptPSOCPSO(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
                 Dim opt = New clsOptPSOLDIW(func)
                 optimizers.Add(opt)
             End With
@@ -731,5 +735,27 @@ Namespace Util
             Next
             Return ret / vec.Count
         End Function
+
+        ''' <summary>
+        ''' Find global best(for PSO)
+        ''' </summary>
+        ''' <param name="particles"></param>
+        ''' <returns></returns>
+        Public Shared Function FindGlobalBestFromParticles(ByVal particles As List(Of clsParticle)) As clsPoint
+            Dim gBest = particles(0).Point.Copy()
+            For i As Integer = 1 To particles.Count - 1
+                'replace personal best
+                If particles(i).Point.Eval < particles(i).BestPoint.Eval Then
+                    particles(i).BestPoint = particles(i).Point.Copy()
+                End If
+
+                'find global best
+                If particles(i).Point.Eval < gBest.Eval Then
+                    gBest = particles(i).Point.Copy
+                End If
+            Next
+            Return gBest
+        End Function
+
     End Class
 End Namespace

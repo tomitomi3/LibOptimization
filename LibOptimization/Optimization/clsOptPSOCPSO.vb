@@ -3,19 +3,18 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Particle Swarm Optimization using Chaotic inertia weight(CDIW-PSO, CRIW-PSO)
+    ''' Competitive PSOparallel competitive Particle Swarm Optimization
     ''' </summary>
     ''' <remarks>
     ''' Features:
     '''  -Swarm Intelligence algorithm.
-    '''  -Derivative free optimization algorithm.
     ''' 
     ''' Refference:
-    ''' [1]Y. Feng, G. Teng, A. Wang, Y.M. Yao, "Chaotic inertia weight in particle swarm optimization", in: Second International Conference on Innovative Computing, Information and Control (ICICIC 07), 2007, pp. 475–1475.
+    ''' [1]Luu, Keurfon, et al. "A parallel competitive Particle Swarm Optimization for non-linear first arrival traveltime tomography and uncertainty quantification." Computers and Geosciences 113 (2018): 81-93.
     ''' </remarks>
-    Public Class clsOptPSOChaoticIW : Inherits absOptimization
+    Public Class clsOptPSOCPSO : Inherits absOptimization
 #Region "Member"
-        ''' <summary>Max Iteration(Default:20,000)</summary>
+        ''' <summary>Max iteration count(Default:20,000)</summary>
         Public Overrides Property Iteration As Integer = 20000
 
         ''' <summary>Epsilon(Default:0.000001) for Criterion</summary>
@@ -28,8 +27,10 @@ Namespace Optimization
         Public Property HigherNPercent As Double = 0.8 'for IsCriterion()
         Private HigherNPercentIndex As Integer = 0 'for IsCriterion())
 
-        'particles
+        ''' <summary>particles</summary>
         Private m_swarm As New List(Of clsParticle)
+
+        ''' <summary>global best</summary>
         Private m_globalBest As clsPoint = Nothing
 
         '-------------------------------------------------------------------
@@ -38,30 +39,20 @@ Namespace Optimization
         ''' <summary>Swarm Size(Default:100)</summary>
         Public Property SwarmSize As Integer = 100
 
-        ''' <summary>adaptive inertia weight(Default:1.0)</summary>
-        Public Property Weight As Double = 1.0
+        ''' <summary>Inertia weight. Weigth=1.0(orignal paper 1995), Weight=0.729(Default setting)</summary>
+        Public Property Weight As Double = 0.729
 
-        ''' <summary>Weight max for adaptive weight(Default:0.9).</summary>
-        Public Property WeightMax As Double = 0.9 'base LDIW
-
-        ''' <summary>Weight min for adaptive weight(Default:0.4).</summary>
-        Public Property WeightMin As Double = 0.4
-
-        ''' <summary>velocity coefficient(affected by personal best)(Default:1.49445)</summary>
+        ''' <summary>velocity coefficient(affected by personal best). C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)</summary>
         Public Property C1 As Double = 1.49445
 
-        ''' <summary>velocity coefficient(affected by global best)(Default:1.49445)</summary>
+        ''' <summary>velocity coefficient(affected by global best). C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)</summary>
         Public Property C2 As Double = 1.49445
 
-        ''' <summary>Inertial weight strategie</summary>
-        Public Property ChaoticMode As EnumChaoticInertiaWeightMode = EnumChaoticInertiaWeightMode.CDIW
+        ''' <summary>Gamma</summary>
+        Public Property Gamma As Double = 1.0
 
-        Public Enum EnumChaoticInertiaWeightMode
-            ''' <summary>Charotic Decrease Inertia Weight</summary>
-            CDIW
-            ''' <summary>Charotic Random Inertia Weight</summary>
-            CRIW
-        End Enum
+        ''' <summary>Delta</summary>
+        Private Delta As Double
 #End Region
 
 #Region "Constructor"
@@ -104,7 +95,9 @@ Namespace Optimization
                 'Sort Evaluate
                 Me.m_swarm.Sort()
                 Me.m_globalBest = Me.m_swarm(0).BestPoint.Copy()
-                Me.Weight = 1
+
+                'Swarm maximum radius
+                Me.Delta = Math.Log(1.0 + 0.003 * m_swarm.Count) / Math.Max(0.2, Math.Log(0.01 * Iteration))
 
                 'Detect HigherNPercentIndex
                 Me.HigherNPercentIndex = CInt(Me.m_swarm.Count * Me.HigherNPercent)
@@ -144,15 +137,28 @@ Namespace Optimization
                 'check criterion
                 If Me.IsUseCriterion = True Then
                     'higher N percentage particles are finished at the time of same evaluate value.
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(Me.HigherNPercentIndex).BestPoint) Then
+                    If clsUtil.IsCriterion(Me.EPS, Me.m_globalBest, Me.m_swarm(Me.HigherNPercentIndex).BestPoint) Then
                         Return True
                     End If
                 End If
 
                 'PSO process
                 For Each particle In Me.m_swarm
-                    'update a velocity 
+                    'replace personal best
+                    If particle.Point.Eval < particle.BestPoint.Eval Then
+                        particle.BestPoint = particle.Point.Copy()
+                    End If
+
+                    'update global best
+                    If particle.Point.Eval < Me.m_globalBest.Eval Then
+                        Me.m_globalBest = particle.Point.Copy()
+                    End If
+                Next
+                Dim max_dist = 0.0
+                For Each particle In Me.m_swarm
+                    Dim temp_dist = 0.0
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                        'update a velocity 
                         Dim r1 = Me.m_rand.NextDouble()
                         Dim r2 = Me.m_rand.NextDouble()
                         Dim newV = Me.Weight * particle.Velocity(i) +
@@ -161,35 +167,43 @@ Namespace Optimization
                         particle.Velocity(i) = newV
 
                         'update a position using velocity
-                        Dim newPos = particle.Point(i) + particle.Velocity(i)
-                        particle.Point(i) = newPos
+                        particle.Point(i) = particle.Point(i) + particle.Velocity(i)
+
+                        'distance
+                        temp_dist += Math.Pow((particle.Point(i) - m_globalBest(i)), 2)
+                        'distance
+                        'temp_dist += Math.Pow((particle.Point(i) - particle.BestPoint(i)), 2)
                     Next
                     particle.Point.ReEvaluate()
 
-                    'replace personal best
-                    If particle.Point.Eval < particle.BestPoint.Eval Then
-                        particle.BestPoint = particle.Point.Copy()
-
-                        'replace global best
-                        If particle.Point.Eval < Me.m_globalBest.Eval Then
-                            Me.m_globalBest = particle.Point.Copy()
-                        End If
+                    If temp_dist > max_dist Then
+                        max_dist = temp_dist
                     End If
                 Next
 
-                'Inertia Weight Strategie
-                If Me.ChaoticMode = EnumChaoticInertiaWeightMode.CDIW Then
-                    'CDIW is Chaotic Descending(Decreasing?) Inertia Weight
-                    Dim randVal = Me.m_rand.NextDouble()
-                    Dim u = 4.0 '3.75 to 4.0
-                    Dim z = u * randVal * (1 - randVal)
-                    Me.Weight = (Me.WeightMax - Me.WeightMin) * (Me.Iteration - Me.m_iteration) / Me.Iteration + Me.WeightMin * z
-                ElseIf Me.ChaoticMode = EnumChaoticInertiaWeightMode.CRIW Then
-                    'CRIW is Chaotic Random Inertia Weight
-                    Dim randVal = Me.m_rand.NextDouble()
-                    Dim u = 4.0
-                    Dim z = u * randVal * (1 - randVal)
-                    Me.Weight = 0.5 * Me.m_rand.NextDouble() + 0.5 * z
+                'restart patricles
+                Dim swarm_radius = max_dist / Math.Sqrt(4.0 * m_func.NumberOfVariable())
+                If swarm_radius < Me.Delta Then
+                    Dim inorm = Me.m_iteration / Me.Iteration
+                    inorm = 0.9
+                    Dim nw = CInt(((m_swarm.Count - 1.0) / (1 + Math.Exp(1.0 / 0.09 * (inorm - Gamma + 0.5)))))
+                    If nw > 0 Then
+                        Me.m_swarm.Sort()
+                        Dim resetSwarmSize = m_swarm.Count - nw - 1
+                        For i As Integer = resetSwarmSize To m_swarm.Count - 1
+                            'Particles initial positions
+                            Dim tempPosition = New clsPoint(Me.m_func)
+                            Dim tempBestPosition = New clsPoint(Me.m_func)
+                            Dim Array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                            tempPosition = New clsPoint(Me.m_func, Array)
+                            tempBestPosition = tempPosition.Copy()
+
+                            'Initialize particle velocity
+                            Dim tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                            m_swarm(i) = New clsParticle(tempPosition, tempVelocity, tempBestPosition)
+                            m_swarm(i).Point.ReEvaluate()
+                        Next
+                    End If
                 End If
 
                 'sort by eval
@@ -238,11 +252,11 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Results As List(Of Optimization.clsPoint)
             Get
-                Me.m_swarm.Sort()
                 Dim ret As New List(Of clsPoint)(Me.m_swarm.Count - 1)
                 For Each p In Me.m_swarm
                     ret.Add(p.BestPoint.Copy())
                 Next
+                ret.Sort()
                 Return ret
             End Get
         End Property

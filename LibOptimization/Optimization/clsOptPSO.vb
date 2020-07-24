@@ -150,8 +150,8 @@ Namespace Optimization
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim r1 = Me.m_rand.NextDouble()
                         Dim r2 = Me.m_rand.NextDouble()
-                        Dim newV = Me.Weight * particle.Velocity(i) + _
-                                   C1 * r1 * (particle.BestPoint(i) - particle.Point(i)) + _
+                        Dim newV = Me.Weight * particle.Velocity(i) +
+                                   C1 * r1 * (particle.BestPoint(i) - particle.Point(i)) +
                                    C2 * r2 * (Me.m_globalBest(i) - particle.Point(i))
                         particle.Velocity(i) = newV
 
@@ -179,7 +179,7 @@ Namespace Optimization
         End Function
 
         ''' <summary>
-        ''' Result
+        ''' Result (return global best)
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
@@ -187,15 +187,16 @@ Namespace Optimization
         Public Overrides ReadOnly Property Result As Optimization.clsPoint
             Get
                 'find best index
-                Dim bestIndex As Integer = 0
-                Dim bestEval = Me.m_swarm(0).BestPoint.Eval
-                For i = 0 To Me.m_swarm.Count - 1
-                    If Me.m_swarm(i).BestPoint.Eval < bestEval Then
-                        bestEval = Me.m_swarm(i).BestPoint.Eval
-                        bestIndex = i
-                    End If
-                Next
-                Return Me.m_swarm(0).BestPoint.Copy()
+                'Dim bestIndex As Integer = 0
+                'Dim bestEval = Me.m_swarm(0).BestPoint.Eval
+                'For i = 0 To Me.m_swarm.Count - 1
+                '    If Me.m_swarm(i).BestPoint.Eval < bestEval Then
+                '        bestEval = Me.m_swarm(i).BestPoint.Eval
+                '        bestIndex = i
+                '    End If
+                'Next
+                'Return Me.m_swarm(0).BestPoint.Copy()
+                Return Me.m_globalBest.Copy()
             End Get
         End Property
 

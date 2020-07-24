@@ -118,7 +118,7 @@ Namespace Optimization
             End If
 
             'current best
-            Me.m_currentBest = Me.m_nests(clsUtil.FindCurrentIndex(Me.m_nests))
+            Me.m_currentBest = Me.m_nests(clsUtil.FindCurrentBestIndex(Me.m_nests))
 
             'levy flight parameter
             Dim sigma = (Me.Gamma(1 + Beta) * Math.Sin(Math.PI * Beta / 2) / (Me.Gamma((1 + Beta) / 2) * Beta * 2 ^ ((Beta - 1) / 2))) ^ (1 / Beta)
@@ -164,7 +164,7 @@ Namespace Optimization
                 Next
 
                 'Find current best
-                Dim candidateBest = newNests(clsUtil.FindCurrentIndex(newNests))
+                Dim candidateBest = newNests(clsUtil.FindCurrentBestIndex(newNests))
                 If candidateBest.Eval < Me.m_currentBest.Eval Then
                     Me.m_currentBest = candidateBest.Copy()
                 End If
@@ -194,7 +194,7 @@ Namespace Optimization
                 Next
 
                 'Find current best
-                candidateBest = newNests(clsUtil.FindCurrentIndex(newNests))
+                candidateBest = newNests(clsUtil.FindCurrentBestIndex(newNests))
                 If candidateBest.Eval < Me.m_currentBest.Eval Then
                     Me.m_currentBest = candidateBest.Copy()
                 End If

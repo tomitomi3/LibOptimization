@@ -139,6 +139,7 @@
     <Compile Include="Optimization\clsOptDE.vb" />
     <Compile Include="Optimization\clsOptHillClimbing.vb" />
     <Compile Include="Optimization\clsOptNelderMeadWiki.vb" />
+    <Compile Include="Optimization\clsOptPSOCPSO.vb" />
     <Compile Include="Optimization\clsOptPSOChaoticIW.vb" />
     <Compile Include="Optimization\clsOptPSOLDIW.vb" />
     <Compile Include="Optimization\clsOptPSOAIW.vb" />
