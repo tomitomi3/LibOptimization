@@ -631,6 +631,12 @@ Namespace Util
             End With
             With Nothing
                 Dim opt = New clsOptPSO(func)
+                opt.SwarmType = clsOptPSO.EnumSwarmType.GlobalBest
+                optimizers.Add(opt)
+            End With
+            With Nothing
+                Dim opt = New clsOptPSO(func)
+                opt.SwarmType = clsOptPSO.EnumSwarmType.LocalBest
                 optimizers.Add(opt)
             End With
             With Nothing
@@ -742,19 +748,16 @@ Namespace Util
         ''' <param name="particles"></param>
         ''' <returns></returns>
         Public Shared Function FindGlobalBestFromParticles(ByVal particles As List(Of clsParticle)) As clsPoint
-            Dim gBest = particles(0).Point.Copy()
+            Dim tempBest = particles(0).Point
             For i As Integer = 1 To particles.Count - 1
-                'replace personal best
-                If particles(i).Point.Eval < particles(i).BestPoint.Eval Then
-                    particles(i).BestPoint = particles(i).Point.Copy()
+                If particles(i).Point.Eval < tempBest.Eval Then
+                    tempBest = particles(i).Point
                 End If
-
-                'find global best
-                If particles(i).Point.Eval < gBest.Eval Then
-                    gBest = particles(i).Point.Copy
+                If particles(i).BestPoint.Eval < tempBest.Eval Then
+                    tempBest = particles(i).BestPoint
                 End If
             Next
-            Return gBest
+            Return tempBest.Copy()
         End Function
 
     End Class

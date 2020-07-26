@@ -12,8 +12,9 @@ Namespace Optimization
     ''' 
     ''' Refference:
     ''' [1]James Kennedy and Russell Eberhart, "Particle Swarm Optimization", Proceedings of IEEE the International Conference on Neural Networks，1995
-    ''' [2]Y. Shi and Russell Eberhart, "A Modified Particle Swarm Optimizer", Proceedings of Congress on Evolu-tionary Computation, 79-73., 1998
-    ''' [3]R. C. Eberhart and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.
+    ''' [2]Eberhart, Russell, and James Kennedy. "A new optimizer using particle swarm theory." MHS'95. Proceedings of the Sixth International Symposium on Micro Machine and Human Science. Ieee, 1995.
+    ''' [3]Y. Shi and Russell Eberhart, "A Modified Particle Swarm Optimizer", Proceedings of Congress on Evolu-tionary Computation, 79-73., 1998
+    ''' [4]R. C. Eberhart and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.
     ''' </remarks>
     Public Class clsOptPSO : Inherits absOptimization
 #Region "Member"
@@ -48,6 +49,23 @@ Namespace Optimization
 
         ''' <summary>velocity coefficient(affected by global best). C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)</summary>
         Public Property C2 As Double = 1.49445
+
+        ''' <summary>Neighborhood coefficient for LocalBest. compares its error value with particle(i-1) and particle(i+1).</summary>
+        Public Property Neighborhood As Integer = 6
+
+        ''' <summary>SwarmType[1][2]</summary>
+        Public Enum EnumSwarmType
+            ''' <summary>Global best(original pso)[1]</summary>
+            GlobalBest
+            ''' <summary>Local best[2]</summary>
+            LocalBest
+        End Enum
+
+        ''' <summary>SwarmType default:GlobalBest</summary>
+        Public Property SwarmType As EnumSwarmType = EnumSwarmType.GlobalBest
+
+        ''' <summary>Zero Velocity Initialization(Engelbrecht 2012). default:true.</summary>
+        Public Property IsUseZeroVelocityInitialization As Boolean = True
 #End Region
 
 #Region "Constructor"
@@ -81,9 +99,12 @@ Namespace Optimization
                     tempBestPosition = tempPosition.Copy()
 
                     'velocity
-                    Dim tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Dim tempVelocity = New Double(Me.m_func.NumberOfVariable - 1) {}
+                    If IsUseZeroVelocityInitialization = False Then
+                        tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    End If
 
-                    'create swarm
+                    'create
                     Me.m_swarm.Add(New clsParticle(tempPosition, tempVelocity, tempBestPosition))
                 Next
 
@@ -135,35 +156,87 @@ Namespace Optimization
                 End If
 
                 'PSO process
+                'common process
                 For Each particle In Me.m_swarm
-                    'replace personal best
+                    'replace personal best, find global best
                     If particle.Point.Eval < particle.BestPoint.Eval Then
                         particle.BestPoint = particle.Point.Copy()
-
-                        'replace global best
-                        If particle.Point.Eval < Me.m_globalBest.Eval Then
-                            Me.m_globalBest = particle.Point.Copy()
-                        End If
                     End If
 
-                    'update a velocity 
-                    For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        Dim r1 = Me.m_rand.NextDouble()
-                        Dim r2 = Me.m_rand.NextDouble()
-                        Dim newV = Me.Weight * particle.Velocity(i) +
-                                   C1 * r1 * (particle.BestPoint(i) - particle.Point(i)) +
-                                   C2 * r2 * (Me.m_globalBest(i) - particle.Point(i))
-                        particle.Velocity(i) = newV
-
-                        'update a position using velocity
-                        Dim newPos = particle.Point(i) + particle.Velocity(i)
-                        particle.Point(i) = newPos
-                    Next
-                    particle.Point.ReEvaluate()
+                    'find globalbest
+                    If particle.BestPoint.Eval < Me.m_globalBest.Eval Then
+                        Me.m_globalBest = particle.BestPoint
+                    End If
                 Next
+                Me.m_globalBest = Me.m_globalBest.Copy()
 
-                'sort by eval
-                Me.m_swarm.Sort()
+                If Me.SwarmType = EnumSwarmType.GlobalBest Then
+                    'global best. particles move toward the global best.
+
+                    'update velocity
+                    For Each particle In Me.m_swarm
+                        For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                            Dim r1 = Me.m_rand.NextDouble()
+                            Dim r2 = Me.m_rand.NextDouble()
+                            Dim newV = Me.Weight * particle.Velocity(i) +
+                                       C1 * r1 * (particle.BestPoint(i) - particle.Point(i)) +
+                                       C2 * r2 * (Me.m_globalBest(i) - particle.Point(i))
+                            particle.Velocity(i) = newV
+
+                            'update a position using velocity
+                            Dim newPos = particle.Point(i) + particle.Velocity(i)
+                            particle.Point(i) = newPos
+                        Next
+                        particle.Point.ReEvaluate()
+                    Next
+
+                    'sort by eval.
+                    Me.m_swarm.Sort()
+                ElseIf Me.SwarmType = EnumSwarmType.LocalBest Then
+                    'local best.
+                    Dim halfNeighbor = CInt(Me.Neighborhood / 2)
+                    For pp As Integer = 0 To Me.m_swarm.Count - 1
+                        Dim lBests = New List(Of clsParticle)
+
+                        'first half p[i-n] p[i-1] p[i-2]
+                        Dim startIndex = pp - halfNeighbor
+                        For i As Integer = startIndex To startIndex + halfNeighbor - 1
+                            If i < 0 Then
+                                Exit For
+                            End If
+                            lBests.Add(Me.m_swarm(i))
+                        Next
+
+                        'second half
+                        Dim endIndex = pp + halfNeighbor - 1
+                        For i As Integer = pp To endIndex
+                            If i >= Me.m_swarm.Count Then
+                                Exit For
+                            End If
+                            lBests.Add(Me.m_swarm(i))
+                        Next
+                        Dim lBest = clsUtil.FindGlobalBestFromParticles(lBests)
+
+                        'update a velocity 
+                        Dim particle = Me.m_swarm(pp)
+                        For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                            Dim r1 = Me.m_rand.NextDouble()
+                            Dim r2 = Me.m_rand.NextDouble()
+                            Dim newV = Me.Weight * particle.Velocity(i) +
+                                       C1 * r1 * (particle.BestPoint(i) - particle.Point(i)) +
+                                       C2 * r2 * (lBest(i) - particle.Point(i))
+                            particle.Velocity(i) = newV
+
+                            'update a position using velocity
+                            Dim newPos = particle.Point(i) + particle.Velocity(i)
+                            particle.Point(i) = newPos
+                        Next
+                        particle.Point.ReEvaluate()
+                    Next
+
+                    'sort by eval. not use local best PSO
+                    'Me.m_swarm.Sort()
+                End If
             Next
 
             Return False

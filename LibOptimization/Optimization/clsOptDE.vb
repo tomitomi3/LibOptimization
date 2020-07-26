@@ -74,9 +74,7 @@ Namespace Optimization
         ''' </summary>
         Public Property DEStrategy As EnumDEStrategyType = EnumDEStrategyType.DE_rand_1_bin
 
-        ''' <summary>
-        ''' Enum Differential Evolution Strategy[3][4]
-        ''' </summary>
+        ''' <summary>Enum Differential Evolution Strategy[3][4]</summary>
         Public Enum EnumDEStrategyType
             ''' <summary>DE/rand/1/bin - global searchability(大域検索)</summary>
             DE_rand_1_bin

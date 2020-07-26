@@ -151,7 +151,20 @@ Namespace Optimization
 
                 'PSO process
                 For Each particle In Me.m_swarm
-                    'update a velocity 
+                    'replace personal best, find global best
+                    If particle.Point.Eval < particle.BestPoint.Eval Then
+                        particle.BestPoint = particle.Point.Copy()
+                    End If
+
+                    'find globalbest
+                    If particle.BestPoint.Eval < Me.m_globalBest.Eval Then
+                        Me.m_globalBest = particle.BestPoint
+                    End If
+                Next
+                Me.m_globalBest = Me.m_globalBest.Copy()
+
+                'update a velocity 
+                For Each particle In Me.m_swarm
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                         Dim r1 = Me.m_rand.NextDouble()
                         Dim r2 = Me.m_rand.NextDouble()
@@ -165,16 +178,6 @@ Namespace Optimization
                         particle.Point(i) = newPos
                     Next
                     particle.Point.ReEvaluate()
-
-                    'replace personal best
-                    If particle.Point.Eval < particle.BestPoint.Eval Then
-                        particle.BestPoint = particle.Point.Copy()
-
-                        'replace global best
-                        If particle.Point.Eval < Me.m_globalBest.Eval Then
-                            Me.m_globalBest = particle.Point.Copy()
-                        End If
-                    End If
                 Next
 
                 'Inertia Weight Strategie

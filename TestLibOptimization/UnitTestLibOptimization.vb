@@ -22,7 +22,7 @@ Imports LibOptimization.Util
     ''' <summary>
     ''' test Optimization
     ''' </summary>
-    <TestMethod()> Public Sub Opt_OptimizeSphere()
+    <TestMethod()> Public Sub Opt_OptimizeSphere_2D_3D()
         Dim EVAL As Double = 0.0001
         For i As Integer = 2 To 3
             Console.WriteLine("===sphere {0}D===", i)

@@ -39,20 +39,23 @@ Namespace Optimization
         ''' <summary>Swarm Size(Default:100)</summary>
         Public Property SwarmSize As Integer = 100
 
-        ''' <summary>Inertia weight. Weigth=1.0(orignal paper 1995), Weight=0.729(Default setting)</summary>
-        Public Property Weight As Double = 0.729
+        ''' <summary>Inertia weight. default 0.7298</summary>
+        Public Property Weight As Double = 0.7298
 
-        ''' <summary>velocity coefficient(affected by personal best). C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)</summary>
-        Public Property C1 As Double = 1.49445
+        ''' <summary>velocity coefficient(affected by personal best). default 1.49618</summary>
+        Public Property C1 As Double = 1.49618
 
-        ''' <summary>velocity coefficient(affected by global best). C1 = C2 = 2.0 (orignal paper 1995), C1 = C2 = 1.49445(Default setting)</summary>
-        Public Property C2 As Double = 1.49445
+        ''' <summary>velocity coefficient(affected by global best). default 1.49618</summary>
+        Public Property C2 As Double = 1.49618
 
         ''' <summary>Gamma</summary>
         Public Property Gamma As Double = 1.0
 
         ''' <summary>Delta</summary>
-        Private Delta As Double
+        Private Delta As Double = 0.0
+
+        ''' <summary>Zero Velocity Initialization(Engelbrecht 2012). default:true.</summary>
+        Public Property IsUseZeroVelocityInitialization As Boolean = True
 #End Region
 
 #Region "Constructor"
@@ -86,9 +89,12 @@ Namespace Optimization
                     tempBestPosition = tempPosition.Copy()
 
                     'velocity
-                    Dim tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Dim tempVelocity = New Double(Me.m_func.NumberOfVariable - 1) {}
+                    If IsUseZeroVelocityInitialization = False Then
+                        tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    End If
 
-                    'create swarm
+                    'create
                     Me.m_swarm.Add(New clsParticle(tempPosition, tempVelocity, tempBestPosition))
                 Next
 
@@ -144,21 +150,23 @@ Namespace Optimization
 
                 'PSO process
                 For Each particle In Me.m_swarm
-                    'replace personal best
+                    'replace personal best, find global best
                     If particle.Point.Eval < particle.BestPoint.Eval Then
                         particle.BestPoint = particle.Point.Copy()
                     End If
 
-                    'update global best
-                    If particle.Point.Eval < Me.m_globalBest.Eval Then
-                        Me.m_globalBest = particle.Point.Copy()
+                    'find globalbest
+                    If particle.BestPoint.Eval < Me.m_globalBest.Eval Then
+                        Me.m_globalBest = particle.BestPoint
                     End If
                 Next
+                Me.m_globalBest = Me.m_globalBest.Copy()
+
+                'update a velocity 
                 Dim max_dist = 0.0
                 For Each particle In Me.m_swarm
                     Dim temp_dist = 0.0
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                        'update a velocity 
                         Dim r1 = Me.m_rand.NextDouble()
                         Dim r2 = Me.m_rand.NextDouble()
                         Dim newV = Me.Weight * particle.Velocity(i) +
@@ -194,14 +202,16 @@ Namespace Optimization
                             'Particles initial positions
                             Dim tempPosition = New clsPoint(Me.m_func)
                             Dim tempBestPosition = New clsPoint(Me.m_func)
-                            Dim Array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                            tempPosition = New clsPoint(Me.m_func, Array)
+                            Dim tempRandArray = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                            tempPosition = New clsPoint(Me.m_func, tempRandArray)
                             tempBestPosition = tempPosition.Copy()
 
                             'Initialize particle velocity
-                            Dim tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                            Dim tempVelocity = New Double(Me.m_func.NumberOfVariable - 1) {}
+                            If IsUseZeroVelocityInitialization = False Then
+                                tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                            End If
                             m_swarm(i) = New clsParticle(tempPosition, tempVelocity, tempBestPosition)
-                            m_swarm(i).Point.ReEvaluate()
                         Next
                     End If
                 End If
