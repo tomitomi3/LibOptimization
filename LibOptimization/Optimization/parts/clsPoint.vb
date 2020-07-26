@@ -10,7 +10,14 @@ Namespace Optimization
         Inherits clsEasyVector
         Implements IComparable
 
+        ''' <summary>
+        ''' objective function
+        ''' </summary>
         Private m_func As absObjectiveFunction = Nothing
+
+        ''' <summary>
+        ''' evaluate value
+        ''' </summary>
         Private m_evaluateValue As Double = 0.0
 
         ''' <summary>
@@ -138,6 +145,13 @@ Namespace Optimization
                 Return Me.m_evaluateValue
             End Get
         End Property
+
+        ''' <summary>
+        ''' manual set eval
+        ''' </summary>
+        Public Sub SetEval(value As Double)
+            Me.m_evaluateValue = value
+        End Sub
 
         ''' <summary>
         ''' Init

@@ -149,21 +149,9 @@ Namespace Optimization
                 End If
 
                 'PSO process
-                For Each particle In Me.m_swarm
-                    'replace personal best, find global best
-                    If particle.Point.Eval < particle.BestPoint.Eval Then
-                        particle.BestPoint = particle.Point.Copy()
-                    End If
-
-                    'find globalbest
-                    If particle.BestPoint.Eval < Me.m_globalBest.Eval Then
-                        Me.m_globalBest = particle.BestPoint
-                    End If
-                Next
-                Me.m_globalBest = Me.m_globalBest.Copy()
-
                 'update a velocity 
                 Dim max_dist = 0.0
+                Dim tempGlobalBest As clsPoint = m_swarm(0).BestPoint.Copy()
                 For Each particle In Me.m_swarm
                     Dim temp_dist = 0.0
                     For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
@@ -178,16 +166,30 @@ Namespace Optimization
                         particle.Point(i) = particle.Point(i) + particle.Velocity(i)
 
                         'distance
-                        temp_dist += Math.Pow((particle.Point(i) - m_globalBest(i)), 2)
+                        temp_dist += Math.Pow((particle.Point(i) - Me.m_globalBest(i)), 2)
                         'distance
                         'temp_dist += Math.Pow((particle.Point(i) - particle.BestPoint(i)), 2)
                     Next
                     particle.Point.ReEvaluate()
 
+                    temp_dist = Math.Sqrt(temp_dist)
                     If temp_dist > max_dist Then
                         max_dist = temp_dist
                     End If
+
+                    'replace personal best
+                    If particle.Point.Eval < particle.BestPoint.Eval Then
+                        particle.BestPoint = particle.Point.Copy()
+                    End If
+
+                    'find global
+                    If particle.BestPoint.Eval < tempGlobalBest.Eval Then
+                        tempGlobalBest = particle.BestPoint
+                    End If
                 Next
+
+                'update globalbest
+                Me.m_globalBest = tempGlobalBest.Copy()
 
                 'restart patricles
                 Dim swarm_radius = max_dist / Math.Sqrt(4.0 * m_func.NumberOfVariable())
@@ -204,7 +206,10 @@ Namespace Optimization
                             Dim tempBestPosition = New clsPoint(Me.m_func)
                             Dim tempRandArray = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                             tempPosition = New clsPoint(Me.m_func, tempRandArray)
+
+                            'Pbest
                             tempBestPosition = tempPosition.Copy()
+                            tempBestPosition.SetEval(Double.MaxValue)
 
                             'Initialize particle velocity
                             Dim tempVelocity = New Double(Me.m_func.NumberOfVariable - 1) {}
