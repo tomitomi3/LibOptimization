@@ -132,12 +132,9 @@ Namespace Optimization
                 'Counting generation
                 m_iteration += 1
 
-                'check criterion
-                If Me.IsUseCriterion = True Then
-                    'higher N percentage particles are finished at the time of same evaluate value.
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_swarm(0).BestPoint, Me.m_swarm(Me.HigherNPercentIndex).BestPoint) Then
-                        Return True
-                    End If
+                'check criterion - higher N percentage particles are finished at the time of same evaluate value.
+                If Me.IsUseCriterion = True AndAlso clsUtil.IsCriterion(Me.EPS, Me.m_swarm, Me.HigherNPercentIndex) Then
+                    Return True
                 End If
 
                 'PSO process
@@ -178,7 +175,7 @@ Namespace Optimization
                 Me.Weight = (Me.WeightMax - Me.WeightMin) * PS - Me.WeightMin
 
                 'sort by eval
-                Me.m_swarm.Sort()
+                'Me.m_swarm.Sort()
             Next
 
             Return False
@@ -211,7 +208,7 @@ Namespace Optimization
                 '    End If
                 'Next
                 'Return Me.m_swarm(0).BestPoint.Copy()
-                Return clsUtil.FindGlobalBestFromParticles(m_swarm)
+                Return m_swarm(clsUtil.FindCurrentBestIndexFromParticles(m_swarm)).BestPoint.Copy()
             End Get
         End Property
 

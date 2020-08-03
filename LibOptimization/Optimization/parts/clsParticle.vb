@@ -91,6 +91,18 @@ Namespace Optimization
         End Property
 
         ''' <summary>
+        ''' Compare points and best points from eval
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function GetBestEval() As Double
+            If Me.m_bestPoint.Eval < Me.m_point.Eval Then
+                Return Me.m_bestPoint.Eval
+            Else
+                Return Me.m_point.Eval
+            End If
+        End Function
+
+        ''' <summary>
         ''' for sort
         ''' </summary>
         ''' <param name="ai_obj"></param>

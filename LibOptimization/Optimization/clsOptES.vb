@@ -210,7 +210,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return clsUtil.GetBestPoint(Me._populations, True)
+                Return clsUtil.FindCurrentBestPointFromPoints(Me._populations, True)
             End Get
         End Property
 

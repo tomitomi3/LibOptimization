@@ -8,6 +8,8 @@ Namespace Util
     ''' </summary>
     ''' <remarks></remarks>
     Public Class clsUtil
+        Public Const SAME_ZERO As Double = 2.0E-50 '2^-50
+
         ''' <summary>
         ''' Normal Distribution
         ''' </summary>
@@ -207,22 +209,7 @@ Namespace Util
         End Sub
 
         ''' <summary>
-        ''' Check Criterion
-        ''' </summary>
-        ''' <param name="ai_eps">EPS</param>
-        ''' <param name="ai_comparisonA"></param>
-        ''' <param name="ai_comparisonB"></param>
-        ''' <param name="ai_tiny"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Shared Function IsCriterion(ByVal ai_eps As Double,
-                                           ByVal ai_comparisonA As clsPoint, ByVal ai_comparisonB As clsPoint,
-                                           Optional ByVal ai_tiny As Double = 0.0000000000001) As Boolean
-            Return clsUtil.IsCriterion(ai_eps, ai_comparisonA.Eval, ai_comparisonB.Eval, ai_tiny)
-        End Function
-
-        ''' <summary>
-        ''' Check Criterion
+        ''' Check Criterion using eval
         ''' </summary>
         ''' <param name="ai_eps">EPS</param>
         ''' <param name="ai_comparisonA"></param>
@@ -236,7 +223,7 @@ Namespace Util
         ''' </remarks>
         Public Shared Function IsCriterion(ByVal ai_eps As Double,
                                            ByVal ai_comparisonA As Double, ByVal ai_comparisonB As Double,
-                                           Optional ByVal ai_tiny As Double = 0.0000000000001) As Boolean
+                                           Optional ByVal ai_tiny As Double = SAME_ZERO) As Boolean
             'check division by zero
             Dim denominator = (Math.Abs(ai_comparisonB) + Math.Abs(ai_comparisonA)) + ai_tiny
             If denominator = 0 Then
@@ -250,6 +237,71 @@ Namespace Util
             Else
                 Return False
             End If
+        End Function
+
+        ''' <summary>
+        ''' Check Criterion using points
+        ''' </summary>
+        ''' <param name="ai_eps">EPS</param>
+        ''' <param name="ai_comparisonA"></param>
+        ''' <param name="ai_comparisonB"></param>
+        ''' <param name="ai_tiny"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function IsCriterion(ByVal ai_eps As Double,
+                                           ByVal ai_comparisonA As clsPoint, ByVal ai_comparisonB As clsPoint,
+                                           Optional ByVal ai_tiny As Double = SAME_ZERO) As Boolean
+            Return clsUtil.IsCriterion(ai_eps, ai_comparisonA.Eval, ai_comparisonB.Eval, ai_tiny)
+        End Function
+
+        ''' <summary>
+        ''' Check Criterion using points
+        ''' </summary>
+        ''' <param name="eps"></param>
+        ''' <param name="points"></param>
+        ''' <param name="higherNPercentIndex"></param>
+        ''' <param name="tiny"></param>
+        ''' <returns></returns>
+        Public Shared Function IsCriterion(ByVal eps As Double,
+                                           ByVal points As List(Of clsPoint),
+                                           ByVal higherNPercentIndex As Integer,
+                                           Optional ByVal tiny As Double = SAME_ZERO) As Boolean
+            Dim evalIndexs = clsUtil.GetIndexSortedEvalFromPoints(points)
+
+            'global
+            Dim bestIndex = evalIndexs(0).Index
+            Dim bestEval = points(bestIndex).Eval
+
+            'comparators
+            Dim compareIndex = evalIndexs(higherNPercentIndex).Index
+            Dim compareEval = points(compareIndex).Eval
+
+            Return clsUtil.IsCriterion(eps, bestEval, compareEval, tiny)
+        End Function
+
+        ''' <summary>
+        ''' Check Criterion using particles
+        ''' </summary>
+        ''' <param name="eps"></param>
+        ''' <param name="particles"></param>
+        ''' <param name="higherNPercentIndex"></param>
+        ''' <param name="tiny"></param>
+        ''' <returns></returns>
+        Public Shared Function IsCriterion(ByVal eps As Double,
+                                           ByVal particles As List(Of clsParticle),
+                                           ByVal higherNPercentIndex As Integer,
+                                           Optional ByVal tiny As Double = SAME_ZERO) As Boolean
+            Dim evalIndexs = clsUtil.GetIndexSortedEvalFromParticles(particles)
+
+            'global
+            Dim bestIndex = evalIndexs(0).Index
+            Dim bestEval = particles(bestIndex).GetBestEval()
+
+            'comparators
+            Dim compareIndex = evalIndexs(higherNPercentIndex).Index
+            Dim compareEval = particles(compareIndex).GetBestEval()
+
+            Return clsUtil.IsCriterion(eps, bestEval, compareEval, tiny)
         End Function
 
         ''' <summary>
@@ -339,68 +391,6 @@ Namespace Util
                 Console.WriteLine("{0}", p.Eval)
             Next
         End Sub
-
-        ''' <summary>
-        ''' Eval list
-        ''' </summary>
-        ''' <param name="arP"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Shared Function GetSortedEvalList(ByVal arP As List(Of clsPoint)) As List(Of clsEval)
-            Dim sortedEvalList = New List(Of clsEval)
-            For i = 0 To arP.Count - 1
-                sortedEvalList.Add(New clsEval(i, arP(i).Eval))
-            Next
-            sortedEvalList.Sort()
-            Return sortedEvalList
-        End Function
-
-        ''' <summary>
-        ''' Best clsPoint
-        ''' </summary>
-        ''' <param name="ai_points"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Shared Function GetBestPoint(ByVal ai_points As List(Of clsPoint), Optional ByVal isCopy As Boolean = False) As clsPoint
-            If ai_points Is Nothing Then
-                Return Nothing
-            ElseIf ai_points.Count = 0 Then
-                Return Nothing
-            ElseIf ai_points.Count = 1 Then
-                Return ai_points(0)
-            End If
-
-            Dim best = ai_points(0)
-            For i As Integer = 1 To ai_points.Count - 1
-                If best.Eval > ai_points(i).Eval Then
-                    best = ai_points(i)
-                End If
-            Next
-
-            If isCopy = False Then
-                Return best
-            Else
-                Return best.Copy()
-            End If
-        End Function
-
-        ''' <summary>
-        ''' Find current best index from List(of clsPoint)
-        ''' </summary>
-        ''' <param name="ai_points"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Shared Function FindCurrentBestIndex(ByVal ai_points As List(Of clsPoint)) As Integer
-            Dim bestIndex As Integer = 0
-            Dim bestEval = ai_points(0).Eval
-            For i = 0 To ai_points.Count - 1
-                If ai_points(i).Eval < bestEval Then
-                    bestEval = ai_points(i).Eval
-                    bestIndex = i
-                End If
-            Next
-            Return bestIndex
-        End Function
 
         ''' <summary>
         ''' Limit solution space
@@ -743,21 +733,105 @@ Namespace Util
         End Function
 
         ''' <summary>
+        ''' Find current best index from List(of clsPoint)
+        ''' </summary>
+        ''' <param name="ai_points"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function FindCurrentBestIndex(ByVal ai_points As List(Of clsPoint)) As Integer
+            Dim bestIndex As Integer = 0
+            Dim bestEval = ai_points(0).Eval
+            For i = 0 To ai_points.Count - 1
+                If ai_points(i).Eval < bestEval Then
+                    bestEval = ai_points(i).Eval
+                    bestIndex = i
+                End If
+            Next
+            Return bestIndex
+        End Function
+
+        ''' <summary>
+        ''' Find current best point from List(of clsPoint)
+        ''' </summary>
+        ''' <param name="ai_points"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function FindCurrentBestPointFromPoints(ByVal ai_points As List(Of clsPoint), Optional ByVal isCopy As Boolean = False) As clsPoint
+            Dim i = FindCurrentBestIndex(ai_points)
+            If isCopy Then
+                Return ai_points(i).Copy()
+            Else
+                Return ai_points(i)
+            End If
+        End Function
+
+        ''' <summary>
         ''' Find global best(for PSO)
         ''' </summary>
         ''' <param name="particles"></param>
         ''' <returns></returns>
-        Public Shared Function FindGlobalBestFromParticles(ByVal particles As List(Of clsParticle)) As clsPoint
-            Dim tempBest = particles(0).Point
+        Public Shared Function FindCurrentBestIndexFromParticles(ByVal particles As List(Of clsParticle)) As Integer
+            Dim bestIndex As Integer = 0
+            Dim tempBest As clsPoint = Nothing
+            If particles(0).BestPoint.Eval < particles(0).Point.Eval Then
+                tempBest = particles(0).BestPoint
+            Else
+                tempBest = particles(0).Point
+            End If
             For i As Integer = 1 To particles.Count - 1
                 If particles(i).Point.Eval < tempBest.Eval Then
                     tempBest = particles(i).Point
+                    bestIndex = i
                 End If
                 If particles(i).BestPoint.Eval < tempBest.Eval Then
                     tempBest = particles(i).BestPoint
+                    bestIndex = i
                 End If
             Next
-            Return tempBest.Copy()
+            Return bestIndex
+        End Function
+
+        ''' <summary>
+        ''' Eval list
+        ''' </summary>
+        ''' <param name="arP"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function GetSortedEvalList(ByVal arP As List(Of clsPoint)) As List(Of clsEval)
+            Dim sortedEvalList = New List(Of clsEval)
+            For i = 0 To arP.Count - 1
+                sortedEvalList.Add(New clsEval(i, arP(i).Eval))
+            Next
+            sortedEvalList.Sort()
+            Return sortedEvalList
+        End Function
+
+        ''' <summary>
+        ''' Get an index sorted by valuation
+        ''' </summary>
+        ''' <param name="arP"></param>
+        ''' <returns></returns>
+        Public Shared Function GetIndexSortedEvalFromPoints(ByVal arP As List(Of clsPoint)) As List(Of clsEval)
+            Dim sortedEvalList = New List(Of clsEval)
+            For i = 0 To arP.Count - 1
+                sortedEvalList.Add(New clsEval(i, arP(i).Eval))
+            Next
+            sortedEvalList.Sort()
+            Return sortedEvalList
+        End Function
+
+        ''' <summary>
+        ''' Get an index sorted by valuation
+        ''' </summary>
+        ''' <param name="arP"></param>
+        ''' <returns></returns>
+        Public Shared Function GetIndexSortedEvalFromParticles(ByVal arP As List(Of clsParticle)) As List(Of clsEval)
+            Dim sortedEvalList = New List(Of clsEval)
+            For i = 0 To arP.Count - 1
+                sortedEvalList.Add(New clsEval(i, arP(i).GetBestEval()))
+            Next
+            sortedEvalList.Sort()
+            Return sortedEvalList
         End Function
 
     End Class

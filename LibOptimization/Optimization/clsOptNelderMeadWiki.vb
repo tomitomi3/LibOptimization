@@ -190,7 +190,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return clsUtil.GetBestPoint(Me.m_points, True)
+                Return clsUtil.FindCurrentBestPointFromPoints(Me.m_points, True)
             End Get
         End Property
 

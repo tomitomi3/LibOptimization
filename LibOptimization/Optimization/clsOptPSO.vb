@@ -147,12 +147,9 @@ Namespace Optimization
                 'Counting generation
                 m_iteration += 1
 
-                'check criterion
-                If Me.IsUseCriterion = True Then
-                    'higher N percentage particles are finished at the time of same evaluate value.
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_globalBest, Me.m_swarm(Me.HigherNPercentIndex).BestPoint) Then
-                        Return True
-                    End If
+                'check criterion - higher N percentage particles are finished at the time of same evaluate value.
+                If Me.IsUseCriterion = True AndAlso clsUtil.IsCriterion(Me.EPS, Me.m_swarm, Me.HigherNPercentIndex) Then
+                    Return True
                 End If
 
                 'PSO process
@@ -191,7 +188,7 @@ Namespace Optimization
                     Next
 
                     'sort by eval.
-                    Me.m_swarm.Sort()
+                    'Me.m_swarm.Sort()
                 ElseIf Me.SwarmType = EnumSwarmType.LocalBest Then
                     'local best.
                     Dim halfNeighbor = CInt(Me.Neighborhood / 2)
@@ -207,7 +204,7 @@ Namespace Optimization
                             lBests.Add(Me.m_swarm(i))
                         Next
 
-                        'second half
+                        'second half  p[i+n] p[i+1] p[i+2]
                         Dim endIndex = pp + halfNeighbor - 1
                         For i As Integer = pp To endIndex
                             If i >= Me.m_swarm.Count Then
@@ -215,7 +212,7 @@ Namespace Optimization
                             End If
                             lBests.Add(Me.m_swarm(i))
                         Next
-                        Dim lBest = clsUtil.FindGlobalBestFromParticles(lBests)
+                        Dim lBest = lBests(clsUtil.FindCurrentBestIndexFromParticles(lBests)).BestPoint().Copy()
 
                         'update a velocity 
                         Dim particle = Me.m_swarm(pp)
@@ -269,7 +266,7 @@ Namespace Optimization
                 '    End If
                 'Next
                 'Return Me.m_swarm(0).BestPoint.Copy()
-                Return Me.m_globalBest.Copy()
+                Return m_swarm(clsUtil.FindCurrentBestIndexFromParticles(m_swarm)).BestPoint.Copy()
             End Get
         End Property
 

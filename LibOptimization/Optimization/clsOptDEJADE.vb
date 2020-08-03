@@ -158,12 +158,12 @@ Namespace Optimization
                 m_iteration += 1
 
                 'Sort Evaluate
-                Me.m_parents.Sort()
+                'Me.m_parents.Sort()
+                Dim evalIndexs = clsUtil.GetIndexSortedEvalFromPoints(m_parents)
 
-                'check criterion
+                'check criterion - higher N percentage particles are finished at the time of same evaluate value.
                 If Me.IsUseCriterion = True Then
-                    'higher N percentage particles are finished at the time of same evaluate value.
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(Me.HigherNPercentIndex).Eval) Then
+                    If clsUtil.IsCriterion(Me.EPS, m_parents(evalIndexs(0).Index).Eval, m_parents(evalIndexs(HigherNPercentIndex).Index).Eval) Then
                         Return True
                     End If
                 End If
@@ -203,12 +203,12 @@ Namespace Optimization
                     Dim pBestIndex = CInt(Me.PopulationSize * Random.NextDouble())
                     If pBestIndex <= 2 Then
                         If Random.NextDouble() > 0.5 Then
-                            pbest = Me.m_parents(0)
+                            pbest = Me.m_parents(evalIndexs(0).Index)
                         Else
-                            pbest = Me.m_parents(1)
+                            pbest = Me.m_parents(evalIndexs(1).Index)
                         End If
                     ElseIf pBestIndex = Me.PopulationSize Then
-                        pbest = m_parents(PopulationSize - 1) 'worst
+                        pbest = m_parents(evalIndexs(PopulationSize - 1).Index) 'worst
                     Else
                         pbest = m_parents(Random.Next(0, pBestIndex))
                     End If
@@ -300,7 +300,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return clsUtil.GetBestPoint(m_parents, True)
+                Return clsUtil.FindCurrentBestPointFromPoints(Me.m_parents, True)
             End Get
         End Property
 

@@ -194,18 +194,18 @@ Namespace Optimization
                 m_iteration += 1
 
                 'Sort Evaluate
-                Me.m_parents.Sort()
+                'Me.m_parents.Sort()
+                Dim evalIndexs = clsUtil.GetIndexSortedEvalFromPoints(m_parents)
 
-                'check criterion
+                'check criterion - higher N percentage particles are finished at the time of same evaluate value.
                 If Me.IsUseCriterion = True Then
-                    'higher N percentage particles are finished at the time of same evaluate value.
-                    If clsUtil.IsCriterion(Me.EPS, Me.m_parents(0).Eval, Me.m_parents(Me.HigherNPercentIndex).Eval) Then
+                    If clsUtil.IsCriterion(Me.EPS, m_parents(evalIndexs(0).Index).Eval, m_parents(evalIndexs(HigherNPercentIndex).Index).Eval) Then
                         Return True
                     End If
                 End If
 
                 'reserve best value
-                Dim best = Me.m_parents(0).Copy()
+                Dim best = m_parents(evalIndexs(0).Index).Copy()
 
                 'DE
                 For i As Integer = 0 To Me.PopulationSize - 1
@@ -322,7 +322,7 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides ReadOnly Property Result As clsPoint
             Get
-                Return clsUtil.GetBestPoint(m_parents, True)
+                Return clsUtil.FindCurrentBestPointFromPoints(Me.m_parents, True)
             End Get
         End Property
 
