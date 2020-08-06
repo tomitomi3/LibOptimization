@@ -48,6 +48,9 @@ Namespace Optimization
         ''' <summary>Children Size(Default:n*10)</summary>
         Public Property ChildrenSize As Integer = 100
 
+        ''' <summary>expantion rate(Default:sqrt(n+2))</summary>
+        Public Property Alpha As Double = 0.0
+
         ''' <summary>population</summary>
         Private m_parents As New List(Of clsPoint) 'Parent
 #End Region
@@ -65,6 +68,7 @@ Namespace Optimization
 
             Me.PopulationSize = Me.m_func.NumberOfVariable * 33
             Me.ChildrenSize = Me.m_func.NumberOfVariable * 10
+            Me.Alpha = Math.Sqrt(Me.m_func.NumberOfVariable + 2) 'recommend
         End Sub
 #End Region
 
@@ -178,42 +182,48 @@ Namespace Optimization
         ''' <param name="ai_parents"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function CrossOverSPX(ByVal ai_childSize As Integer, _
+        Private Function CrossOverSPX(ByVal ai_childSize As Integer,
                                       ByVal ai_parents As List(Of KeyValuePair(Of Integer, clsPoint))) As List(Of clsPoint)
             'Calc Centroid
-            Dim xg As New clsEasyVector(MyBase.m_func.NumberOfVariable)
+            Dim g As New clsEasyVector(MyBase.m_func.NumberOfVariable)
             For Each p As KeyValuePair(Of Integer, clsPoint) In ai_parents
-                xg += p.Value
+                g += p.Value
             Next
-            xg /= ai_parents.Count 'sum(xi)/(n+k)
+            g /= ai_parents.Count 'sum(xi)/(n+k)
 
             'SPX
             Dim retChilds As New List(Of clsPoint)
-            Dim alpha As Double = Math.Sqrt(MyBase.m_func.NumberOfVariable + 2) 'expantion rate
+
+            'CrossOver
             For i As Integer = 0 To ai_childSize - 1
-                Dim cVector As New List(Of clsEasyVector)
-                Dim pVector As New List(Of clsEasyVector)
+                Dim c_k As New List(Of clsEasyVector)
+                Dim x_k As New List(Of clsEasyVector)
                 Dim k As Integer = 0
-                For Each xi As KeyValuePair(Of Integer, clsPoint) In ai_parents
-                    pVector.Add(xg + alpha * (xi.Value - xg))
+                For Each p_k As KeyValuePair(Of Integer, clsPoint) In ai_parents
+                    x_k.Add(g + Alpha * (p_k.Value - g))
 
                     If k = 0 Then
-                        cVector.Add(New clsEasyVector(MyBase.m_func.NumberOfVariable)) 'all zero
+                        c_k.Add(New clsEasyVector(MyBase.m_func.NumberOfVariable)) 'all zero
                     Else
                         Dim rk As Double = m_rand.NextDouble() ^ (1 / k)
-                        Dim pos = rk * (pVector(k - 1) - pVector(k) + cVector(k - 1))
-                        cVector.Add(pos)
+                        'If (k-1) >= Me.m_func.NumberOfVariable Then
+                        '    rk = 1 'do not calc
+                        'End If
+                        Dim pos = rk * (x_k(k - 1) - x_k(k) + c_k(k - 1))
+                        c_k.Add(pos)
                     End If
                     k += 1
                 Next
-                Dim tempChild = New clsPoint(MyBase.m_func, pVector(pVector.Count - 1) + cVector(cVector.Count - 1))
+                Dim n = MyBase.m_func.NumberOfVariable
+                Dim tempChild As clsPoint = Nothing
+                tempChild = New clsPoint(MyBase.m_func, x_k(n) + c_k(n))
 
                 'limit solution space
                 clsUtil.LimitSolutionSpace(tempChild, Me.LowerBounds, Me.UpperBounds)
 
                 retChilds.Add(tempChild)
             Next
-            retChilds.Sort()
+            retChilds.Sort() 'for tournement selection
 
             Return retChilds
         End Function
