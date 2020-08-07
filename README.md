@@ -2,6 +2,8 @@
 | ---- | ---- |
 | [![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/master?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/master) | [![NuGet](https://img.shields.io/nuget/dt/LibOptimization.svg)](https://www.nuget.org/packages/LibOptimization/) |
 
+<img src="https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png" width=30%>
+
 LibOptimization
 ===============
 
@@ -33,8 +35,6 @@ If you like, f you use LibOptimization for a publication, please cite it as:
 Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0. Refactoring LibOptimization code with development branch. In the future, I will add new function to the new branch.
 
 # Introduction
-
-![LibOptimization Log](https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png)
 
 ## Implement Optimization algorithm
 
@@ -398,9 +398,8 @@ http://opensource.org/licenses/MS-PL
 
 # Support .NET Framework
 
-.NET Framework 4.0 (Nuget)
-
-.NET Framework 3.0, 3.5 (include This repository)
+* .NET Framework 4.6
+* .NET Framework 3.0, 3.5 (include This repository)
 
 # Refference
 
