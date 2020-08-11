@@ -521,10 +521,7 @@ Imports LibOptimization.Util
         '----------------
         With Nothing
             Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
-                                                  New Double() {1, 0, 0},
-                                                  New Double() {0, 1, 0},
-                                                  New Double() {0, 0, 1}})
+            Dim mat As New MathUtil.clsEasyMatrix(v.Count, True)
             Try
                 Dim temp = v * mat
 
@@ -750,7 +747,6 @@ Imports LibOptimization.Util
         End With
     End Sub
 
-
     ''' <summary>
     ''' test Matrix x Matrix
     ''' </summary>
@@ -758,6 +754,7 @@ Imports LibOptimization.Util
         '---------
         'bad
         '---------
+        '3x3 * 2x2
         With Nothing
             Dim dimNum = 3
             Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
@@ -765,12 +762,13 @@ Imports LibOptimization.Util
             Try
                 Dim temp = matA * matB
 
-                Assert.Fail()
+                Assert.Fail("error : 3x3 * 2x2")
             Catch myex As clsException
                 'OK
             End Try
         End With
 
+        '2x2 * 3x3
         With Nothing
             Dim dimNum = 3
             Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum - 1)
@@ -778,12 +776,13 @@ Imports LibOptimization.Util
             Try
                 Dim temp = matA * matB
 
-                Assert.Fail()
+                Assert.Fail("error : 2x2 * 3x3")
             Catch myex As clsException
                 'OK
             End Try
         End With
 
+        '3x3 * 2x3
         With Nothing
             Dim matA As New clsEasyMatrix(3, True)
             Dim matB As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1},
@@ -791,7 +790,7 @@ Imports LibOptimization.Util
             Try
                 Dim temp = matA * matB
 
-                Assert.Fail()
+                Assert.Fail("error : 3x3 * 2x3")
             Catch myex As clsException
                 'OK
             End Try
@@ -800,37 +799,37 @@ Imports LibOptimization.Util
         '---------
         'OK
         '---------
-        With Nothing
-            Dim dimNum = 3
-            Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
-            Dim matB = New clsEasyMatrix(dimNum, True)
-            Try
-                Dim temp = matA * matB
-                temp.PrintValue()
+        For dimNum = 2 To 10 - 1
+            With Nothing
+                Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim matB = New clsEasyMatrix(dimNum, True)
+                Try
+                    Dim temp = matA * matB
+                    temp.PrintValue(name:="A*B")
 
-                If clsMathUtil.IsNearyEqualMatrix(temp, matA) = False Then
+                    If clsMathUtil.IsNearyEqualMatrix(temp, matA) = False Then
+                        Assert.Fail("error : {0}x{0}", dimNum)
+                    End If
+                Catch myex As clsException
                     Assert.Fail()
-                End If
-            Catch myex As clsException
-                Assert.Fail()
-            End Try
-        End With
+                End Try
+            End With
 
-        With Nothing
-            Dim dimNum = 3
-            Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
-            Dim matB = New clsEasyMatrix(dimNum, False)
-            Try
-                Dim temp = matA * matB
-                temp.PrintValue()
+            With Nothing
+                Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim matB = New clsEasyMatrix(dimNum, False)
+                Try
+                    Dim temp = matA * matB
+                    temp.PrintValue(name:="B(zero)*A")
 
-                If clsMathUtil.IsNearyEqualMatrix(temp, matB) = False Then
+                    If clsMathUtil.IsNearyEqualMatrix(temp, matB) = False Then
+                        Assert.Fail("error : {0}x{0}", dimNum)
+                    End If
+                Catch myex As clsException
                     Assert.Fail()
-                End If
-            Catch myex As clsException
-                Assert.Fail()
-            End Try
-        End With
+                End Try
+            End With
+        Next
 
         With Nothing
             Dim matA As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1},
@@ -849,19 +848,9 @@ Imports LibOptimization.Util
                 End If
 
                 'check value
-                For i As Integer = 0 To temp.RowCount - 1
-                    For j As Integer = 0 To temp.ColCount - 1
-                        If i = 0 Then
-                            If temp(i)(j) <> 1 Then
-                                Assert.Fail()
-                            End If
-                        Else
-                            If temp(i)(j) <> 2 Then
-                                Assert.Fail()
-                            End If
-                        End If
-                    Next
-                Next
+                If clsMathUtil.IsNearyEqualMatrix(temp, matA) = False Then
+                    Assert.Fail()
+                End If
             Catch myex As clsException
                 Assert.Fail()
             End Try
@@ -973,11 +962,12 @@ Imports LibOptimization.Util
     ''' </summary>
     <TestMethod()> Public Sub InverseMatrix_4to10()
         For dimNum As Integer = 4 To 10
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, 11111)
+            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, 1111)
             source.PrintValue(name:="Source matrix")
-            source.Inverse().PrintValue(name:="Inverse matrix")
+            Dim souceInv = source.Inverse()
+            souceInv.PrintValue(name:="Inverse matrix")
 
-            Dim product = source * source.Inverse()
+            Dim product = source * souceInv
             product.PrintValue(name:="S*S^-1")
 
             'check

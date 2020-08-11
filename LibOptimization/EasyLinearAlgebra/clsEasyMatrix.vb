@@ -4,6 +4,9 @@
     ''' </summary>
     Public Class LU
         ''' <summary></summary>
+        Public Property P As clsEasyMatrix = Nothing
+
+        ''' <summary></summary>
         Public Property L As clsEasyMatrix = Nothing
 
         ''' <summary></summary>
@@ -13,6 +16,12 @@
         End Sub
 
         Public Sub New(ByVal matL As clsEasyMatrix, ByVal matU As clsEasyMatrix)
+            Me.L = matL
+            Me.U = matU
+        End Sub
+
+        Public Sub New(ByVal matP As clsEasyMatrix, ByVal matL As clsEasyMatrix, ByVal matU As clsEasyMatrix)
+            Me.P = matP
             Me.L = matL
             Me.U = matU
         End Sub
@@ -297,22 +306,15 @@
         ''' <remarks>
         ''' </remarks>
         Public Shared Operator *(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
+            '.NET Frameworkのバージョンで区分け
+#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
+            '------------------------------------------------------------------
+            '.net 3.0, 3.5
+            '------------------------------------------------------------------
             If IsSameDimension(ai_source, ai_dest) = True Then
                 '[M*M] X [M*M]
                 Dim size = ai_source.RowCount
                 Dim ret As New clsEasyMatrix(size)
-
-                '並列化 .NET4
-                'Threading.Tasks.Parallel.For(0, size - 1,
-                '                             Sub(i)
-                '                                 For j As Integer = 0 To size - 1
-                '                                     For k As Integer = 0 To size - 1
-                '                                         Dim tempA = ai_source(i)(k)
-                '                                         Dim tempB = ai_dest(k)(j)
-                '                                         ret(i)(j) += tempA * tempB
-                '                                     Next
-                '                                 Next
-                '                             End Sub)
 
                 For i As Integer = 0 To size - 1
                     For j As Integer = 0 To size - 1
@@ -323,11 +325,11 @@
                         Next
                     Next
                 Next
-
                 Return ret
             ElseIf ai_source.ColCount = ai_dest.RowCount Then
                 '[M*N] X [N*O]
                 Dim ret As New clsEasyMatrix(ai_source.RowCount, ai_dest.ColCount)
+
                 For i As Integer = 0 To ret.RowCount - 1
                     For j As Integer = 0 To ret.ColCount - 1
                         Dim temp As Double = 0.0
@@ -341,6 +343,52 @@
             End If
 
             Throw New clsException(clsException.Series.NotComputable, "Matrix * Matrix")
+#Else
+            '------------------------------------------------------------------
+            '.net 4.0
+            '------------------------------------------------------------------
+            'using Paralle .NET4
+            Dim pOption = New Threading.Tasks.ParallelOptions()
+            '#If DEBUG Then
+            '            pOption.MaxDegreeOfParallelism = 1
+            '#End If
+
+            If IsSameDimension(ai_source, ai_dest) = True Then
+                '[M*M] X [M*M]
+                Dim size = ai_source.RowCount
+                Dim ret As New clsEasyMatrix(size)
+
+                Threading.Tasks.Parallel.For(0, size, pOption,
+                                             Sub(i)
+                                                 For j As Integer = 0 To size - 1
+                                                     For k As Integer = 0 To size - 1
+                                                         Dim tempA = ai_source(i)(k)
+                                                         Dim tempB = ai_dest(k)(j)
+                                                         ret(i)(j) += tempA * tempB
+                                                     Next
+                                                 Next
+                                             End Sub)
+                Return ret
+            ElseIf ai_source.ColCount = ai_dest.RowCount Then
+                '[M*N] X [N*O]
+                Dim rowSize = ai_source.RowCount
+                Dim ret As New clsEasyMatrix(ai_source.RowCount, ai_dest.ColCount)
+
+                Threading.Tasks.Parallel.For(0, rowSize, pOption,
+                                             Sub(i)
+                                                 For j As Integer = 0 To ret.ColCount - 1
+                                                     Dim temp As Double = 0.0
+                                                     For k As Integer = 0 To ai_source.ColCount - 1
+                                                         temp += ai_source(i)(k) * ai_dest(k)(j)
+                                                     Next
+                                                     ret(i)(j) = temp
+                                                 Next
+                                             End Sub)
+                Return ret
+            End If
+
+            Throw New clsException(clsException.Series.NotComputable, "Matrix * Matrix")
+#End If
         End Operator
 
         ''' <summary>
@@ -353,10 +401,11 @@
         ''' </remarks>
         Public Shared Operator *(ByVal mat As clsEasyMatrix, ByVal vec As clsEasyVector) As clsEasyVector
             'ベクトルと行列のサイズ確認
-            'OK
+            ' M*M * M
             ' |a11 a12| * |v1| = cv1
             ' |a21 a22|   |v2|   cv2
             '
+            ' M*N * N
             ' |a11 a12| * |v1| = cv1
             '             |v2|
             '
@@ -367,13 +416,13 @@
             If mat.ColCount <> vec.Count Then
                 Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector - size error")
             End If
-            If vec.Direction <> clsEasyVector.VectorDirection.COL Then
-                Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector - size error")
-            End If
+            'If vec.Direction <> clsEasyVector.VectorDirection.COL Then
+            '    Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector - vector direction is row")
+            'End If
 
-            '計算
-            Dim vSize As Integer = mat.RowCount '行列の行サイズ
+            Dim vSize As Integer = mat.RowCount
             Dim ret As New clsEasyVector(vSize, clsEasyVector.VectorDirection.COL)
+#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
             For i As Integer = 0 To vSize - 1
                 Dim sum As Double = 0.0
                 For j As Integer = 0 To mat.ColCount - 1
@@ -382,6 +431,17 @@
                 ret(i) = sum
             Next
             Return ret
+#Else
+            Threading.Tasks.Parallel.For(0, vSize,
+                                             Sub(i)
+                                                 Dim sum As Double = 0.0
+                                                 For j As Integer = 0 To mat.ColCount - 1
+                                                     sum += mat(i)(j) * vec(j)
+                                                 Next
+                                                 ret(i) = sum
+                                             End Sub)
+            Return ret
+#End If
         End Operator
 
         ''' <summary>
@@ -407,11 +467,14 @@
             If vec.Count <> mat.RowCount Then
                 Throw New clsException(clsException.Series.NotComputable, "Vector * Matrix - size error")
             End If
+            'If vec.Direction <> clsEasyVector.VectorDirection.COL Then
+            '    Throw New clsException(clsException.Series.NotComputable, "Vector * Matrix - vector direction is col")
+            'End If
 
-            '計算
             Dim vSize As Integer = mat.ColCount '行列の行サイズ
             Dim ret As New clsEasyVector(vSize, clsEasyVector.VectorDirection.ROW)
-            For j As Integer = 0 To vSize - 1
+#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
+           For j As Integer = 0 To vSize - 1
                 Dim sum As Double = 0.0
                 For i As Integer = 0 To mat.RowCount - 1
                     sum += vec(i) * mat(i)(j)
@@ -419,6 +482,17 @@
                 ret(j) = sum
             Next
             Return ret
+#Else
+            Threading.Tasks.Parallel.For(0, vSize,
+                                             Sub(j)
+                                                 Dim sum As Double = 0.0
+                                                 For i As Integer = 0 To mat.RowCount - 1
+                                                     sum += vec(i) * mat(i)(j)
+                                                 Next
+                                                 ret(j) = sum
+                                             End Sub)
+            Return ret
+#End If
         End Operator
 
         ''' <summary>
@@ -550,29 +624,29 @@
                 retInverse(2)(1) = -((Me(0)(0) * Me(2)(1) - Me(0)(1) * Me(2)(0))) / tempDet
                 retInverse(2)(2) = ((Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))) / tempDet
             Else
-                'Gauss elimination with pivot select
+                'Gauss elimination
                 For i As Integer = 0 To n - 1
-                    'diagonal element
-                    Dim ip As Integer = i 'maxIndex
-                    Dim amax As Double = source(i)(i) 'maxValue
-                    For index As Integer = 0 To n - 1
-                        Dim temp As Double = Math.Abs(source(index)(i))
-                        If temp > amax Then
-                            amax = temp
-                            ip = index
-                        End If
-                    Next
+                    ''diagonal element
+                    'Dim ip As Integer = i 'maxIndex
+                    'Dim amax As Double = source(i)(i) 'maxValue
+                    'For index As Integer = 0 To n - 1
+                    '    Dim temp As Double = Math.Abs(source(index)(i))
+                    '    If temp > amax Then
+                    '        amax = temp
+                    '        ip = index
+                    '    End If
+                    'Next
 
-                    'check 正則性の判定
-                    If amax < same_zero_value Then
-                        Throw New clsException(clsException.Series.NotComputable, "Inverse nxn")
-                    End If
+                    ''check 正則性の判定
+                    'If amax < same_zero_value Then
+                    '    Throw New clsException(clsException.Series.NotComputable, "Inverse nxn")
+                    'End If
 
-                    'change row
-                    If i <> ip Then
-                        source.SwapRow(i, ip)
-                        retInverse.SwapRow(i, ip)
-                    End If
+                    ''change row
+                    'If i <> ip Then
+                    '    source.SwapRow(i, ip)
+                    '    retInverse.SwapRow(i, ip)
+                    'End If
 
                     'discharge calculation
                     Dim tempValue As Double = 1.0 / source(i)(i)
@@ -916,6 +990,7 @@
 
         ''' <summary>
         ''' LU decomposition using Crout method
+        ''' note:クラウト法なのでUの対角成分が1になる
         ''' </summary>
         ''' <param name="same_zero_value">2.0E-50</param>
         ''' <returns></returns>
@@ -928,7 +1003,7 @@
                 For i = j To n - 1
                     Dim sum = 0.0
                     For k = 0 To j - 1
-                        sum = sum + matL(i)(k) * matU(k)(j)
+                        sum += matL(i)(k) * matU(k)(j)
                     Next
                     matL(i)(j) = Me(i)(j) - sum
                 Next
@@ -936,14 +1011,49 @@
                 For i = j To n - 1
                     Dim sum = 0.0
                     For k = 0 To j - 1
-                        sum = sum + matL(j)(k) * matU(k)(i)
+                        sum += matL(j)(k) * matU(k)(i)
                     Next
 
                     If Math.Abs(matL(j)(j)) < same_zero_value Then
                         'Singular matrix
-                        matL.Clear()
-                        matU.Clear()
-                        Return New LU(matL, matU)
+                        Throw New clsException(clsException.Series.NotComputable, "singular matrix")
+                    End If
+
+                    matU(j)(i) = (Me(j)(i) - sum) / matL(j)(j)
+                Next
+            Next
+
+            Return New LU(matL, matU)
+        End Function
+
+        ''' <summary>
+        ''' PLU
+        ''' </summary>
+        ''' <param name="same_zero_value"></param>
+        ''' <returns></returns>
+        Public Function PLU(Optional ByVal same_zero_value As Double = SAME_ZERO) As LU
+            Dim matU = New clsEasyMatrix(Me.ColCount, True)
+            Dim matL = New clsEasyMatrix(Me.ColCount, False)
+            Dim n = Me.ColCount
+
+            For j As Integer = 0 To n - 1
+                For i = j To n - 1
+                    Dim sum = 0.0
+                    For k = 0 To j - 1
+                        sum += matL(i)(k) * matU(k)(j)
+                    Next
+                    matL(i)(j) = Me(i)(j) - sum
+                Next
+
+                For i = j To n - 1
+                    Dim sum = 0.0
+                    For k = 0 To j - 1
+                        sum += matL(j)(k) * matU(k)(i)
+                    Next
+
+                    If Math.Abs(matL(j)(j)) < same_zero_value Then
+                        'Singular matrix
+                        Throw New clsException(clsException.Series.NotComputable, "singular matrix")
                     End If
 
                     matU(j)(i) = (Me(j)(i) - sum) / matL(j)(j)
