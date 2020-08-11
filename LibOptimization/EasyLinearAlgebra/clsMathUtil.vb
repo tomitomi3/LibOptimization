@@ -23,6 +23,7 @@
                     matTemp(i)(j) = r
                     matTemp(j)(i) = r
                 Next
+                matTemp(i)(i) = 1
             Next
 
             Return matTemp
@@ -52,40 +53,6 @@
         End Function
 
         ''' <summary>
-        ''' for Eigen() debug
-        ''' </summary>
-        ''' <param name="dimNum"></param>
-        ''' <param name="seed"></param>
-        ''' <returns></returns>
-        Public Shared Function IsCheckEigen(ByVal dimNum As Integer, Optional ByVal seed As Integer = 123456) As Boolean
-            Dim sw As New Stopwatch()
-            Dim mat2 = CreateRandomSymmetricMatrix(dimNum, seed)
-            mat2.PrintValue(name:="Source")
-
-            Dim retM As clsEasyMatrix = Nothing
-            Dim retV As clsEasyVector = Nothing
-            Dim suspend As clsEasyMatrix = Nothing
-            sw.Start()
-            While (clsEasyMatrix.Eigen(mat2, retV, retM, SuspendMat:=suspend) = False)
-                Console.WriteLine("Retry")
-                mat2 = suspend
-            End While
-            sw.Stop()
-            Dim retD = retV.ToDiagonalMatrix()
-
-            retM.PrintValue(name:="Eigen V")
-            retD.PrintValue(name:="D")
-            retM.T.PrintValue(name:="Eigen V^T")
-
-            Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
-            temp.PrintValue()
-
-            Console.WriteLine("Elapsed Time:{0}", sw.ElapsedMilliseconds)
-
-            Return True
-        End Function
-
-        ''' <summary>
         ''' check eaual matrix
         ''' </summary>
         ''' <param name="matA"></param>
@@ -99,7 +66,7 @@
                     For j As Integer = 0 To matA.ColCount - 1
                         Dim tempValA = matA(i)(j)
                         Dim tempValB = matB(i)(j)
-                        Dim diff = Math.Abs(tempValA) - Math.Abs(tempValB)
+                        Dim diff = Math.Sqrt(Math.Pow(tempValA - tempValB, 2))
                         If diff > eps Then
                             Return False
                         End If

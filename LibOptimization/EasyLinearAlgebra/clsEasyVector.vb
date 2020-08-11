@@ -465,7 +465,7 @@
         End Sub
 
         ''' <summary>
-        ''' Convert diagonal matrix from vector
+        ''' create diagonal matrix from vector
         ''' </summary>
         ''' <returns></returns>
         Public Function ToDiagonalMatrix() As clsEasyMatrix

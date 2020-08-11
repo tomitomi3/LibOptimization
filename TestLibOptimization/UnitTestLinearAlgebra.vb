@@ -1011,34 +1011,34 @@ Imports LibOptimization.Util
     ''' test Eigen decomposition
     ''' </summary>
     <TestMethod()> Public Sub Eigen()
-        Dim tempMat = clsMathUtil.CreateRandomSymmetricMatrix(5, 123456) '8, 12345 is not calc?
-        tempMat.PrintValue(name:="Source")
+        For i As Integer = 2 To 5
+            Dim matDim = i
 
-        Dim retM As clsEasyMatrix = Nothing
-        Dim retV As clsEasyVector = Nothing
-        Dim suspend As clsEasyMatrix = Nothing
-        clsEasyMatrix.Eigen(tempMat, retV, retM, Iteration:=10000)
-        Dim retD = retV.ToDiagonalMatrix()
+            Dim srcMat = clsMathUtil.CreateRandomSymmetricMatrix(matDim, 123456)
+            srcMat.PrintValue(name:="Source")
 
-        retM.PrintValue(name:="Eigen V")
-        retD.PrintValue(name:="D")
-        retM.T().PrintValue(name:="Eigen V^T")
-        retM.Inverse().PrintValue(name:="Eigen V^-1")
+            'eigen
+            Dim isConv As Boolean = False
+            Dim eigen = srcMat.Eigen(isConversion:=isConv)
+            Dim retV = eigen.EigenValue
+            Dim retM = eigen.EigenVector
+            Dim retD = retV.ToDiagonalMatrix()
 
-        'check
-        Dim temp As clsEasyMatrix = Nothing
-        temp = retM * retV.ToDiagonalMatrix() * retM.T()
-        temp.PrintValue(name:="V*D*V^T")
-        If clsMathUtil.IsNearyEqualMatrix(tempMat, temp) = False Then
-            Assert.Fail()
-        End If
+            'check
+            '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
+            Dim matI = retM * retM.T()
+            matI.PrintValue(name:="EigenVector * EivenVector^T")
+            If clsMathUtil.IsNearyEqualMatrix(matI, New clsEasyMatrix(matDim, True)) = False Then
+                Assert.Fail()
+            End If
 
-        'check
-        temp = retM * retV.ToDiagonalMatrix() * retM.Inverse()
-        temp.PrintValue(name:="V*D*V^-1")
-        If clsMathUtil.IsNearyEqualMatrix(tempMat, temp) = False Then
-            Assert.Fail()
-        End If
+            'check
+            Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
+            temp.PrintValue(name:="V*D*V^T")
+            If clsMathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
+                Assert.Fail()
+            End If
+        Next
     End Sub
 
     ''' <summary>

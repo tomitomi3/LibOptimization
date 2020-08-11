@@ -1,12 +1,71 @@
 ﻿Namespace MathUtil
     ''' <summary>
+    ''' store LU decomposition
+    ''' </summary>
+    Public Class LU
+        ''' <summary></summary>
+        Public Property L As clsEasyMatrix = Nothing
+
+        ''' <summary></summary>
+        Public Property U As clsEasyMatrix = Nothing
+
+        Private Sub New()
+        End Sub
+
+        Public Sub New(ByVal matL As clsEasyMatrix, ByVal matU As clsEasyMatrix)
+            Me.L = matL
+            Me.U = matU
+        End Sub
+    End Class
+
+    ''' <summary>
+    ''' store SVD decomposition
+    ''' </summary>
+    Public Class SVD
+        ''' <summary></summary>
+        Public Property S As clsEasyMatrix = Nothing
+
+        ''' <summary></summary>
+        Public Property V As clsEasyVector = Nothing
+
+        ''' <summary></summary>
+        Public Property D As clsEasyMatrix = Nothing
+
+        Private Sub New()
+        End Sub
+
+        Public Sub New(ByVal matS As clsEasyMatrix, ByVal matV As clsEasyVector,
+                       ByVal matD As clsEasyMatrix)
+            Me.S = matS
+            Me.V = matV
+            Me.D = matD
+        End Sub
+    End Class
+
+    ''' <summary>
+    ''' store Eigen values, vector
+    ''' </summary>
+    Public Class Eigen
+        ''' <summary></summary>
+        Public Property EigenValue As clsEasyVector = Nothing
+
+        ''' <summary></summary>
+        Public Property EigenVector As clsEasyMatrix = Nothing
+
+        Private Sub New()
+        End Sub
+
+        Public Sub New(ByVal eigeValue As clsEasyVector, ByVal eigenVec As clsEasyMatrix)
+            Me.EigenValue = eigeValue
+            Me.EigenVector = eigenVec
+        End Sub
+    End Class
+
+    ''' <summary>
     ''' Matrix class
     ''' </summary>
     ''' <remarks>
     ''' Inherits List(Of List(Of Double))
-    ''' 
-    ''' TODO:
-    ''' LU, Solve ,SVD
     ''' </remarks>
     Public Class clsEasyMatrix : Inherits List(Of List(Of Double))
         Public Const SAME_ZERO As Double = 2.0E-50 '2^-50
@@ -615,19 +674,6 @@
         End Function
 
         ''' <summary>
-        ''' 対角成分で行列を作る
-        ''' </summary>
-        ''' <param name="vec"></param>
-        ''' <returns></returns>
-        Public Shared Function ToDiagonalMatrix(ByVal vec As clsEasyVector) As clsEasyMatrix
-            Dim ret = New clsEasyMatrix(vec.Count)
-            For i As Integer = 0 To ret.Count - 1
-                ret(i)(i) = vec(i)
-            Next
-            Return ret
-        End Function
-
-        ''' <summary>
         ''' Cholesky decomposition A=LL^T
         ''' </summary>
         ''' <returns></returns>
@@ -664,7 +710,7 @@
         ''' </summary>
         ''' <param name="sourceMat"></param>
         ''' <returns></returns>
-        Public Shared Function ToTridiagonalMatrix(ByVal sourceMat As clsEasyMatrix) As clsEasyMatrix
+        Public Function ToTridiagonalMatrix(ByVal sourceMat As clsEasyMatrix) As clsEasyMatrix
             'ref
             'ハウスホルダー変換
             'http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?%B8%C7%CD%AD%C3%CD/%B8%C7%CD%AD%A5%D9%A5%AF%A5%C8%A5%EB
@@ -751,19 +797,14 @@
         ''' Eigen decomposition using Jacobi Method.
         ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
         ''' </summary>
-        ''' <param name="inMat">source matrix</param>
-        ''' <param name="eigenvalues">eigen vaues(Vector)</param>
-        ''' <param name="eigenVectors">eigen vectors(Matrix)</param>
         ''' <param name="Iteration">default iteration:1000</param>
         ''' <param name="Conversion">default conversion:1.0e-16</param>
-        ''' <returns>True:success conversion. False:not conversion</returns>
-        Public Shared Function Eigen(ByVal inMat As clsEasyMatrix,
-                                     ByRef eigenvalues As clsEasyVector, ByRef eigenVectors As clsEasyMatrix,
-                                     Optional ByVal Iteration As Integer = 1000,
-                                     Optional ByVal Conversion As Double = 0.0000000000000001,
-                                     Optional ByRef SuspendMat As clsEasyMatrix = Nothing) As Boolean
-            Dim size = inMat.ColCount()
-            Dim retEigenMat = New clsEasyMatrix(inMat)
+        ''' <returns></returns>
+        Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
+                              Optional ByVal Conversion As Double = 0.0000000000000001,
+                              Optional ByRef isConversion As Boolean = False) As Eigen
+            Dim size = Me.ColCount()
+            Dim retEigenMat = New clsEasyMatrix(Me)
             Dim rotate = New clsEasyMatrix(size, True)
 
             Dim rowIdx() = New Integer(size * 4 - 1) {}
@@ -771,7 +812,6 @@
             Dim value() = New Double(size * 4 - 1) {}
 
             'iteration
-            Dim isConversion As Boolean = False
             For itr As Integer = 0 To Iteration - 1
                 'find abs max value without diag
                 Dim max = Math.Abs(retEigenMat(0)(1))
@@ -871,31 +911,18 @@
                 rotate = rotate * rotateNew
             Next
 
-            '途中結果
-            SuspendMat = retEigenMat
-
-            '値を代入
-            eigenvalues = retEigenMat.ToVectorFromDiagonal()
-            eigenVectors = rotate
-
-            Return isConversion
+            Return New Eigen(retEigenMat.ToVectorFromDiagonal(), rotate)
         End Function
 
         ''' <summary>
         ''' LU decomposition using Crout method
         ''' </summary>
-        ''' <param name="inMat"></param>
-        ''' <param name="matL"></param>
-        ''' <param name="matU"></param>
         ''' <param name="same_zero_value">2.0E-50</param>
         ''' <returns></returns>
-        Public Shared Function LU(ByVal inMat As clsEasyMatrix,
-                                  ByRef matL As clsEasyMatrix,
-                                  ByRef matU As clsEasyMatrix,
-                                  Optional ByVal same_zero_value As Double = SAME_ZERO) As Boolean
-            matU = New clsEasyMatrix(inMat.ColCount, True)
-            matL = New clsEasyMatrix(inMat.ColCount, False)
-            Dim n = inMat.ColCount
+        Public Function LU(Optional ByVal same_zero_value As Double = SAME_ZERO) As LU
+            Dim matU = New clsEasyMatrix(Me.ColCount, True)
+            Dim matL = New clsEasyMatrix(Me.ColCount, False)
+            Dim n = Me.ColCount
 
             For j As Integer = 0 To n - 1
                 For i = j To n - 1
@@ -903,7 +930,7 @@
                     For k = 0 To j - 1
                         sum = sum + matL(i)(k) * matU(k)(j)
                     Next
-                    matL(i)(j) = inMat(i)(j) - sum
+                    matL(i)(j) = Me(i)(j) - sum
                 Next
 
                 For i = j To n - 1
@@ -913,18 +940,18 @@
                     Next
 
                     If Math.Abs(matL(j)(j)) < same_zero_value Then
+                        'Singular matrix
                         matL.Clear()
                         matU.Clear()
-                        Return False
+                        Return New LU(matL, matU)
                     End If
 
-                    matU(j)(i) = (inMat(j)(i) - sum) / matL(j)(j)
+                    matU(j)(i) = (Me(j)(i) - sum) / matL(j)(j)
                 Next
             Next
 
-            Return True
+            Return New LU(matL, matU)
         End Function
-
 
         ''' <summary>
         ''' Resize matrix dimension
@@ -1107,12 +1134,12 @@
             If ai_dim = 1 Then
                 Return ai_clsMatrix(0)(0)
             ElseIf ai_dim = 2 Then
-                '2 order
+                '2 dim
                 ' | a b |
                 ' | c d | = ad-bc
                 Return ai_clsMatrix(0)(0) * ai_clsMatrix(1)(1) - ai_clsMatrix(0)(1) * ai_clsMatrix(1)(0)
             ElseIf ai_dim = 3 Then
-                '3 order using Sarrus rule
+                '3 dim using Sarrus rule
                 Dim d As Double = 0.0
                 d += ai_clsMatrix(0)(0) * ai_clsMatrix(1)(1) * ai_clsMatrix(2)(2)
                 d += ai_clsMatrix(1)(0) * ai_clsMatrix(2)(1) * ai_clsMatrix(0)(2)
@@ -1122,7 +1149,7 @@
                 d -= ai_clsMatrix(0)(0) * ai_clsMatrix(2)(1) * ai_clsMatrix(1)(2)
                 Return d
             Else
-                'over 4 order
+                'over 4 dim
                 Dim detVal As Double = 0.0
                 Dim b As New clsEasyMatrix(ai_dim - 1)
                 Dim sign As Integer = 0
