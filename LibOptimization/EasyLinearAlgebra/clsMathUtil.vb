@@ -89,5 +89,19 @@
             source(fromIdx) = source(destIdx)
             source(destIdx) = temp
         End Sub
+
+        ''' <summary>
+        ''' check close to zero
+        ''' </summary>
+        ''' <param name="value"></param>
+        ''' <param name="eps">2.20E-16</param>
+        ''' <returns></returns>
+        Public Shared Function IsCloseToZero(ByVal value As Double, Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron) As Boolean
+            If Math.Abs(value + eps) <= eps Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
     End Class
 End Namespace
