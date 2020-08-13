@@ -3,27 +3,33 @@
     ''' store LU decomposition
     ''' </summary>
     Public Class LU
-        ''' <summary></summary>
+        ''' <summary>Pivot matrix</summary>
         Public Property P As clsEasyMatrix = Nothing
 
-        ''' <summary></summary>
+        ''' <summary>Lower matrix</summary>
         Public Property L As clsEasyMatrix = Nothing
 
-        ''' <summary></summary>
+        ''' <summary>Upper matrix</summary>
         Public Property U As clsEasyMatrix = Nothing
+
+        ''' <summary>Determinant</summary>
+        Public Property Det As Double = 0.0
 
         Private Sub New()
         End Sub
 
-        Public Sub New(ByVal matL As clsEasyMatrix, ByVal matU As clsEasyMatrix)
-            Me.L = matL
-            Me.U = matU
-        End Sub
-
-        Public Sub New(ByVal matP As clsEasyMatrix, ByVal matL As clsEasyMatrix, ByVal matU As clsEasyMatrix)
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="matP"></param>
+        ''' <param name="matL"></param>
+        ''' <param name="matU"></param>
+        ''' <param name="det"></param>
+        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double)
             Me.P = matP
             Me.L = matL
             Me.U = matU
+            Me.Det = det
         End Sub
     End Class
 
@@ -77,8 +83,8 @@
     ''' Inherits List(Of List(Of Double))
     ''' </remarks>
     Public Class clsEasyMatrix : Inherits List(Of List(Of Double))
-        Public Const SAME_ZERO As Double = 2.0E-50 '2^-50
-        Public Const Epsiron As Double = 0.0000000000000001 '1.0^-16
+        Public Const SAME_ZERO As Double = 2.0E-50 '2.0*10^-50
+        Public Const MachineEpsiron As Double = 0.00000000000000022 ' 2.20*E-16 = 2.20*10^-16
 
 #Region "Constructor"
         ''' <summary>
@@ -571,7 +577,7 @@
         ''' </summary>
         ''' <param name="direction">direction of vector</param>
         ''' <returns></returns>
-        Public Function ToVectorFromDiagonal(Optional ByVal direction As clsEasyVector.VectorDirection = clsEasyVector.VectorDirection.ROW) As clsEasyVector
+        Public Function ToDiagonalVector(Optional ByVal direction As clsEasyVector.VectorDirection = clsEasyVector.VectorDirection.ROW) As clsEasyVector
             If Me.RowCount <> Me.ColCount Then
                 Throw New clsException(clsException.Series.NotComputable, "ToVectorFromDiagonal")
             End If
@@ -647,6 +653,11 @@
                     '    source.SwapRow(i, ip)
                     '    retInverse.SwapRow(i, ip)
                     'End If
+
+                    'check
+                    If Math.Abs(source(i)(i) + MachineEpsiron) <= MachineEpsiron Then
+                        Throw New clsException(clsException.Series.NotComputable, "Inverse nxn")
+                    End If
 
                     'discharge calculation
                     Dim tempValue As Double = 1.0 / source(i)(i)
@@ -985,82 +996,207 @@
                 rotate = rotate * rotateNew
             Next
 
-            Return New Eigen(retEigenMat.ToVectorFromDiagonal(), rotate)
+            Return New Eigen(retEigenMat.ToDiagonalVector(), rotate)
         End Function
 
         ''' <summary>
-        ''' LU decomposition using Crout method
-        ''' note:クラウト法なのでUの対角成分が1になる
+        ''' LU decomposition (using PLU())
         ''' </summary>
-        ''' <param name="same_zero_value">2.0E-50</param>
+        ''' <param name="same_zero_value">2.0*10^-50</param>
+        ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function LU(Optional ByVal same_zero_value As Double = SAME_ZERO) As LU
-            Dim matU = New clsEasyMatrix(Me.ColCount, True)
-            Dim matL = New clsEasyMatrix(Me.ColCount, False)
+        Public Function LU(Optional ByVal same_zero_value As Double = SAME_ZERO, Optional ByVal eps As Double = MachineEpsiron) As LU
+            Return Me.PLU(same_zero_value, eps)
+        End Function
+
+        Public Function PLU_CALGO(Optional ByVal same_zero_value As Double = SAME_ZERO, Optional ByVal eps As Double = MachineEpsiron) As LU
             Dim n = Me.ColCount
+            Dim source = New clsEasyMatrix(Me)
+            Dim matL = New clsEasyMatrix(n, True)
+            Dim matU = New clsEasyMatrix(n, True)
+            Dim matP = New clsEasyMatrix(n, True)
 
-            For j As Integer = 0 To n - 1
-                For i = j To n - 1
-                    Dim sum = 0.0
-                    For k = 0 To j - 1
-                        sum += matL(i)(k) * matU(k)(j)
-                    Next
-                    matL(i)(j) = Me(i)(j) - sum
-                Next
+            Dim det = 1.0
+            Dim imax As Integer = 0
+            Dim weight = New Double(n - 1) {}
+            Dim ip = New Integer(n - 1) {}
+            Dim j = 0
+            Dim ik = 0
+            Dim ii = 0
 
-                For i = j To n - 1
-                    Dim sum = 0.0
-                    For k = 0 To j - 1
-                        sum += matL(j)(k) * matU(k)(i)
-                    Next
-
-                    If Math.Abs(matL(j)(j)) < same_zero_value Then
-                        'Singular matrix
-                        Throw New clsException(clsException.Series.NotComputable, "singular matrix")
+            'Find absolute max value of each row
+            For k = 0 To n - 1
+                ip(k) = k
+                Dim absValue = 0.0
+                For j = 0 To n - 1
+                    Dim temp = Math.Abs(source(k)(j))
+                    If temp > absValue Then
+                        absValue = temp
                     End If
+                Next
+                If absValue = 0.0 Then
+                    'If absValue < SAME_ZERO Then
+                    Throw New clsException(clsException.Series.NotComputable, "singular matrix")
+                End If
+                weight(k) = 1.0 / absValue
+            Next
 
-                    matU(j)(i) = (Me(j)(i) - sum) / matL(j)(j)
+            'crout
+            For k = 0 To n - 1
+                Dim u = -1.0
+                For i = k To n - 1
+                    ii = ip(i)
+                    Dim t = Math.Abs(source(ii)(k) * weight(ii))
+                    If t > u Then
+                        u = t
+                        j = i
+                    End If
+                Next
+                ik = ip(j)
+
+                'interchange row
+                If j <> k Then
+                    ip(j) = ip(k)
+                    ip(k) = ik
+                    clsMathUtil.SwapRow(matP, j, k)
+                    det = -det
+                End If
+                u = source(ik)(k)
+                det *= u
+                If Math.Abs(u) < SAME_ZERO Then
+                    Throw New clsException(clsException.Series.NotComputable, "singular matrix(det is zero)")
+                End If
+
+                'gauss eimination
+                For i = k + 1 To n - 1
+                    ii = ip(i)
+                    source(ii)(k) /= u
+                    Dim t = source(ii)(k)
+                    For j = k + 1 To n - 1
+                        source(ii)(j) -= t * source(ik)(j)
+                    Next
                 Next
             Next
 
-            Return New LU(matL, matU)
+            source.PrintValue(name:="souce")
+            source.T().PrintValue(name:="souce")
+
+            'replace
+            For i = 1 To n - 1
+                For j = 0 To i - 1
+                    matL(i)(j) = source(i)(j)
+                Next
+            Next
+            For i = 0 To n - 1
+                For j = i To n - 1
+                    matU(i)(j) = source(i)(j)
+                Next
+            Next
+
+            Return New LU(matP, matL, matU, det)
         End Function
 
         ''' <summary>
-        ''' PLU
+        ''' PLU decomposition
         ''' </summary>
-        ''' <param name="same_zero_value"></param>
+        ''' <param name="same_zero_value">2.0*10^-50</param>
+        ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function PLU(Optional ByVal same_zero_value As Double = SAME_ZERO) As LU
-            Dim matU = New clsEasyMatrix(Me.ColCount, True)
-            Dim matL = New clsEasyMatrix(Me.ColCount, False)
+        Public Function PLU(Optional ByVal same_zero_value As Double = SAME_ZERO, Optional ByVal eps As Double = MachineEpsiron) As LU
             Dim n = Me.ColCount
+            Dim source = New clsEasyMatrix(Me)
+            Dim matL = New clsEasyMatrix(n, True)
+            Dim matU = New clsEasyMatrix(n, True)
+            Dim matP = New clsEasyMatrix(n, True)
 
-            For j As Integer = 0 To n - 1
-                For i = j To n - 1
-                    Dim sum = 0.0
-                    For k = 0 To j - 1
-                        sum += matL(i)(k) * matU(k)(j)
+            Dim det = 1.0
+            Dim imax As Integer = 0
+            Dim weight = New Double(n - 1) {}
+            Dim indx = New Double(n - 1) {}
+
+            Dim swapCount = 0
+
+            'Find absolute max value of each row
+            For i = 0 To n - 1
+                'indx(i) = i
+                Dim absValue = 0.0
+                For j = 0 To n - 1
+                    Dim temp = Math.Abs(Me(i)(j))
+                    If temp >= absValue Then
+                        absValue = temp
+                    End If
+                Next
+                'If absValue < SAME_ZERO Then
+                If absValue = 0.0 Then
+                    Throw New clsException(clsException.Series.NotComputable, "singular matrix")
+                End If
+                weight(i) = 1.0 / absValue
+            Next
+
+            'crout
+            For j = 0 To n - 1
+                For i = 0 To j - 1
+                    Dim sum = source(i)(j)
+                    For k = 0 To i - 1
+                        sum -= source(i)(k) * source(k)(j)
                     Next
-                    matL(i)(j) = Me(i)(j) - sum
+                    source(i)(j) = sum
                 Next
 
+                Dim big = -1.0
                 For i = j To n - 1
-                    Dim sum = 0.0
+                    Dim sum = source(i)(j)
                     For k = 0 To j - 1
-                        sum += matL(j)(k) * matU(k)(i)
+                        sum -= source(i)(k) * source(k)(j)
                     Next
-
-                    If Math.Abs(matL(j)(j)) < same_zero_value Then
-                        'Singular matrix
-                        Throw New clsException(clsException.Series.NotComputable, "singular matrix")
+                    source(i)(j) = sum
+                    Dim dum = weight(i) * Math.Abs(sum)
+                    If dum > big Then
+                        big = dum
+                        imax = i
                     End If
+                Next
 
-                    matU(j)(i) = (Me(j)(i) - sum) / matL(j)(j)
+                'interchange row
+                If j <> imax Then
+                    clsMathUtil.SwapRow(source, imax, j)
+                    clsMathUtil.SwapRow(matP, imax, j)
+                    swapCount += 1
+                    det = -det
+                    weight(imax) = weight(j)
+                End If
+                indx(j) = imax
+                'If source(j)(j) = 0.0 Then
+                If Math.Abs(source(j)(j) + eps) <= eps Then
+                    source(j)(j) = SAME_ZERO
+                End If
+                'If Math.Abs(source(j)(j)) < SAME_ZERO Then
+                '    Throw New clsException(clsException.Series.NotComputable, "singular matrix(diagronal value is zero)")
+                'End If
+                'det
+                det *= source(j)(j)
+
+                If j <> n Then
+                    Dim dum = 1.0 / (source(j)(j))
+                    For i = j + 1 To n - 1
+                        source(i)(j) *= dum
+                    Next
+                End If
+            Next
+
+            'replace
+            For i = 1 To n - 1
+                For j = 0 To i - 1
+                    matL(i)(j) = source(i)(j)
+                Next
+            Next
+            For i = 0 To n - 1
+                For j = i To n - 1
+                    matU(i)(j) = source(i)(j)
                 Next
             Next
 
-            Return New LU(matL, matU)
+            Return New LU(matP, matL, matU, det)
         End Function
 
         ''' <summary>
@@ -1295,6 +1431,23 @@
             'other
             'number of row exchanges
             'det A = sign * det(L) * det(U)
+        End Function
+
+        ''' <summary>
+        ''' Multiply the diagonal values(a_00 * a_11 * ...)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function ProductDiagonal() As Double
+            If IsSquare() = False Then
+                Return 0.0
+            End If
+
+            Dim ret = 1.0
+            Dim n = Me.RowCount()
+            For i As Integer = 0 To n - 1
+                ret *= Me(i)(i)
+            Next
+            Return ret
         End Function
 #End Region
     End Class

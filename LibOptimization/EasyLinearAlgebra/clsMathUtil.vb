@@ -78,5 +78,16 @@
             End Try
         End Function
 
+        ''' <summary>
+        ''' Swap row
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <param name="fromIdx"></param>
+        ''' <param name="destIdx"></param>
+        Public Shared Sub SwapRow(ByRef source As clsEasyMatrix, ByVal fromIdx As Integer, ByVal destIdx As Integer)
+            Dim temp = source(fromIdx)
+            source(fromIdx) = source(destIdx)
+            source(destIdx) = temp
+        End Sub
     End Class
 End Namespace

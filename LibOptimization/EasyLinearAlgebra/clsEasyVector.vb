@@ -429,6 +429,19 @@
         End Function
 
         ''' <summary>
+        ''' Prodcut ( x1*x2... )
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function Product() As Double
+            Dim ret As Double = 1.0
+            For Each value As Double In Me
+                ret *= value
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
         ''' Average
         ''' </summary>
         ''' <returns></returns>
