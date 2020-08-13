@@ -5,6 +5,124 @@ Imports LibOptimization.Optimization
 Imports LibOptimization.Util
 
 Module Module1
+    Sub Main()
+        Dim rng1 As clsRandomXorshift = Nothing
+        Dim rng2 As clsRandomXorshift = Nothing
+
+        With Nothing
+            'bench mark
+            System.Threading.Thread.Sleep(1000)
+
+            Dim loopNum = 5
+            Dim trynum = 2000
+            For kk = 0 To 10 - 1
+                With Nothing
+                    rng2 = New LibOptimization.Util.clsRandomXorshift()
+                    Dim plu2 = 0.0
+                    For j = 0 To loopNum - 1
+                        Dim sw = New Stopwatch()
+                        sw.Start()
+                        For i = 0 To trynum - 1
+                            Dim dimNum = 4
+                            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng2)
+                            Dim resultLU As LU = Nothing
+                            Try
+                                resultLU = source.PLU()
+                                Dim P = resultLU.P
+                                Dim L = resultLU.L
+                                Dim U = resultLU.U
+                                Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
+                                If flg = False Then
+                                    Return
+                                End If
+                            Catch ex As Exception
+                                source.PrintValue()
+                                Return
+                            End Try
+                        Next
+                        sw.Stop()
+                        plu2 += sw.ElapsedMilliseconds
+                    Next
+                    Console.WriteLine("{0}s CALGO", plu2 / 1000.0)
+                End With
+                With Nothing
+                    Dim plu1 = 0.0
+                    rng1 = New LibOptimization.Util.clsRandomXorshift()
+                    For j = 0 To loopNum - 1
+                        Dim sw = New Stopwatch()
+                        sw.Start()
+                        For i = 0 To trynum - 1
+                            Dim dimNum = 4
+                            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng1)
+                            Dim resultLU As LU = Nothing
+                            Try
+                                resultLU = source.PLU()
+                                Dim P = resultLU.P
+                                Dim L = resultLU.L
+                                Dim U = resultLU.U
+                                Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
+                                If flg = False Then
+                                    Return
+                                End If
+                            Catch ex As Exception
+                                source.PrintValue()
+                                Return
+                            End Try
+                        Next
+                        sw.Stop()
+                        plu1 += sw.ElapsedMilliseconds
+                    Next
+                    Console.WriteLine("{0}s NR", plu1 / 1000.0)
+                End With
+            Next
+
+            Console.ReadKey()
+            Return
+
+            'test
+            For i = 0 To 10000 - 1
+                Dim dimNum = 4
+                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=New clsRandomXorshift())
+
+                '下記だと特異行列になる
+                'source(0)(0) = 0.0
+                'source(2)(2) = 0.0
+
+                Dim resultLU As LU = Nothing
+                Try
+                    resultLU = source.PLU_CALGO()
+                Catch ex As Exception
+                    source.PrintValue()
+                    Return
+                End Try
+
+                Dim d = source.Det
+                Dim P = resultLU.P
+                Dim L = resultLU.L
+                Dim U = resultLU.U
+                'source.PrintValue(name:="souce")
+                'P.PrintValue(name:="P")
+                'L.PrintValue(name:="L")
+                'U.PrintValue(name:="U")
+                'Dim plt = P * L * U
+                'plt.PrintValue()
+
+                'check
+                Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
+                If flg = False Then
+                    Console.WriteLine("No={0} det={1}", i, resultLU.Det)
+                    P.PrintValue(name:="P")
+                    P.T().PrintValue(name:="P^T")
+                    resultLU = source.PLU()
+                End If
+                If resultLU.Det = 0.0 Then
+                    Console.WriteLine("No={0} det={1}", i, resultLU.Det)
+                End If
+            Next
+            Return
+        End With
+
+    End Sub
 
     ''' <summary>
     ''' Benchmark
@@ -196,129 +314,4 @@ Module Module1
         End Function
     End Class
 
-    Sub Main()
-
-        With Nothing
-            clsMathUtil.IsCheckEigen(10)
-            Console.ReadLine()
-            Return
-
-            'benchmark
-            Dim matAr As New List(Of clsEasyMatrix)
-            For i As Integer = 0 To 2
-                matAr.Add(MathUtil.clsMathUtil.CreateRandomSymmetricMatrix(50, i * 100))
-            Next
-            Dim sw = New Stopwatch()
-            sw.Start()
-            For l As Integer = 0 To matAr.Count - 1
-                Dim tempV As clsEasyVector = Nothing
-                Dim tempM As clsEasyMatrix = Nothing
-                Dim ret = clsEasyMatrix.Eigen(matAr(l), tempV, tempM, Iteration:=10000)
-                If ret = False Then
-                    Console.WriteLine("Not conversion")
-                Else
-                    Console.WriteLine("Conversion")
-                End If
-            Next
-            sw.Stop()
-            Console.WriteLine("Time:{0}", sw.ElapsedMilliseconds)
-            Console.ReadLine()
-            Return
-
-            'Dim retM As clsEasyMatrix = Nothing
-            'Dim retV As clsEasyVector = Nothing
-            'clsEasyMatrix.Eigen(mat3, retV, retM)
-            'Dim retD = retV.ToDiaglonalMatrix()
-
-            'retM.PrintValue(name:="Eigen V")
-            'retD.PrintValue(name:="D")
-            'retM.T.PrintValue(name:="Eigen V^T")
-
-            'Dim temp = retM * retV.ToDiaglonalMatrix() * retM.T()
-            'temp.PrintValue()
-            Return
-            'Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
-            '    New Double() {1, 4, 2},
-            '    New Double() {4, 41, 23},
-            '    New Double() {2, 23, 22}})
-            Dim v1 As New clsEasyVector(New Double() {1, 2, 3})
-            v1.Direction = clsEasyVector.VectorDirection.COL
-            Dim v2 As New clsEasyVector(New Double() {4, 5, 6})
-            v2.Direction = clsEasyVector.VectorDirection.ROW
-            Dim mat As New clsEasyMatrix(New Double()() {New Double() {4, 5, 6}})
-
-            v1.PrintValue()
-            v2.PrintValue()
-            mat.PrintValue()
-
-            Dim temp1 = v1 * mat
-            Dim temp2 = mat * v1
-
-            Return
-
-            Dim o As New clsOptCMAES()
-            o.ObjectiveFunction = New BenchmarkFunction.clsBenchSphere(2)
-            o.Init()
-            Return
-        End With
-
-        With Nothing
-            Dim optimization As New Optimization.clsOptPatternSearch(New clsBenchRosenblock(20))
-            'optimization.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_to_Best_1_bin
-            optimization.Init()
-            clsUtil.DebugValue(optimization)
-            While (optimization.DoIteration(20) = False)
-                clsUtil.DebugValue(optimization, ai_isOutValue:=False)
-            End While
-            clsUtil.DebugValue(optimization)
-        End With
-
-        With Nothing
-            Dim func As absObjectiveFunction = New clsBenchSphere(10)
-
-            Dim aaa = 10
-            Dim optimizers As New List(Of absOptimization)
-            optimizers.Add(New clsOptCS(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptDE(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptDEJADE(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptES(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptFA(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptNelderMead(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptNelderMeadWiki(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptPatternSearch(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptPSO(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptPSOAIW(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptPSOChaoticIW(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptPSOLDIW(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptRealGABLX(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptRealGAPCX(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptRealGAREX(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptRealGASPX(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptRealGAUNDX(New clsBenchSphere(aaa)))
-            optimizers.Add(New clsOptSimulatedAnnealing(New clsBenchSphere(aaa)))
-            'optimizers.Add(New clsOptSteepestDescent(New clsBenchSphere(aaa)))
-            'optimizers.Add(New clsOptNewtonMethod(New clsBenchSphere(aaa)))
-
-            Dim sw As New Stopwatch()
-            sw.Start()
-
-            Dim statistics As New clsBenchmark()
-            For Each opt In optimizers
-                Console.WriteLine("Optimization:{0}", opt.GetType().Name())
-                opt.InitialPosition = {10, 10}
-                statistics.DoMeasument(opt)
-            Next
-            Console.WriteLine()
-
-            '結果の表示ze
-            statistics.DisplayStatic()
-
-            sw.Stop()
-            Console.WriteLine()
-            Console.WriteLine("Calc time:{0}[s]", sw.ElapsedMilliseconds / 1000)
-            'Console.ReadLine()
-            Return
-        End With
-
-    End Sub
 End Module

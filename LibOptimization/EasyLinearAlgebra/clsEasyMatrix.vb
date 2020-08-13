@@ -1016,6 +1016,10 @@
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
         Public Function PLU(Optional ByVal same_zero_value As Double = SAME_ZERO, Optional ByVal eps As Double = MachineEpsiron) As LU
+            'Refference
+            '[1]C言語による標準アルゴリズム事典
+            '[2]NUMERICAL RECIPES in C 日本語版 C言語による数値計算のレシピ
+
             Dim n = Me.ColCount
             Dim source = New clsEasyMatrix(Me)
             Dim matL = New clsEasyMatrix(n, True)
@@ -1024,7 +1028,7 @@
 
             Dim det = 1.0
             Dim weight = New Double(n - 1) {}
-            Dim indx = New Double(n - 1) {}
+            'Dim indx = New Double(n - 1) {}
 
             'Find absolute max value of each row
             For i = 0 To n - 1
@@ -1043,6 +1047,7 @@
                 weight(i) = 1.0 / absValue
             Next
 
+            'calc PLU
             For j = 0 To n - 1
                 For i = 0 To j - 1
                     Dim sum = source(i)(j)
@@ -1074,7 +1079,7 @@
                     det = -det
                     weight(imax) = weight(j)
                 End If
-                indx(j) = imax
+                'indx(j) = imax
 
                 'diagonal value is close to 0.
                 If clsMathUtil.IsCloseToZero(source(j)(j), eps) Then
@@ -1123,7 +1128,17 @@
             Return New LU(matP, matL, matU, det)
         End Function
 
+        ''' <summary>
+        ''' PLU decomposition
+        ''' </summary>
+        ''' <param name="same_zero_value">2.0*10^-50</param>
+        ''' <param name="eps">2.20*10^-16</param>
+        ''' <returns></returns>
         Public Function PLU_CALGO(Optional ByVal same_zero_value As Double = SAME_ZERO, Optional ByVal eps As Double = MachineEpsiron) As LU
+            'Refference
+            '[1]C言語による標準アルゴリズム事典
+            '[2]NUMERICAL RECIPES in C 日本語版 C言語による数値計算のレシピ
+
             Dim n = Me.ColCount
             Dim source = New clsEasyMatrix(Me)
             Dim matL = New clsEasyMatrix(n, True)
@@ -1407,35 +1422,36 @@
                 Return d
             Else
                 'over 4 dim
-                Dim detVal As Double = 0.0
-                Dim b As New clsEasyMatrix(ai_dim - 1)
-                Dim sign As Integer = 0
-                If ((ai_dim + 1) Mod (2)) = 0 Then
-                    sign = 1
-                Else
-                    sign = -1
-                End If
+                'Dim detVal As Double = 0.0
+                'Dim b As New clsEasyMatrix(ai_dim - 1)
+                'Dim sign As Integer = 0
+                'If ((ai_dim + 1) Mod (2)) = 0 Then
+                '    sign = 1
+                'Else
+                '    sign = -1
+                'End If
 
-                For k As Integer = 0 To ai_dim - 1
-                    For i As Integer = 0 To ai_dim - 2
-                        For j As Integer = 0 To ai_dim - 1
-                            If j = k Then
-                                Continue For
-                            End If
-                            If j > k Then
-                                b(i)(j - 1) = ai_clsMatrix(i)(j)
-                            Else
-                                b(i)(j) = ai_clsMatrix(i)(j)
-                            End If
-                        Next
-                    Next
-                    If ai_isDebug = True Then
-                        Console.WriteLine(sign.ToString() & " " & ai_clsMatrix(ai_dim - 1)(k).ToString())
-                        b.PrintValue()
-                    End If
-                    detVal += sign * ai_clsMatrix(ai_dim - 1)(k) * CalcDeterminant(b, ai_dim - 1)
-                    sign *= -1
-                Next
+                'For k As Integer = 0 To ai_dim - 1
+                '    For i As Integer = 0 To ai_dim - 2
+                '        For j As Integer = 0 To ai_dim - 1
+                '            If j = k Then
+                '                Continue For
+                '            End If
+                '            If j > k Then
+                '                b(i)(j - 1) = ai_clsMatrix(i)(j)
+                '            Else
+                '                b(i)(j) = ai_clsMatrix(i)(j)
+                '            End If
+                '        Next
+                '    Next
+                '    If ai_isDebug = True Then
+                '        Console.WriteLine(sign.ToString() & " " & ai_clsMatrix(ai_dim - 1)(k).ToString())
+                '        b.PrintValue()
+                '    End If
+                '    detVal += sign * ai_clsMatrix(ai_dim - 1)(k) * CalcDeterminant(b, ai_dim - 1)
+                '    sign *= -1
+                'Next
+                Dim detVal = Me.PLU().Det
                 Return detVal
             End If
 

@@ -147,7 +147,7 @@ Imports LibOptimization.Util
                 Dim v1 = New clsEasyMatrix(5, True)
                 Dim v2 = New clsEasyMatrix(5, True)
                 Dim temp = v1 + v2
-                Dim diag = temp.ToVectorFromDiagonal()
+                Dim diag = temp.ToDiagonalVector()
                 For Each val As Double In diag
                     Assert.AreEqual(val, 2.0)
                 Next
@@ -232,7 +232,7 @@ Imports LibOptimization.Util
                 Dim v1 = New clsEasyMatrix(5, True)
                 Dim v2 = New clsEasyMatrix(5, True)
                 Dim temp = v1 - v2
-                Dim diag = temp.ToVectorFromDiagonal()
+                Dim diag = temp.ToDiagonalVector()
                 For Each val As Double In diag
                     Assert.AreEqual(val, 0.0)
                 Next
@@ -441,6 +441,7 @@ Imports LibOptimization.Util
     ''' Determinant4Order
     ''' </summary>
     <TestMethod()> Public Sub Determinant4Order()
+        'swap
         Dim detMat As New clsEasyMatrix(New Double()() {New Double() {1, 0, 0, 0},
                                                         New Double() {0, 1, 0, 0},
                                                         New Double() {0, 0, 1, 0},
@@ -461,6 +462,33 @@ Imports LibOptimization.Util
         If d <> -1 Then
             Assert.Fail()
         End If
+
+        '4 to 10
+        Dim rng = New LibOptimization.Util.clsRandomXorshift()
+        For i = 0 To 10 - 1
+            For j = 4 To 11 - 1
+                Dim dimNum = j
+                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+
+                Dim resultLU = source.PLU()
+                Dim P = resultLU.P
+                Dim L = resultLU.L
+                Dim U = resultLU.U
+
+                'check
+                If clsMathUtil.IsNearyEqualMatrix(P * L * U, source) = True Then
+                    'OK
+                Else
+                    Console.WriteLine("No={0} det={1}", i, resultLU.Det)
+                    source.PrintValue(name:="souce")
+                    P.PrintValue(name:="P")
+                    L.PrintValue(name:="L")
+                    U.PrintValue(name:="U")
+                    CType(P * L * U, clsEasyMatrix).PrintValue(name:="PLU")
+                    Assert.Fail("try no", i)
+                End If
+            Next
+        Next
     End Sub
 
     ''' <summary>
@@ -958,6 +986,58 @@ Imports LibOptimization.Util
     End Sub
 
     ''' <summary>
+    ''' test Inverse 4x4
+    ''' </summary>
+    <TestMethod()> Public Sub InverseMatrix_4_diag_not_zero()
+        Dim rng = New LibOptimization.Util.clsRandomXorshift()
+        For i = 0 To 29
+            Dim dimNum = 4
+            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+            source.PrintValue(name:="Source matrix")
+            Dim souceInv = source.Inverse()
+            souceInv.PrintValue(name:="Inverse matrix")
+
+            Dim product = source * souceInv
+            product.PrintValue(name:="S*S^-1")
+
+            'check
+            If clsMathUtil.IsNearyEqualMatrix(product, New clsEasyMatrix(dimNum, True)) = True Then
+                'OK
+            Else
+                Assert.Fail("Dim = {0}", dimNum)
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' test Inverse 4x4 include zero
+    ''' </summary>
+    <TestMethod()> Public Sub InverseMatrix_4_include_zero()
+        Dim rng = New LibOptimization.Util.clsRandomXorshift()
+        For i = 0 To 29
+            Dim dimNum = 4
+            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+
+            'source(0)(0) = 0.0
+            'source(1)(1) = 0.0
+            'source(2)(2) = 0.0
+            'source(3)(3) = 0.0
+
+            Dim souceInv = source.Inverse()
+            Dim product = source * souceInv
+            source.PrintValue(name:="Source matrix")
+            souceInv.PrintValue(name:="Inverse matrix")
+            product.PrintValue(name:="S*S^-1")
+            'check
+            If clsMathUtil.IsNearyEqualMatrix(product, New clsEasyMatrix(dimNum, True)) = True Then
+                'OK
+            Else
+                Assert.Fail("try no", i)
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
     ''' test Inverse 4x4 - 10x10
     ''' </summary>
     <TestMethod()> Public Sub InverseMatrix_4to10()
@@ -1029,6 +1109,63 @@ Imports LibOptimization.Util
                 Assert.Fail()
             End If
         Next
+    End Sub
+
+    ''' <summary>
+    ''' test LU decomposition
+    ''' </summary>
+    <TestMethod()> Public Sub LU()
+        Dim rng = New LibOptimization.Util.clsRandomXorshift()
+        For i = 0 To 10000 - 1
+            Dim dimNum = 4
+            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+
+            Dim resultLU = source.PLU()
+            Dim P = resultLU.P
+            Dim L = resultLU.L
+            Dim U = resultLU.U
+
+            'check
+            If clsMathUtil.IsNearyEqualMatrix(P * L * U, source) = True Then
+                'OK
+            Else
+                Console.WriteLine("No={0} det={1}", i, resultLU.Det)
+                source.PrintValue(name:="souce")
+                P.PrintValue(name:="P")
+                L.PrintValue(name:="L")
+                U.PrintValue(name:="U")
+                CType(P * L * U, clsEasyMatrix).PrintValue(name:="PLU")
+                Assert.Fail("try no", i)
+            End If
+        Next
+
+        With Nothing
+            Dim dimNum = 4
+            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+
+            '列を0に
+            source(2)(0) = 0.0
+            source(2)(1) = 0.0
+            source(2)(2) = 0.0
+            source(2)(3) = 0.0
+
+            Dim resultLU As LU = Nothing
+            Try
+                resultLU = source.PLU()
+                Dim P = resultLU.P
+                Dim L = resultLU.L
+                Dim U = resultLU.U
+
+                source.PrintValue(name:="souce")
+                P.PrintValue(name:="P")
+                L.PrintValue(name:="L")
+                U.PrintValue(name:="U")
+                CType(P * L * U, clsEasyMatrix).PrintValue(name:="PLU")
+                Assert.Fail("error")
+            Catch ex As Exception
+                'OK
+            End Try
+        End With
     End Sub
 
     ''' <summary>
