@@ -74,7 +74,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' <summary>
     ''' Matrix x Vector
     ''' </summary>
-    <TestMethod()> Public Sub Product_MatrixVectorNet35()
+    <TestMethod()> Public Sub Mat_Product_MatrixVectorNet35()
         '----------------
         'bad
         '----------------
@@ -220,7 +220,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' <summary>
     ''' test Matrix x Matrix
     ''' </summary>
-    <TestMethod()> Public Sub Product_MatrixMatrixNet35()
+    <TestMethod()> Public Sub Mat_Product_MatrixMatrixNet35()
         For dimNum = 2 To 10 - 1
             With Nothing
                 Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)

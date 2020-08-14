@@ -7,23 +7,48 @@
         ''' Create random symmetric matrix(for Debug)
         ''' </summary>
         ''' <param name="size"></param>
-        ''' <param name="rngSeed"></param>
         ''' <param name="rng"></param>
         ''' <returns></returns>
         Public Shared Function CreateRandomSymmetricMatrix(ByVal size As Integer,
-                                                           Optional ByVal rngSeed As Integer = 123456,
-                                                           Optional ByVal rng As Random = Nothing) As clsEasyMatrix
+                                                           Optional ByVal rng As Random = Nothing,
+                                                           Optional ByVal isIncludeZero As Boolean = False,
+                                                           Optional ByVal isFloating As Boolean = False,
+                                                           Optional ByVal lower As Double = -10,
+                                                           Optional ByVal upper As Double = 10) As clsEasyMatrix
             If rng Is Nothing Then
-                rng = New System.Random(rngSeed)
+                rng = New Util.clsRandomXorshift()
             End If
             Dim matTemp = New MathUtil.clsEasyMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 1 + i To matTemp.Count - 1
-                    Dim r = rng.Next(-10, 10)
-                    matTemp(i)(j) = r
-                    matTemp(j)(i) = r
+                    Dim r As Double = 0.0
+                    If isFloating = False Then
+                        r = rng.Next(CInt(lower), CInt(upper))
+                    Else
+                        r = Math.Abs(upper - lower) * rng.NextDouble() + lower
+                    End If
+
+                    If isIncludeZero = True Then
+                        matTemp(i)(j) = r
+                        matTemp(j)(i) = r
+                    Else
+                        If r = 0 Then
+                            If (rng.Next Mod 2) = 0 Then
+                                r = 2
+                            Else
+                                r = 3
+                            End If
+                        End If
+                        matTemp(i)(j) = r
+                        matTemp(j)(i) = r
+                    End If
                 Next
-                matTemp(i)(i) = 1
+
+                If isFloating = False Then
+                    matTemp(i)(i) = rng.Next(CInt(lower), CInt(upper))
+                Else
+                    matTemp(i)(i) = Math.Abs(upper - lower) * rng.NextDouble() + lower
+                End If
             Next
 
             Return matTemp
@@ -33,19 +58,38 @@
         ''' Create random Asymmetric matrix(for Debug)
         ''' </summary>
         ''' <param name="size"></param>
-        ''' <param name="rngSeed"></param>
         ''' <returns></returns>
         Public Shared Function CreateRandomASymmetricMatrix(ByVal size As Integer,
-                                                            Optional ByVal rngSeed As Integer = 123456,
-                                                            Optional ByVal rng As Random = Nothing) As clsEasyMatrix
+                                                           Optional ByVal rng As Random = Nothing,
+                                                           Optional ByVal isIncludeZero As Boolean = True,
+                                                           Optional ByVal isFloating As Boolean = False,
+                                                           Optional ByVal lower As Double = -10,
+                                                           Optional ByVal upper As Double = 10) As clsEasyMatrix
             If rng Is Nothing Then
-                rng = New System.Random(rngSeed)
+                rng = New Util.clsRandomXorshift()
             End If
             Dim matTemp = New MathUtil.clsEasyMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 0 To matTemp.Count - 1
-                    Dim r = rng.Next(-10, 10)
-                    matTemp(i)(j) = r
+                    Dim r As Double = 0.0
+                    If isFloating = False Then
+                        r = rng.Next(CInt(lower), CInt(upper))
+                    Else
+                        r = Math.Abs(upper - lower) * rng.NextDouble() + lower
+                    End If
+
+                    If isIncludeZero = True Then
+                        matTemp(i)(j) = r
+                    Else
+                        If r = 0 Then
+                            If (rng.Next Mod 2) = 0 Then
+                                r = 2
+                            Else
+                                r = 3
+                            End If
+                        End If
+                        matTemp(i)(j) = r
+                    End If
                 Next
             Next
 
@@ -53,7 +97,7 @@
         End Function
 
         ''' <summary>
-        ''' check eaual matrix
+        ''' check eaual matrix(for debug)
         ''' </summary>
         ''' <param name="matA"></param>
         ''' <param name="matB"></param>
@@ -66,8 +110,7 @@
                     For j As Integer = 0 To matA.ColCount - 1
                         Dim tempValA = matA(i)(j)
                         Dim tempValB = matB(i)(j)
-                        Dim diff = Math.Sqrt(Math.Pow(tempValA - tempValB, 2))
-                        If diff > eps Then
+                        If clsMathUtil.IsCloseToValues(tempValA, tempValB, eps) = False Then
                             Return False
                         End If
                     Next
@@ -91,6 +134,21 @@
         End Sub
 
         ''' <summary>
+        ''' Swap row
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <param name="fromIdx"></param>
+        ''' <param name="destIdx"></param>
+        Public Shared Sub SwapCol(ByRef source As clsEasyMatrix, ByVal fromIdx As Integer, ByVal destIdx As Integer)
+            Dim rowCount = source.RowCount
+            For i As Integer = 0 To rowCount - 1
+                Dim temp As Double = source(i)(fromIdx)
+                source(i)(fromIdx) = source(i)(destIdx)
+                source(i)(destIdx) = temp
+            Next
+        End Sub
+
+        ''' <summary>
         ''' check close to zero
         ''' </summary>
         ''' <param name="value"></param>
@@ -98,6 +156,21 @@
         ''' <returns></returns>
         Public Shared Function IsCloseToZero(ByVal value As Double, Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron) As Boolean
             If Math.Abs(value + eps) <= eps Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
+
+        ''' <summary>
+        ''' compare 2 value
+        ''' </summary>
+        ''' <param name="value1"></param>
+        ''' <param name="value2"></param>
+        ''' <param name="eps"></param>
+        ''' <returns></returns>
+        Public Shared Function IsCloseToValues(ByVal value1 As Double, ByVal value2 As Double, Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron) As Boolean
+            If Math.Abs(value1 - value2) < eps Then
                 Return True
             Else
                 Return False

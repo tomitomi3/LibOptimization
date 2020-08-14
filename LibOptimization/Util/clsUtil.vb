@@ -558,48 +558,48 @@ Namespace Util
             With Nothing
                 Dim opt = New clsOptDE(func)
                 opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_best_1_bin
-                opt.Iteration = 1000
+                opt.Iteration = 500
                 optimizers.Add(opt)
             End With
             With Nothing
                 Dim opt = New clsOptDE(func)
                 opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_best_2_bin
-                opt.Iteration = 1000
+                opt.Iteration = 500
                 optimizers.Add(opt)
             End With
             With Nothing
                 Dim opt = New clsOptDE(func)
                 opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_to_Best_1_bin
-                opt.Iteration = 1000
+                opt.Iteration = 500
                 optimizers.Add(opt)
             End With
             With Nothing
                 Dim opt = New clsOptDE(func)
                 opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_to_Best_2_bin
-                opt.Iteration = 1000
+                opt.Iteration = 500
                 optimizers.Add(opt)
             End With
             With Nothing
                 Dim opt = New clsOptDE(func)
                 opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_current_to_rand_1_bin
-                opt.Iteration = 1000
+                opt.Iteration = 500
                 optimizers.Add(opt)
             End With
             With Nothing
                 Dim opt = New clsOptDE(func)
                 opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_rand_1_bin
-                opt.Iteration = 1000
+                opt.Iteration = 500
                 optimizers.Add(opt)
             End With
             With Nothing
                 Dim opt = New clsOptDE(func)
                 opt.DEStrategy = clsOptDE.EnumDEStrategyType.DE_rand_2_bin
-                opt.Iteration = 1000
+                opt.Iteration = 500
                 optimizers.Add(opt)
             End With
             With Nothing
                 Dim opt = New clsOptDEJADE(func)
-                opt.Iteration = 1000
+                opt.Iteration = 300
                 optimizers.Add(opt)
             End With
             With Nothing

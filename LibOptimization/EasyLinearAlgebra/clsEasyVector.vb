@@ -323,11 +323,10 @@
         End Function
 
         ''' <summary>
-        ''' Norm L1 ( |x1| + |x2| ... )
+        ''' Norm L1 ( |x| = |x1| + |x2| ... )
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' |x|1
         ''' Refference:
         ''' 皆本晃弥, "C言語による「数値計算入門」～ 解法・アルゴリズム・プログラム ～", サイエンス社 2008年 初版第4刷, pp28-32
         ''' </remarks>
@@ -340,11 +339,10 @@
         End Function
 
         ''' <summary>
-        ''' Norm L2 ( Sqrt( x1^2 + x2^2 ... ) )
+        ''' Norm L2 ( ||x||2 = Sqrt( x1^2 + x2^2 ... ) )
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' ||x||
         ''' Refference:
         ''' 皆本晃弥, "C言語による「数値計算入門」～ 解法・アルゴリズム・プログラム ～", サイエンス社 2008年 初版第4刷, pp28-32
         ''' </remarks>
@@ -361,7 +359,6 @@
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' |x|max
         ''' Refference:
         ''' 皆本晃弥, "C言語による「数値計算入門」～ 解法・アルゴリズム・プログラム ～", サイエンス社 2008年 初版第4刷, pp28-32
         ''' </remarks>
@@ -451,6 +448,29 @@
         End Function
 
         ''' <summary>
+        ''' create diagonal matrix from vector
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function ToDiagonalMatrix() As clsEasyMatrix
+            Dim ret = New clsEasyMatrix(Me.Count)
+            For i As Integer = 0 To ret.Count - 1
+                ret(i)(i) = Me(i)
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Resize vector dimension
+        ''' </summary>
+        ''' <param name="vecDim">vector dimension</param>
+        Public Sub Resize(ByVal vecDim As Integer)
+            Me.Clear()
+            If vecDim <> 0 Then
+                Me.AddRange(New Double(vecDim - 1) {})
+            End If
+        End Sub
+
+        ''' <summary>
         ''' For Debug
         ''' </summary>
         ''' <param name="ai_preci"></param>
@@ -475,29 +495,6 @@
             End If
             str.Append(Environment.NewLine)
             Console.Write(str.ToString())
-        End Sub
-
-        ''' <summary>
-        ''' create diagonal matrix from vector
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function ToDiagonalMatrix() As clsEasyMatrix
-            Dim ret = New clsEasyMatrix(Me.Count)
-            For i As Integer = 0 To ret.Count - 1
-                ret(i)(i) = Me(i)
-            Next
-            Return ret
-        End Function
-
-        ''' <summary>
-        ''' Resize vector dimension
-        ''' </summary>
-        ''' <param name="vecDim">vector dimension</param>
-        Public Sub Resize(ByVal vecDim As Integer)
-            Me.Clear()
-            If vecDim <> 0 Then
-                Me.AddRange(New Double(vecDim - 1) {})
-            End If
         End Sub
 #End Region
 

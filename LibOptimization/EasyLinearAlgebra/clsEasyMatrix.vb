@@ -84,7 +84,7 @@
     ''' </remarks>
     Public Class clsEasyMatrix : Inherits List(Of List(Of Double))
         Public Const SAME_ZERO As Double = 2.0E-50 '2.0*10^-50
-        Public Const MachineEpsiron As Double = 0.00000000000000022 ' 2.20*E-16 = 2.20*10^-16
+        Public Const MachineEpsiron As Double = 0.000000000000000222 ' 2.20*E-16 = 2.20*10^-16
 
 #Region "Constructor"
         ''' <summary>
@@ -354,7 +354,7 @@
             '.net 4.0
             '------------------------------------------------------------------
             'using Paralle .NET4
-            Dim pOption = New Threading.Tasks.ParallelOptions()
+            'Dim pOption = New Threading.Tasks.ParallelOptions()
             '#If DEBUG Then
             '            pOption.MaxDegreeOfParallelism = 1
             '#End If
@@ -364,7 +364,7 @@
                 Dim size = ai_source.RowCount
                 Dim ret As New clsEasyMatrix(size)
 
-                Threading.Tasks.Parallel.For(0, size, pOption,
+                Threading.Tasks.Parallel.For(0, size,
                                              Sub(i)
                                                  For j As Integer = 0 To size - 1
                                                      For k As Integer = 0 To size - 1
@@ -380,7 +380,7 @@
                 Dim rowSize = ai_source.RowCount
                 Dim ret As New clsEasyMatrix(ai_source.RowCount, ai_dest.ColCount)
 
-                Threading.Tasks.Parallel.For(0, rowSize, pOption,
+                Threading.Tasks.Parallel.For(0, rowSize,
                                              Sub(i)
                                                  For j As Integer = 0 To ret.ColCount - 1
                                                      Dim temp As Double = 0.0
@@ -539,9 +539,26 @@
         ''' <remarks></remarks>
         Public Function T() As clsEasyMatrix
             Dim ret As New clsEasyMatrix(Me.ColCount, Me.RowCount)
+
+#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
+            '------------------------------------------------------------------
+            '.net 3.0, 3.5
+            '------------------------------------------------------------------
             For rowIndex As Integer = 0 To ret.RowCount - 1
                 ret.Row(rowIndex) = Me.Column(rowIndex)
             Next
+#Else
+            '------------------------------------------------------------------
+            '.net 4.0
+            '------------------------------------------------------------------
+            'using Paralle .NET4
+            'Dim pOption = New Threading.Tasks.ParallelOptions()
+            Threading.Tasks.Parallel.For(0, ret.RowCount,
+                                             Sub(rowIndex)
+                                                 ret.Row(rowIndex) = Me.Column(rowIndex)
+                                             End Sub)
+#End If
+
             Return ret
         End Function
 
@@ -549,15 +566,67 @@
         ''' Determinant
         ''' </summary>
         ''' <remarks></remarks>
-        Public Function Det(Optional ByVal ai_isDebug As Boolean = False) As Double
+        Public Function Det() As Double
             If Me.RowCount <> Me.ColCount Then
                 Return 0
             End If
-            Return CalcDeterminant(Me, Me.RowCount(), ai_isDebug)
+            Dim n = Me.RowCount
+
+            If n = 1 Then
+                Return Me(0)(0)
+            ElseIf n = 2 Then
+                '2 dim
+                ' | a b |
+                ' | c d | = ad-bc
+                Return Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0)
+            ElseIf n = 3 Then
+                '3 dim using Sarrus rule
+                Dim d As Double = 0.0
+                d += Me(0)(0) * Me(1)(1) * Me(2)(2)
+                d += Me(1)(0) * Me(2)(1) * Me(0)(2)
+                d += Me(2)(0) * Me(0)(1) * Me(1)(2)
+                d -= Me(2)(0) * Me(1)(1) * Me(0)(2)
+                d -= Me(1)(0) * Me(0)(1) * Me(2)(2)
+                d -= Me(0)(0) * Me(2)(1) * Me(1)(2)
+                Return d
+            Else
+                'over 4 dim using PLU decomposition
+                'Dim detVal As Double = 0.0
+                'Dim b As New clsEasyMatrix(ai_dim - 1)
+                'Dim sign As Integer = 0
+                'If ((ai_dim + 1) Mod (2)) = 0 Then
+                '    sign = 1
+                'Else
+                '    sign = -1
+                'End If
+
+                'For k As Integer = 0 To ai_dim - 1
+                '    For i As Integer = 0 To ai_dim - 2
+                '        For j As Integer = 0 To ai_dim - 1
+                '            If j = k Then
+                '                Continue For
+                '            End If
+                '            If j > k Then
+                '                b(i)(j - 1) = ai_clsMatrix(i)(j)
+                '            Else
+                '                b(i)(j) = ai_clsMatrix(i)(j)
+                '            End If
+                '        Next
+                '    Next
+                '    If ai_isDebug = True Then
+                '        Console.WriteLine(sign.ToString() & " " & ai_clsMatrix(ai_dim - 1)(k).ToString())
+                '        b.PrintValue()
+                '    End If
+                '    detVal += sign * ai_clsMatrix(ai_dim - 1)(k) * CalcDeterminant(b, ai_dim - 1)
+                '    sign *= -1
+                'Next
+                Dim detVal = Me.PLU().Det
+                Return detVal
+            End If
         End Function
 
         ''' <summary>
-        ''' conversion Diagonal matrix
+        ''' Convert to a matrix with only diagonal values
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
@@ -573,9 +642,9 @@
         End Function
 
         ''' <summary>
-        ''' 対角成分をベクトルに変換
+        ''' Convert to a vector with only diagonal values
         ''' </summary>
-        ''' <param name="direction">direction of vector</param>
+        ''' <param name="direction">direction of vector(default:row)</param>
         ''' <returns></returns>
         Public Function ToDiagonalVector(Optional ByVal direction As clsEasyVector.VectorDirection = clsEasyVector.VectorDirection.ROW) As clsEasyVector
             If Me.RowCount <> Me.ColCount Then
@@ -600,11 +669,11 @@
 
             Dim n As Integer = Me.RowCount
             Dim source As New clsEasyMatrix(Me)
-            Dim retInverse As New clsEasyMatrix(n, True)
+            Dim retInverse As New clsEasyMatrix(n, False)
             If n = 0 Then
                 'nop
             ElseIf n = 1 Then
-                source(0)(0) = 1.0 / source(0)(0)
+                retInverse(0)(0) = 1.0 / source(0)(0)
             ElseIf n = 2 Then
                 Dim temp = Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0)
                 If Math.Abs(temp) < same_zero_value Then
@@ -630,6 +699,7 @@
                 retInverse(2)(1) = -((Me(0)(0) * Me(2)(1) - Me(0)(1) * Me(2)(0))) / tempDet
                 retInverse(2)(2) = ((Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))) / tempDet
             Else
+                '4
                 'Gauss elimination
                 For i As Integer = 0 To n - 1
                     ''diagonal element
@@ -655,7 +725,7 @@
                     'End If
 
                     'check
-                    If Math.Abs(source(i)(i) + MachineEpsiron) <= MachineEpsiron Then
+                    If clsMathUtil.IsCloseToZero(source(i)(i), MachineEpsiron) = True Then
                         Throw New clsException(clsException.Series.NotComputable, "Inverse nxn")
                     End If
 
@@ -679,30 +749,6 @@
 
             Return retInverse
         End Function
-
-        ''' <summary>
-        ''' Swap Row
-        ''' </summary>
-        ''' <param name="ai_sourceRowIndex"></param>
-        ''' <param name="ai_destRowIndex"></param>
-        ''' <remarks></remarks>
-        Public Sub SwapRow(ByVal ai_sourceRowIndex As Integer, ByVal ai_destRowIndex As Integer)
-            Dim temp As clsEasyVector = Me.Row(ai_sourceRowIndex)
-            Me.Row(ai_sourceRowIndex) = Me.Row(ai_destRowIndex)
-            Me.Row(ai_destRowIndex) = temp
-        End Sub
-
-        ''' <summary>
-        ''' Swap Col
-        ''' </summary>
-        ''' <param name="ai_sourceColIndex"></param>
-        ''' <param name="ai_destColIndex"></param>
-        ''' <remarks></remarks>
-        Public Sub SwapCol(ByVal ai_sourceColIndex As Integer, ByVal ai_destColIndex As Integer)
-            Dim temp As clsEasyVector = Me.Column(ai_sourceColIndex)
-            Me.Column(ai_sourceColIndex) = Me.Row(ai_destColIndex)
-            Me.Column(ai_destColIndex) = temp
-        End Sub
 
         ''' <summary>
         ''' For Debug
@@ -795,7 +841,7 @@
         ''' </summary>
         ''' <param name="sourceMat"></param>
         ''' <returns></returns>
-        Public Function ToTridiagonalMatrix(ByVal sourceMat As clsEasyMatrix) As clsEasyMatrix
+        Public Function ToTridiagonalMatrix(ByVal sourceMat As clsEasyMatrix, Optional ByVal eps As Double = MachineEpsiron) As clsEasyMatrix
             'ref
             'ハウスホルダー変換
             'http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?%B8%C7%CD%AD%C3%CD/%B8%C7%CD%AD%A5%D9%A5%AF%A5%C8%A5%EB
@@ -825,7 +871,7 @@
 
                 ' |x-y|
                 Dim alpha = Math.Sqrt(2.0 * s * (s - temp))
-                If Math.Abs(alpha) < 0.0000000000000001 Then
+                If clsMathUtil.IsCloseToZero(alpha) = True Then
                     Continue For
                 End If
 
@@ -1042,7 +1088,7 @@
                 Next
                 '列要素の絶対最大値が0に近い場合
                 If clsMathUtil.IsCloseToZero(absValue, eps) Then
-                    Throw New clsException(clsException.Series.NotComputable, "singular matrix")
+                    Throw New clsException(clsException.Series.NotComputable, "PLU() singular matrix")
                 End If
                 weight(i) = 1.0 / absValue
             Next
@@ -1356,6 +1402,23 @@
                 Me.AddRange(value)
             End Set
         End Property
+
+        ''' <summary>
+        ''' Multiply the diagonal values(a_00 * a_11 * ...)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function ProductDiagonal() As Double
+            If IsSquare() = False Then
+                Return 0.0
+            End If
+
+            Dim ret = 1.0
+            Dim n = Me.RowCount()
+            For i As Integer = 0 To n - 1
+                ret *= Me(i)(i)
+            Next
+            Return ret
+        End Function
 #End Region
 
 #Region "Private"
@@ -1393,89 +1456,6 @@
             Return False
         End Function
 
-        ''' <summary>
-        ''' Determinant(Recursive)
-        ''' </summary>
-        ''' <param name="ai_clsMatrix"></param>
-        ''' <param name="ai_dim"></param>
-        ''' <param name="ai_isDebug"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function CalcDeterminant(ByVal ai_clsMatrix As clsEasyMatrix,
-                                         ByVal ai_dim As Integer, Optional ai_isDebug As Boolean = False) As Double
-            If ai_dim = 1 Then
-                Return ai_clsMatrix(0)(0)
-            ElseIf ai_dim = 2 Then
-                '2 dim
-                ' | a b |
-                ' | c d | = ad-bc
-                Return ai_clsMatrix(0)(0) * ai_clsMatrix(1)(1) - ai_clsMatrix(0)(1) * ai_clsMatrix(1)(0)
-            ElseIf ai_dim = 3 Then
-                '3 dim using Sarrus rule
-                Dim d As Double = 0.0
-                d += ai_clsMatrix(0)(0) * ai_clsMatrix(1)(1) * ai_clsMatrix(2)(2)
-                d += ai_clsMatrix(1)(0) * ai_clsMatrix(2)(1) * ai_clsMatrix(0)(2)
-                d += ai_clsMatrix(2)(0) * ai_clsMatrix(0)(1) * ai_clsMatrix(1)(2)
-                d -= ai_clsMatrix(2)(0) * ai_clsMatrix(1)(1) * ai_clsMatrix(0)(2)
-                d -= ai_clsMatrix(1)(0) * ai_clsMatrix(0)(1) * ai_clsMatrix(2)(2)
-                d -= ai_clsMatrix(0)(0) * ai_clsMatrix(2)(1) * ai_clsMatrix(1)(2)
-                Return d
-            Else
-                'over 4 dim
-                'Dim detVal As Double = 0.0
-                'Dim b As New clsEasyMatrix(ai_dim - 1)
-                'Dim sign As Integer = 0
-                'If ((ai_dim + 1) Mod (2)) = 0 Then
-                '    sign = 1
-                'Else
-                '    sign = -1
-                'End If
-
-                'For k As Integer = 0 To ai_dim - 1
-                '    For i As Integer = 0 To ai_dim - 2
-                '        For j As Integer = 0 To ai_dim - 1
-                '            If j = k Then
-                '                Continue For
-                '            End If
-                '            If j > k Then
-                '                b(i)(j - 1) = ai_clsMatrix(i)(j)
-                '            Else
-                '                b(i)(j) = ai_clsMatrix(i)(j)
-                '            End If
-                '        Next
-                '    Next
-                '    If ai_isDebug = True Then
-                '        Console.WriteLine(sign.ToString() & " " & ai_clsMatrix(ai_dim - 1)(k).ToString())
-                '        b.PrintValue()
-                '    End If
-                '    detVal += sign * ai_clsMatrix(ai_dim - 1)(k) * CalcDeterminant(b, ai_dim - 1)
-                '    sign *= -1
-                'Next
-                Dim detVal = Me.PLU().Det
-                Return detVal
-            End If
-
-            'other
-            'number of row exchanges
-            'det A = sign * det(L) * det(U)
-        End Function
-
-        ''' <summary>
-        ''' Multiply the diagonal values(a_00 * a_11 * ...)
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function ProductDiagonal() As Double
-            If IsSquare() = False Then
-                Return 0.0
-            End If
-
-            Dim ret = 1.0
-            Dim n = Me.RowCount()
-            For i As Integer = 0 To n - 1
-                ret *= Me(i)(i)
-            Next
-            Return ret
-        End Function
 #End Region
     End Class
 

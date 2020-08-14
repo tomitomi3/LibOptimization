@@ -19,60 +19,63 @@ Imports LibOptimization.Util
     End Sub
 
 #Region "Optimization"
+    Dim lock As Object
 
     Sub TestOpt(ByVal opt As absOptimization)
-        Dim EVAL As Double = 0.0001
-        Try
-            Console.Write("{0,-40}", opt.GetType().Name)
+        SyncLock Me
+            Dim EVAL As Double = 0.0001
+            Try
+                Console.Write("{0,-40}", opt.GetType().Name)
 
-            'fix rng
-            'opt.Random = New clsRandomXorshift()
+                'fix rng
+                'opt.Random = New clsRandomXorshift()
 
-            Dim sw As New Stopwatch()
-            sw.Start()
+                Dim sw As New Stopwatch()
+                sw.Start()
 
-            'check init
-            opt.InitialPosition = New Double() {10, 10}
-            opt.Init()
-            Dim errorFlg = opt.IsRecentError()
-            Assert.IsFalse(errorFlg)
+                'check init
+                opt.InitialPosition = New Double() {10, 10}
+                opt.Init()
+                Dim errorFlg = opt.IsRecentError()
+                Assert.IsFalse(errorFlg)
 
-            'check iterate
-            opt.DoIteration()
-            errorFlg = opt.IsRecentError()
-            Assert.IsFalse(errorFlg)
+                'check iterate
+                opt.DoIteration()
+                errorFlg = opt.IsRecentError()
+                Assert.IsFalse(errorFlg)
 
-            sw.Stop()
-            Console.Write("ElapsedTime:{0}[ms] ", sw.ElapsedMilliseconds)
+                sw.Stop()
+                Console.Write("ElapsedTime:{0}[ms] ", sw.ElapsedMilliseconds)
 
-            'Eval
-            Console.Write("Eval:{0} ", opt.Result.Eval)
-            Dim isConversion = False
-            For retry As Integer = 0 To 20
-                If Math.Abs(opt.Result.Eval) > EVAL Then
-                    Console.Write("{0}Retry! Eval:{1}", Environment.NewLine, opt.Result.Eval)
-                    opt.InitialPosition = opt.Result.ToArray()
-                    opt.InitialValueRangeLower = opt.InitialValueRangeLower / 2
-                    opt.InitialValueRangeUpper = opt.InitialValueRangeUpper / 2
-                    opt.Init()
-                    opt.DoIteration()
-                Else
-                    isConversion = True
-                    Exit For
+                'Eval
+                Console.Write("Eval:{0} ", opt.Result.Eval)
+                Dim isConversion = False
+                For retry As Integer = 0 To 20
+                    If Math.Abs(opt.Result.Eval) > EVAL Then
+                        Console.Write("{0}Retry! Eval:{1}", Environment.NewLine, opt.Result.Eval)
+                        opt.InitialPosition = opt.Result.ToArray()
+                        opt.InitialValueRangeLower = opt.InitialValueRangeLower / 2
+                        opt.InitialValueRangeUpper = opt.InitialValueRangeUpper / 2
+                        opt.Init()
+                        opt.DoIteration()
+                    Else
+                        isConversion = True
+                        Exit For
+                    End If
+                Next
+                If isConversion = False Then
+                    Throw New Exception(String.Format("fail:{0} Eval:{1}", opt.GetType().Name, opt.Result.Eval))
                 End If
-            Next
-            If isConversion = False Then
-                Throw New Exception(String.Format("fail:{0} Eval:{1}", opt.GetType().Name, opt.Result.Eval))
-            End If
 
-            'Result
-            If Math.Abs(opt.Result(0)) > 0.1 OrElse Math.Abs(opt.Result(1)) > 0.1 Then
-                Throw New Exception(String.Format("fail:{0} Result:{1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
-            End If
-            Console.WriteLine(String.Format("Result:{0} {1}", opt.Result(0), opt.Result(1)))
-        Catch ex As Exception
-            Assert.Fail("Throw Exception! {0} {1}", opt.GetType().Name, ex.Message)
-        End Try
+                'Result
+                If Math.Abs(opt.Result(0)) > 0.1 OrElse Math.Abs(opt.Result(1)) > 0.1 Then
+                    Throw New Exception(String.Format("fail:{0} Result:{1} {2}", opt.GetType().Name, opt.Result(0), opt.Result(1)))
+                End If
+                Console.WriteLine(String.Format("Result:{0} {1}", opt.Result(0), opt.Result(1)))
+            Catch ex As Exception
+                Assert.Fail("Throw Exception! {0} {1}", opt.GetType().Name, ex.Message)
+            End Try
+        End SyncLock
     End Sub
 
     ''' <summary>
