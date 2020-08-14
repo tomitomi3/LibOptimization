@@ -7,6 +7,24 @@ Imports LibOptimization.Util
 Module Module1
     Sub Main()
 
+        Dim dimNum = 4
+        Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
+        Try
+            Dim matPLU = source.PLU()
+            Dim colVec = source.Inverse().Column(0)
+            Dim result = clsEasyMatrix.Solve(matPLU, (New clsEasyMatrix(dimNum, True))(0))
+
+            'check
+            If clsMathUtil.IsNearyEqualVector(colVec, result) = True Then
+                'OK
+            Else
+                source.PrintValue(name:="Source vector")
+            End If
+        Catch ex As Exception
+            source.PrintValue(name:="Source matrix")
+        End Try
+
+
     End Sub
 
     ''' <summary>

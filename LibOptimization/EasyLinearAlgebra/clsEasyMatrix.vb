@@ -70,8 +70,7 @@
         Private Sub New()
         End Sub
 
-        Public Sub New(ByVal matS As clsEasyMatrix, ByVal matV As clsEasyVector,
-                       ByVal matD As clsEasyMatrix)
+        Public Sub New(ByRef matS As clsEasyMatrix, ByRef matV As clsEasyVector, ByRef matD As clsEasyMatrix)
             Me.S = matS
             Me.V = matV
             Me.D = matD
@@ -88,13 +87,23 @@
         ''' <summary></summary>
         Public Property EigenVector As clsEasyMatrix = Nothing
 
+        ''' <summary></summary>
+        Public Property IsConversion As Boolean = Nothing
+
         Private Sub New()
         End Sub
 
-        Public Sub New(ByVal eigeValue As clsEasyVector, ByVal eigenVec As clsEasyMatrix)
+        Public Sub New(ByRef eigeValue As clsEasyVector, ByRef eigenVec As clsEasyMatrix)
             Me.EigenValue = eigeValue
             Me.EigenVector = eigenVec
         End Sub
+
+        Public Sub New(ByRef eigeValue As clsEasyVector, ByRef eigenVec As clsEasyMatrix, ByVal isconversion As Boolean)
+            Me.EigenValue = eigeValue
+            Me.EigenVector = eigenVec
+            Me.IsConversion = isconversion
+        End Sub
+
     End Class
 
     ''' <summary>
@@ -920,19 +929,18 @@
         End Function
 
         ''' <summary>
-        ''' Eigen decomposition using Jacobi Method.
+        ''' Eigen decomposition using Jacobi Method. 対象行列のみ
         ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
         ''' </summary>
         ''' <param name="Iteration">default iteration:1000</param>
         ''' <param name="Conversion">default conversion:1.0e-16</param>
         ''' <returns></returns>
         Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
-                              Optional ByVal Conversion As Double = 0.0000000000000001,
-                              Optional ByRef isConversion As Boolean = False) As Eigen
+                              Optional ByVal Conversion As Double = 0.0000000000000001) As Eigen
             Dim size = Me.ColCount()
             Dim retEigenMat = New clsEasyMatrix(Me)
             Dim rotate = New clsEasyMatrix(size, True)
-
+            Dim isConversion = False
             Dim rowIdx() = New Integer(size * 4 - 1) {}
             Dim colIdx() = New Integer(size * 4 - 1) {}
             Dim value() = New Double(size * 4 - 1) {}
@@ -964,12 +972,15 @@
                 'B.PrintValue(name:="B")
                 'R.PrintValue(name:="R")
 
+                Dim temp_pp = retEigenMat(p)(p)
+                Dim temp_qq = retEigenMat(q)(q)
+                Dim temp_pq = retEigenMat(p)(q)
                 Dim theta = 0.0
-                Dim diff = retEigenMat(p)(p) - retEigenMat(q)(q)
-                If Math.Abs(diff) = 0.0 Then
+                Dim diff = temp_pp - temp_qq
+                If MathUtil.clsMathUtil.IsCloseToZero(diff) = True Then
                     theta = Math.PI / 4.0
                 Else
-                    theta = Math.Atan(-2.0 * retEigenMat(p)(q) / diff) * 0.5
+                    theta = Math.Atan(-2.0 * temp_pq / diff) * 0.5
                 End If
 
                 Dim D = New clsEasyMatrix(retEigenMat)
@@ -985,9 +996,9 @@
                     D(q)(i) = temp
                 Next
                 Dim cosThetasinTheta = cosTheta * cosTheta - sinTheta * sinTheta
-                Dim tempA = (retEigenMat(p)(p) + retEigenMat(q)(q)) / 2.0
-                Dim tempB = (retEigenMat(p)(p) - retEigenMat(q)(q)) / 2.0
-                Dim tempC = retEigenMat(p)(q) * (sinTheta * cosTheta) * 2.0
+                Dim tempA = (temp_pp + temp_qq) / 2.0
+                Dim tempB = (temp_pp - temp_qq) / 2.0
+                Dim tempC = temp_pq * (sinTheta * cosTheta) * 2.0
                 D(p)(p) = tempA + tempB * cosThetasinTheta - tempC
                 D(q)(q) = tempA - tempB * cosThetasinTheta + tempC
                 D(p)(q) = 0.0
@@ -1030,33 +1041,31 @@
 
                 'rotate
                 Dim rotateNew = New clsEasyMatrix(size, True)
-                rotateNew(p)(p) = Math.Cos(theta)
-                rotateNew(p)(q) = Math.Sin(theta)
-                rotateNew(q)(p) = -Math.Sin(theta)
-                rotateNew(q)(q) = Math.Cos(theta)
+                rotateNew(p)(p) = cosTheta
+                rotateNew(p)(q) = sinTheta
+                rotateNew(q)(p) = -sinTheta
+                rotateNew(q)(q) = cosTheta
                 rotate = rotate * rotateNew
             Next
 
-            Return New Eigen(retEigenMat.ToDiagonalVector(), rotate)
+            Return New Eigen(retEigenMat.ToDiagonalVector(), rotate, isConversion)
         End Function
 
         ''' <summary>
         ''' LU decomposition (using PLU())
         ''' </summary>
-        ''' <param name="same_zero_value">2.0*10^-50</param>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function LU(Optional ByVal same_zero_value As Double = SAME_ZERO, Optional ByVal eps As Double = MachineEpsiron) As LU
-            Return Me.PLU(same_zero_value, eps)
+        Public Function LU(Optional ByVal eps As Double = MachineEpsiron) As LU
+            Return Me.PLU(eps)
         End Function
 
         ''' <summary>
         ''' PLU decomposition
         ''' </summary>
-        ''' <param name="same_zero_value">2.0*10^-50</param>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function PLU(Optional ByVal same_zero_value As Double = SAME_ZERO, Optional ByVal eps As Double = MachineEpsiron) As LU
+        Public Function PLU( Optional ByVal eps As Double = MachineEpsiron) As LU
             'Refference
             '[1]C言語による標準アルゴリズム事典
             '[2]NUMERICAL RECIPES in C 日本語版 C言語による数値計算のレシピ
@@ -1157,29 +1166,15 @@
                 Next
             Next
 
-#If DEBUG Then
-            Dim flg = clsMathUtil.IsNearyEqualMatrix(matP * matL * matU, Me)
-            If flg = False Then
-                Me.PrintValue(name:="souce")
-                matP.PrintValue(name:="P")
-                matP.T().PrintValue(name:="P^T")
-                matL.PrintValue(name:="L")
-                matU.PrintValue(name:="U")
-                Dim r = matP * matL * matU
-                r.PrintValue(name:="PLU")
-            End If
-#End If
-
             Return New LU(matP, matL, matU, det, indx)
         End Function
 
         ''' <summary>
         ''' PLU decomposition
         ''' </summary>
-        ''' <param name="same_zero_value">2.0*10^-50</param>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function PLU_CALGO(Optional ByVal same_zero_value As Double = SAME_ZERO, Optional ByVal eps As Double = MachineEpsiron) As LU
+        Public Function PLU_CALGO(Optional ByVal eps As Double = MachineEpsiron) As LU
             'Refference
             '[1]C言語による標準アルゴリズム事典
             '[2]NUMERICAL RECIPES in C 日本語版 C言語による数値計算のレシピ
@@ -1421,7 +1416,6 @@
 #End Region
 
 #Region "Public shared"
-
         ''' <summary>
         ''' solve(Ax=b)
         ''' </summary>
@@ -1438,26 +1432,24 @@
         ''' <param name="matP">pivot matrix(LU decomposition of A matrix)</param>
         ''' <param name="matL">lower triangle matrix(LU decomposition of A matrix)</param>
         ''' <param name="matU">upper triangle matrix(LU decomposition of A matrix)</param>
-        ''' <param name="b"></param>
+        ''' <param name="vecB"></param>
         ''' <returns>x</returns>
         Public Shared Function Solve(ByRef matP As clsEasyMatrix,
                                      ByRef matL As clsEasyMatrix,
                                      ByRef matU As clsEasyMatrix,
-                                     ByRef b As clsEasyVector) As clsEasyVector
+                                     ByRef vecB As clsEasyVector) As clsEasyVector
             Dim n = matP.ColCount
-
             Dim x = New clsEasyVector(n)
             Dim y = New clsEasyVector(n)
-
-            b = b * matP
+            Dim b = vecB * matP
 
             For i = 0 To n - 1
                 Dim s = 0.0
-                Dim jj As Integer = 0
-                For jj = 0 To i - 1
-                    s += matL(i)(jj) * y(jj)
+                Dim j As Integer = 0
+                For j = 0 To i - 1
+                    s += matL(i)(j) * y(j)
                 Next
-                y(jj) = b(i) - s
+                y(j) = b(i) - s
             Next
 
             For i = n - 1 To 0 Step -1
@@ -1480,7 +1472,7 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared Function IsSameDimension(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyMatrix) As Boolean
+        Private Shared Function IsSameDimension(ByRef ai_source As clsEasyMatrix, ByRef ai_dest As clsEasyMatrix) As Boolean
             If ai_source.RowCount <> ai_dest.RowCount Then
                 Return False
             End If
@@ -1497,7 +1489,7 @@
         ''' <param name="ai_vector"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared Function IsComputableMatrixVector(ByVal ai_matrix As clsEasyMatrix, ByVal ai_vector As clsEasyVector) As Boolean
+        Private Shared Function IsComputableMatrixVector(ByRef ai_matrix As clsEasyMatrix, ByRef ai_vector As clsEasyVector) As Boolean
             If (ai_matrix.ColCount = 1) AndAlso (ai_matrix.RowCount = ai_vector.Count) Then
                 Return True
             ElseIf (ai_matrix.RowCount = 1) AndAlso (ai_matrix.ColCount = ai_vector.Count) Then
