@@ -1085,15 +1085,16 @@ Imports LibOptimization.Util
     ''' </summary>
     <TestMethod()> Public Sub Mat_Eigen()
         Dim rng = New LibOptimization.Util.clsRandomXorshift()
-        For i As Integer = 2 To 5
+        For i As Integer = 2 To 20 - 1
             Dim matDim = i
 
             Dim srcMat = clsMathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
-            srcMat.PrintValue(name:="Source")
+            'srcMat.PrintValue(name:="Source")
 
             'eigen
-            Dim isConv As Boolean = False
-            Dim eigen = srcMat.Eigen(isConversion:=isConv)
+            Dim eigen As Eigen = Nothing
+            Dim ite = (i / 10) * 1000 + 1000
+            eigen = srcMat.Eigen(ite)
             Dim retV = eigen.EigenValue
             Dim retM = eigen.EigenVector
             Dim retD = retV.ToDiagonalMatrix()
@@ -1101,16 +1102,18 @@ Imports LibOptimization.Util
             'check
             '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
             Dim matI = retM * retM.T()
-            matI.PrintValue(name:="EigenVector * EivenVector^T")
+            'matI.PrintValue(name:="EigenVector * EivenVector^T")
             If clsMathUtil.IsNearyEqualMatrix(matI, New clsEasyMatrix(matDim, True)) = False Then
-                Assert.Fail()
+                srcMat.PrintValue(name:="Source")
+                Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0}", i)
             End If
 
             'check
             Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
-            temp.PrintValue(name:="V*D*V^T")
+            'temp.PrintValue(name:="V*D*V^T")
             If clsMathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
-                Assert.Fail()
+                srcMat.PrintValue(name:="Source")
+                Assert.Fail("Error eigen() V*D*V^T dim={0}", i)
             End If
         Next
     End Sub
