@@ -122,6 +122,29 @@
         End Function
 
         ''' <summary>
+        ''' check eaual vector(for debug)
+        ''' </summary>
+        ''' <param name="vecA"></param>
+        ''' <param name="vecB"></param>
+        ''' <param name="eps">default:1E-8</param>
+        ''' <returns></returns>
+        Public Shared Function IsNearyEqualVector(ByVal vecA As clsEasyVector, ByVal vecB As clsEasyVector,
+                                                  Optional ByVal eps As Double = 0.00000001) As Boolean
+            Try
+                For i As Integer = 0 To vecA.Count - 1
+                    Dim tempValA = vecA(i)
+                    Dim tempValB = vecB(i)
+                    If clsMathUtil.IsCloseToValues(tempValA, tempValB, eps) = False Then
+                        Return False
+                    End If
+                Next
+                Return True
+            Catch ex As Exception
+                Return False
+            End Try
+        End Function
+
+        ''' <summary>
         ''' Swap row
         ''' </summary>
         ''' <param name="source"></param>

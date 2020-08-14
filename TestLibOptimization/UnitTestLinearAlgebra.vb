@@ -921,7 +921,7 @@ Imports LibOptimization.Util
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
-                Assert.Fail("Inverse fail")
+                Assert.Fail("Inverse fail 1x1")
             End If
         End With
 
@@ -935,7 +935,7 @@ Imports LibOptimization.Util
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
-                Assert.Fail("before swap col")
+                Assert.Fail("before swap col 2x2")
             End If
 
             'col swap
@@ -947,7 +947,7 @@ Imports LibOptimization.Util
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
-                Assert.Fail("after swap col")
+                Assert.Fail("after swap col 2x2")
             End If
         End With
 
@@ -963,7 +963,7 @@ Imports LibOptimization.Util
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
-                Assert.Fail("before swap col")
+                Assert.Fail("before swap col 3x3")
             End If
 
             'col swap
@@ -975,15 +975,33 @@ Imports LibOptimization.Util
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
-                Assert.Fail("after swap col")
+                Assert.Fail("after swap col 3x3")
+            End If
+        End With
+
+        With Nothing
+            'ピボット選択が必須の場合（対角成分が０になる場合）
+            Dim source = New MathUtil.clsEasyMatrix(New Double()() {
+                                     New Double() {1.0, -1.0, -4.0, 8.0},
+                                     New Double() {-1.0, 1.0, 6.0, 6.0},
+                                     New Double() {-4.0, 6.0, 1.0, 9.0},
+                                     New Double() {8.0, 6.0, 9.0, 1.0}})
+            Dim sourceInv As clsEasyMatrix = source.Inverse()
+
+            'check Identy matrix I = A * A^-1
+            Dim productMat = source * sourceInv
+            If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(source.RowCount, True)) = True Then
+                'OK
+            Else
+                source.PrintValue(name:="Source matrix")
             End If
         End With
 
         With Nothing
             Dim rng = New LibOptimization.Util.clsRandomXorshift()
-            For i = 0 To 20 - 1
+            For i = 0 To 100 - 1
                 Dim dimNum = 4
-                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng, isIncludeZero:=False)
+                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng, isIncludeZero:=True, isFloating:=True)
                 Try
                     Dim souceInv = source.Inverse()
                     Dim product = source * souceInv
@@ -1004,7 +1022,7 @@ Imports LibOptimization.Util
 
         With Nothing
             Dim rng = New LibOptimization.Util.clsRandomXorshift()
-            For i = 5 To 20 - 1
+            For i = 5 To 10 - 1
                 Dim dimNum = i
                 Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
                 Try
@@ -1102,7 +1120,7 @@ Imports LibOptimization.Util
     ''' </summary>
     <TestMethod()> Public Sub Mat_LU()
         Dim rng = New LibOptimization.Util.clsRandomXorshift()
-        For i = 0 To 10000 - 1
+        For i = 0 To 2000 - 1
             Dim dimNum = 4
             Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
@@ -1124,11 +1142,13 @@ Imports LibOptimization.Util
                 Assert.Fail("try no", i)
             End If
         Next
-        For i = 0 To 10000 - 1
+
+        For i = 0 To 2000 - 1
             Dim dimNum = 4
             Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
             source(0)(0) = 0.0
+            source(2)(2) = 0.0
 
             Dim resultLU = source.PLU()
             Dim P = resultLU.P
@@ -1176,6 +1196,33 @@ Imports LibOptimization.Util
                 'OK
             End Try
         End With
+    End Sub
+
+    ''' <summary>
+    ''' test Solve() Ax=b
+    ''' </summary>
+    <TestMethod()> Public Sub Mat_Solve()
+        Dim rng = New LibOptimization.Util.clsRandomXorshift()
+        For i = 3 To 10 - 1
+            Dim dimNum = i
+            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+            Try
+                Dim matPLU = source.PLU()
+                Dim colVec = source.Inverse().Column(0)
+                Dim result = clsEasyMatrix.Solve(matPLU, (New clsEasyMatrix(dimNum, True))(0))
+
+                'check
+                If clsMathUtil.IsNearyEqualVector(colVec, result) = True Then
+                    'OK
+                Else
+                    source.PrintValue(name:="Source vector")
+                    Assert.Fail("Solve fail")
+                End If
+            Catch ex As Exception
+                source.PrintValue(name:="Source matrix")
+                Assert.Fail("Solve fail")
+            End Try
+        Next
     End Sub
 
     ''' <summary>

@@ -316,7 +316,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Release (
+    <PostBuildEvent>if $(ConfigurationName)==Release and $(PlatformName)=="Any CPU" (
     copy /Y $(TargetPath) ..\..\..\_BuildLib\DotNet3.5\$(TargetFileName)
 )</PostBuildEvent>
   </PropertyGroup>

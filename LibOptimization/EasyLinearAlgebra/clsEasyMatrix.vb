@@ -15,6 +15,12 @@
         ''' <summary>Determinant</summary>
         Public Property Det As Double = 0.0
 
+        ''' <summary>pivto row info</summary>
+        Public Property PivotRow As Double() = Nothing
+
+        ''' <summary>
+        ''' default constructtor
+        ''' </summary>
         Private Sub New()
         End Sub
 
@@ -30,6 +36,21 @@
             Me.L = matL
             Me.U = matU
             Me.Det = det
+        End Sub
+
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="matP"></param>
+        ''' <param name="matL"></param>
+        ''' <param name="matU"></param>
+        ''' <param name="det"></param>
+        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double, ByRef p() As Double)
+            Me.P = matP
+            Me.L = matL
+            Me.U = matU
+            Me.Det = det
+            Me.PivotRow = p
         End Sub
     End Class
 
@@ -699,50 +720,24 @@
                 retInverse(2)(1) = -((Me(0)(0) * Me(2)(1) - Me(0)(1) * Me(2)(0))) / tempDet
                 retInverse(2)(2) = ((Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))) / tempDet
             Else
-                '4
-                'Gauss elimination
-                For i As Integer = 0 To n - 1
-                    ''diagonal element
-                    'Dim ip As Integer = i 'maxIndex
-                    'Dim amax As Double = source(i)(i) 'maxValue
-                    'For index As Integer = 0 To n - 1
-                    '    Dim temp As Double = Math.Abs(source(index)(i))
-                    '    If temp > amax Then
-                    '        amax = temp
-                    '        ip = index
-                    '    End If
-                    'Next
-
-                    ''check 正則性の判定
-                    'If amax < same_zero_value Then
-                    '    Throw New clsException(clsException.Series.NotComputable, "Inverse nxn")
-                    'End If
-
-                    ''change row
-                    'If i <> ip Then
-                    '    source.SwapRow(i, ip)
-                    '    retInverse.SwapRow(i, ip)
-                    'End If
-
-                    'check
-                    If clsMathUtil.IsCloseToZero(source(i)(i), MachineEpsiron) = True Then
-                        Throw New clsException(clsException.Series.NotComputable, "Inverse nxn")
-                    End If
-
-                    'discharge calculation
-                    Dim tempValue As Double = 1.0 / source(i)(i)
-                    For j As Integer = 0 To n - 1
-                        source(i)(j) *= tempValue
-                        retInverse(i)(j) *= tempValue
+                Dim plu = Me.PLU()
+                For j = 0 To n - 1
+                    Dim y = New clsEasyVector(n)
+                    Dim b = plu.P(j)
+                    For i = 0 To n - 1
+                        Dim s = 0.0
+                        Dim k As Integer = 0
+                        For k = 0 To i - 1
+                            s += plu.L(i)(k) * y(k)
+                        Next
+                        y(k) = b(i) - s
                     Next
-                    For j As Integer = 0 To n - 1
-                        If i <> j Then
-                            tempValue = source(j)(i)
-                            For k As Integer = 0 To n - 1
-                                source(j)(k) -= source(i)(k) * tempValue
-                                retInverse(j)(k) -= retInverse(i)(k) * tempValue
-                            Next
-                        End If
+                    For i = n - 1 To 0 Step -1
+                        Dim s = 0.0
+                        For k = i + 1 To n - 1
+                            s += plu.U(i)(k) * retInverse(k)(j)
+                        Next
+                        retInverse(i)(j) = (y(i) - s) / plu.U(i)(i)
                     Next
                 Next
             End If
@@ -1074,11 +1069,11 @@
 
             Dim det = 1.0
             Dim weight = New Double(n - 1) {}
-            'Dim indx = New Double(n - 1) {}
+            Dim indx = New Double(n - 1) {}
 
             'Find absolute max value of each row
             For i = 0 To n - 1
-                'indx(i) = i
+                indx(i) = i
                 Dim absValue = 0.0
                 For j = 0 To n - 1
                     Dim temp = Math.Abs(Me(i)(j))
@@ -1122,11 +1117,15 @@
                 If j <> imax Then
                     clsMathUtil.SwapRow(source, imax, j)
                     clsMathUtil.SwapRow(matP, imax, j)
-                    det = -det
                     weight(imax) = weight(j)
-                End If
-                'indx(j) = imax
 
+                    'change sign
+                    det = -det
+
+                    'swap row info
+                    indx(imax) = indx(j)
+                    indx(j) = imax
+                End If
                 'diagonal value is close to 0.
                 If clsMathUtil.IsCloseToZero(source(j)(j), eps) Then
                     source(j)(j) = SAME_ZERO
@@ -1171,7 +1170,7 @@
             End If
 #End If
 
-            Return New LU(matP, matL, matU, det)
+            Return New LU(matP, matL, matU, det, indx)
         End Function
 
         ''' <summary>
@@ -1418,6 +1417,58 @@
                 ret *= Me(i)(i)
             Next
             Return ret
+        End Function
+#End Region
+
+#Region "Public shared"
+
+        ''' <summary>
+        ''' solve(Ax=b)
+        ''' </summary>
+        ''' <param name="luMat">LU decomposition of A matrix</param>
+        ''' <param name="b"></param>
+        ''' <returns></returns>
+        Public Shared Function Solve(ByRef luMat As LU, ByRef b As clsEasyVector) As clsEasyVector
+            Return clsEasyMatrix.Solve(luMat.P, luMat.L, luMat.U, b)
+        End Function
+
+        ''' <summary>
+        ''' solve(Ax=b)
+        ''' </summary>
+        ''' <param name="matP">pivot matrix(LU decomposition of A matrix)</param>
+        ''' <param name="matL">lower triangle matrix(LU decomposition of A matrix)</param>
+        ''' <param name="matU">upper triangle matrix(LU decomposition of A matrix)</param>
+        ''' <param name="b"></param>
+        ''' <returns>x</returns>
+        Public Shared Function Solve(ByRef matP As clsEasyMatrix,
+                                     ByRef matL As clsEasyMatrix,
+                                     ByRef matU As clsEasyMatrix,
+                                     ByRef b As clsEasyVector) As clsEasyVector
+            Dim n = matP.ColCount
+
+            Dim x = New clsEasyVector(n)
+            Dim y = New clsEasyVector(n)
+
+            b = b * matP
+
+            For i = 0 To n - 1
+                Dim s = 0.0
+                Dim jj As Integer = 0
+                For jj = 0 To i - 1
+                    s += matL(i)(jj) * y(jj)
+                Next
+                y(jj) = b(i) - s
+            Next
+
+            For i = n - 1 To 0 Step -1
+                Dim s = 0.0
+                For k = i + 1 To n - 1
+                    s += matU(i)(k) * x(k)
+                Next
+                x(i) = (y(i) - s) / matU(i)(i)
+            Next
+
+            Return x
         End Function
 #End Region
 
