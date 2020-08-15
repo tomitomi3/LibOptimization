@@ -926,215 +926,6 @@
         End Function
 
         ''' <summary>
-        ''' Cholesky decomposition A=LL^T
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function Cholesky() As clsEasyMatrix
-            If Me.IsSquare() = False Then
-                Throw New clsException(clsException.Series.NotComputable, "Cholesky() not Square")
-            End If
-
-            Dim ret As New MathUtil.clsEasyMatrix(Me.RowCount)
-            Dim n = CInt(Math.Sqrt(ret.RowCount * ret.ColCount))
-            For i As Integer = 0 To n - 1
-                For j As Integer = 0 To i
-                    If j = i Then
-                        Dim sum = 0.0
-                        For k As Integer = 0 To j
-                            sum += ret(j)(k) * ret(j)(k)
-                        Next
-                        ret(j)(j) = Math.Sqrt(Me(j)(j) - sum)
-                    Else
-                        Dim sum = 0.0
-                        For k As Integer = 0 To j
-                            sum += ret(i)(k) * ret(j)(k)
-                        Next
-                        ret(i)(j) = 1.0 / ret(j)(j) * (Me(i)(j) - sum)
-                    End If
-                Next
-            Next
-
-            Return ret
-        End Function
-
-        ''' <summary>
-        ''' To Tridiagonal matrix using Householder transform 三重対角行列
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function ToTridiagonalMatrix() As clsEasyMatrix
-            'ref
-            'ハウスホルダー変換
-            'http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?%B8%C7%CD%AD%C3%CD/%B8%C7%CD%AD%A5%D9%A5%AF%A5%C8%A5%EB
-
-            Dim tempMat = New clsEasyMatrix(Me)
-            Dim n As Integer = tempMat.Count
-            Dim u = New clsEasyVector(n)
-            Dim v = New clsEasyVector(n)
-            Dim q = New clsEasyVector(n)
-
-            For k As Integer = 0 To n - 2
-                's
-                Dim s As Double = 0.0
-                For i = k + 1 To n - 1
-                    s += tempMat(i)(k) * tempMat(i)(k)
-                Next
-
-                ' | -
-                ' |a10 -
-                ' |   a21
-                Dim temp As Double = tempMat(k + 1)(k)
-                If temp >= 0 Then
-                    s = Math.Sqrt(s)
-                Else
-                    s = -Math.Sqrt(s)
-                End If
-
-                ' |x-y|
-                Dim alpha = Math.Sqrt(2.0 * s * (s - temp))
-                If clsMathUtil.IsCloseToZero(alpha) = True Then
-                    Continue For
-                End If
-
-                'u
-                u(k + 1) = (temp - s) / alpha
-                For i = k + 2 To n - 1
-                    u(i) = tempMat(i)(k) / alpha
-                Next
-
-                'Au
-                q(k) = alpha / 2.0
-                For i = k + 1 To n - 1
-                    q(i) = 0.0
-                    For j = k + 1 To n - 1
-                        q(i) += tempMat(i)(j) * u(j)
-                    Next
-                Next
-
-                'v=2(Au-uu^T(Au))
-                alpha = 0.0
-                'uu^T
-                For i = k + 1 To n - 1
-                    alpha += u(i) * q(i)
-                Next
-                v(k) = 2.0 * q(k)
-                For i = k + 1 To n - 1
-                    v(i) = 2.0 * (q(i) - alpha * u(i))
-                Next
-
-                'A = PAP
-                ' | -    a02
-                ' |    -
-                ' |a20    -
-                tempMat(k)(k + 1) = s
-                tempMat(k + 1)(k) = s
-                For i = k + 2 To n - 1
-                    tempMat(k)(i) = 0.0
-                    tempMat(i)(k) = 0.0
-                Next
-                For i = k + 1 To n - 1
-                    tempMat(i)(i) = tempMat(i)(i) - 2.0 * u(i) * v(i)
-                    For j = i + 1 To n - 1
-                        Dim tempVal = tempMat(i)(j) - u(i) * v(j) - v(i) * u(j)
-                        tempMat(i)(j) = tempVal
-                        tempMat(j)(i) = tempVal
-                    Next
-                Next
-            Next
-
-            Return tempMat
-        End Function
-
-        ''' <summary>
-        ''' Eigen decomposition using Jacobi Method. for Symmetric Matrix.
-        ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
-        ''' </summary>
-        ''' <param name="Iteration">default:1000</param>
-        ''' <param name="Conversion">default:1.0e-16</param>
-        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
-        ''' <returns></returns>
-        Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
-                              Optional ByVal Conversion As Double = 0.0000000000000001,
-                              Optional ByVal IsSort As Boolean = True) As Eigen
-            Dim size = Me.ColCount()
-            Dim retEigenMat = New clsEasyMatrix(Me)
-            Dim rotate = New clsEasyMatrix(size, True)
-            Dim isConversion = False
-            Dim rowIdx() = New Integer(size * 4 - 1) {}
-            Dim colIdx() = New Integer(size * 4 - 1) {}
-            Dim value() = New Double(size * 4 - 1) {}
-
-            'iteration
-            For itr As Integer = 0 To Iteration - 1
-                'find abs max value without diag
-                Dim max = Math.Abs(retEigenMat(0)(1))
-                Dim p As Integer = 0
-                Dim q As Integer = 1
-                For i As Integer = 0 To size - 1
-                    For j As Integer = i + 1 To size - 1
-                        If max < Math.Abs(retEigenMat(i)(j)) Then
-                            max = Math.Abs(retEigenMat(i)(j))
-                            p = i
-                            q = j
-                        End If
-                    Next
-                Next
-
-                'check conversion
-                If max < Conversion Then
-                    isConversion = True
-                    Exit For
-                End If
-
-                Dim temp_pp = retEigenMat(p)(p)
-                Dim temp_qq = retEigenMat(q)(q)
-                Dim temp_pq = retEigenMat(p)(q)
-                Dim theta = 0.0
-                Dim diff = temp_pp - temp_qq
-                If MathUtil.clsMathUtil.IsCloseToZero(diff) = True Then
-                    theta = Math.PI / 4.0
-                Else
-                    theta = Math.Atan(-2.0 * temp_pq / diff) * 0.5
-                End If
-
-                Dim D = New clsEasyMatrix(retEigenMat)
-                Dim cosTheta = Math.Cos(theta)
-                Dim sinTheta = Math.Sin(theta)
-                For i As Integer = 0 To size - 1
-                    Dim temp = 0.0
-                    temp = retEigenMat(p)(i) * cosTheta - retEigenMat(q)(i) * sinTheta
-                    D(p)(i) = temp
-                    D(i)(p) = temp
-                    temp = retEigenMat(p)(i) * sinTheta + retEigenMat(q)(i) * cosTheta
-                    D(i)(q) = temp
-                    D(q)(i) = temp
-                Next
-                Dim cosThetasinTheta = cosTheta * cosTheta - sinTheta * sinTheta
-                Dim tempA = (temp_pp + temp_qq) / 2.0
-                Dim tempB = (temp_pp - temp_qq) / 2.0
-                Dim tempC = temp_pq * (sinTheta * cosTheta) * 2.0
-                D(p)(p) = tempA + tempB * cosThetasinTheta - tempC
-                D(q)(q) = tempA - tempB * cosThetasinTheta + tempC
-                D(p)(q) = 0.0
-                D(q)(p) = 0.0
-                retEigenMat = D
-
-                'rotate
-                Dim rotateNew = New clsEasyMatrix(size, True)
-                rotateNew(p)(p) = cosTheta
-                rotateNew(p)(q) = sinTheta
-                rotateNew(q)(p) = -sinTheta
-                rotateNew(q)(q) = cosTheta
-                rotate = rotate * rotateNew
-            Next
-
-            'sort by Eigen value
-            Dim eigenValue = retEigenMat.ToDiagonalVector()
-            clsMathUtil.EigenSort(eigenValue, rotate)
-
-            Return New Eigen(eigenValue, rotate, isConversion)
-        End Function
-
-        ''' <summary>
         ''' LU decomposition (using PLU())
         ''' </summary>
         ''' <param name="eps">2.20*10^-16</param>
@@ -1347,6 +1138,324 @@
 
             Return New LU(matP, matL, matU, det)
         End Function
+
+        ''' <summary>
+        ''' Cholesky decomposition A=LL^T
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function Cholesky() As clsEasyMatrix
+            If Me.IsSquare() = False Then
+                Throw New clsException(clsException.Series.NotComputable, "Cholesky() not Square")
+            End If
+
+            Dim ret As New MathUtil.clsEasyMatrix(Me.RowCount)
+            Dim n = CInt(Math.Sqrt(ret.RowCount * ret.ColCount))
+            For i As Integer = 0 To n - 1
+                For j As Integer = 0 To i
+                    If j = i Then
+                        Dim sum = 0.0
+                        For k As Integer = 0 To j
+                            sum += ret(j)(k) * ret(j)(k)
+                        Next
+                        ret(j)(j) = Math.Sqrt(Me(j)(j) - sum)
+                    Else
+                        Dim sum = 0.0
+                        For k As Integer = 0 To j
+                            sum += ret(i)(k) * ret(j)(k)
+                        Next
+                        ret(i)(j) = 1.0 / ret(j)(j) * (Me(i)(j) - sum)
+                    End If
+                Next
+            Next
+
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Eigen decomposition using Jacobi Method. for Symmetric Matrix.
+        ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
+        ''' </summary>
+        ''' <param name="Iteration">default:1000</param>
+        ''' <param name="Conversion">default:1.0e-16</param>
+        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
+        ''' <returns></returns>
+        Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
+                              Optional ByVal Conversion As Double = 0.0000000000000001,
+                              Optional ByVal IsSort As Boolean = True) As Eigen
+            Dim size = Me.ColCount()
+            Dim retEigenMat = New clsEasyMatrix(Me)
+            Dim rotate = New clsEasyMatrix(size, True)
+            Dim isConversion = False
+            Dim rowIdx() = New Integer(size * 4 - 1) {}
+            Dim colIdx() = New Integer(size * 4 - 1) {}
+            Dim value() = New Double(size * 4 - 1) {}
+
+            'iteration
+            For itr As Integer = 0 To Iteration - 1
+                'find abs max value without diag
+                Dim max = Math.Abs(retEigenMat(0)(1))
+                Dim p As Integer = 0
+                Dim q As Integer = 1
+                For i As Integer = 0 To size - 1
+                    For j As Integer = i + 1 To size - 1
+                        If max < Math.Abs(retEigenMat(i)(j)) Then
+                            max = Math.Abs(retEigenMat(i)(j))
+                            p = i
+                            q = j
+                        End If
+                    Next
+                Next
+
+                'check conversion
+                If max < Conversion Then
+                    isConversion = True
+                    Exit For
+                End If
+
+                Dim temp_pp = retEigenMat(p)(p)
+                Dim temp_qq = retEigenMat(q)(q)
+                Dim temp_pq = retEigenMat(p)(q)
+                Dim theta = 0.0
+                Dim diff = temp_pp - temp_qq
+                If MathUtil.clsMathUtil.IsCloseToZero(diff) = True Then
+                    theta = Math.PI / 4.0
+                Else
+                    theta = Math.Atan(-2.0 * temp_pq / diff) * 0.5
+                End If
+
+                Dim D = New clsEasyMatrix(retEigenMat)
+                Dim cosTheta = Math.Cos(theta)
+                Dim sinTheta = Math.Sin(theta)
+                For i As Integer = 0 To size - 1
+                    Dim temp = 0.0
+                    temp = retEigenMat(p)(i) * cosTheta - retEigenMat(q)(i) * sinTheta
+                    D(p)(i) = temp
+                    D(i)(p) = temp
+                    temp = retEigenMat(p)(i) * sinTheta + retEigenMat(q)(i) * cosTheta
+                    D(i)(q) = temp
+                    D(q)(i) = temp
+                Next
+                Dim cosThetasinTheta = cosTheta * cosTheta - sinTheta * sinTheta
+                Dim tempA = (temp_pp + temp_qq) / 2.0
+                Dim tempB = (temp_pp - temp_qq) / 2.0
+                Dim tempC = temp_pq * (sinTheta * cosTheta) * 2.0
+                D(p)(p) = tempA + tempB * cosThetasinTheta - tempC
+                D(q)(q) = tempA - tempB * cosThetasinTheta + tempC
+                D(p)(q) = 0.0
+                D(q)(p) = 0.0
+                retEigenMat = D
+
+                'rotate
+                Dim rotateNew = New clsEasyMatrix(size, True)
+                rotateNew(p)(p) = cosTheta
+                rotateNew(p)(q) = sinTheta
+                rotateNew(q)(p) = -sinTheta
+                rotateNew(q)(q) = cosTheta
+                rotate = rotate * rotateNew
+            Next
+
+            'sort by Eigen value
+            Dim eigenValue = retEigenMat.ToDiagonalVector()
+            If IsSort = True Then
+                clsMathUtil.EigenSort(eigenValue, rotate)
+            End If
+
+            Return New Eigen(eigenValue, rotate, isConversion)
+        End Function
+
+        Public Function Eigen2(Optional ByVal Iteration As Integer = 1000,
+                              Optional ByVal Conversion As Double = 0.0000000000000001,
+                              Optional ByVal IsSort As Boolean = True) As Eigen
+            '対称行列の場合 固有値分解 変換（対称三重対角行列、ヘッセンベルグ行列に変換後）→反復計算 がよい
+            'ヤコビ法 10次元程度 遅い
+            'ギブンス法（ギブンス変換による三重対角化）で行う。ハウスホルダー法の法が効率よい
+
+        End Function
+
+        ''' <summary>
+        ''' To Tridiagonal matrix using Householder transform 三重対角行列
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function HouseholderTransformation() As clsEasyMatrix
+            'ref
+            'ハウスホルダー変換
+            'http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?Numerical%20Calculation
+
+            Dim tempMat = New clsEasyMatrix(Me)
+            Dim n As Integer = tempMat.Count
+            Dim u = New clsEasyVector(n)
+            Dim v = New clsEasyVector(n)
+            Dim q = New clsEasyVector(n)
+
+            For k As Integer = 0 To n - 2
+                's
+                Dim s As Double = 0.0
+                For i = k + 1 To n - 1
+                    s += tempMat(i)(k) * tempMat(i)(k)
+                Next
+
+                ' | -
+                ' |a10 -
+                ' |   a21
+                Dim temp As Double = tempMat(k + 1)(k)
+                If temp >= 0 Then
+                    s = -Math.Sqrt(s)
+                Else
+                    s = Math.Sqrt(s)
+                End If
+
+                ' |x-y|
+                Dim alpha = Math.Sqrt(2.0 * s * (s - temp))
+                If clsMathUtil.IsCloseToZero(alpha) = True Then
+                    Continue For
+                End If
+
+                'u
+                u(k + 1) = (temp - s) / alpha
+                For i = k + 2 To n - 1
+                    u(i) = tempMat(i)(k) / alpha
+                Next
+
+                'Au
+                q(k) = alpha / 2.0
+                For i = k + 1 To n - 1
+                    q(i) = 0.0
+                    For j = k + 1 To n - 1
+                        q(i) += tempMat(i)(j) * u(j)
+                    Next
+                Next
+
+                'v=2(Au-uu^T(Au))
+                alpha = 0.0
+                'uu^T
+                For i = k + 1 To n - 1
+                    alpha += u(i) * q(i)
+                Next
+                v(k) = 2.0 * q(k)
+                For i = k + 1 To n - 1
+                    v(i) = 2.0 * (q(i) - alpha * u(i))
+                Next
+
+                'A = PAP
+                ' | -    a02
+                ' |    -
+                ' |a20    -
+                tempMat(k)(k + 1) = s
+                tempMat(k + 1)(k) = s
+                For i = k + 2 To n - 1
+                    tempMat(k)(i) = 0.0
+                    tempMat(i)(k) = 0.0
+                Next
+                For i = k + 1 To n - 1
+                    tempMat(i)(i) = tempMat(i)(i) - 2.0 * u(i) * v(i)
+                    For j = i + 1 To n - 1
+                        Dim tempVal = tempMat(i)(j) - u(i) * v(j) - v(i) * u(j)
+                        tempMat(i)(j) = tempVal
+                        tempMat(j)(i) = tempVal
+                    Next
+                Next
+            Next
+
+            Return tempMat
+        End Function
+
+        ''' <summary>
+        ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
+        ''' 対称行列をハウスホルダー変換 → 三重対角行列
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function HouseholderTransformationForQR() As clsEasyMatrix
+            'ref
+            'ハウスホルダー変換
+            'http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?Numerical%20Calculation
+
+            Dim a = New clsEasyMatrix(Me)
+            Dim n = a.Count
+
+            Dim b = New clsEasyMatrix(n)
+            Dim p = New clsEasyMatrix(n)
+            Dim q = New clsEasyMatrix(n)
+            Dim u = New clsEasyVector(n)
+
+            For k As Integer = 0 To n - 2
+                's
+                Dim s As Double = 0.0
+                For i = k + 1 To n - 1
+                    s += a(i)(k) * a(i)(k)
+                Next
+                Dim tempVal = a(k + 1)(k)
+                If tempVal >= 0 Then
+                    s = -Math.Sqrt(s)
+                Else
+                    s = Math.Sqrt(s)
+                End If
+
+                ' |x-y|
+                Dim alpha = Math.Sqrt(2.0 * s * (s - tempVal))
+                If clsMathUtil.IsCloseToZero(alpha) = True Then
+                    Continue For
+                End If
+
+                'u
+                u(k + 1) = (tempVal - s) / alpha
+                For i = k + 2 To n - 1
+                    u(i) = a(i)(k) / alpha
+                Next
+
+                'P
+                For i = k + 1 To n - 1
+                    For j = i To n - 1
+                        If j = i Then
+                            p(i)(j) = 1.0 - 2.0 * u(i) * u(i)
+                        Else
+                            p(i)(j) = -2.0 * u(i) * u(j)
+                            p(j)(i) = p(i)(j)
+                        End If
+                    Next
+                Next
+
+                'PA
+                For i = k + 1 To n - 1
+                    For j = k + 1 To n - 1
+                        q(i)(j) = 0.0
+                        For m = k + 1 To n - 1
+                            q(i)(j) += p(i)(m) * a(m)(j)
+                        Next
+                    Next
+                Next
+
+                'A = PAP^T
+                For i = 0 To k
+                    b(i)(k) = a(i)(k)
+                Next
+                b(k + 1)(k) = s
+                For i = k + 2 To n - 1
+                    b(i)(k) = 0.0
+                Next
+                For j = k + 1 To n - 1
+                    For i = 0 To k
+                        b(i)(j) = 0.0
+                        For m = k + 1 To n - 1
+                            b(i)(j) += a(i)(m) * p(j)(m)
+                        Next
+                    Next
+                    For i = k + 1 To n - 1
+                        b(i)(j) = 0.0
+                        For m = k + 1 To n - 1
+                            b(i)(j) += q(i)(m) * p(j)(m)
+                        Next
+                    Next
+                Next
+
+                For j = 0 To n - 1
+                    For i = 0 To n - 1
+                        a(j)(i) = b(j)(i)
+                    Next
+                Next
+            Next
+            Return a
+        End Function
+
 #End Region
 
 #Region "Public shared"

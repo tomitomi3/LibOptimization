@@ -3,6 +3,9 @@
     ''' Utility class for Math
     ''' </summary>
     Public Class clsMathUtil
+        ''' <summary>
+        ''' for sort
+        ''' </summary>
         Private Class ValueDescSort
             Implements IComparable
 
@@ -26,7 +29,7 @@
                     Throw New ArgumentException("Different type", "obj")
                 End If
 
-                'Compare 降順ソート
+                'Compare descent sort
                 Dim mineValue As Double = Me.v
                 Dim compareValue As Double = DirectCast(obj, ValueDescSort).v
                 If mineValue < compareValue Then
@@ -253,6 +256,7 @@
             For j As Integer = 0 To n - 1
                 'eigen value
                 eigenValue(j) = colSwapInfo(j).v
+
                 'eigen vector
                 Dim k = colSwapInfo(j).idx
                 For i As Integer = 0 To n - 1
