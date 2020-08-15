@@ -3,6 +3,42 @@
     ''' Utility class for Math
     ''' </summary>
     Public Class clsMathUtil
+        Private Class ValueDescSort
+            Implements IComparable
+
+            Public v As Double = 0.0
+
+            Public idx As Integer = 0
+
+            Public Sub New(ByVal v As Double, ByVal idx As Integer)
+                Me.v = v
+                Me.idx = idx
+            End Sub
+
+            Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
+                'Nothing check
+                If obj Is Nothing Then
+                    Return 1
+                End If
+
+                'Type check
+                If Not Me.GetType() Is obj.GetType() Then
+                    Throw New ArgumentException("Different type", "obj")
+                End If
+
+                'Compare 降順ソート
+                Dim mineValue As Double = Me.v
+                Dim compareValue As Double = DirectCast(obj, ValueDescSort).v
+                If mineValue < compareValue Then
+                    Return 1
+                ElseIf mineValue > compareValue Then
+                    Return -1
+                Else
+                    Return 0
+                End If
+            End Function
+        End Class
+
         ''' <summary>
         ''' Create random symmetric matrix(for Debug)
         ''' </summary>
@@ -199,5 +235,31 @@
                 Return False
             End If
         End Function
+
+        ''' <summary>
+        ''' sort by eigen value
+        ''' </summary>
+        ''' <param name="eigenValue"></param>
+        ''' <param name="eigenVector"></param>
+        Public Shared Sub EigenSort(ByRef eigenValue As clsEasyVector, ByRef eigenVector As clsEasyMatrix)
+            Dim n = eigenValue.Count
+            Dim colSwapInfo = New List(Of ValueDescSort)
+            For i As Integer = 0 To n - 1
+                colSwapInfo.Add(New ValueDescSort(eigenValue(i), i))
+            Next
+            colSwapInfo.Sort()
+
+            Dim newEigenVector = New clsEasyMatrix(n)
+            For j As Integer = 0 To n - 1
+                'eigen value
+                eigenValue(j) = colSwapInfo(j).v
+                'eigen vector
+                Dim k = colSwapInfo(j).idx
+                For i As Integer = 0 To n - 1
+                    newEigenVector(i)(j) = eigenVector(i)(k)
+                Next
+            Next
+            eigenVector = newEigenVector
+        End Sub
     End Class
 End Namespace
