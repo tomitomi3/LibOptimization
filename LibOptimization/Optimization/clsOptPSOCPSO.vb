@@ -12,6 +12,7 @@ Namespace Optimization
     ''' Refference:
     ''' [1]Luu, Keurfon, et al. "A parallel competitive Particle Swarm Optimization for non-linear first arrival traveltime tomography and uncertainty quantification." Computers and Geosciences 113 (2018): 81-93.
     ''' </remarks>
+    <Serializable>
     Public Class clsOptPSOCPSO : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max iteration count(Default:20,000)</summary>

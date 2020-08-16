@@ -19,6 +19,7 @@ Namespace Optimization
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
+    <Serializable>
     Public Class clsOptDEJADE : Inherits absOptimization
 #Region "Member"
         '----------------------------------------------------------------

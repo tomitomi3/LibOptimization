@@ -18,6 +18,7 @@ Namespace Optimization
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
+    <Serializable>
     Public Class clsOptRealGAPCX : Inherits absOptimization
 #Region "Member"
         '----------------------------------------------------------------

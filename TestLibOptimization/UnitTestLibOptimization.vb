@@ -280,5 +280,44 @@ Imports LibOptimization.Util
             Next
         End With
     End Sub
+
+    ''' <summary>
+    ''' test serialize and deserialize
+    ''' </summary>
+    <TestMethod()> Public Sub Opt_SerializeAndDesrialize()
+        Dim opt = New LibOptimization.Optimization.clsOptCS(New clsBenchSphere(5))
+        opt.Random = New clsRandomXorshift()
+        opt.Init()
+
+        'serialize
+        opt.DoIteration(10)
+        Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        Dim PATH_SERIALIZE = "serialize_file.txt"
+        clsUtil.SerializeOpt(CType(opt, absOptimization), PATH_SERIALIZE)
+        opt.DoIteration(10)
+        Dim result1 = opt.Result()
+        Dim itr1 = opt.IterationCount
+
+        'deserialize
+        Dim temp = clsUtil.DeSerializeOpt(PATH_SERIALIZE)
+        opt = CType(temp, clsOptCS)
+        Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        opt.DoIteration(10)
+        Dim result2 = opt.Result()
+        Dim itr2 = opt.IterationCount
+
+        'compare
+        Dim flg = True
+
+        flg = flg And (itr1 = itr2)
+        If flg = False Then
+            Assert.Fail(String.Format("not same iteration count"))
+        End If
+
+        flg = flg And clsMathUtil.IsNearyEqualVector(result1, result2)
+        If flg = False Then
+            Assert.Fail(String.Format("not same result"))
+        End If
+    End Sub
 #End Region
 End Class

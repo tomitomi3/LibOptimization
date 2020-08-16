@@ -13,6 +13,7 @@ Namespace Optimization
     ''' Refference:
     ''' [1]Y. Feng, G. Teng, A. Wang, Y.M. Yao, "Chaotic inertia weight in particle swarm optimization", in: Second International Conference on Innovative Computing, Information and Control (ICICIC 07), 2007, pp. 475–1475.
     ''' </remarks>
+    <Serializable>
     Public Class clsOptPSOChaoticIW : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max Iteration(Default:20,000)</summary>

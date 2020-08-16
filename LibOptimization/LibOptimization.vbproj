@@ -215,8 +215,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName)==Release and $(PlatformName)=="Any CPU" (
-    copy /Y $(TargetPath) ..\..\..\_BuildLib\DotNet4.0\$(TargetFileName)
+    <PostBuildEvent>set DESTPATH="$(SolutionDir)_BuildLib\$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+mkdir %25DESTPATH%25
+copy /Y "$(TargetPath)" "%25DESTPATH%25"
+
+if $(ConfigurationName)==Release  (
+  if $(PlatformName)==Any CPU (
+  )
 )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

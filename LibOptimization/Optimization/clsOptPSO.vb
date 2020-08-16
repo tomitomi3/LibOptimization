@@ -16,6 +16,7 @@ Namespace Optimization
     ''' [3]Y. Shi and Russell Eberhart, "A Modified Particle Swarm Optimizer", Proceedings of Congress on Evolu-tionary Computation, 79-73., 1998
     ''' [4]R. C. Eberhart and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.
     ''' </remarks>
+    <Serializable>
     Public Class clsOptPSO : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max iteration count(Default:20,000)</summary>

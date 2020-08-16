@@ -13,6 +13,7 @@ Namespace Optimization
     ''' Refference:
     ''' [1]Y. Shi and Russell C. Eberhart, "Empirical Study of Particle Swarm Optimization, Proceeding Congress on Evolutionary Computation 1999, Piscataway, 1945-1949
     ''' </remarks>
+    <Serializable>
     Public Class clsOptPSOLDIW : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max Iteration(Default:20,000)</summary>

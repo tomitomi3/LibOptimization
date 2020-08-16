@@ -21,6 +21,7 @@ Namespace Optimization
     ''' 最適化で微分を用いて求める手法のことを「勾配法」という。
     ''' 最大値を求めることを山登り法、最小値の場合は最急降下法とよばれる。
     ''' </remarks>
+    <Serializable>
     Public Class clsOptSteepestDescent : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max iteration count</summary>

@@ -14,6 +14,7 @@ Namespace Optimization
     ''' Refference:
     ''' [1]A. Nickabadi, M. M. Ebadzadeh, and R. Safabakhsh, “A novel particle swarm optimization algorithm with adaptive inertia weight,” Applied Soft Computing Journal, vol. 11, no. 4, pp. 3658–3670, 2011.
     ''' </remarks>
+    <Serializable>
     Public Class clsOptPSOAIW : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max iteration count(Default:20,000)</summary>

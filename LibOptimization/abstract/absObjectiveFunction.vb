@@ -3,6 +3,7 @@
     ''' Abstarct objective function class
     ''' </summary>
     ''' <remarks></remarks>
+    <Serializable>
     Public MustInherit Class absObjectiveFunction
         ''' <summary>
         ''' Get number of variables

@@ -7,6 +7,7 @@
     ''' Refference:
     ''' George Marsaglia, "Xorshift RNGs", Journal of Statistical Software Vol. 8, Issue 14, Jul 2003
     ''' </remarks>
+    <Serializable>
     Public Class clsRandomXorshift : Inherits System.Random
         'DefaultParameter
         Private x As UInt32 = 123456789
@@ -209,6 +210,7 @@
     ''' </summary>
     ''' <remarks>
     ''' </remarks>
+    <Serializable>
     Public Class clsRandomXorshiftSingleton
         Private Shared m_rand As New clsRandomXorshift()
 

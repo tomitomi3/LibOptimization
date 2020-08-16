@@ -13,6 +13,7 @@ Namespace BenchmarkFunction
     ''' Referrence:
     ''' http://mikilab.doshisha.ac.jp/dia/research/pdga/archive/doc/ga2k_performance.pdf
     ''' </remarks>
+    <Serializable>
     Public Class clsBenchRidge : Inherits absObjectiveFunction
         Private dimension As Integer = 0
 

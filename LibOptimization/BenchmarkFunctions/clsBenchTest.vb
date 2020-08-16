@@ -6,6 +6,7 @@ Namespace BenchmarkFunction
     ''' </summary>
     ''' <remarks>
     ''' </remarks>
+    <Serializable>
     Public Class clsBenchTest : Inherits absObjectiveFunction
         ''' <summary>
         ''' Default constructor

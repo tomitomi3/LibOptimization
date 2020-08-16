@@ -16,6 +16,7 @@ Namespace Optimization
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
+    <Serializable>
     Public Class clsOptNelderMeadWiki : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max iteration count(Default:5,000)</summary>

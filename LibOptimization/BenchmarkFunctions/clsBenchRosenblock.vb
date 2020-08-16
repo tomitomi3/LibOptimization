@@ -9,6 +9,7 @@ Namespace BenchmarkFunction
     ''' Minimum:
     '''  F(0,...,0) = 0
     ''' </remarks>
+    <Serializable>
     Public Class clsBenchRosenblock : Inherits absObjectiveFunction
         Private dimension As Integer = 0
 

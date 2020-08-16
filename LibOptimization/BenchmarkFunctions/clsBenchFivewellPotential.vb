@@ -13,6 +13,7 @@ Namespace BenchmarkFunction
     ''' Referrence:
     ''' Ilya Pavlyukevich, "Levy flights, non-local search and simulated annealing", Journal of Computational Physics 226 (2007) 1830-1844
     ''' </remarks>
+    <Serializable>
     Public Class clsBenchFivewellPotential : Inherits absObjectiveFunction
         ''' <summary>
         ''' Default constructor

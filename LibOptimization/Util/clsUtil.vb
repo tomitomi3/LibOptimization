@@ -842,5 +842,28 @@ Namespace Util
             Return sortedEvalList
         End Function
 
+        ''' <summary>
+        ''' serialize(write)
+        ''' </summary>
+        ''' <param name="optobj"></param>
+        ''' <param name="path"></param>
+        Public Shared Sub SerializeOpt(optobj As Object, path As String)
+            Using fs = New System.IO.FileStream(path, System.IO.FileMode.Create)
+                Dim bf = New System.Runtime.Serialization.Formatters.Binary.BinaryFormatter()
+                bf.Serialize(fs, optobj)
+            End Using
+        End Sub
+
+        ''' <summary>
+        ''' deserialize(read)
+        ''' </summary>
+        ''' <param name="path"></param>
+        ''' <returns></returns>
+        Public Shared Function DeSerializeOpt(path As String) As Object
+            Using fs = New System.IO.FileStream(path, System.IO.FileMode.Open)
+                Dim bf = New System.Runtime.Serialization.Formatters.Binary.BinaryFormatter()
+                Return bf.Deserialize(fs)
+            End Using
+        End Function
     End Class
 End Namespace

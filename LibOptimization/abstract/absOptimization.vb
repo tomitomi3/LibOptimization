@@ -5,6 +5,7 @@ Namespace Optimization
     ''' Abstarct optimization Class
     ''' </summary>
     ''' <remarks></remarks>
+    <Serializable>
     Public MustInherit Class absOptimization
         ''' <summary>Objective function</summary>
         Protected m_func As absObjectiveFunction = Nothing

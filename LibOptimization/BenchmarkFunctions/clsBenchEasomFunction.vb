@@ -13,6 +13,7 @@ Namespace BenchmarkFunction
     ''' Referrence:
     ''' [1]Test fXin-She Yang, "Test Problems in Optimization", arXiv(http://arxiv.org/abs/1008.0549)
     ''' </remarks>
+    <Serializable>
     Public Class clsBenchEasomFunction : Inherits absObjectiveFunction
         ''' <summary>
         ''' Default constructor

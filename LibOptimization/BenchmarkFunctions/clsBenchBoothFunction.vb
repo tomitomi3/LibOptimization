@@ -13,6 +13,7 @@ Namespace BenchmarkFunction
     ''' Referrence:
     ''' http://www-optima.amp.i.kyoto-u.ac.jp/member/student/hedar/Hedar_files/TestGO_files/Page816.htm
     ''' </remarks>
+    <Serializable>
     Public Class clsBenchBoothFunction : Inherits absObjectiveFunction
         ''' <summary>
         ''' Default constructor

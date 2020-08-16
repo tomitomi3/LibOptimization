@@ -9,6 +9,7 @@ Namespace BenchmarkFunction
     ''' Minimum:
     '''  F(0,0,0,0) = 0
     ''' </remarks>
+    <Serializable>
     Public Class clsBenchPowell : Inherits absObjectiveFunction
         ''' <summary>
         ''' Default constructor

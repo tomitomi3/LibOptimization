@@ -6,6 +6,7 @@ Namespace Optimization
     ''' Firefly class
     ''' </summary>
     ''' <remarks></remarks>
+    <Serializable>
     Public Class clsFireFly
         Inherits clsEasyVector
         Implements IComparable

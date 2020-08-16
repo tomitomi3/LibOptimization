@@ -6,6 +6,7 @@ Namespace Optimization
     ''' Point Class
     ''' </summary>
     ''' <remarks></remarks>
+    <Serializable>
     Public Class clsPoint
         Inherits clsEasyVector
         Implements IComparable

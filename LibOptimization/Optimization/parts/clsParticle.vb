@@ -8,6 +8,7 @@ Namespace Optimization
     ''' <remarks>
     ''' for Swarm Particle Optimization
     ''' </remarks>
+    <Serializable>
     Public Class clsParticle : Implements IComparable
         Private m_point As clsPoint
         Private m_bestPoint As clsPoint

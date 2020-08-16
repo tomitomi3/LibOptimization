@@ -4,6 +4,7 @@
     ''' </summary>
     ''' <remarks>
     ''' </remarks>
+    <Serializable>
     Public Class clsError
         Private m_errList As New List(Of clsErrorInfomation)
 
@@ -19,6 +20,7 @@
         ''' Error infomation class
         ''' </summary>
         ''' <remarks></remarks>
+        <Serializable>
         Public Class clsErrorInfomation
             ''' <summary>
             ''' Default constructor(do not use)

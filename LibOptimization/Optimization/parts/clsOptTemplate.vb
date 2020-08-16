@@ -6,6 +6,7 @@ Namespace Optimization
     ''' optimize template not use
     ''' </summary>
     ''' <remarks></remarks>
+    <Serializable>
     Public Class clsOptTemplate : Inherits absOptimization
 #Region "Member"
         '----------------------------------------------------------------

@@ -14,6 +14,7 @@ Namespace Optimization
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
+    <Serializable>
     Public Class clsOptES : Inherits absOptimization
 #Region "Member"
         '----------------------------------------------------------------

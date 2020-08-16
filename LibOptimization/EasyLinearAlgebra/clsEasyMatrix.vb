@@ -2,6 +2,7 @@
     ''' <summary>
     ''' store LU decomposition
     ''' </summary>
+    <Serializable>
     Public Class LU
         ''' <summary>Pivot matrix</summary>
         Public Property P As clsEasyMatrix = Nothing
@@ -57,6 +58,7 @@
     ''' <summary>
     ''' store SVD decomposition
     ''' </summary>
+    <Serializable>
     Public Class SVD
         ''' <summary></summary>
         Public Property S As clsEasyMatrix = Nothing
@@ -80,6 +82,7 @@
     ''' <summary>
     ''' store Eigen values, vector
     ''' </summary>
+    <Serializable>
     Public Class Eigen
         ''' <summary></summary>
         Public Property EigenValue As clsEasyVector = Nothing
@@ -112,6 +115,8 @@
     ''' <remarks>
     ''' Inherits List(Of List(Of Double))
     ''' </remarks>
+    <Serializable>
+    <DebuggerDisplay("Row={RowCount()}, Col={ColCount()}")>
     Public Class clsEasyMatrix : Inherits List(Of List(Of Double))
         Public Const SAME_ZERO As Double = 2.0E-50 '2.0*10^-50
         Public Const MachineEpsiron As Double = 0.000000000000000222 ' 2.20*E-16 = 2.20*10^-16
@@ -1269,7 +1274,7 @@
             '対称行列の場合 固有値分解 変換（対称三重対角行列、ヘッセンベルグ行列に変換後）→反復計算 がよい
             'ヤコビ法 10次元程度 遅い
             'ギブンス法（ギブンス変換による三重対角化）で行う。ハウスホルダー法の法が効率よい
-
+            Return Nothing
         End Function
 
         ''' <summary>
@@ -1543,5 +1548,4 @@
         End Function
 #End Region
     End Class
-
 End Namespace

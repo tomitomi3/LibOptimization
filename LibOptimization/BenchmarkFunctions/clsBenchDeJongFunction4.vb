@@ -13,6 +13,7 @@ Namespace BenchmarkFunction
     ''' Refference:
     '''  De Jong, K. A., "Analysis of the Behavior of a Class of Genetic Adaptive Systems", PhD dissertation, The University of Michigan, Computer and Communication Sciences Department (1975)
     ''' </remarks>
+    <Serializable>
     Public Class clsBenchDeJongFunction4 : Inherits absObjectiveFunction
         Private normRand As New List(Of Double)
 

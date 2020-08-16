@@ -5,6 +5,8 @@
     ''' <remarks>
     ''' Inherits List(of double)
     ''' </remarks>
+    <Serializable>
+    <DebuggerDisplay("Count={Me.Count}")>
     Public Class clsEasyVector : Inherits List(Of Double)
         Private m_direcition As VectorDirection = VectorDirection.ROW
 
@@ -559,5 +561,4 @@
         End Function
 #End Region
     End Class
-
 End Namespace
