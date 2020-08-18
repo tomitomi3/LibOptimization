@@ -106,7 +106,6 @@
             Me.EigenVector = eigenVec
             Me.IsConversion = isconversion
         End Sub
-
     End Class
 
     ''' <summary>
@@ -1187,6 +1186,13 @@
         Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
                               Optional ByVal Conversion As Double = 0.0000000000000001,
                               Optional ByVal IsSort As Boolean = True) As Eigen
+            If Me.IsSquare() = False Then
+                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+            End If
+            If Me.IsSymmetricMatrix() = False Then
+                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+            End If
+
             Dim size = Me.ColCount()
             Dim retEigenMat = New clsEasyMatrix(Me)
             Dim rotate = New clsEasyMatrix(size, True)
@@ -1268,6 +1274,13 @@
             Return New Eigen(eigenValue, rotate, isConversion)
         End Function
 
+        ''' <summary>
+        ''' Eigen2 not imple
+        ''' </summary>
+        ''' <param name="Iteration"></param>
+        ''' <param name="Conversion"></param>
+        ''' <param name="IsSort"></param>
+        ''' <returns></returns>
         Public Function Eigen2(Optional ByVal Iteration As Integer = 1000,
                               Optional ByVal Conversion As Double = 0.0000000000000001,
                               Optional ByVal IsSort As Boolean = True) As Eigen
@@ -1460,10 +1473,9 @@
             Next
             Return a
         End Function
-
 #End Region
 
-#Region "Public shared"
+#Region "Public Shared"
         ''' <summary>
         ''' solve(Ax=b)
         ''' </summary>
@@ -1545,6 +1557,24 @@
             End If
 
             Return False
+        End Function
+
+        ''' <summary>
+        ''' check SymmetricMatrix
+        ''' </summary>
+        ''' <returns></returns>
+        Private Function IsSymmetricMatrix() As Boolean
+            Dim s = Me
+            Dim n = s.ColCount
+            For i = 0 To n - 1
+                For j = 0 To i - 1
+                    Dim flg = s(i)(j) = s(j)(i)
+                    If flg = False Then
+                        Return False
+                    End If
+                Next
+            Next
+            Return True
         End Function
 #End Region
     End Class

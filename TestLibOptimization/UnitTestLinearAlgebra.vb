@@ -1,12 +1,6 @@
-﻿Imports System.Text
-Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
-'LibOptimization
+﻿'LibOptimization
 Imports LibOptimization
 Imports LibOptimization.MathUtil
-Imports LibOptimization.Optimization
-Imports LibOptimization.BenchmarkFunction
-Imports LibOptimization.Util
 
 ''' <summary>
 ''' unit test for my Linear Algebra  lib
@@ -690,6 +684,46 @@ Imports LibOptimization.Util
     End Sub
 
     ''' <summary>
+    ''' Vector * Vector
+    ''' </summary>
+    <TestMethod()> Public Sub Vec_Product_VectorVector()
+        Dim vec1 = New clsEasyVector(New Double() {1, 2, 3}, clsEasyVector.VectorDirection.ROW)
+        Dim vec2 = New clsEasyVector(New Double() {4, 5, 6}, clsEasyVector.VectorDirection.COL)
+
+        With Nothing
+            '|v1 v2| * |v3|
+            '          |v4|
+            Dim vec1vec2 = vec1 * vec2
+            If vec1vec2.RowCount <> 1 AndAlso vec1vec2.ColCount <> 1 Then
+                vec1vec2.PrintValue(name:="vec1vec2")
+                Assert.Fail("error : vector * vector")
+            End If
+            If MathUtil.clsMathUtil.IsCloseToValues(vec1vec2(0)(0), 32.0) = False Then
+                vec1vec2.PrintValue(name:="vec1vec2")
+                Assert.Fail("error : vector * vector")
+            End If
+        End With
+
+        With Nothing
+            '|v1| * |v3 v4|
+            '|v2|
+            Dim vec2vec1 = vec2 * vec1
+            If vec2vec1.RowCount <> 3 AndAlso vec2vec1.ColCount <> 3 Then
+                vec2vec1.PrintValue(name:="vec2vec1")
+                Assert.Fail("error : vector * vector")
+            End If
+
+            Dim correctMat As New clsEasyMatrix(New Double()() {(vec2 * 1.0).ToArray(),
+                                                                (vec2 * 2.0).ToArray(),
+                                                                (vec2 * 3.0).ToArray()})
+            If MathUtil.clsMathUtil.IsNearyEqualMatrix(vec2vec1, correctMat) = False Then
+                vec2vec1.PrintValue(name:="vec2vec1")
+                Assert.Fail("error : vector * vector")
+            End If
+        End With
+    End Sub
+
+    ''' <summary>
     ''' Scalar * Vector
     ''' </summary>
     <TestMethod()> Public Sub Mat_Product_ScalarVector()
@@ -789,7 +823,6 @@ Imports LibOptimization.Util
             Dim matB = New clsEasyMatrix(dimNum - 1, True)
             Try
                 Dim temp = matA * matB
-
                 Assert.Fail("error : 3x3 * 2x2")
             Catch myex As clsException
                 'OK
@@ -1283,4 +1316,5 @@ Imports LibOptimization.Util
         Assert.AreEqual(tempMat.RowCount, 1)
         Assert.AreEqual(tempMat.ColCount, 2)
     End Sub
+
 End Class
