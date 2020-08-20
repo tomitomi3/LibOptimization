@@ -265,5 +265,48 @@
             Next
             eigenVector = newEigenVector
         End Sub
+
+        ''' <summary>
+        ''' Create Variane Co-Varianve Matrix
+        ''' </summary>
+        ''' <param name="mat"></param>
+        ''' <param name="isRowOrder">True:The data sequence is "row".</param>
+        ''' <param name="isUnbalanceVariance">use UnbalanceVariance</param>
+        ''' <returns></returns>
+        Public Shared Function CreateVarCoVarMat(ByRef mat As clsEasyMatrix,
+                                                 ByVal isRowOrder As Boolean,
+                                                 Optional ByVal isUnbalanceVariance As Boolean = True) As clsEasyMatrix
+            If isRowOrder = True Then
+                'demean
+                Dim avev = mat.AverageVector(True)
+                Dim mat_demean As clsEasyMatrix = mat - avev
+
+                'E[X.T * X] -> 1/N[X.T * X]
+                Dim gramMatrix = mat_demean.T * mat_demean
+                Dim var_covar As clsEasyMatrix = Nothing
+                If isUnbalanceVariance Then
+                    var_covar = gramMatrix / (mat.RowCount - 1)
+                Else
+                    var_covar = gramMatrix / mat.RowCount
+                End If
+
+                Return var_covar
+            Else
+                'demean
+                Dim avev = mat.AverageVector(False)
+                Dim mat_demean As clsEasyMatrix = mat - avev
+
+                'E[X.T * X] -> 1/N[X.T * X]
+                Dim gramMatrix = mat_demean * mat_demean.T
+                Dim var_covar As clsEasyMatrix = Nothing
+                If isUnbalanceVariance Then
+                    var_covar = gramMatrix / (mat.RowCount - 1)
+                Else
+                    var_covar = gramMatrix / mat.RowCount
+                End If
+
+                Return var_covar
+            End If
+        End Function
     End Class
 End Namespace

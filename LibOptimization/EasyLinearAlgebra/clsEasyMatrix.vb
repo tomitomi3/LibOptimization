@@ -1,6 +1,6 @@
 ﻿Namespace MathUtil
     ''' <summary>
-    ''' store LU decomposition
+    ''' store LU decomposition with solver
     ''' </summary>
     <Serializable>
     Public Class LU
@@ -53,6 +53,54 @@
             Me.Det = det
             Me.PivotRow = p
         End Sub
+
+        ''' <summary>
+        ''' solve(Ax=b)
+        ''' </summary>
+        ''' <param name="b"></param>
+        ''' <returns></returns>
+        Public Function Solve(ByRef b As clsEasyVector) As clsEasyVector
+            Return Me.Solve(Me.P, Me.L, Me.U, b)
+        End Function
+
+        ''' <summary>
+        ''' solve(Ax=b)
+        ''' </summary>
+        ''' <param name="matP">pivot matrix(LU decomposition of A matrix)</param>
+        ''' <param name="matL">lower triangle matrix(LU decomposition of A matrix)</param>
+        ''' <param name="matU">upper triangle matrix(LU decomposition of A matrix)</param>
+        ''' <param name="vecB"></param>
+        ''' <returns>x</returns>
+        Private Function Solve(ByRef matP As clsEasyMatrix,
+                               ByRef matL As clsEasyMatrix,
+                               ByRef matU As clsEasyMatrix,
+                               ByRef vecB As clsEasyVector) As clsEasyVector
+            Dim n = matP.ColCount
+            Dim x = New clsEasyVector(n)
+            Dim y = New clsEasyVector(n)
+
+            'transopose
+            Dim b = vecB * matP.T()
+
+            For i = 0 To n - 1
+                Dim s = 0.0
+                Dim j As Integer = 0
+                For j = 0 To i - 1
+                    s += matL(i)(j) * y(j)
+                Next
+                y(j) = b(i) - s
+            Next
+
+            For i = n - 1 To 0 Step -1
+                Dim s = 0.0
+                For k = i + 1 To n - 1
+                    s += matU(i)(k) * x(k)
+                Next
+                x(i) = (y(i) - s) / matU(i)(i)
+            Next
+
+            Return x
+        End Function
     End Class
 
     ''' <summary>
@@ -386,25 +434,40 @@
         End Operator
 
         ''' <summary>
-        ''' Diff(Matrix + Vector)
+        ''' Diff(Matrix - Vector)
         ''' </summary>
-        ''' <param name="ai_source"></param>
-        ''' <param name="ai_dest"></param>
+        ''' <param name="mat"></param>
+        ''' <param name="vec"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator -(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyVector) As clsEasyVector
-            If IsComputableMatrixVector(ai_source, ai_dest) = False Then
-                Throw New clsException(clsException.Series.NotComputable)
+        Public Shared Operator -(ByVal mat As clsEasyMatrix, ByVal vec As clsEasyVector) As clsEasyMatrix
+            If vec.Direction = clsEasyVector.VectorDirection.COL AndAlso mat.ColCount = vec.Count Then
+                Dim ret As New clsEasyMatrix(mat)
+                Dim row = mat.RowCount
+                Dim col = mat.ColCount
+                For j = 0 To col - 1
+                    For i = 0 To row - 1
+                        ret(i)(j) -= vec(j)
+                    Next
+                Next
+                Return ret
+            ElseIf vec.Direction = clsEasyVector.VectorDirection.ROW AndAlso mat.RowCount = vec.Count Then
+                Dim ret As New clsEasyMatrix(mat)
+                Dim row = mat.RowCount
+                Dim col = mat.ColCount
+                For i = 0 To row - 1
+                    For j = 0 To col - 1
+                        ret(i)(j) -= vec(i)
+                    Next
+                Next
+                Return ret
+            Else
+                Throw New clsException(clsException.Series.NotComputable, "The number of dimensions of matrices and vectors is different.")
             End If
-            Dim ret As New clsEasyVector(ai_dest)
-            For i As Integer = 0 To ai_dest.Count - 1
-                ret(i) = ai_source(i)(0) - ai_dest(i)
-            Next
-            Return ret
         End Operator
 
         ''' <summary>
-        ''' Diff(Vector + Matrix)
+        ''' Diff(Vector - Matrix)
         ''' </summary>
         ''' <param name="ai_source"></param>
         ''' <param name="ai_dest"></param>
@@ -648,6 +711,21 @@
             Next
             Return ret
         End Operator
+
+        ''' <summary>
+        ''' Divide(Matrix / value)
+        ''' </summary>
+        ''' <param name="ai_source"></param>
+        ''' <param name="ai_dest"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Operator /(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As Double) As clsEasyMatrix
+            Dim ret As New clsEasyMatrix(ai_source)
+            For i As Integer = 0 To ret.RowCount() - 1
+                ret.Row(i) = ai_source.Row(i) / ai_dest
+            Next
+            Return ret
+        End Operator
 #End Region
 
 #Region "Public Utility"
@@ -819,6 +897,104 @@
 
 #Region "Public Func"
         ''' <summary>
+        ''' Sqrt(Mat)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function Sqrt() As clsEasyMatrix
+            Dim ret = New clsEasyMatrix(Me)
+            Dim row = Me.RowCount
+            Dim col = Me.ColCount
+            For i = 0 To row - 1
+                For j = 0 To col - 1
+                    ret(i)(j) = Math.Sqrt(Me(i)(j))
+                Next
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Hadamard product ( a1 * b1, a2 * b2, ... )
+        ''' </summary>
+        ''' <param name="b">( a1 * a1, a2 * a2, ... )</param>
+        Public Function HadamardProduct(Optional ByRef b As clsEasyMatrix = Nothing) As clsEasyMatrix
+            If b Is Nothing Then
+                Dim ret = New clsEasyMatrix(Me)
+                Dim row = Me.RowCount
+                Dim col = Me.ColCount
+                For i = 0 To row - 1
+                    For j = 0 To col - 1
+                        ret(i)(j) = Me(i)(j) * Me(i)(j)
+                    Next
+                Next
+                Return ret
+            Else
+                If IsSameDimension(b, Me) = False Then
+                    Throw New clsException(clsException.Series.DifferElementNumber)
+                End If
+                Dim ret = New clsEasyMatrix(Me)
+                Dim row = Me.RowCount
+                Dim col = Me.ColCount
+                For i = 0 To row - 1
+                    For j = 0 To col - 1
+                        ret(i)(j) = Me(i)(j) * b(i)(j)
+                    Next
+                Next
+                Return ret
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Hadamard divide ( a1 / b1, a2 / b2, ... )
+        ''' </summary>
+        ''' <param name="b"></param>
+        ''' <returns></returns>
+        Public Function HadamardDivide(ByRef b As clsEasyMatrix) As clsEasyMatrix
+            If IsSameDimension(b, Me) = False Then
+                Throw New clsException(clsException.Series.DifferElementNumber)
+            End If
+            Dim ret = New clsEasyMatrix(Me)
+            Dim row = Me.RowCount
+            Dim col = Me.ColCount
+            For i = 0 To row - 1
+                For j = 0 To col - 1
+                    ret(i)(j) = Me(i)(j) / b(i)(j)
+                Next
+            Next
+            Return ret
+        End Function
+
+        ''' <summary>
+        ''' Average vector
+        ''' </summary>
+        ''' <param name="isRowOrder">True:data sequence is "row".</param>
+        ''' <returns></returns>
+        Public Function AverageVector(ByVal isRowOrder As Boolean) As clsEasyVector
+            Dim row = Me.RowCount
+            Dim col = Me.ColCount
+            Dim ret As clsEasyVector = Nothing
+            If isRowOrder Then
+                ret = New clsEasyVector(col, clsEasyVector.VectorDirection.COL)
+                For j = 0 To col - 1
+                    For i = 0 To row - 1
+                        ret(j) += Me(i)(j)
+                    Next
+                    ret(j) /= row
+                Next
+                Return ret
+            Else
+                ret = New clsEasyVector(row, clsEasyVector.VectorDirection.ROW)
+                For i = 0 To row - 1
+                    For j = 0 To col - 1
+                        ret(i) += Me(i)(j)
+                    Next
+                    ret(i) /= col
+                Next
+                Return ret
+            End If
+            Return ret
+        End Function
+
+        ''' <summary>
         ''' Determinant
         ''' </summary>
         ''' <remarks></remarks>
@@ -846,8 +1022,8 @@
                 d -= Me(0)(0) * Me(2)(1) * Me(1)(2)
                 Return d
             Else
-                'over 4 dim using PLU decomposition
-                Dim detVal = Me.PLU().Det
+                'over 4 dim using LUP decomposition
+                Dim detVal = Me.LUP().Det()
                 Return detVal
             End If
         End Function
@@ -898,28 +1074,29 @@
                 retInverse(2)(2) = ((Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))) / det
             Else
                 Try
-                    Dim plu = Me.PLU()
+                    Dim lup = Me.LUP()
+                    lup.P = lup.P.T() 'Transopose = Inverse
                     For j = 0 To n - 1
                         Dim y = New clsEasyVector(n)
-                        Dim b = plu.P(j)
+                        Dim b = lup.P(j)
                         For i = 0 To n - 1
                             Dim s = 0.0
                             Dim k As Integer = 0
                             For k = 0 To i - 1
-                                s += plu.L(i)(k) * y(k)
+                                s += lup.L(i)(k) * y(k)
                             Next
                             y(k) = b(i) - s
                         Next
                         For i = n - 1 To 0 Step -1
                             Dim s = 0.0
                             For k = i + 1 To n - 1
-                                s += plu.U(i)(k) * retInverse(k)(j)
+                                s += lup.U(i)(k) * retInverse(k)(j)
                             Next
-                            retInverse(i)(j) = (y(i) - s) / plu.U(i)(i)
+                            retInverse(i)(j) = (y(i) - s) / lup.U(i)(i)
                         Next
                     Next
 
-                    If clsMathUtil.IsCloseToZero(plu.Det) = True Then
+                    If clsMathUtil.IsCloseToZero(lup.Det) = True Then
                         Throw New clsException(clsException.Series.NotComputable, String.Format("Inverse {0}x{0}", n))
                     End If
                 Catch ex As Exception
@@ -930,20 +1107,20 @@
         End Function
 
         ''' <summary>
-        ''' LU decomposition (using PLU())
+        ''' LU decomposition (using LUP())
         ''' </summary>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
         Public Function LU(Optional ByVal eps As Double = MachineEpsiron) As LU
-            Return Me.PLU(eps)
+            Return Me.LUP(eps)
         End Function
 
         ''' <summary>
-        ''' PLU decomposition
+        ''' LUP decomposition( P*X=L*U -> X=P^-1*L*U)
         ''' </summary>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function PLU(Optional ByVal eps As Double = MachineEpsiron) As LU
+        Public Function LUP(Optional ByVal eps As Double = MachineEpsiron) As LU
             'Refference
             '[1]奧村晴彥. C 言語による最新アルゴリズム事典. 技術評論社, 1991.
             '[2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
@@ -970,12 +1147,12 @@
                 Next
                 '列要素の絶対最大値が0に近い場合
                 If clsMathUtil.IsCloseToZero(absValue, eps) Then
-                    Throw New clsException(clsException.Series.NotComputable, "PLU() singular matrix")
+                    Throw New clsException(clsException.Series.NotComputable, "LUP() singular matrix")
                 End If
                 weight(i) = 1.0 / absValue
             Next
 
-            'calc PLU
+            'calc LUP
             For j = 0 To n - 1
                 For i = 0 To j - 1
                     Dim sum = source(i)(j)
@@ -1030,7 +1207,9 @@
             Next
 
             'transopose
-            matP = matP.T()
+            'If isInverseP Then
+            '    matP = matP.T()
+            'End If
 
             'replace
             For i = 1 To n - 1
@@ -1048,11 +1227,11 @@
         End Function
 
         ''' <summary>
-        ''' PLU decomposition
+        ''' LUP decomposition
         ''' </summary>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function PLU_CALGO(Optional ByVal eps As Double = MachineEpsiron) As LU
+        Public Function LUP_CALGO(Optional ByVal eps As Double = MachineEpsiron) As LU
             'Refference
             '[1]奧村晴彥. C 言語による最新アルゴリズム事典. 技術評論社, 1991.
             '[2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
@@ -1088,7 +1267,7 @@
                 weight(k) = 1.0 / absValue
             Next
 
-            'calc PLU
+            'calc LUP
             For k = 0 To n - 1
                 Dim u = -1.0
                 For i = k To n - 1
@@ -1476,52 +1655,7 @@
 #End Region
 
 #Region "Public Shared"
-        ''' <summary>
-        ''' solve(Ax=b)
-        ''' </summary>
-        ''' <param name="luMat">LU decomposition of A matrix</param>
-        ''' <param name="b"></param>
-        ''' <returns></returns>
-        Public Shared Function Solve(ByRef luMat As LU, ByRef b As clsEasyVector) As clsEasyVector
-            Return clsEasyMatrix.Solve(luMat.P, luMat.L, luMat.U, b)
-        End Function
 
-        ''' <summary>
-        ''' solve(Ax=b)
-        ''' </summary>
-        ''' <param name="matP">pivot matrix(LU decomposition of A matrix)</param>
-        ''' <param name="matL">lower triangle matrix(LU decomposition of A matrix)</param>
-        ''' <param name="matU">upper triangle matrix(LU decomposition of A matrix)</param>
-        ''' <param name="vecB"></param>
-        ''' <returns>x</returns>
-        Public Shared Function Solve(ByRef matP As clsEasyMatrix,
-                                     ByRef matL As clsEasyMatrix,
-                                     ByRef matU As clsEasyMatrix,
-                                     ByRef vecB As clsEasyVector) As clsEasyVector
-            Dim n = matP.ColCount
-            Dim x = New clsEasyVector(n)
-            Dim y = New clsEasyVector(n)
-            Dim b = vecB * matP
-
-            For i = 0 To n - 1
-                Dim s = 0.0
-                Dim j As Integer = 0
-                For j = 0 To i - 1
-                    s += matL(i)(j) * y(j)
-                Next
-                y(j) = b(i) - s
-            Next
-
-            For i = n - 1 To 0 Step -1
-                Dim s = 0.0
-                For k = i + 1 To n - 1
-                    s += matU(i)(k) * x(k)
-                Next
-                x(i) = (y(i) - s) / matU(i)(i)
-            Next
-
-            Return x
-        End Function
 #End Region
 
 #Region "Private"

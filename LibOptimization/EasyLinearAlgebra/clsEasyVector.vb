@@ -545,17 +545,25 @@
         ''' <summary>
         ''' Hadamard product ( a1 * b1, a2 * b2, ... )
         ''' </summary>
-        ''' <param name="ai_source"></param>
+        ''' <param name="b">( a1 * a1, a2 * a2, ... )</param>
         ''' <returns></returns>
-        Public Function HadamardProduct(ByVal ai_source As clsEasyVector) As clsEasyVector
-            If IsSameDimension(ai_source, Me) = False Then
-                Throw New clsException(clsException.Series.DifferElementNumber)
+        Public Function HadamardProduct(Optional ByRef b As clsEasyVector = Nothing) As clsEasyVector
+            If b Is Nothing Then
+                Dim ret = New clsEasyVector(Me.Count)
+                For i As Integer = 0 To Me.Count - 1
+                    ret(i) = Me(i) * Me(i)
+                Next
+                Return ret
+            Else
+                If IsSameDimension(b, Me) = False Then
+                    Throw New clsException(clsException.Series.DifferElementNumber)
+                End If
+                Dim ret = New clsEasyVector(Me.Count)
+                For i As Integer = 0 To Me.Count - 1
+                    ret(i) = Me(i) * b(i)
+                Next
+                Return ret
             End If
-            Dim ret = New clsEasyVector(Me.Count)
-            For i As Integer = 0 To Me.Count - 1
-                ret(0) = Me(i) * ai_source(i)
-            Next
-            Return ret
         End Function
 #End Region
 
