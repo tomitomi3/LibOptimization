@@ -277,7 +277,7 @@
                                                  ByVal isRowOrder As Boolean,
                                                  Optional ByVal isUnbalanceVariance As Boolean = True) As clsEasyMatrix
             If isRowOrder = True Then
-                'demean
+                'de-mean
                 Dim avev = mat.AverageVector(True)
                 Dim mat_demean As clsEasyMatrix = mat - avev
 
@@ -292,7 +292,7 @@
 
                 Return var_covar
             Else
-                'demean
+                'de-mean
                 Dim avev = mat.AverageVector(False)
                 Dim mat_demean As clsEasyMatrix = mat - avev
 
@@ -306,6 +306,24 @@
                 End If
 
                 Return var_covar
+            End If
+        End Function
+
+        ''' <summary>
+        ''' Pythagorean Addition (sqrt(x1^2 + x2^2))
+        ''' </summary>
+        ''' <param name="valA"></param>
+        ''' <param name="valB"></param>
+        ''' <returns></returns>
+        Public Shared Function PythagoreanAddition(ByVal valA As Double, ByVal valB As Double) As Double
+            Dim a = Math.Abs(valA)
+            Dim b = Math.Abs(valB)
+            If a > b Then
+                Return a * Math.Sqrt(1.0 + (b / a) * (b / a))
+            ElseIf b = 0.0 Then
+                Return 0.0
+            Else
+                Return b * Math.Sqrt(1.0 + (a / b) * (a / b))
             End If
         End Function
     End Class

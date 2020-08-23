@@ -4,26 +4,173 @@ Imports LibOptimization.MathUtil
 Imports LibOptimization.Optimization
 Imports LibOptimization.Util
 
+Imports Dbl = System.Double
+
 Module Module1
     Sub Main()
 
-        Dim dimNum = 4
-        Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
-        Try
-            Dim matPLU = source.PLU()
-            Dim colVec = source.Inverse().Column(0)
-            Dim result = clsEasyMatrix.Solve(matPLU, (New clsEasyMatrix(dimNum, True))(0))
+        With Nothing
+            'Dim mat As New clsEasyMatrix(New Double()() {
+            '                             New Double() {3, 0, 0},
+            '                             New Double() {-2, -2, 4},
+            '                             New Double() {0, -1, 3}})
+            'Dim mat As New clsEasyMatrix(New Double()() {
+            '                             New Double() {2, 1, 0},
+            '                             New Double() {1, 2, 1},
+            '                             New Double() {1, 5, 3}})
+            Dim mat As New clsEasyMatrix(New Double()() {
+                                         New Double() {16, -1, 1, 2},
+                                         New Double() {2, 12, 1, -1},
+                                         New Double() {1, 3, -24, 2},
+                                         New Double() {4, -2, 1, 20}})
+            Dim eigen = mat.Eigen2()
+
+            'eigen
+            Dim retV = eigen.EigenValue
+            Dim retM = eigen.EigenVector
+            Dim retD = retV.ToDiagonalMatrix()
+
+            retV.PrintValue(ai_preci:=4)
+            retM.PrintValue(ai_preci:=4)
+
+            'Ax=ramudax
+            'check
+            '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
+            Dim matI = retM * retM.T()
+        End With
+
+        With Nothing
+            Dim mat As New clsEasyMatrix(New Double()() {
+                                         New Double() {2, 1},
+                                         New Double() {1, 2}})
+            Dim eigen = mat.Eigen2()
+
+            'eigen
+            Dim retV = eigen.EigenValue
+            Dim retM = eigen.EigenVector
+            Dim retD = retV.ToDiagonalMatrix()
+
+            retV.PrintValue(ai_preci:=4)
+            retM.PrintValue(ai_preci:=4)
+
+            'Ax=ramudax
 
             'check
-            If clsMathUtil.IsNearyEqualVector(colVec, result) = True Then
-                'OK
-            Else
-                source.PrintValue(name:="Source vector")
-            End If
-        Catch ex As Exception
-            source.PrintValue(name:="Source matrix")
-        End Try
+            '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
+            Dim matI = retM * retM.T()
+            Return
+        End With
 
+
+        With Nothing
+            Dim s0 As New clsEasyMatrix(New Double()() {New Double() {1, 2, 1, 2, 1, 2}})
+            Dim s1 As New clsEasyMatrix(New Double()() {New Double() {1, 2, 1, 2, 1, 2},
+                                                   New Double() {2, 4, 2, 4, 2, 4}})
+            Dim s2 As New clsEasyMatrix(New Double()() {New Double() {1, 2, 1, 2, 1, 2},
+                                                   New Double() {2, 4, 2, 4, 2, 4},
+                                                   New Double() {4, 8, 4, 8, 4, 8}})
+            Dim s3 As New clsEasyMatrix(New Double()() {New Double() {50, 50, 80, 70, 90},
+                                                   New Double() {50, 70, 60, 90, 100}})
+
+            Dim rng = New LibOptimization.Util.clsRandomXorshift()
+            For i = 0 To 2000 - 1
+                Dim dimNum = 3
+                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+
+                Dim resultLU = source.LUP()
+                Dim P = resultLU.P
+                Dim L = resultLU.L
+                Dim U = resultLU.U
+
+                'check
+                If clsMathUtil.IsNearyEqualMatrix(P * source, L * U) = True Then
+                    'OK
+                Else
+                    Console.WriteLine("No={0} det={1}", i, resultLU.Det)
+                    source.PrintValue(name:="souce")
+                    P.PrintValue(name:="P")
+                    L.PrintValue(name:="L")
+                    U.PrintValue(name:="U")
+                    CType(P * L * U, clsEasyMatrix).PrintValue(name:="LUP")
+                End If
+            Next
+        End With
+
+        With Nothing
+            Dim rng = New LibOptimization.Util.clsRandomXorshift()
+            For i = 0 To 2000 - 1
+                Dim dimNum = 4
+                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+                Try
+                    Dim matLUP = source.LUP()
+                    Dim colVec = source.Inverse().Column(0)
+                    Dim result = matLUP.Solve((New clsEasyMatrix(dimNum, True))(0))
+
+                    'check
+                    If clsMathUtil.IsNearyEqualVector(colVec, result) = True Then
+                        'OK
+                    Else
+                        colVec.PrintValue()
+                        result.PrintValue()
+                        source.PrintValue(name:="Source vector")
+                    End If
+                Catch ex As Exception
+                    source.PrintValue(name:="Source matrix")
+                End Try
+            Next
+        End With
+        Return
+
+        'Dim v = New Vector(Of Double)
+        'Dim c = Vector(Of Double).Count
+        'Dim retV = System.Numerics.Vector.Abs(v)
+
+        'Console.WriteLine("{0} {1}", Vector.IsHardwareAccelerated, Vector(Of Double).Count)
+
+        'With Nothing
+        '    Dim answerTemp = New Vector(Of Double)(New Double() {1, 1, 1, 1})
+        '    Dim multiTemp = New Vector(Of Double)(New Double() {1.0, 2.0, 3.0, 4.0})
+        '    answerTemp = answerTemp + multiTemp
+        '    Console.WriteLine(answerTemp.ToString())
+        '    Dim answer = answerTemp(0) * answerTemp(1) * answerTemp(2) * answerTemp(3)
+        '    Console.WriteLine(answer)
+        'End With
+
+        'For i = 0 To 1000000 - 1
+        '    Dim answerTemp = New Vector(Of Double)(New Double() {1, 1, 1, 1})
+        '    Dim multiTemp = New Vector(Of Double)(New Double() {1.0, 2.0, 3.0, 4.0})
+        '    Dim loopEnd = 1000000 / Vector(Of Double).Count
+        '    For j = 0 To loopEnd - 1
+        '        multiTemp += Vector(Of Double).One
+        '        answerTemp *= multiTemp
+
+        '    Next
+        '    Dim answer = answerTemp(0) * answerTemp(1) * answerTemp(2) * answerTemp(3)
+        'Next
+
+        Return
+        With Nothing
+            Dim dimNum = 5
+            Dim source = clsMathUtil.CreateRandomASymmetricMatrix(dimNum)
+            Try
+                Dim hoge = source.HouseholderTransformation()
+                hoge.PrintValue()
+                hoge = source.HouseholderTransformationForQR()
+                hoge.PrintValue()
+
+                Dim ee = source.Eigen()
+                ee.EigenValue.PrintValue()
+                ee.EigenVector.PrintValue()
+
+                Dim e = hoge.Eigen()
+                e.EigenValue.PrintValue()
+                e.EigenVector.PrintValue()
+
+                Return
+            Catch ex As Exception
+                source.PrintValue(name:="Source matrix")
+            End Try
+        End With
 
     End Sub
 
@@ -173,7 +320,7 @@ Module Module1
                             Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng2)
                             Dim resultLU As LU = Nothing
                             Try
-                                resultLU = source.PLU()
+                                resultLU = source.LUP()
                                 Dim P = resultLU.P
                                 Dim L = resultLU.L
                                 Dim U = resultLU.U
@@ -202,7 +349,7 @@ Module Module1
                             Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng1)
                             Dim resultLU As LU = Nothing
                             Try
-                                resultLU = source.PLU()
+                                resultLU = source.LUP()
                                 Dim P = resultLU.P
                                 Dim L = resultLU.L
                                 Dim U = resultLU.U

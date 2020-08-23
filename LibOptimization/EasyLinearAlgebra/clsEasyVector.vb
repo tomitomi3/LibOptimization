@@ -496,7 +496,7 @@
         End Function
 
         ''' <summary>
-        ''' Product(Inner product, dot product)
+        ''' Inner product, dot product (a1*b1 + a2*b2 ... )
         ''' </summary>
         ''' <param name="ai_source"></param>
         ''' <returns></returns>
