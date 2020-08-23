@@ -1126,68 +1126,36 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_Eigen()
         Dim rng = New LibOptimization.Util.clsRandomXorshift()
+        For j As Integer = 2 To 10 - 1
+            For i As Integer = 0 To 100 - 1
+                Dim matDim = j
+                Dim srcMat = clsMathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
 
-        For i As Integer = 0 To 100 - 1
-            Dim matDim = 4
+                'eigen
+                Dim eigen As Eigen = Nothing
+                eigen = srcMat.Eigen()
+                Dim retV = eigen.EigenValue
+                Dim retM = eigen.EigenVector
 
-            Dim srcMat = clsMathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
-            'srcMat.PrintValue(name:="Source")
+                'check
+                '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
+                ' I = V * V^T
+                Dim matI = retM * retM.T
+                'matI.PrintValue(name:="EigenVector * EivenVector^T")
+                If clsMathUtil.IsNearyEqualMatrix(matI, New clsEasyMatrix(matDim, True)) = False Then
+                    srcMat.PrintValue(name:="Source")
+                    Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0}", i)
+                End If
 
-            'eigen
-            Dim eigen As Eigen = Nothing
-            eigen = srcMat.Eigen()
-            Dim retV = eigen.EigenValue
-            Dim retM = eigen.EigenVector
-            Dim retD = retV.ToDiagonalMatrix()
-
-            'check
-            '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
-            Dim matI = retM * retM.T()
-            'matI.PrintValue(name:="EigenVector * EivenVector^T")
-            If clsMathUtil.IsNearyEqualMatrix(matI, New clsEasyMatrix(matDim, True)) = False Then
-                srcMat.PrintValue(name:="Source")
-                Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0}", i)
-            End If
-
-            'check
-            Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
-            'temp.PrintValue(name:="V*D*V^T")
-            If clsMathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
-                srcMat.PrintValue(name:="Source")
-                Assert.Fail("Error eigen() V*D*V^T dim={0}", i)
-            End If
-        Next
-
-        For i As Integer = 2 To 10 - 1
-            Dim matDim = i
-
-            Dim srcMat = clsMathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
-            'srcMat.PrintValue(name:="Source")
-
-            'eigen
-            Dim eigen As Eigen = Nothing
-            Dim ite = (i / 10) * 1000 + 1000
-            eigen = srcMat.Eigen(ite)
-            Dim retV = eigen.EigenValue
-            Dim retM = eigen.EigenVector
-            Dim retD = retV.ToDiagonalMatrix()
-
-            'check
-            '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
-            Dim matI = retM * retM.T()
-            'matI.PrintValue(name:="EigenVector * EivenVector^T")
-            If clsMathUtil.IsNearyEqualMatrix(matI, New clsEasyMatrix(matDim, True)) = False Then
-                srcMat.PrintValue(name:="Source")
-                Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0}", i)
-            End If
-
-            'check
-            Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
-            'temp.PrintValue(name:="V*D*V^T")
-            If clsMathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
-                srcMat.PrintValue(name:="Source")
-                Assert.Fail("Error eigen() V*D*V^T dim={0}", i)
-            End If
+                'check
+                ' Source = V * D * V^T
+                Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
+                'temp.PrintValue(name:="V*D*V^T")
+                If clsMathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
+                    srcMat.PrintValue(name:="Source")
+                    Assert.Fail("Error eigen() V*D*V^T dim={0}", i)
+                End If
+            Next
         Next
     End Sub
 
@@ -1196,98 +1164,34 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_LU()
         Dim rng = New LibOptimization.Util.clsRandomXorshift()
-        For i = 0 To 500 - 1
-            Dim dimNum = 3
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+        For j = 3 To 4
+            Console.WriteLine("Dim={0} run", j)
+            For i = 0 To 1000 - 1
+                Dim dimNum = j
+                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
-            Dim resultLU = source.LUP()
-            Dim P = resultLU.P
-            Dim L = resultLU.L
-            Dim U = resultLU.U
+                If i Mod 2 = 0 Then
+                    source(0)(0) = 0.0
+                    source(2)(2) = 0.0
+                End If
 
-            'check
-            If clsMathUtil.IsNearyEqualMatrix(P * source, L * U) = True Then
-                'OK
-            Else
-                Console.WriteLine("No={0} det={1}", i, resultLU.Det)
-                source.PrintValue(name:="souce")
-                P.PrintValue(name:="P")
-                L.PrintValue(name:="L")
-                U.PrintValue(name:="U")
-                Assert.Fail("try no", i)
-            End If
-        Next
+                Dim resultLU = source.LUP()
+                Dim P = resultLU.P
+                Dim L = resultLU.L
+                Dim U = resultLU.U
 
-        For i = 0 To 500 - 1
-            Dim dimNum = 3
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
-
-            source(0)(0) = 0.0
-            source(1)(1) = 0.0
-
-            Dim resultLU = source.LUP()
-            Dim P = resultLU.P
-            Dim L = resultLU.L
-            Dim U = resultLU.U
-
-            'check
-            If clsMathUtil.IsNearyEqualMatrix(P * source, L * U) = True Then
-                'OK
-            Else
-                Console.WriteLine("No={0} det={1}", i, resultLU.Det)
-                source.PrintValue(name:="souce")
-                P.PrintValue(name:="P")
-                L.PrintValue(name:="L")
-                U.PrintValue(name:="U")
-                Assert.Fail("try no", i)
-            End If
-        Next
-
-        For i = 0 To 1000 - 1
-            Dim dimNum = 4
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
-
-            Dim resultLU = source.LUP()
-            Dim P = resultLU.P
-            Dim L = resultLU.L
-            Dim U = resultLU.U
-
-            'check
-            If clsMathUtil.IsNearyEqualMatrix(P * source, L * U) = True Then
-                'OK
-            Else
-                Console.WriteLine("No={0} det={1}", i, resultLU.Det)
-                source.PrintValue(name:="souce")
-                P.PrintValue(name:="P")
-                L.PrintValue(name:="L")
-                U.PrintValue(name:="U")
-                Assert.Fail("try no", i)
-            End If
-        Next
-
-        For i = 0 To 1000 - 1
-            Dim dimNum = 4
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
-
-            source(0)(0) = 0.0
-            source(2)(2) = 0.0
-
-            Dim resultLU = source.LUP()
-            Dim P = resultLU.P
-            Dim L = resultLU.L
-            Dim U = resultLU.U
-
-            'check
-            If clsMathUtil.IsNearyEqualMatrix(P * source, L * U) = True Then
-                'OK
-            Else
-                Console.WriteLine("No={0} det={1}", i, resultLU.Det)
-                source.PrintValue(name:="souce")
-                P.PrintValue(name:="P")
-                L.PrintValue(name:="L")
-                U.PrintValue(name:="U")
-                Assert.Fail("try no", i)
-            End If
+                'check
+                If clsMathUtil.IsNearyEqualMatrix(source, P * L * U) = True Then
+                    'OK
+                Else
+                    Console.WriteLine("No={0} det={1}", i, resultLU.Det)
+                    source.PrintValue(name:="souce")
+                    P.PrintValue(name:="P")
+                    L.PrintValue(name:="L")
+                    U.PrintValue(name:="U")
+                    Assert.Fail("try no", i)
+                End If
+            Next
         Next
 
         With Nothing
@@ -1323,12 +1227,17 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_Solve()
         Dim rng = New LibOptimization.Util.clsRandomXorshift()
-        For i = 3 To 10 - 1
+        For i = 2 To 10 - 1
             Dim dimNum = i
-            For j As Integer = 0 To 100 - 1
+            For j As Integer = 0 To 200 - 1
                 Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
                 Try
                     Dim matLUP = source.LUP()
+                    If clsMathUtil.IsCloseToZero(matLUP.Det) = True Then
+                        Continue For
+                    End If
+
+                    '1列目
                     Dim colVec = source.Inverse().Column(0)
                     Dim result = matLUP.Solve((New clsEasyMatrix(dimNum, True))(0))
 

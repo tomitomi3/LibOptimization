@@ -17,7 +17,7 @@
         Public Property Det As Double = 0.0
 
         ''' <summary>pivto row info</summary>
-        Public Property PivotRow As Double() = Nothing
+        Public Property PivotRow As Integer() = Nothing
 
         ''' <summary>
         ''' default constructtor
@@ -46,7 +46,7 @@
         ''' <param name="matL"></param>
         ''' <param name="matU"></param>
         ''' <param name="det"></param>
-        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double, ByRef p() As Double)
+        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double, ByRef p() As Integer)
             Me.P = matP
             Me.L = matL
             Me.U = matU
@@ -60,7 +60,7 @@
         ''' <param name="b"></param>
         ''' <returns></returns>
         Public Function Solve(ByRef b As clsEasyVector) As clsEasyVector
-            Return Me.Solve(Me.P, Me.L, Me.U, b)
+            Return Me.Solve(Me.P, Me.L, Me.U, Me.PivotRow, b)
         End Function
 
         ''' <summary>
@@ -69,18 +69,20 @@
         ''' <param name="matP">pivot matrix(LU decomposition of A matrix)</param>
         ''' <param name="matL">lower triangle matrix(LU decomposition of A matrix)</param>
         ''' <param name="matU">upper triangle matrix(LU decomposition of A matrix)</param>
+        ''' <param name="pivotRow"></param>
         ''' <param name="vecB"></param>
         ''' <returns>x</returns>
         Private Function Solve(ByRef matP As clsEasyMatrix,
                                ByRef matL As clsEasyMatrix,
                                ByRef matU As clsEasyMatrix,
+                               ByRef pivotRow() As Integer,
                                ByRef vecB As clsEasyVector) As clsEasyVector
             Dim n = matP.ColCount
             Dim x = New clsEasyVector(n)
             Dim y = New clsEasyVector(n)
 
             'transopose
-            Dim b = vecB * matP.T()
+            'Dim b = vecB * matP
 
             For i = 0 To n - 1
                 Dim s = 0.0
@@ -88,7 +90,9 @@
                 For j = 0 To i - 1
                     s += matL(i)(j) * y(j)
                 Next
-                y(j) = b(i) - s
+
+                'y(j) = b(i) - s
+                y(j) = vecB(pivotRow(i)) - s
             Next
 
             For i = n - 1 To 0 Step -1
@@ -440,8 +444,12 @@
                 Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
             End If
             Dim ret As New clsEasyMatrix(ai_source)
-            For i As Integer = 0 To ret.RowCount() - 1
-                ret.Row(i) = ai_source.Row(i) - ai_dest.Row(i)
+            Dim row = ret.RowCount()
+            Dim col = ret.ColCount()
+            For i As Integer = 0 To row - 1
+                For j = 0 To col - 1
+                    ret(i)(j) = ai_source(i)(j) - ai_dest(i)(j)
+                Next
             Next
             Return ret
         End Operator
@@ -1103,7 +1111,7 @@
             Else
                 Try
                     Dim lup = Me.LUP()
-                    lup.P = lup.P.T() 'Transopose = Inverse
+                    'lup.P = lup.P.T() 'Transopose = Inverse
                     For j = 0 To n - 1
                         Dim y = New clsEasyVector(n)
                         Dim b = lup.P(j)
@@ -1135,16 +1143,7 @@
         End Function
 
         ''' <summary>
-        ''' LU decomposition (using LUP())
-        ''' </summary>
-        ''' <param name="eps">2.20*10^-16</param>
-        ''' <returns></returns>
-        Public Function LU(Optional ByVal eps As Double = MachineEpsiron) As LU
-            Return Me.LUP(eps)
-        End Function
-
-        ''' <summary>
-        ''' LUP decomposition( P*X=L*U -> X=P^-1*L*U)
+        ''' LUP decomposition( X=PLU -> P^-1X=LU )
         ''' </summary>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
@@ -1161,11 +1160,11 @@
 
             Dim det = 1.0
             Dim weight = New Double(n - 1) {}
-            Dim indx = New Double(n - 1) {}
+            Dim pivotrow = New Integer(n - 1) {}
 
             'Find absolute max value of each row
             For i = 0 To n - 1
-                indx(i) = i
+                pivotrow(i) = i
                 Dim absValue = 0.0
                 For j = 0 To n - 1
                     Dim temp = Math.Abs(Me(i)(j))
@@ -1215,8 +1214,9 @@
                     det = -det
 
                     'swap row info
-                    indx(imax) = indx(j)
-                    indx(j) = imax
+                    Dim temp = pivotrow(imax)
+                    pivotrow(imax) = pivotrow(j)
+                    pivotrow(j) = temp
                 End If
                 'diagonal value is close to 0.
                 If clsMathUtil.IsCloseToZero(source(j)(j), eps) Then
@@ -1235,9 +1235,7 @@
             Next
 
             'transopose
-            'If isInverseP Then
-            '    matP = matP.T()
-            'End If
+            matP = matP.T
 
             'replace
             For i = 1 To n - 1
@@ -1251,7 +1249,7 @@
                 Next
             Next
 
-            Return New LU(matP, matL, matU, det, indx)
+            Return New LU(matP, matL, matU, det, pivotrow)
         End Function
 
         ''' <summary>
@@ -1569,7 +1567,7 @@
         End Function
 
         ''' <summary>
-        ''' Eigen2 not imple
+        ''' Eigen
         ''' </summary>
         ''' <param name="Iteration"></param>
         ''' <param name="Conversion"></param>
@@ -1588,7 +1586,7 @@
             Dim t = New clsEasyMatrix(n)
 
             Dim u = New clsEasyVector(n)
-            Dim v_v = New clsEasyVector(n)
+            Dim vv = New clsEasyVector(n)
 
             Dim cnt = 0
             Dim isConversion = False
@@ -1608,10 +1606,6 @@
                     If clsMathUtil.IsCloseToZero(alpha) = True Then
                         Continue For
                     End If
-                    'Dim alpha = Math.Sqrt(r(k)(k) * r(k)(k) + r(k + 1)(k) * r(k + 1)(k))
-                    'If Math.Abs(alpha) < 0.00000001 Then
-                    '    Continue For
-                    'End If
 
                     Dim c = r(k)(k) / alpha
                     Dim s = -r(k + 1)(k) / alpha
@@ -1619,26 +1613,26 @@
                     'calc R
                     For j = k + 1 To n - 1
                         u(j) = c * r(k)(j) - s * r(k + 1)(j)
-                        v_v(j) = s * r(k)(j) + c * r(k + 1)(j)
+                        vv(j) = s * r(k)(j) + c * r(k + 1)(j)
                     Next
                     r(k)(k) = alpha
                     r(k + 1)(k) = 0.0
 
                     For j = k + 1 To n - 1
                         r(k)(j) = u(j)
-                        r(k + 1)(j) = v_v(j)
+                        r(k + 1)(j) = vv(j)
                     Next
 
                     'calc Q
                     For j = 0 To k
                         u(j) = c * q(k)(j)
-                        v_v(j) = s * q(k)(j)
+                        vv(j) = s * q(k)(j)
                     Next
                     q(k)(k + 1) = -s
                     q(k + 1)(k + 1) = c
                     For j = 0 To k
                         q(k)(j) = u(j)
-                        q(k + 1)(j) = v_v(j)
+                        q(k + 1)(j) = vv(j)
                     Next
                 Next
 
@@ -1676,53 +1670,62 @@
             End While
 
             'EigenValue
-            '(A-λI)x=0
-            h.PrintValue()
             Dim eigenValue = h.ToDiagonalVector()
+
+            'EigenVector
+            Dim eigenVector = New clsEasyMatrix(n)
             For i = 0 To n - 1
                 'initialize
                 Dim y = New clsEasyVector(n)
                 y(i) = 1.0
 
                 Dim tempMat = Me - (New clsEasyMatrix(n, eigenValue(i)))
-                Dim lu = tempMat.LU()
+                Dim luSolver = tempMat.LUP()
 
                 'iteration
                 Dim mu0 = 0.0
                 Dim mu = 0.0
                 Dim v2 = 0.0
                 Dim v2s = 0.0
+                cnt = 0
                 While (True)
                     mu0 = mu
                     Dim v = New clsEasyVector(y)
 
-                    v = lu.Solve(v)
+                    v = luSolver.Solve(v)
                     mu = v.InnerProduct(y)
-                    v2 = v.InnerProduct(v)
-                    v2s = Math.Sqrt(v2)
-                    For j = 0 To n - 1
-                        y(j) = v(j) / v2s
-                    Next
+                    v2 = v.NormL2()
+                    y = v / v2
 
-                    Dim e = Math.Abs((mu - mu0) / mu)
-                    If e < 2.0E-30 Then
+                    'Dim e = Math.Abs((mu - mu0) / mu)
+                    'If e < Conversion Then
+                    '    For j = 0 To n - 1
+                    '        eigenVector(i)(j) = y(j)
+                    '    Next
+                    '    Exit While
+                    'End If
+                    If MathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
+                        For j = 0 To n - 1
+                            eigenVector(i)(j) = y(j)
+                        Next
                         Exit While
                     End If
+                    If cnt > Iteration Then
+                        For j = 0 To n - 1
+                            eigenVector(j)(i) = y(j)
+                        Next
+                        Exit While
+                    End If
+                    cnt += 1
                 End While
             Next
 
-            Return New Eigen(eigenValue, Nothing, True)
+            'sort by Eigen value
+            If IsSort = True Then
+                clsMathUtil.EigenSort(eigenValue, eigenVector)
+            End If
 
-            'For Each e In eigenValue
-            '    Dim temp = Me - (New clsEasyMatrix(n, e))
-            '    temp.PrintValue()
-
-            '    Dim lup = temp.LUP()
-            '    Dim b = New clsEasyVector(n)
-            '    Dim result = lup.Solve(b)
-            '    result.PrintValue()
-            'Next
-
+            Return New Eigen(eigenValue, eigenVector, True)
             '対称行列の場合 固有値分解 変換（対称三重対角行列、ヘッセンベルグ行列に変換後）→反復計算 がよい
             'ヤコビ法 10次元程度 遅い
             'ギブンス法（ギブンス変換による三重対角化）で行う。ハウスホルダー法の法が効率よい
