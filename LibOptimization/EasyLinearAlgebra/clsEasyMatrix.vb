@@ -1419,7 +1419,7 @@
             'transopose
             'matP = matP.T
 
-            a.PrintValue(10)
+            'a.PrintValue(10)
 
             'replace
             Dim matL = New clsEasyMatrix(n, True)
@@ -1487,102 +1487,15 @@
         End Function
 
         ''' <summary>
-        ''' To Tridiagonal matrix using Householder transform 三重対角行列
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function HouseholderTransformation() As clsEasyMatrix
-            'ref
-            'ハウスホルダー変換
-            'http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?Numerical%20Calculation
-
-            Dim tempMat = New clsEasyMatrix(Me)
-            Dim n As Integer = tempMat.RowCount
-            Dim u = New clsEasyVector(n)
-            Dim v = New clsEasyVector(n)
-            Dim q = New clsEasyVector(n)
-
-            For k As Integer = 0 To n - 2
-                's
-                Dim s As Double = 0.0
-                For i = k + 1 To n - 1
-                    s += tempMat(i)(k) * tempMat(i)(k)
-                Next
-
-                ' | -
-                ' |a10 -
-                ' |   a21
-                Dim temp As Double = tempMat(k + 1)(k)
-                If temp >= 0 Then
-                    s = -Math.Sqrt(s)
-                Else
-                    s = Math.Sqrt(s)
-                End If
-
-                ' |x-y|
-                Dim alpha = Math.Sqrt(2.0 * s * (s - temp))
-                If clsMathUtil.IsCloseToZero(alpha) = True Then
-                    Continue For
-                End If
-
-                'u
-                u(k + 1) = (temp - s) / alpha
-                For i = k + 2 To n - 1
-                    u(i) = tempMat(i)(k) / alpha
-                Next
-
-                'Au
-                q(k) = alpha / 2.0
-                For i = k + 1 To n - 1
-                    q(i) = 0.0
-                    For j = k + 1 To n - 1
-                        q(i) += tempMat(i)(j) * u(j)
-                    Next
-                Next
-
-                'v=2(Au-uu^T(Au))
-                alpha = 0.0
-                'uu^T
-                For i = k + 1 To n - 1
-                    alpha += u(i) * q(i)
-                Next
-                v(k) = 2.0 * q(k)
-                For i = k + 1 To n - 1
-                    v(i) = 2.0 * (q(i) - alpha * u(i))
-                Next
-
-                'A = PAP
-                ' | -    a02
-                ' |    -
-                ' |a20    -
-                tempMat(k)(k + 1) = s
-                tempMat(k + 1)(k) = s
-                For i = k + 2 To n - 1
-                    tempMat(k)(i) = 0.0
-                    tempMat(i)(k) = 0.0
-                Next
-                For i = k + 1 To n - 1
-                    tempMat(i)(i) = tempMat(i)(i) - 2.0 * u(i) * v(i)
-                    For j = i + 1 To n - 1
-                        Dim tempVal = tempMat(i)(j) - u(i) * v(j) - v(i) * u(j)
-                        tempMat(i)(j) = tempVal
-                        tempMat(j)(i) = tempVal
-                    Next
-                Next
-            Next
-
-            Return tempMat
-        End Function
-
-        ''' <summary>
         ''' Eigen decomposition using Jacobi Method. for Symmetric Matrix.
         ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
         ''' </summary>
         ''' <param name="Iteration">default:1000</param>
-        ''' <param name="Conversion">default:1.0e-16</param>
+        ''' <param name="Conversion">default:1.0e-15</param>
         ''' <param name="IsSort">descent sort by EigenValue default:true</param>
         ''' <returns></returns>
         Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
-                              Optional ByVal Conversion As Double = 0.0000000000000001,
+                              Optional ByVal Conversion As Double = 0.000000000000001,
                               Optional ByVal IsSort As Boolean = True) As Eigen
             '固有値、固有ベクトルを求める方針
             ' 反復計算によって求める。計算しやすい行列に変換
@@ -1675,7 +1588,7 @@
             'sort by Eigen value
             Dim eigenValue = retEigenMat.ToDiagonalVector()
             If IsSort = True Then
-                clsMathUtil.EigenSort(eigenValue, rotate)
+                clsMathUtil.EigenSort(eigenValue, rotate, True)
             End If
 
             Return New Eigen(eigenValue, rotate, isConversion)
@@ -1684,12 +1597,12 @@
         ''' <summary>
         ''' Eigen
         ''' </summary>
-        ''' <param name="Iteration"></param>
-        ''' <param name="Conversion"></param>
-        ''' <param name="IsSort"></param>
+        ''' <param name="Iteration">default:1000</param>
+        ''' <param name="Conversion">default:1.0e-15</param>
+        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
         ''' <returns></returns>
         Public Function Eigen2(Optional ByVal Iteration As Integer = 1000,
-                               Optional ByVal Conversion As Double = 0.0000000000000001,
+                               Optional ByVal Conversion As Double = 0.000000000000001,
                                Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
                 Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
@@ -1838,7 +1751,7 @@
 
             'sort by Eigen value
             If IsSort = True Then
-                clsMathUtil.EigenSort(eigenValue, eigenVector)
+                clsMathUtil.EigenSort(eigenValue, eigenVector, False)
             End If
 
             Return New Eigen(eigenValue, eigenVector, True)
@@ -1847,9 +1760,9 @@
         ''' <summary>
         ''' Eigen
         ''' </summary>
-        ''' <param name="Iteration"></param>
-        ''' <param name="Conversion"></param>
-        ''' <param name="IsSort"></param>
+        ''' <param name="Iteration">default:1000</param>
+        ''' <param name="Conversion">default:1.0e-15</param>
+        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
         ''' <returns></returns>
         Public Function Eigen3(Optional ByVal Iteration As Integer = 1000,
                                Optional ByVal Conversion As Double = 0.000000000000001,
@@ -1869,7 +1782,6 @@
                 While (m > 1)
                     Dim dVal = a(m)(m - 1)
                     If Math.Abs(dVal) < Conversion Then
-                        a.PrintValue()
                         m -= 1
                     End If
 
@@ -1989,7 +1901,7 @@
 
             'sort by Eigen value
             If IsSort = True Then
-                clsMathUtil.EigenSort(eigenValues, eigenVectors)
+                clsMathUtil.EigenSort(eigenValues, eigenVectors, False)
             End If
 
             Return New Eigen(eigenValues, eigenVectors, True)
@@ -1998,9 +1910,9 @@
         ''' <summary>
         ''' Eigen
         ''' </summary>
-        ''' <param name="Iteration"></param>
-        ''' <param name="Conversion"></param>
-        ''' <param name="IsSort"></param>
+        ''' <param name="Iteration">default:1000</param>
+        ''' <param name="Conversion">default:1.0e-15</param>
+        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
         ''' <returns></returns>
         Public Function Eigen4(Optional ByVal Iteration As Integer = 1000,
                                Optional ByVal Conversion As Double = 0.000000000000001,
@@ -2020,7 +1932,6 @@
                 While (m > 1)
                     Dim dVal = a(m)(m - 1)
                     If Math.Abs(dVal) < Conversion Then
-                        a.PrintValue()
                         m -= 1
                     End If
 
@@ -2133,7 +2044,7 @@
                         Next
                         v(k) = temp / ludecomp(k)(k)
                     Next
-                    v.PrintValue()
+                    'v.PrintValue()
 
                     mu = v.InnerProduct(y)
                     v2 = v.NormL2()
@@ -2282,104 +2193,6 @@
                 For i = 0 To n - 1
                     For j = 0 To n - 1
                         a(i)(j) = a(i)(j) - 2.0 * u(i) * g(j) - 2.0 * f(i) * u(j)
-                    Next
-                Next
-            Next
-            Return a
-        End Function
-
-        ''' <summary>
-        ''' Householder Transformation
-        ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
-        ''' 対称行列をハウスホルダー変換 → 三重対角行列
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function HouseholderTransformationForQR() As clsEasyMatrix
-            'ref
-            'ハウスホルダー変換
-            'http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?Numerical%20Calculation
-
-            Dim a = New clsEasyMatrix(Me)
-            Dim n = a.Count
-
-            Dim b = New clsEasyMatrix(n)
-            Dim p = New clsEasyMatrix(n)
-            Dim q = New clsEasyMatrix(n)
-            Dim u = New clsEasyVector(n)
-
-            For k As Integer = 0 To n - 3
-                's
-                Dim s As Double = 0.0
-                For i = k + 1 To n - 1
-                    s += a(i)(k) * a(i)(k)
-                Next
-                Dim tempVal = a(k + 1)(k)
-                If tempVal >= 0 Then
-                    s = -Math.Sqrt(s)
-                Else
-                    s = Math.Sqrt(s)
-                End If
-
-                ' |x-y|
-                Dim alpha = Math.Sqrt(2.0 * s * (s - tempVal))
-                If clsMathUtil.IsCloseToZero(alpha) = True Then
-                    Continue For
-                End If
-
-                'u
-                u(k + 1) = (tempVal - s) / alpha
-                For i = k + 2 To n - 1
-                    u(i) = a(i)(k) / alpha
-                Next
-
-                'P
-                For i = k + 1 To n - 1
-                    For j = i To n - 1
-                        If j = i Then
-                            p(i)(j) = 1.0 - 2.0 * u(i) * u(i)
-                        Else
-                            p(i)(j) = -2.0 * u(i) * u(j)
-                            p(j)(i) = p(i)(j)
-                        End If
-                    Next
-                Next
-
-                'PA
-                For i = k + 1 To n - 1
-                    For j = k + 1 To n - 1
-                        q(i)(j) = 0.0
-                        For m = k + 1 To n - 1
-                            q(i)(j) += p(i)(m) * a(m)(j)
-                        Next
-                    Next
-                Next
-
-                'A = PAP^T
-                For i = 0 To k
-                    b(i)(k) = a(i)(k)
-                Next
-                b(k + 1)(k) = s
-                For i = k + 2 To n - 1
-                    b(i)(k) = 0.0
-                Next
-                For j = k + 1 To n - 1
-                    For i = 0 To k
-                        b(i)(j) = 0.0
-                        For m = k + 1 To n - 1
-                            b(i)(j) += a(i)(m) * p(j)(m)
-                        Next
-                    Next
-                    For i = k + 1 To n - 1
-                        b(i)(j) = 0.0
-                        For m = k + 1 To n - 1
-                            b(i)(j) += q(i)(m) * p(j)(m)
-                        Next
-                    Next
-                Next
-
-                For i = 0 To n - 1
-                    For j = 0 To n - 1
-                        a(i)(j) = b(i)(j)
                     Next
                 Next
             Next

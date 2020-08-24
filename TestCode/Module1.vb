@@ -25,21 +25,30 @@ Module Module1
             'Dim mat As New clsEasyMatrix(New Double()() {
             '                             New Double() {2, 1},
             '                             New Double() {1, 2}})
-            'mat = clsMathUtil.CreateRandomSymmetricMatrix(4)
-
+            mat = clsMathUtil.CreateRandomSymmetricMatrix(2)
             mat.PrintValue(4, "Source")
 
             'eigen
-            Dim eigen = mat.Eigen2(IsSort:=False)
+            Dim eigen = mat.Eigen3()
             Dim retV = eigen.EigenValue
             Dim retM = eigen.EigenVector
             retV.PrintValue(4, "EigenValue")
             retM.PrintValue(4, "EigenVector")
-
             Dim matI = retM * retM.T()
             matI.PrintValue(ai_preci:=4)
-            'Dim matSource = retM * retV.ToDiagonalMatrix() * retM.T()
-            'matSource.PrintValue(ai_preci:=4)
+            Dim prodSource = retM * retV.ToDiagonalMatrix() * retM.T
+            prodSource.PrintValue(ai_preci:=4)
+
+            'jacobi
+            eigen = mat.Eigen()
+            retV = eigen.EigenValue
+            retM = eigen.EigenVector
+            retV.PrintValue(4, "EigenValue")
+            retM.PrintValue(4, "EigenVector")
+            matI = retM * retM.T()
+            matI.PrintValue(ai_preci:=4)
+            prodSource = retM * retV.ToDiagonalMatrix() * retM.T
+            prodSource.PrintValue(ai_preci:=4)
         End With
     End Sub
 

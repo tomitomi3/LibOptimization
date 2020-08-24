@@ -244,7 +244,8 @@
         ''' </summary>
         ''' <param name="eigenValue"></param>
         ''' <param name="eigenVector"></param>
-        Public Shared Sub EigenSort(ByRef eigenValue As clsEasyVector, ByRef eigenVector As clsEasyMatrix)
+        ''' <param name="isColOrder"></param>
+        Public Shared Sub EigenSort(ByRef eigenValue As clsEasyVector, ByRef eigenVector As clsEasyMatrix, ByVal isColOrder As Boolean)
             Dim n = eigenValue.Count
             Dim colSwapInfo = New List(Of ValueDescSort)
             For i As Integer = 0 To n - 1
@@ -252,18 +253,31 @@
             Next
             colSwapInfo.Sort()
 
-            Dim newEigenVector = New clsEasyMatrix(n)
-            For j As Integer = 0 To n - 1
-                'eigen value
-                eigenValue(j) = colSwapInfo(j).v
+            If isColOrder = True Then
+                Dim newEigenVector = New clsEasyMatrix(n)
+                For j As Integer = 0 To n - 1
+                    'eigen value
+                    eigenValue(j) = colSwapInfo(j).v
 
-                'eigen vector
-                Dim k = colSwapInfo(j).idx
-                For i As Integer = 0 To n - 1
-                    newEigenVector(i)(j) = eigenVector(i)(k)
+                    'eigen vector
+                    Dim k = colSwapInfo(j).idx
+                    For i As Integer = 0 To n - 1
+                        newEigenVector(i)(j) = eigenVector(i)(k)
+                    Next
                 Next
-            Next
-            eigenVector = newEigenVector
+                eigenVector = newEigenVector
+            Else
+                Dim newEigenVector = New clsEasyMatrix(n)
+                For i = 0 To n - 1
+                    'eigen value
+                    eigenValue(i) = colSwapInfo(i).v
+
+                    'eigen vector
+                    Dim k = colSwapInfo(i).idx
+                    newEigenVector(i) = eigenVector(k)
+                Next
+                eigenVector = newEigenVector
+            End If
         End Sub
 
         ''' <summary>
