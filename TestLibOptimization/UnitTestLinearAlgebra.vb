@@ -1126,8 +1126,8 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_Eigen()
         Dim rng = New LibOptimization.Util.clsRandomXorshift()
-        For j As Integer = 2 To 10 - 1
-            For i As Integer = 0 To 100 - 1
+        For j As Integer = 2 To 20 - 1
+            For i As Integer = 0 To 50 - 1
                 Dim matDim = j
                 Dim srcMat = clsMathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
 
@@ -1144,7 +1144,7 @@ Imports LibOptimization.MathUtil
                 'matI.PrintValue(name:="EigenVector * EivenVector^T")
                 If clsMathUtil.IsNearyEqualMatrix(matI, New clsEasyMatrix(matDim, True)) = False Then
                     srcMat.PrintValue(name:="Source")
-                    Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0}", i)
+                    Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0} try={1}", matDim, i)
                 End If
 
                 'check
@@ -1153,7 +1153,7 @@ Imports LibOptimization.MathUtil
                 'temp.PrintValue(name:="V*D*V^T")
                 If clsMathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
                     srcMat.PrintValue(name:="Source")
-                    Assert.Fail("Error eigen() V*D*V^T dim={0}", i)
+                    Assert.Fail("Error eigen() V*D*V^T dim={0} try={1}", matDim, i)
                 End If
             Next
         Next
@@ -1181,9 +1181,13 @@ Imports LibOptimization.MathUtil
                 Dim U = resultLU.U
 
                 'check
+                Dim flg = True
                 If clsMathUtil.IsNearyEqualMatrix(source, P * L * U) = True Then
                     'OK
                 Else
+                    flg = False
+                End If
+                If flg = False Then
                     Console.WriteLine("No={0} det={1}", i, resultLU.Det)
                     source.PrintValue(name:="souce")
                     P.PrintValue(name:="P")
@@ -1229,7 +1233,7 @@ Imports LibOptimization.MathUtil
         Dim rng = New LibOptimization.Util.clsRandomXorshift()
         For i = 2 To 10 - 1
             Dim dimNum = i
-            For j As Integer = 0 To 200 - 1
+            For j As Integer = 0 To 300 - 1
                 Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
                 Try
                     Dim matLUP = source.LUP()
@@ -1256,6 +1260,36 @@ Imports LibOptimization.MathUtil
                 End Try
             Next
         Next
+    End Sub
+
+    ''' <summary>
+    ''' test Householder
+    ''' </summary>
+    <TestMethod()> Public Sub Mat_Householder()
+        Try
+            Dim source = New MathUtil.clsEasyMatrix(New Double()() {
+                                                    New Double() {8, -4, 2, -2},
+                                                    New Double() {-4, -2, 4, 9},
+                                                    New Double() {2, 4, 3, -6},
+                                                    New Double() {-2, 9, -6, 2}})
+            Dim correct = New MathUtil.clsEasyMatrix(New Double()() {
+                                                    New Double() {8, 4.89898, 0, 0},
+                                                    New Double() {4.89898, 4.83333, 9.46778, 0},
+                                                    New Double() {0, 9.46778, -6.97526, -1.62287},
+                                                    New Double() {0, 0, -1.62287, 5.14193}})
+            Dim result = source.Householder()
+
+            'check
+            Dim isOK = False
+            If clsMathUtil.IsNearyEqualMatrix(result, correct, 0.0001) = True Then
+                isOK = True
+            End If
+            If isOK = False Then
+                Assert.Fail()
+            End If
+        Catch ex As Exception
+            Assert.Fail("throw exception")
+        End Try
     End Sub
 
     ''' <summary>

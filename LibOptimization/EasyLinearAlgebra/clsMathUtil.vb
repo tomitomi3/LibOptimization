@@ -318,6 +318,7 @@
         Public Shared Function PythagoreanAddition(ByVal valA As Double, ByVal valB As Double) As Double
             Dim a = Math.Abs(valA)
             Dim b = Math.Abs(valB)
+
             If a > b Then
                 Return a * Math.Sqrt(1.0 + (b / a) * (b / a))
             ElseIf b = 0.0 Then
@@ -326,5 +327,50 @@
                 Return b * Math.Sqrt(1.0 + (a / b) * (a / b))
             End If
         End Function
+
+        ''' <summary>
+        ''' Pythagorean Addition (sqrt(x1^2 + x2^2)) using Moler-Morrison Algorithm
+        ''' </summary>
+        ''' <param name="valA"></param>
+        ''' <param name="valB"></param>
+        ''' <returns></returns>
+        Public Shared Function PythagoreanAddition_MolerMorrison(ByVal valA As Double, ByVal valB As Double) As Double
+            Dim a = Math.Abs(valA)
+            Dim b = Math.Abs(valB)
+
+            If b = 0.0 Then
+                Return 0.0
+            ElseIf a < b Then
+                Dim temp = a
+                a = b
+                b = temp
+            End If
+
+            For i = 0 To 4 - 1
+                Dim s = Math.Pow(b / a, 2)
+                s /= 4.0 + s
+                a += 2.0 * a * s
+                b *= s
+            Next
+
+            Return a
+        End Function
+
+        ''' <summary>
+        ''' set identify matrix
+        ''' </summary>
+        ''' <param name="mat"></param>
+        Public Shared Sub SetIdentifyMatrix(ByRef mat As clsEasyMatrix)
+            Dim n_dim = mat.RowCount
+            For i = 0 To n_dim - 1
+                For j = 0 To n_dim - 1
+                    If i = j Then
+                        mat(i)(j) = 1.0
+                    Else
+                        mat(i)(j) = 0
+                    End If
+                Next
+            Next
+        End Sub
     End Class
 End Namespace

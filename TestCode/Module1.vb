@@ -8,7 +8,6 @@ Imports Dbl = System.Double
 
 Module Module1
     Sub Main()
-
         With Nothing
             'Dim mat As New clsEasyMatrix(New Double()() {
             '                             New Double() {3, 0, 0},
@@ -23,155 +22,25 @@ Module Module1
                                          New Double() {2, 12, 1, -1},
                                          New Double() {1, 3, -24, 2},
                                          New Double() {4, -2, 1, 20}})
-            Dim eigen = mat.Eigen2()
+            'Dim mat As New clsEasyMatrix(New Double()() {
+            '                             New Double() {2, 1},
+            '                             New Double() {1, 2}})
+            'mat = clsMathUtil.CreateRandomSymmetricMatrix(4)
+
+            mat.PrintValue(4, "Source")
 
             'eigen
+            Dim eigen = mat.Eigen2(IsSort:=False)
             Dim retV = eigen.EigenValue
             Dim retM = eigen.EigenVector
-            Dim retD = retV.ToDiagonalMatrix()
+            retV.PrintValue(4, "EigenValue")
+            retM.PrintValue(4, "EigenVector")
 
-            retV.PrintValue(ai_preci:=4)
-            retM.PrintValue(ai_preci:=4)
-
-            'Ax=ramudax
-            'check
-            '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
             Dim matI = retM * retM.T()
+            matI.PrintValue(ai_preci:=4)
+            'Dim matSource = retM * retV.ToDiagonalMatrix() * retM.T()
+            'matSource.PrintValue(ai_preci:=4)
         End With
-
-        With Nothing
-            Dim mat As New clsEasyMatrix(New Double()() {
-                                         New Double() {2, 1},
-                                         New Double() {1, 2}})
-            Dim eigen = mat.Eigen2()
-
-            'eigen
-            Dim retV = eigen.EigenValue
-            Dim retM = eigen.EigenVector
-            Dim retD = retV.ToDiagonalMatrix()
-
-            retV.PrintValue(ai_preci:=4)
-            retM.PrintValue(ai_preci:=4)
-
-            'Ax=ramudax
-
-            'check
-            '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
-            Dim matI = retM * retM.T()
-            Return
-        End With
-
-
-        With Nothing
-            Dim s0 As New clsEasyMatrix(New Double()() {New Double() {1, 2, 1, 2, 1, 2}})
-            Dim s1 As New clsEasyMatrix(New Double()() {New Double() {1, 2, 1, 2, 1, 2},
-                                                   New Double() {2, 4, 2, 4, 2, 4}})
-            Dim s2 As New clsEasyMatrix(New Double()() {New Double() {1, 2, 1, 2, 1, 2},
-                                                   New Double() {2, 4, 2, 4, 2, 4},
-                                                   New Double() {4, 8, 4, 8, 4, 8}})
-            Dim s3 As New clsEasyMatrix(New Double()() {New Double() {50, 50, 80, 70, 90},
-                                                   New Double() {50, 70, 60, 90, 100}})
-
-            Dim rng = New LibOptimization.Util.clsRandomXorshift()
-            For i = 0 To 2000 - 1
-                Dim dimNum = 3
-                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
-
-                Dim resultLU = source.LUP()
-                Dim P = resultLU.P
-                Dim L = resultLU.L
-                Dim U = resultLU.U
-
-                'check
-                If clsMathUtil.IsNearyEqualMatrix(P * source, L * U) = True Then
-                    'OK
-                Else
-                    Console.WriteLine("No={0} det={1}", i, resultLU.Det)
-                    source.PrintValue(name:="souce")
-                    P.PrintValue(name:="P")
-                    L.PrintValue(name:="L")
-                    U.PrintValue(name:="U")
-                    CType(P * L * U, clsEasyMatrix).PrintValue(name:="LUP")
-                End If
-            Next
-        End With
-
-        With Nothing
-            Dim rng = New LibOptimization.Util.clsRandomXorshift()
-            For i = 0 To 2000 - 1
-                Dim dimNum = 4
-                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
-                Try
-                    Dim matLUP = source.LUP()
-                    Dim colVec = source.Inverse().Column(0)
-                    Dim result = matLUP.Solve((New clsEasyMatrix(dimNum, True))(0))
-
-                    'check
-                    If clsMathUtil.IsNearyEqualVector(colVec, result) = True Then
-                        'OK
-                    Else
-                        colVec.PrintValue()
-                        result.PrintValue()
-                        source.PrintValue(name:="Source vector")
-                    End If
-                Catch ex As Exception
-                    source.PrintValue(name:="Source matrix")
-                End Try
-            Next
-        End With
-        Return
-
-        'Dim v = New Vector(Of Double)
-        'Dim c = Vector(Of Double).Count
-        'Dim retV = System.Numerics.Vector.Abs(v)
-
-        'Console.WriteLine("{0} {1}", Vector.IsHardwareAccelerated, Vector(Of Double).Count)
-
-        'With Nothing
-        '    Dim answerTemp = New Vector(Of Double)(New Double() {1, 1, 1, 1})
-        '    Dim multiTemp = New Vector(Of Double)(New Double() {1.0, 2.0, 3.0, 4.0})
-        '    answerTemp = answerTemp + multiTemp
-        '    Console.WriteLine(answerTemp.ToString())
-        '    Dim answer = answerTemp(0) * answerTemp(1) * answerTemp(2) * answerTemp(3)
-        '    Console.WriteLine(answer)
-        'End With
-
-        'For i = 0 To 1000000 - 1
-        '    Dim answerTemp = New Vector(Of Double)(New Double() {1, 1, 1, 1})
-        '    Dim multiTemp = New Vector(Of Double)(New Double() {1.0, 2.0, 3.0, 4.0})
-        '    Dim loopEnd = 1000000 / Vector(Of Double).Count
-        '    For j = 0 To loopEnd - 1
-        '        multiTemp += Vector(Of Double).One
-        '        answerTemp *= multiTemp
-
-        '    Next
-        '    Dim answer = answerTemp(0) * answerTemp(1) * answerTemp(2) * answerTemp(3)
-        'Next
-
-        Return
-        With Nothing
-            Dim dimNum = 5
-            Dim source = clsMathUtil.CreateRandomASymmetricMatrix(dimNum)
-            Try
-                Dim hoge = source.HouseholderTransformation()
-                hoge.PrintValue()
-                hoge = source.HouseholderTransformationForQR()
-                hoge.PrintValue()
-
-                Dim ee = source.Eigen()
-                ee.EigenValue.PrintValue()
-                ee.EigenVector.PrintValue()
-
-                Dim e = hoge.Eigen()
-                e.EigenValue.PrintValue()
-                e.EigenVector.PrintValue()
-
-                Return
-            Catch ex As Exception
-                source.PrintValue(name:="Source matrix")
-            End Try
-        End With
-
     End Sub
 
     ''' <summary>
@@ -300,77 +169,74 @@ Module Module1
     ''' LU decompostion benchmark
     ''' </summary>
     Public Sub BenchmarkLU()
-        With Nothing
-            Dim rng1 As clsRandomXorshift = Nothing
-            Dim rng2 As clsRandomXorshift = Nothing
-            'bench mark
-            System.Threading.Thread.Sleep(1000)
+        Dim rng1 As clsRandomXorshift = Nothing
+        Dim rng2 As clsRandomXorshift = Nothing
+        'bench mark
+        System.Threading.Thread.Sleep(1000)
 
-            Dim loopNum = 5
-            Dim trynum = 2000
-            For kk = 0 To 10 - 1
-                With Nothing
-                    rng2 = New LibOptimization.Util.clsRandomXorshift()
-                    Dim plu2 = 0.0
-                    For j = 0 To loopNum - 1
-                        Dim sw = New Stopwatch()
-                        sw.Start()
-                        For i = 0 To trynum - 1
-                            Dim dimNum = 4
-                            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng2)
-                            Dim resultLU As LU = Nothing
-                            Try
-                                resultLU = source.LUP()
-                                Dim P = resultLU.P
-                                Dim L = resultLU.L
-                                Dim U = resultLU.U
-                                Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
-                                If flg = False Then
-                                    Return
-                                End If
-                            Catch ex As Exception
-                                source.PrintValue()
+        Dim loopNum = 5
+        Dim trynum = 2000
+        For kk = 0 To 10 - 1
+            With Nothing
+                rng2 = New LibOptimization.Util.clsRandomXorshift()
+                Dim plu2 = 0.0
+                For j = 0 To loopNum - 1
+                    Dim sw = New Stopwatch()
+                    sw.Start()
+                    For i = 0 To trynum - 1
+                        Dim dimNum = 4
+                        Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng2)
+                        Dim resultLU As LU = Nothing
+                        Try
+                            resultLU = source.LUP()
+                            Dim P = resultLU.P
+                            Dim L = resultLU.L
+                            Dim U = resultLU.U
+                            Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
+                            If flg = False Then
                                 Return
-                            End Try
-                        Next
-                        sw.Stop()
-                        plu2 += sw.ElapsedMilliseconds
+                            End If
+                        Catch ex As Exception
+                            source.PrintValue()
+                            Return
+                        End Try
                     Next
-                    Console.WriteLine("{0}s CALGO", plu2 / 1000.0)
-                End With
-                With Nothing
-                    Dim plu1 = 0.0
-                    rng1 = New LibOptimization.Util.clsRandomXorshift()
-                    For j = 0 To loopNum - 1
-                        Dim sw = New Stopwatch()
-                        sw.Start()
-                        For i = 0 To trynum - 1
-                            Dim dimNum = 4
-                            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng1)
-                            Dim resultLU As LU = Nothing
-                            Try
-                                resultLU = source.LUP()
-                                Dim P = resultLU.P
-                                Dim L = resultLU.L
-                                Dim U = resultLU.U
-                                Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
-                                If flg = False Then
-                                    Return
-                                End If
-                            Catch ex As Exception
-                                source.PrintValue()
+                    sw.Stop()
+                    plu2 += sw.ElapsedMilliseconds
+                Next
+                Console.WriteLine("{0}s CALGO", plu2 / 1000.0)
+            End With
+            With Nothing
+                Dim plu1 = 0.0
+                rng1 = New LibOptimization.Util.clsRandomXorshift()
+                For j = 0 To loopNum - 1
+                    Dim sw = New Stopwatch()
+                    sw.Start()
+                    For i = 0 To trynum - 1
+                        Dim dimNum = 4
+                        Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng1)
+                        Dim resultLU As LU = Nothing
+                        Try
+                            resultLU = source.LUP()
+                            Dim P = resultLU.P
+                            Dim L = resultLU.L
+                            Dim U = resultLU.U
+                            Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
+                            If flg = False Then
                                 Return
-                            End Try
-                        Next
-                        sw.Stop()
-                        plu1 += sw.ElapsedMilliseconds
+                            End If
+                        Catch ex As Exception
+                            source.PrintValue()
+                            Return
+                        End Try
                     Next
-                    Console.WriteLine("{0}s NR", plu1 / 1000.0)
-                End With
-            Next
-            Console.ReadKey()
-            Return
-        End With
+                    sw.Stop()
+                    plu1 += sw.ElapsedMilliseconds
+                Next
+                Console.WriteLine("{0}s NR", plu1 / 1000.0)
+            End With
+        Next
+        Console.ReadKey()
+        Return
     End Sub
-
 End Module

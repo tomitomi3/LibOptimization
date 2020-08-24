@@ -1154,8 +1154,6 @@
 
             Dim n = Me.ColCount
             Dim source = New clsEasyMatrix(Me)
-            Dim matL = New clsEasyMatrix(n, True)
-            Dim matU = New clsEasyMatrix(n, True)
             Dim matP = New clsEasyMatrix(n, True)
 
             Dim det = 1.0
@@ -1238,6 +1236,8 @@
             matP = matP.T
 
             'replace
+            Dim matL = New clsEasyMatrix(n, True)
+            Dim matU = New clsEasyMatrix(n, True)
             For i = 1 To n - 1
                 For j = 0 To i - 1
                     matL(i)(j) = source(i)(j)
@@ -1346,6 +1346,112 @@
             Next
 
             Return New LU(matP, matL, matU, det)
+        End Function
+
+        ''' <summary>
+        ''' LUP decomposition
+        ''' </summary>
+        ''' <param name="eps"></param>
+        ''' <returns></returns>
+        Public Function LUP2(Optional ByVal eps As Double = MachineEpsiron) As LU
+            Dim n = Me.ColCount
+            Dim a = New clsEasyMatrix(Me)
+            Dim matP = New clsEasyMatrix(n, True)
+            Dim ip = 0
+            Dim pivotRow = New Integer(n - 1) {}
+            Dim det = 1.0
+
+            For i = 0 To n - 1
+                pivotRow(i) = i
+            Next
+
+            For k = 0 To n - 1
+                Dim amax = Math.Abs(a(k)(k))
+                ip = k
+                For i = k + 1 To n - 1
+                    Dim temp = Math.Abs(a(i)(k))
+                    If temp > amax Then
+                        amax = temp
+                        ip = i
+                    End If
+                Next
+
+                '列要素の絶対最大値が0に近い場合
+                If clsMathUtil.IsCloseToZero(amax, eps) Then
+                    Throw New clsException(clsException.Series.NotComputable, "LUP() singular matrix")
+                End If
+
+                'ピボット選択行を保存
+                If k <> ip Then
+                    'clsMathUtil.SwapRow(a, k, ip)
+                    For j = k To n - 1
+                        Dim tempVal = a(k)(j)
+                        a(k)(j) = a(ip)(j)
+                        a(ip)(j) = tempVal
+                    Next
+
+                    clsMathUtil.SwapRow(matP, k, ip)
+                    Dim temp = pivotRow(ip)
+                    pivotRow(ip) = pivotRow(k)
+                    pivotRow(k) = temp
+
+                    'change sign
+                    det = -det
+                End If
+
+                'diagonal value is close to 0.
+                If clsMathUtil.IsCloseToZero(a(k)(k), eps) Then
+                    a(k)(k) = SAME_ZERO
+                End If
+
+                'calc det
+                det *= a(k)(k)
+
+                For i = k + 1 To n - 1
+                    Dim alpha = -a(i)(k) / a(k)(k)
+                    a(i)(k) = alpha
+                    For j = k + 1 To n - 1
+                        a(i)(j) = a(i)(j) + alpha * a(k)(j)
+                    Next
+                Next
+            Next
+
+            'transopose
+            'matP = matP.T
+
+            a.PrintValue(10)
+
+            'replace
+            Dim matL = New clsEasyMatrix(n, True)
+            Dim matU = New clsEasyMatrix(n, True)
+            For i = 1 To n - 1
+                For j = 0 To i - 1
+                    matL(i)(j) = a(i)(j)
+                Next
+            Next
+            For i = 0 To n - 1
+                For j = i To n - 1
+                    matU(i)(j) = a(i)(j)
+                Next
+            Next
+            matL.PrintValue(10)
+            matU.PrintValue(10)
+            'For i = 0 To n - 1
+            '    For j = 0 To i
+            '        matL(i)(j) = a(i)(j)
+            '    Next
+            'Next
+            'For i = 0 To n - 1
+            '    For j = i + 1 To n - 1
+            '        matU(i)(j) = a(i)(j)
+            '    Next
+            'Next
+
+            Dim c = Me.LUP()
+            c.L.PrintValue(10)
+            c.U.PrintValue(10)
+
+            Return New LU(matP, matL, matU, det, pivotRow)
         End Function
 
         ''' <summary>
@@ -1478,6 +1584,15 @@
         Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
                               Optional ByVal Conversion As Double = 0.0000000000000001,
                               Optional ByVal IsSort As Boolean = True) As Eigen
+            '固有値、固有ベクトルを求める方針
+            ' 反復計算によって求める。計算しやすい行列に変換
+            '対称行列 or 非対称行列
+            ' 対称行列   :べき乗法、ヤコビ法、三重対角行列->QR法
+            ' 非対称行列 :ヘッセンベルグ行列->QR法
+            'QR法の高速
+            ' 原点移動（ウィルキンソンシフト）、減次（デフレーション）
+            ' QR法だと固有値のみ固有ベクトルは別途計算
+
             If Me.IsSquare() = False Then
                 Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
             End If
@@ -1576,8 +1691,12 @@
         Public Function Eigen2(Optional ByVal Iteration As Integer = 1000,
                                Optional ByVal Conversion As Double = 0.0000000000000001,
                                Optional ByVal IsSort As Boolean = True) As Eigen
-            'House
-            Dim h = Me.HouseholderTransformationForQR()
+            If Me.IsSquare() = False Then
+                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+            End If
+
+            'Householder変換
+            Dim h = Me.Householder()
 
             'QR method
             Dim n As Integer = h.RowCount
@@ -1690,26 +1809,23 @@
                 cnt = 0
                 While (True)
                     mu0 = mu
-                    Dim v = New clsEasyVector(y)
-
-                    v = luSolver.Solve(v)
+                    Dim v = luSolver.Solve(y)
                     mu = v.InnerProduct(y)
                     v2 = v.NormL2()
                     y = v / v2
-
-                    'Dim e = Math.Abs((mu - mu0) / mu)
-                    'If e < Conversion Then
-                    '    For j = 0 To n - 1
-                    '        eigenVector(i)(j) = y(j)
-                    '    Next
-                    '    Exit While
-                    'End If
-                    If MathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
+                    Dim e = Math.Abs((mu - mu0) / mu)
+                    If e < Conversion Then
                         For j = 0 To n - 1
                             eigenVector(i)(j) = y(j)
                         Next
                         Exit While
                     End If
+                    'If MathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
+                    '    For j = 0 To n - 1
+                    '        eigenVector(i)(j) = y(j)
+                    '    Next
+                    '    Exit While
+                    'End If
                     If cnt > Iteration Then
                         For j = 0 To n - 1
                             eigenVector(j)(i) = y(j)
@@ -1726,12 +1842,454 @@
             End If
 
             Return New Eigen(eigenValue, eigenVector, True)
-            '対称行列の場合 固有値分解 変換（対称三重対角行列、ヘッセンベルグ行列に変換後）→反復計算 がよい
-            'ヤコビ法 10次元程度 遅い
-            'ギブンス法（ギブンス変換による三重対角化）で行う。ハウスホルダー法の法が効率よい
         End Function
 
         ''' <summary>
+        ''' Eigen
+        ''' </summary>
+        ''' <param name="Iteration"></param>
+        ''' <param name="Conversion"></param>
+        ''' <param name="IsSort"></param>
+        ''' <returns></returns>
+        Public Function Eigen3(Optional ByVal Iteration As Integer = 1000,
+                               Optional ByVal Conversion As Double = 0.000000000000001,
+                               Optional ByVal IsSort As Boolean = True) As Eigen
+            If Me.IsSquare() = False Then
+                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+            End If
+
+            'Householder transform
+            Dim a = Me.Householder()
+            Dim n = a.RowCount
+            With Nothing
+                'QR method
+                Dim q = New clsEasyMatrix(n)
+                Dim work = New clsEasyVector(n)
+                Dim m = n - 1
+                While (m > 1)
+                    Dim dVal = a(m)(m - 1)
+                    If Math.Abs(dVal) < Conversion Then
+                        a.PrintValue()
+                        m -= 1
+                    End If
+
+                    '原点移動 右下
+                    Dim s = 0.0
+                    If m = (n - 1) Then
+                        '原点移動なし
+                        s = 0.0
+                    Else
+                        '原点移動あり
+                        s = a(n - 1)(n - 1)
+                        For i = 0 To m - 1
+                            a(i)(i) -= s
+                        Next
+                    End If
+
+                    '単位行列に初期化
+                    clsMathUtil.SetIdentifyMatrix(q)
+
+                    For i = 0 To m - 1
+                        Dim sint = 0.0
+                        Dim cost = 0.0
+                        'Dim r = Math.Sqrt(a(i)(i) * a(i)(i) + a(i + 1)(i) * a(i + 1)(i))
+                        Dim r = MathUtil.clsMathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
+                        If clsMathUtil.IsCloseToZero(r) = True Then
+                            sint = 0.0
+                            cost = 0.0
+                        Else
+                            sint = a(i + 1)(i) / r
+                            cost = a(i)(i) / r
+                        End If
+
+                        For j = i + 1 To m
+                            Dim tmp = a(i)(j) * cost + a(i + 1)(j) * sint
+                            a(i + 1)(j) = -a(i)(j) * sint + a(i + 1)(j) * cost
+                            a(i)(j) = tmp
+                        Next
+                        a(i + 1)(i) = 0.0
+                        a(i)(i) = r
+                        For j = 0 To m
+                            Dim tmp = q(j)(i) * cost + q(j)(i + 1) * sint
+                            q(j)(i + 1) = -q(j)(i) * sint + q(j)(i + 1) * cost
+                            q(j)(i) = tmp
+                        Next
+                    Next
+
+                    'calc RQ
+                    For i = 0 To m
+                        For j = i To m
+                            work(j) = a(i)(j)
+                        Next
+                        For j = 0 To m
+                            Dim tmp = 0.0
+                            For k = i To m
+                                tmp += work(k) * q(k)(j)
+                            Next
+                            a(i)(j) = tmp
+                        Next
+                    Next
+
+                    '原点補正
+                    If s <> 0.0 Then
+                        For i = 0 To m - 1
+                            a(i)(i) = a(i)(i) + s
+                        Next
+                    End If
+                End While
+            End With
+
+            'Eigen value
+            Dim eigenValues = a.ToDiagonalVector()
+
+            'Eigen vector
+            Dim eigenVectors = New clsEasyMatrix(n)
+            For i = 0 To n - 1
+                'initialize
+                Dim y = New clsEasyVector(n)
+                y(i) = 1.0
+
+                Dim tempMat = Me - (New clsEasyMatrix(n, eigenValues(i)))
+                Dim luSolver = tempMat.LUP()
+
+                'iteration
+                Dim mu0 = 0.0
+                Dim mu = 0.0
+                Dim v2 = 0.0
+                Dim v2s = 0.0
+                Dim cnt = 0
+                While (True)
+                    mu0 = mu
+                    Dim v = luSolver.Solve(y)
+                    mu = v.InnerProduct(y)
+                    v2 = v.NormL2()
+                    y = v / v2
+                    Dim e = Math.Abs((mu - mu0) / mu)
+                    If e < Conversion Then
+                        For j = 0 To n - 1
+                            eigenVectors(i)(j) = y(j)
+                        Next
+                        Exit While
+                    End If
+                    'If MathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
+                    '    For j = 0 To n - 1
+                    '        eigenVector(i)(j) = y(j)
+                    '    Next
+                    '    Exit While
+                    'End If
+                    If cnt > Iteration Then
+                        For j = 0 To n - 1
+                            eigenVectors(j)(i) = y(j)
+                        Next
+                        Exit While
+                    End If
+                    cnt += 1
+                End While
+            Next
+
+            'sort by Eigen value
+            If IsSort = True Then
+                clsMathUtil.EigenSort(eigenValues, eigenVectors)
+            End If
+
+            Return New Eigen(eigenValues, eigenVectors, True)
+        End Function
+
+        ''' <summary>
+        ''' Eigen
+        ''' </summary>
+        ''' <param name="Iteration"></param>
+        ''' <param name="Conversion"></param>
+        ''' <param name="IsSort"></param>
+        ''' <returns></returns>
+        Public Function Eigen4(Optional ByVal Iteration As Integer = 1000,
+                               Optional ByVal Conversion As Double = 0.000000000000001,
+                               Optional ByVal IsSort As Boolean = True) As Eigen
+            If Me.IsSquare() = False Then
+                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+            End If
+
+            'Householder transform
+            Dim a = Me.Householder()
+            Dim n = a.RowCount
+            With Nothing
+                'QR method
+                Dim q = New clsEasyMatrix(n)
+                Dim work = New clsEasyVector(n)
+                Dim m = n - 1
+                While (m > 1)
+                    Dim dVal = a(m)(m - 1)
+                    If Math.Abs(dVal) < Conversion Then
+                        a.PrintValue()
+                        m -= 1
+                    End If
+
+                    '原点 右下
+                    Dim s = 0.0
+                    If m = (n - 1) Then
+                        '原点移動なし
+                        s = 0.0
+                    Else
+                        '原点移動あり
+                        s = a(n - 1)(n - 1)
+                        For i = 0 To m - 1
+                            a(i)(i) -= s
+                        Next
+                    End If
+
+                    '単位行列に初期化
+                    clsMathUtil.SetIdentifyMatrix(q)
+
+                    For i = 0 To m - 1
+                        Dim sint = 0.0
+                        Dim cost = 0.0
+                        'Dim r = Math.Sqrt(a(i)(i) * a(i)(i) + a(i + 1)(i) * a(i + 1)(i))
+                        Dim r = MathUtil.clsMathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
+                        If clsMathUtil.IsCloseToZero(r) = True Then
+                            sint = 0.0
+                            cost = 0.0
+                        Else
+                            sint = a(i + 1)(i) / r
+                            cost = a(i)(i) / r
+                        End If
+
+                        For j = i + 1 To m
+                            Dim tmp = a(i)(j) * cost + a(i + 1)(j) * sint
+                            a(i + 1)(j) = -a(i)(j) * sint + a(i + 1)(j) * cost
+                            a(i)(j) = tmp
+                        Next
+                        a(i + 1)(i) = 0.0
+                        a(i)(i) = r
+                        For j = 0 To m
+                            Dim tmp = q(j)(i) * cost + q(j)(i + 1) * sint
+                            q(j)(i + 1) = -q(j)(i) * sint + q(j)(i + 1) * cost
+                            q(j)(i) = tmp
+                        Next
+                    Next
+
+                    'calc RQ
+                    For i = 0 To m
+                        For j = i To m
+                            work(j) = a(i)(j)
+                        Next
+                        For j = 0 To m
+                            Dim tmp = 0.0
+                            For k = i To m
+                                tmp += work(k) * q(k)(j)
+                            Next
+                            a(i)(j) = tmp
+                        Next
+                    Next
+
+                    '原点補正
+                    If s <> 0.0 Then
+                        For i = 0 To m - 1
+                            a(i)(i) = a(i)(i) + s
+                        Next
+                    End If
+                End While
+            End With
+
+            'eigen value
+            Dim eigenValues = a.ToDiagonalVector()
+
+            'eigen vector
+            Dim eigenVectors = New clsEasyMatrix(n)
+            Dim cnt = 0
+            For eIdx = 0 To n - 1
+                'initialize
+                Dim y = New clsEasyVector(n)
+                y(eIdx) = 1.0
+
+                'LU decomp
+                Dim ludecomp = Me - (New clsEasyMatrix(n, eigenValues(eIdx)))
+                Dim p() As Integer = Nothing
+                LUPForEigen(ludecomp, p, MachineEpsiron)
+
+                'iteration
+                Dim mu0 = 0.0
+                Dim mu = 0.0
+                Dim v2 = 0.0
+                Dim v2s = 0.0
+                cnt = 0
+                While (True)
+                    mu0 = mu
+                    Dim v = New clsEasyVector(y)
+
+                    'solve
+                    For k = 0 To n - 2
+                        Dim temp = v(k)
+                        v(k) = v(p(k))
+                        v(p(k)) = temp
+                        For i = k + 1 To n - 1
+                            v(i) = v(i) + ludecomp(i)(k) * v(k)
+                        Next
+                    Next
+                    v(n - 1) /= ludecomp(n - 1)(n - 1)
+                    For k = n - 2 To 0 Step -1
+                        Dim temp = v(k)
+                        For j = k + 1 To n - 1
+                            temp = temp - ludecomp(k)(j) * v(j)
+                        Next
+                        v(k) = temp / ludecomp(k)(k)
+                    Next
+                    v.PrintValue()
+
+                    mu = v.InnerProduct(y)
+                    v2 = v.NormL2()
+                    y = v / v2
+
+                    'Dim e = Math.Abs((mu - mu0) / mu)
+                    'If e < Conversion Then
+                    '    For j = 0 To n - 1
+                    '        eigenVector(i)(j) = y(j)
+                    '    Next
+                    '    Exit While
+                    'End If
+                    If MathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
+                        For j = 0 To n - 1
+                            eigenVectors(eIdx)(j) = y(j)
+                        Next
+                        Exit While
+                    End If
+                    If cnt > Iteration Then
+                        For j = 0 To n - 1
+                            eigenVectors(j)(eIdx) = y(j)
+                        Next
+                        Exit While
+                    End If
+                    cnt += 1
+                End While
+            Next
+
+            Return New Eigen(eigenValues, eigenVectors, True)
+        End Function
+
+        ''' <summary>
+        ''' LUP for Eigen
+        ''' </summary>
+        ''' <param name="a"></param>
+        ''' <param name="pivotRow"></param>
+        ''' <param name="Conversion"></param>
+        Private Sub LUPForEigen(ByRef a As clsEasyMatrix, ByRef pivotRow() As Integer, Conversion As Double)
+            Dim n = a.RowCount
+            Dim ip = 0
+            pivotRow = New Integer(n - 1) {}
+            For i = 0 To n - 1
+                pivotRow(i) = i
+            Next
+            For k = 0 To n - 1
+                Dim amax = Math.Abs(a(k)(k))
+                ip = k
+                For i = k + 1 To n - 1
+                    Dim temp = Math.Abs(a(i)(k))
+                    If temp > amax Then
+                        amax = temp
+                        ip = i
+                    End If
+                Next
+
+                '列要素の絶対最大値が0に近い場合
+                If clsMathUtil.IsCloseToZero(amax, Conversion) Then
+                    Throw New clsException(clsException.Series.NotComputable, "LUP() singular matrix")
+                End If
+
+                'ピボット選択行を保存
+                If k <> ip Then
+                    For j = k To n - 1
+                        Dim tempVal = a(k)(j)
+                        a(k)(j) = a(ip)(j)
+                        a(ip)(j) = tempVal
+                    Next
+                    Dim temp = pivotRow(ip)
+                    pivotRow(ip) = pivotRow(k)
+                    pivotRow(k) = temp
+                End If
+
+                'diagonal value is close to 0.
+                If clsMathUtil.IsCloseToZero(a(k)(k), Conversion) Then
+                    a(k)(k) = SAME_ZERO
+                End If
+
+                For i = k + 1 To n - 1
+                    Dim alpha = -a(i)(k) / a(k)(k)
+                    a(i)(k) = alpha
+                    For j = k + 1 To n - 1
+                        a(i)(j) = a(i)(j) + alpha * a(k)(j)
+                    Next
+                Next
+            Next
+        End Sub
+
+        ''' <summary>
+        ''' Householder Transformation
+        ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
+        ''' 対称行列をハウスホルダー変換 → 三重対角行列
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function Householder() As clsEasyMatrix
+            Dim a = New clsEasyMatrix(Me)
+            Dim n = a.Count
+            Dim f = New clsEasyVector(n)
+            Dim g = New clsEasyVector(n)
+            Dim u = New clsEasyVector(n)
+
+            For k = 0 To n - 3
+                For i = 0 To k
+                    u(i) = 0
+                Next
+                For i = k + 1 To n - 1
+                    u(i) = a(i)(k) 'col
+                Next
+
+                Dim ss = 0.0
+                For i = k + 2 To n - 1
+                    ss += u(i) * u(i)
+                Next
+                If MathUtil.clsMathUtil.IsCloseToZero(ss) = True Then
+                    Continue For
+                End If
+                Dim s = Math.Sqrt(ss + u(k + 1) * u(k + 1))
+                If u(k + 1) > 0.0 Then
+                    s = -s
+                End If
+
+                u(k + 1) -= s
+                Dim uu = Math.Sqrt(ss + u(k + 1) * u(k + 1))
+                For i = k + 1 To n - 1
+                    u(i) /= uu
+                Next
+
+                For i = 0 To n - 1
+                    f(i) = 0.0
+                    g(i) = 0.0
+                    For j = k + 1 To n - 1
+                        f(i) += a(i)(j) * u(j)
+                        g(i) += a(j)(i) * u(j)
+                    Next
+                Next
+
+                Dim gamma = 0.0
+                For j = 0 To n - 1
+                    gamma += u(j) * g(j)
+                Next
+
+                For i = 0 To n - 1
+                    f(i) -= gamma * u(i)
+                    g(i) -= gamma * u(i)
+                Next
+
+                For i = 0 To n - 1
+                    For j = 0 To n - 1
+                        a(i)(j) = a(i)(j) - 2.0 * u(i) * g(j) - 2.0 * f(i) * u(j)
+                    Next
+                Next
+            Next
+            Return a
+        End Function
+
+        ''' <summary>
+        ''' Householder Transformation
         ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
         ''' 対称行列をハウスホルダー変換 → 三重対角行列
         ''' </summary>
