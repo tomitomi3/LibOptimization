@@ -214,7 +214,7 @@
                 '|v2|
                 Dim ret = New clsEasyMatrix(n)
 
-#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
+#If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
                 '------------------------------------------------------------------
                 '.net 3.0, 3.5
                 '------------------------------------------------------------------
@@ -379,7 +379,7 @@
             End If
             If Me.m_direcition = VectorDirection.ROW Then
                 For i As Integer = 0 To Me.Count - 1
-                    str.Append(Me(i).ToString("F" & ai_preci.ToString()) & ControlChars.Tab)
+                    str.Append(Me(i).ToString("F" & ai_preci.ToString()) & vbTab)
                 Next
                 str.AppendLine("")
             Else

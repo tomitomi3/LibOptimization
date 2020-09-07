@@ -158,9 +158,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LibOptimizationDotNet3.5\LibOptimizationDotNet3.5.vbproj">
-      <Project>{f7b3f8b5-fe90-45b6-9f86-196618592a47}</Project>
-      <Name>LibOptimizationDotNet3.5</Name>
+    <ProjectReference Include="..\LibOptimization\LibOptimization.vbproj">
+      <Project>{2c280eed-8de4-43bb-9466-000d65794e2d}</Project>
+      <Name>LibOptimization</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Competitive PSOparallel competitive Particle Swarm Optimization
+    ''' Parallel Competitive Particle Swarm Optimization
     ''' </summary>
     ''' <remarks>
     ''' Features:

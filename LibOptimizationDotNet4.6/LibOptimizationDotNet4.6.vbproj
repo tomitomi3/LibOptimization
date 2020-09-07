@@ -1,0 +1,342 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>
+    </SchemaVersion>
+    <ProjectGuid>{D27DC3B8-703D-4694-BDF9-30D809817618}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>LibOptimization</RootNamespace>
+    <AssemblyName>LibOptimization</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>LibOptimization.xml</DocumentationFile>
+    <NoWarn>
+    </NoWarn>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>LibOptimization.xml</DocumentationFile>
+    <NoWarn>
+    </NoWarn>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>On</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>LibOptimization.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>
+    </DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>LibOptimization.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>
+    </DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>LibOptimization.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>LibOptimization.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\LibOptimization\abstract\absObjectiveFunction.vb">
+      <Link>abstract\absObjectiveFunction.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\abstract\absOptimization.vb">
+      <Link>abstract\absOptimization.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchAckley.vb">
+      <Link>BenchmarkFunctions\clsBenchAckley.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchBoothFunction.vb">
+      <Link>BenchmarkFunctions\clsBenchBoothFunction.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchDeJongFunction1.vb">
+      <Link>BenchmarkFunctions\clsBenchDeJongFunction1.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchDeJongFunction2.vb">
+      <Link>BenchmarkFunctions\clsBenchDeJongFunction2.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchDeJongFunction3.vb">
+      <Link>BenchmarkFunctions\clsBenchDeJongFunction3.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchDeJongFunction4.vb">
+      <Link>BenchmarkFunctions\clsBenchDeJongFunction4.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchDeJongFunction5.vb">
+      <Link>BenchmarkFunctions\clsBenchDeJongFunction5.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchEasomFunction.vb">
+      <Link>BenchmarkFunctions\clsBenchEasomFunction.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchEllipsoid.vb">
+      <Link>BenchmarkFunctions\clsBenchEllipsoid.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchFivewellPotential.vb">
+      <Link>BenchmarkFunctions\clsBenchFivewellPotential.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchGriewank.vb">
+      <Link>BenchmarkFunctions\clsBenchGriewank.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchPowell.vb">
+      <Link>BenchmarkFunctions\clsBenchPowell.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchRastrigin.vb">
+      <Link>BenchmarkFunctions\clsBenchRastrigin.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchRidge.vb">
+      <Link>BenchmarkFunctions\clsBenchRidge.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchRosenblock.vb">
+      <Link>BenchmarkFunctions\clsBenchRosenblock.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchSchaffer.vb">
+      <Link>BenchmarkFunctions\clsBenchSchaffer.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchSchwefel.vb">
+      <Link>BenchmarkFunctions\clsBenchSchwefel.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchSphere.vb">
+      <Link>BenchmarkFunctions\clsBenchSphere.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\BenchmarkFunctions\clsBenchTest.vb">
+      <Link>BenchmarkFunctions\clsBenchTest.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\EasyLinearAlgebra\clsEasyMatrix.vb">
+      <Link>EasyLinearAlgebra\clsEasyMatrix.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\EasyLinearAlgebra\clsEasyVector.vb">
+      <Link>EasyLinearAlgebra\clsEasyVector.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\EasyLinearAlgebra\clsException.vb">
+      <Link>EasyLinearAlgebra\clsException.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\EasyLinearAlgebra\clsMathUtil.vb">
+      <Link>EasyLinearAlgebra\clsMathUtil.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\parts\clsFireFly.vb">
+      <Link>Optimization\parts\clsFireFly.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptCS.vb">
+      <Link>Optimization\clsOptCS.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptDE.vb">
+      <Link>Optimization\clsOptDE.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptDEJADE.vb">
+      <Link>Optimization\clsOptDEJADE.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptES.vb">
+      <Link>Optimization\clsOptES.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptFA.vb">
+      <Link>Optimization\clsOptFA.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptHillClimbing.vb">
+      <Link>Optimization\clsOptHillClimbing.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptNelderMead.vb">
+      <Link>Optimization\clsOptNelderMead.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptNelderMeadWiki.vb">
+      <Link>Optimization\clsOptNelderMeadWiki.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptNewtonMethod.vb">
+      <Link>Optimization\clsOptNewtonMethod.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptPatternSearch.vb">
+      <Link>Optimization\clsOptPatternSearch.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptPSO.vb">
+      <Link>Optimization\clsOptPSO.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptPSOAIW.vb">
+      <Link>Optimization\clsOptPSOAIW.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptPSOChaoticIW.vb">
+      <Link>Optimization\clsOptPSOChaoticIW.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptPSOCPSO.vb">
+      <Link>Optimization\clsOptPSOCPSO.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptPSOLDIW.vb">
+      <Link>Optimization\clsOptPSOLDIW.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptRealGABLX.vb">
+      <Link>Optimization\clsOptRealGABLX.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptRealGAPCX.vb">
+      <Link>Optimization\clsOptRealGAPCX.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptRealGAREX.vb">
+      <Link>Optimization\clsOptRealGAREX.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptRealGASPX.vb">
+      <Link>Optimization\clsOptRealGASPX.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptRealGAUNDX.vb">
+      <Link>Optimization\clsOptRealGAUNDX.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptSimulatedAnnealing.vb">
+      <Link>Optimization\clsOptSimulatedAnnealing.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\clsOptSteepestDescent.vb">
+      <Link>Optimization\clsOptSteepestDescent.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\parts\clsOptTemplate.vb">
+      <Link>Optimization\parts\clsOptTemplate.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\parts\clsParticle.vb">
+      <Link>Optimization\parts\clsParticle.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Optimization\parts\clsPoint.vb">
+      <Link>Optimization\parts\clsPoint.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Util\clsError.vb">
+      <Link>Util\clsError.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Util\clsEval.vb">
+      <Link>Util\clsEval.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Util\clsRandomXorshift.vb">
+      <Link>Util\clsRandomXorshift.vb</Link>
+    </Compile>
+    <Compile Include="..\LibOptimization\Util\clsUtil.vb">
+      <Link>Util\clsUtil.vb</Link>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>set DESTPATH="$(SolutionDir)_BuildLib\$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+mkdir %25DESTPATH%25
+copy /Y "$(TargetPath)" "%25DESTPATH%25"
+
+if $(ConfigurationName)==Release  (
+  if $(PlatformName)==Any CPU (
+  )
+)</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

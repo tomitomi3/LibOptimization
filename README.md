@@ -57,10 +57,11 @@ Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0. 
   * REX(Real-coded Ensemble Crossover) and JGG
   * PCX(Parent Centric Recombination) and G3(Generalize Generation Gap)
 * Particle Swarm Optimization(PSO)
-  * Basic PSO
+  * Basic PSO(GlobalBest, LocalBest)
   * PSO using Linear Decrease Inertia Weight
   * PSO using Chaotic inertia weight(CDIW-PSO, CRIW-PSO)
   * PSO using Adaptive inertia weight
+  * Parallel Competitive Particle Swarm Optimization
 * Differential Evolution
   * DE/rand/1/bin
   * DE/rand/2/bin
@@ -392,14 +393,17 @@ End Function
 
 # License
 
-(MIT License)[https://opensource.org/licenses/MIT]
+[MIT License](https://opensource.org/licenses/MIT)
 
 This Library's license was MS-PL until [this commit](https://github.com/tomitomi3/LibOptimization/commit/363c0d5852f1506a89b3b18d89cd541f6f2ebe53).
 
 # Support .NET Framework
 
+* .NET Core 3.1
+* .NET Core 3.0
+* .NET Core 2.1
 * .NET Framework 4.6
-* .NET Framework 3.0, 3.5 (include This repository)
+* .NET Framework 3.5
 
 # Refference
 
@@ -430,3 +434,5 @@ This Library's license was MS-PL until [this commit](https://github.com/tomitomi
 1. Kalyanmoy Deb, Dhiraj Joshi and Ashish Anand, "Real-Coded Evolutionary Algorithms with Parent-Centric Recombination", KanGAL Report No. 2001003
 1. 進化戦略(https://ja.wikipedia.org/wiki/%E9%80%B2%E5%8C%96%E6%88%A6%E7%95%A5)
 1. Hillclimbing(https://en.wikipedia.org/wiki/Hill_climbing)
+1. Luu, Keurfon, et al. "A parallel competitive Particle Swarm Optimization for non-linear first arrival traveltime tomography and uncertainty quantification." Computers and Geosciences 113 (2018): 81-93.
+1. R. C. Eberhart and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.

@@ -1,0 +1,10 @@
+プロジェクト ファイル内で複数の .NET Framework バージョンをサポートする
+https://docs.microsoft.com/ja-jp/nuget/create-packages/multiple-target-frameworks-project-file
+
+ターゲットフレームワークモニカー
+https://docs.microsoft.com/ja-jp/nuget/reference/target-frameworks
+net35
+net46
+netcoreapp3.0
+netcoreapp3.1
+

@@ -515,7 +515,7 @@
         ''' </remarks>
         Public Shared Operator *(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
             '.NET Frameworkのバージョンで区分け
-#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
+#If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
             '------------------------------------------------------------------
             '.net 3.0, 3.5
             '------------------------------------------------------------------
@@ -630,7 +630,7 @@
 
             Dim vSize As Integer = mat.RowCount
             Dim ret As New clsEasyVector(vSize, clsEasyVector.VectorDirection.COL)
-#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
+#If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
             For i As Integer = 0 To vSize - 1
                 Dim sum As Double = 0.0
                 For j As Integer = 0 To mat.ColCount - 1
@@ -681,8 +681,8 @@
 
             Dim vSize As Integer = mat.ColCount '行列の行サイズ
             Dim ret As New clsEasyVector(vSize, clsEasyVector.VectorDirection.ROW)
-#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
-           For j As Integer = 0 To vSize - 1
+#If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
+            For j As Integer = 0 To vSize - 1
                 Dim sum As Double = 0.0
                 For i As Integer = 0 To mat.RowCount - 1
                     sum += vec(i) * mat(i)(j)
@@ -757,7 +757,7 @@
         Public Function T() As clsEasyMatrix
             Dim ret As New clsEasyMatrix(Me.ColCount, Me.RowCount)
 
-#If (NET30_CUSTOM OrElse NET35_CUSTOM) = True Then
+#If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
             '------------------------------------------------------------------
             '.net 3.0, 3.5
             '------------------------------------------------------------------
@@ -825,7 +825,7 @@
             End If
             For Each vec As clsEasyVector In Me
                 For i As Integer = 0 To vec.Count - 1
-                    str.Append(vec(i).ToString("F" & ai_preci.ToString()) & ControlChars.Tab)
+                    str.Append(vec(i).ToString("F" & ai_preci.ToString()) & vbTab)
                 Next
                 str.Append(Environment.NewLine)
             Next
