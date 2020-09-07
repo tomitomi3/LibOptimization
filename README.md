@@ -392,9 +392,9 @@ End Function
 
 # License
 
-Microsoft Public License (MS-PL)
+(MIT License)[https://opensource.org/licenses/MIT]
 
-http://opensource.org/licenses/MS-PL
+This Library's license was MS-PL until [this commit](https://github.com/tomitomi3/LibOptimization/commit/363c0d5852f1506a89b3b18d89cd541f6f2ebe53).
 
 # Support .NET Framework
 
