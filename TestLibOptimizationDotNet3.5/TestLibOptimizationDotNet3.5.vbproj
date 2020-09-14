@@ -124,7 +124,15 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestLibOptimizationDotNet3.5.vb" />
+    <Compile Include="..\TestLibOptimization\UnitTestLibOptimization.vb">
+      <Link>UnitTestLibOptimization.vb</Link>
+    </Compile>
+    <Compile Include="..\TestLibOptimization\UnitTestLinearAlgebra.vb">
+      <Link>UnitTestLinearAlgebra.vb</Link>
+    </Compile>
+    <Compile Include="..\TestLibOptimization\UnitTestOther.vb">
+      <Link>UnitTestOther.vb</Link>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

@@ -18,7 +18,6 @@ Imports LibOptimization.Util
         Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
     End Sub
 
-#Region "Optimization"
     Dim lock As Object
 
     Sub TestOpt(ByVal opt As absOptimization)
@@ -85,10 +84,9 @@ Imports LibOptimization.Util
         For i As Integer = 2 To 3 - 1
             Console.WriteLine("===sphere {0}D===", i)
             Dim optimizers = clsUtil.GetOptimizersForUnitTest(New clsBenchSphere(i))
-            Threading.Tasks.Parallel.ForEach(optimizers,
-                                             Sub(opt)
-                                                 TestOpt(opt)
-                                             End Sub)
+            For Each opt In optimizers
+                TestOpt(opt)
+            Next
         Next
     End Sub
 
@@ -165,6 +163,33 @@ Imports LibOptimization.Util
     End Sub
 
     ''' <summary>
+    ''' test NumericDerivertive
+    ''' </summary>
+    <TestMethod()> Public Sub Opt_NumericDerivertive()
+        Dim optGradient = New clsOptSteepestDescent(New SphereUsingNumericDerivative(2))
+        optGradient.Init()
+        Dim initEval = optGradient.Result.Eval
+        optGradient.DoIteration()
+        If optGradient.Iteration <= 2 OrElse initEval <= optGradient.Result.Eval Then
+            Console.WriteLine("Iteration :{0}", optGradient.Iteration)
+            Assert.Fail("not conversion using NumericDerivertive")
+        Else
+            clsUtil.DebugValue(optGradient)
+        End If
+
+        Dim optNewton = New clsOptSteepestDescent(New SphereUsingNumericDerivative(2))
+        optNewton.Init()
+        initEval = optNewton.Result.Eval
+        optNewton.DoIteration()
+        If optNewton.Iteration <= 2 OrElse initEval <= optNewton.Result.Eval Then
+            Console.WriteLine("Iteration :{0}", optNewton.Iteration)
+            Assert.Fail("not conversion using NumericDerivertive")
+        Else
+            clsUtil.DebugValue(optNewton)
+        End If
+    End Sub
+
+    ''' <summary>
     ''' bound check
     ''' </summary>
     <TestMethod()> Public Sub Opt_OptimizationDEWithBound()
@@ -198,26 +223,58 @@ Imports LibOptimization.Util
         Console.WriteLine(String.Format("Success Result {0} {1}", opt.Result(0), opt.Result(1)))
     End Sub
 
-    Public Class nothingFunc : Inherits LibOptimization.Optimization.absObjectiveFunction
-        Public Overrides Function F(x As List(Of Double)) As Double
-            Return clsRandomXorshiftSingleton.GetInstance().NextDouble * 10
-        End Function
+    ''' <summary>
+    ''' 停止条件の使用可否 勾配を使った最適化関数
+    ''' </summary>
+    <TestMethod()> Public Sub Opt_UseCriterion_grad()
+        With Nothing
+            'not use criterion
+            Dim opt = New clsOptSteepestDescent(New clsBenchSphere(3))
+            opt.IsUseCriterion = False
+            opt.ALPHA = 0.00001
+            opt.Iteration = 1000
+            opt.Init()
+            opt.DoIteration()
+            If opt.IterationCount <> opt.Iteration Then
+                Assert.Fail("not eqaual iteration count")
+            End If
 
-        Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
-            Dim aa = New List(Of Double)
-            aa.Add(clsRandomXorshiftSingleton.GetInstance().NextDouble * 10)
-            aa.Add(clsRandomXorshiftSingleton.GetInstance().NextDouble * 10)
-            Return aa
-        End Function
+            'use criterion
+            opt.IsUseCriterion = True
+            opt.ALPHA = 0.3
+            opt.Iteration = 1000
+            opt.EPS = 100
+            opt.Init()
+            opt.DoIteration()
+            If opt.IterationCount = opt.Iteration Then
+                Assert.Fail("not eqaual iteration count")
+            End If
+        End With
 
-        Public Overrides Function Hessian(x As List(Of Double)) As List(Of List(Of Double))
-            Throw New NotImplementedException()
-        End Function
+        With Nothing
+            'not use criterion
+            Dim opt = New clsOptNewtonMethod(New clsBenchSphere(3))
+            opt.IsUseCriterion = False
+            opt.ALPHA = 0.00001
+            opt.Iteration = 100
+            opt.Init()
+            opt.DoIteration()
+            If opt.IterationCount <> opt.Iteration Then
+                Assert.Fail("not eqaual iteration count")
+            End If
 
-        Public Overrides Function NumberOfVariable() As Integer
-            Return 2
-        End Function
-    End Class
+            'use criterion
+            opt.IsUseCriterion = True
+            opt.ALPHA = 0.3
+            opt.Iteration = 1000
+            opt.EPS = 100
+            opt.Init()
+            opt.DoIteration()
+            If opt.IterationCount = opt.Iteration Then
+                Assert.Fail("not eqaual iteration count")
+            End If
+        End With
+    End Sub
 
     ''' <summary>
     ''' test Iterarion count
@@ -319,5 +376,88 @@ Imports LibOptimization.Util
             Assert.Fail(String.Format("not same result"))
         End If
     End Sub
+
+#Region "absFunc"
+    ''' <summary>
+    ''' test func
+    ''' </summary>
+    Public Class nothingFunc : Inherits LibOptimization.Optimization.absObjectiveFunction
+        Public Overrides Function F(x As List(Of Double)) As Double
+            Return clsRandomXorshiftSingleton.GetInstance().NextDouble * 10
+        End Function
+
+        Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
+            Dim aa = New List(Of Double)
+            aa.Add(clsRandomXorshiftSingleton.GetInstance().NextDouble * 10)
+            aa.Add(clsRandomXorshiftSingleton.GetInstance().NextDouble * 10)
+            Return aa
+        End Function
+
+        Public Overrides Function Hessian(x As List(Of Double)) As List(Of List(Of Double))
+            Throw New NotImplementedException()
+        End Function
+
+        Public Overrides Function NumberOfVariable() As Integer
+            Return 2
+        End Function
+    End Class
+
+
+    Public Class SphereUsingNumericDerivative : Inherits absObjectiveFunction
+        Private dimension As Integer = 0
+
+        ''' <summary>
+        ''' Default constructor
+        ''' </summary>
+        ''' <param name="ai_dim">Set dimension</param>
+        ''' <remarks></remarks>
+        Public Sub New(ByVal ai_dim As Integer)
+            Me.dimension = ai_dim
+        End Sub
+
+        ''' <summary>
+        ''' Target Function
+        ''' </summary>
+        ''' <param name="ai_var"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function F(ByVal ai_var As List(Of Double)) As Double
+            If ai_var Is Nothing Then
+                Return 0
+            End If
+
+            Dim ret As Double = 0
+            For i As Integer = 0 To Me.dimension - 1
+                ret += ai_var(i) ^ 2
+            Next
+            Return ret
+        End Function
+
+        Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
+            Return NumericDerivertive(ai_var)
+        End Function
+
+        Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
+            '2回微分を対角成分のみ
+            Dim secDerivertive = Gradient(ai_var)
+            Dim ret As New List(Of List(Of Double))
+            For i As Integer = 0 To Me.dimension - 1
+                ret.Add(New List(Of Double))
+                For j As Integer = 0 To Me.dimension - 1
+                    If i = j Then
+                        ret(i).Add(secDerivertive(i))
+                    Else
+                        ret(i).Add(0)
+                    End If
+                Next
+            Next
+            Return ret
+        End Function
+
+        Public Overrides Function NumberOfVariable() As Integer
+            Return dimension
+        End Function
+    End Class
+
 #End Region
 End Class

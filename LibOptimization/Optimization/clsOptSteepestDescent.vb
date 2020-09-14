@@ -107,8 +107,10 @@ Namespace Optimization
                 Me.m_vect = Me.m_vect - Me.ALPHA * grad
 
                 'Check conversion
-                If grad.NormL1() < EPS Then
-                    Return True
+                If Me.IsUseCriterion = True Then
+                    If grad.NormL2() < EPS Then
+                        Return True
+                    End If
                 End If
             Next
 
