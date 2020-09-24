@@ -163,25 +163,31 @@ Imports LibOptimization.Util
     End Sub
 
     ''' <summary>
-    ''' test NumericDerivertive
+    ''' test Numeric derivative gradient
     ''' </summary>
-    <TestMethod()> Public Sub Opt_NumericDerivertive()
-        Dim optGradient = New clsOptSteepestDescent(New SphereUsingNumericDerivative(2))
+    <TestMethod()> Public Sub Opt_NumericDerivative_Gradient()
+        Dim optGradient = New clsOptSteepestDescent(New SphereUsingNumericDerivative(3))
         optGradient.Init()
         Dim initEval = optGradient.Result.Eval
         optGradient.DoIteration()
-        If optGradient.Iteration <= 2 OrElse initEval <= optGradient.Result.Eval Then
+        If optGradient.IterationCount <= 2 OrElse initEval <= optGradient.Result.Eval Then
             Console.WriteLine("Iteration :{0}", optGradient.Iteration)
             Assert.Fail("not conversion using NumericDerivertive")
         Else
             clsUtil.DebugValue(optGradient)
         End If
+    End Sub
 
-        Dim optNewton = New clsOptSteepestDescent(New SphereUsingNumericDerivative(2))
+    ''' <summary>
+    ''' test Numeric derivative newton
+    ''' </summary>
+    <TestMethod()> Public Sub Opt_NumericDerivative_Newton()
+        Dim optNewton = New clsOptNewtonMethod(New SphereUsingNumericDerivative(3))
         optNewton.Init()
-        initEval = optNewton.Result.Eval
+        optNewton.ALPHA = 0.75
+        Dim initEval = optNewton.Result.Eval
         optNewton.DoIteration()
-        If optNewton.Iteration <= 2 OrElse initEval <= optNewton.Result.Eval Then
+        If optNewton.IterationCount <= 2 OrElse initEval <= optNewton.Result.Eval Then
             Console.WriteLine("Iteration :{0}", optNewton.Iteration)
             Assert.Fail("not conversion using NumericDerivertive")
         Else
@@ -434,12 +440,12 @@ Imports LibOptimization.Util
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
-            Return NumericDerivertive(ai_var)
+            Return NumericDerivative(ai_var)
         End Function
 
         Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
             '2回微分を対角成分のみ
-            Dim secDerivertive = Gradient(ai_var)
+            Dim secDerivertive = Numeric2ndDerivative(ai_var)
             Dim ret As New List(Of List(Of Double))
             For i As Integer = 0 To Me.dimension - 1
                 ret.Add(New List(Of Double))

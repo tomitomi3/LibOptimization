@@ -49,9 +49,9 @@
         ''' Numerical derivertive
         ''' </summary>
         ''' <param name="x"></param>
-        ''' <param name="h"></param>
+        ''' <param name="h">default 10^-8</param>
         ''' <returns></returns>
-        Public Function NumericDerivertive(ByVal x As List(Of Double), Optional ByVal h As Double = 0.0000000001) As List(Of Double)
+        Public Function NumericDerivative(ByVal x As List(Of Double), Optional ByVal h As Double = 0.00000001) As List(Of Double)
             Dim df As New List(Of Double)
             For i As Integer = 0 To NumberOfVariable() - 1
                 'central differences
@@ -63,6 +63,30 @@
                 'diff
                 Dim tempDf = (F(tempX1) - F(tempX2))
                 tempDf = tempDf / (2.0 * h)
+                df.Add(tempDf)
+            Next
+            Return df
+        End Function
+
+        ''' <summary>
+        ''' Numerical 2nd derivertive
+        ''' </summary>
+        ''' <param name="x"></param>
+        ''' <param name="h">default 10^-5</param>
+        ''' <returns></returns>
+        Public Function Numeric2ndDerivative(ByVal x As List(Of Double), Optional ByVal h As Double = 0.00001) As List(Of Double)
+            Dim df As New List(Of Double)
+            For i As Integer = 0 To NumberOfVariable() - 1
+                'central differences
+                Dim tempX1 As New List(Of Double)(x)
+                Dim tempX2 As New List(Of Double)(x)
+                tempX1(i) = tempX1(i) + h
+                tempX2(i) = tempX2(i) - h
+
+                'diff
+                'x_+1 - 2*x + x_-1 / h^2
+                Dim tempDf = (F(tempX1) - 2.0 * F(x) + F(tempX2))
+                tempDf = tempDf / (h * h)
                 df.Add(tempDf)
             Next
             Return df

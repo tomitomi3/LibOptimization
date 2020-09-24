@@ -9,6 +9,15 @@ Imports Dbl = System.Double
 Module Module1
     Sub Main()
         With Nothing
+            Dim opt = New LibOptimization.Optimization.clsOptNelderMeadANMS(New LibOptimization.BenchmarkFunction.clsBenchRosenblock(20))
+            opt.Iteration = 20000
+            opt.Init()
+            clsUtil.DebugValue(opt)
+            opt.DoIteration()
+            clsUtil.DebugValue(opt)
+            Return
+        End With
+        With Nothing
             'Dim mat As New clsEasyMatrix(New Double()() {
             '                             New Double() {3, 0, 0},
             '                             New Double() {-2, -2, 4},

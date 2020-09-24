@@ -45,7 +45,7 @@ Namespace BenchmarkFunction
         End Function
 
         Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
-            Return MyBase.NumericDerivertive(ai_var)
+            Return MyBase.NumericDerivative(ai_var)
         End Function
 
         Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
