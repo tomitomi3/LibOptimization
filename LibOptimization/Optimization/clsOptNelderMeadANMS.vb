@@ -296,15 +296,16 @@ Namespace Optimization
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function GetCentroidWithoutWorst() As clsPoint
-            Dim ret As New clsPoint(Me.m_func)
             Dim temp = Util.clsUtil.GetIndexSortedEvalFromPoints(Me.m_points)
+            Dim n = temp.Count - 1
+            Dim ret As New clsPoint(Me.m_func)
             For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                 Dim tempVal As Double = 0.0
-                For j As Integer = 0 To Me.m_points.Count - 2
+                For j As Integer = 0 To temp.Count - 2
                     Dim idx = temp(j).Index
                     tempVal += Me.m_points(idx)(i)
                 Next
-                ret(i) = tempVal / (Me.m_points.Count - 1)
+                ret(i) = tempVal / n
             Next
             ret.ReEvaluate()
             Return ret

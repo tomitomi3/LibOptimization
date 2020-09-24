@@ -166,7 +166,7 @@ Imports LibOptimization.Util
     ''' test Numeric derivative gradient
     ''' </summary>
     <TestMethod()> Public Sub Opt_NumericDerivative_Gradient()
-        Dim optGradient = New clsOptSteepestDescent(New SphereUsingNumericDerivative(3))
+        Dim optGradient = New clsOptSteepestDescent(New SphereUsingNumericDerivative(5))
         optGradient.Init()
         Dim initEval = optGradient.Result.Eval
         optGradient.DoIteration()
@@ -182,7 +182,7 @@ Imports LibOptimization.Util
     ''' test Numeric derivative newton
     ''' </summary>
     <TestMethod()> Public Sub Opt_NumericDerivative_Newton()
-        Dim optNewton = New clsOptNewtonMethod(New SphereUsingNumericDerivative(3))
+        Dim optNewton = New clsOptNewtonMethod(New SphereUsingNumericDerivative(5))
         optNewton.Init()
         optNewton.ALPHA = 0.75
         Dim initEval = optNewton.Result.Eval
@@ -408,6 +408,30 @@ Imports LibOptimization.Util
         End Function
     End Class
 
+    Public Class RosenblockUsingNumericDerivative : Inherits absObjectiveFunction
+        Public func As LibOptimization.BenchmarkFunction.clsBenchRosenblock = Nothing
+
+        Public Sub Init(ByVal dim_ As Integer)
+            Me.func = New clsBenchRosenblock(dim_)
+        End Sub
+
+        Public Overrides Function NumberOfVariable() As Integer
+            Return func.NumberOfVariable
+        End Function
+
+        Public Overrides Function F(x As List(Of Double)) As Double
+            Return func.F(x)
+        End Function
+
+        Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
+            Return Me.NumericDerivative(x, 0.0001)
+        End Function
+
+        Public Overrides Function Hessian(x As List(Of Double)) As List(Of List(Of Double))
+            Return Me.NumericHessianToDiagonal(x, 0.0001)
+        End Function
+
+    End Class
 
     Public Class SphereUsingNumericDerivative : Inherits absObjectiveFunction
         Private dimension As Integer = 0
@@ -444,20 +468,7 @@ Imports LibOptimization.Util
         End Function
 
         Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
-            '2回微分を対角成分のみ
-            Dim secDerivertive = Numeric2ndDerivative(ai_var)
-            Dim ret As New List(Of List(Of Double))
-            For i As Integer = 0 To Me.dimension - 1
-                ret.Add(New List(Of Double))
-                For j As Integer = 0 To Me.dimension - 1
-                    If i = j Then
-                        ret(i).Add(secDerivertive(i))
-                    Else
-                        ret(i).Add(0)
-                    End If
-                Next
-            Next
-            Return ret
+            Return NumericHessianToDiagonal(ai_var)
         End Function
 
         Public Overrides Function NumberOfVariable() As Integer

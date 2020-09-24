@@ -91,6 +91,35 @@
             Next
             Return df
         End Function
+
+        ''' <summary>
+        ''' Numeric Hessian(diagonal element)
+        ''' </summary>
+        ''' <param name="x"></param>
+        ''' <param name="h">default 10^-5</param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' ex)
+        ''' f(x1,x2) = x1^2 + x2^2
+        ''' der^2 f = [d^2f/d^2x1  0         ]
+        '''           [0           d^2f/d^2x2]
+        ''' </remarks>
+        Public Function NumericHessianToDiagonal(ByVal x As List(Of Double), Optional ByVal h As Double = 0.00001) As List(Of List(Of Double))
+            '2回微分を対角成分のみ
+            Dim secDerivertive = Numeric2ndDerivative(x, h)
+            Dim ret As New List(Of List(Of Double))
+            For i As Integer = 0 To Me.NumberOfVariable - 1
+                ret.Add(New List(Of Double))
+                For j As Integer = 0 To Me.NumberOfVariable - 1
+                    If i = j Then
+                        ret(i).Add(secDerivertive(i))
+                    Else
+                        ret(i).Add(0.0)
+                    End If
+                Next
+            Next
+            Return ret
+        End Function
     End Class
 
 End Namespace
