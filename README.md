@@ -11,7 +11,7 @@ LibOptimization is a numerical optimization library that simplifies optimization
 
 LibOptimizationは制約条件の無い数値最適化を行う.NET Frameworkのライブラリです。科学 (物理学など)、エンジニアリング、音響、金融、統計、医療、構造設計などの最適化を必要とする人に使用されているようです。
 
-実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装） 、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法、山登り法です。
+実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装）、適応パラメータ Nelder-Mead法、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法、山登り法です。
 
 I may miss your Issues. When a reply is slow, please give me e-mail.
 <pre>
@@ -32,7 +32,7 @@ If you like, f you use LibOptimization for a publication, please cite it as:
 
 # Recent change
 
-Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0. Refactoring LibOptimization code with development branch. In the future, I will add new function to the new branch.
+~~Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0. Refactoring LibOptimization code with development branch. In the future, I will add new function to the new branch.~~
 
 # Introduction
 
@@ -43,9 +43,10 @@ Changed absOptimiazation.NumberOfVariable from propety to function in ver1.9.0. 
 * Steepest Descent Method
 * Newton Method
 
-### Derivative free algorithm
+### Derivative free algorithm (Direct search method)
 
 * Nelder Mead Method (Original ver, Wikipedia ver)
+* Adaptive Nelder-Mead Simplex method
 * Hooke and Jeeves of Pattern Search (Direct Search)
 
 ### Derivative free algorithm (Nature inspired algorithm)
@@ -436,3 +437,4 @@ This Library's license was MS-PL until [this commit](https://github.com/tomitomi
 1. Hillclimbing(https://en.wikipedia.org/wiki/Hill_climbing)
 1. Luu, Keurfon, et al. "A parallel competitive Particle Swarm Optimization for non-linear first arrival traveltime tomography and uncertainty quantification." Computers and Geosciences 113 (2018): 81-93.
 1. R. C. Eberhart and Y. Shi, "Comparing inertia weights and constriction factors in particle swarm optimization", In Proceedings of the Congress on Evolutionary Computation, vol. 1, pp. 84–88, IEEE, La Jolla, Calif, USA, July 2000.
+1. Gao, Fuchang, and Lixing Han. "Implementing the Nelder-Mead simplex algorithm with adaptive parameters." Computational Optimization and Applications 51.1 (2012): 259-277.
