@@ -1,9 +1,8 @@
 ﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Nelder Mead Method wikipedia ver
+    ''' Adaptive Nelder-Mead Simplex (ANMS) method
     ''' </summary>
     ''' <remarks>
     ''' Features:
@@ -11,13 +10,13 @@ Namespace Optimization
     '''  -Also known as "Down hill simplex" or "simplex method".
     ''' 
     ''' Reffrence:
-    ''' http://ja.wikipedia.org/wiki/Nelder-Mead%E6%B3%95
+    ''' Gao, Fuchang, and Lixing Han. "Implementing the Nelder-Mead simplex algorithm with adaptive parameters." Computational Optimization and Applications 51.1 (2012): 259-277.
     ''' 
     ''' Implment:
     ''' N.Tomi(tomi.nori+github at gmail.com)
     ''' </remarks>
     <Serializable>
-    Public Class clsOptNelderMeadWiki : Inherits absOptimization
+    Public Class clsOptNelderMeadANMS : Inherits absOptimization
 #Region "Member"
         ''' <summary>Max iteration count(Default:5,000)</summary>
         Public Overrides Property Iteration As Integer = 5000
@@ -28,18 +27,19 @@ Namespace Optimization
         '-------------------------------------------------------------------
         'Coefficient of Simplex Operator
         '-------------------------------------------------------------------
-        ''' <summary>Refrection coeffcient(default:1.0)</summary>
+        ''' <summary>Refrection coeffcient(adaptive)</summary>
         Public Property Refrection As Double = 1.0
 
-        ''' <summary>Expantion coeffcient(default:2.0)</summary>
+        ''' <summary>Expantion coeffcient(adaptive)</summary>
         Public Property Expantion As Double = 2.0
 
-        ''' <summary>Contraction coeffcient(default:-0.5)</summary>
-        Public Property Contraction As Double = -0.5
+        ''' <summary>Contraction coeffcient(adaptive)</summary>
+        Public Property Contraction As Double = 0.5
 
-        ''' <summary>Shrink coeffcient(default:0.5)</summary>
+        ''' <summary>Shrink coeffcient(adaptive)</summary>
         Public Property Shrink As Double = 0.5
 
+        ''' <summary>vertex points(adaptive)</summary>
         Private m_points As New List(Of clsPoint)
 #End Region
 
@@ -49,8 +49,14 @@ Namespace Optimization
         ''' </summary>
         ''' <param name="ai_func">Optimize Function</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction )
+        Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
+
+            'Adaptive
+            Me.Refrection = 1.0
+            Me.Expantion = 1.0 + 2.0 / Me.m_func.NumberOfVariable
+            Me.Contraction = 0.75 - 1.0 / (2.0 * Me.m_func.NumberOfVariable)
+            Me.Shrink = 1.0 - 1.0 / Me.m_func.NumberOfVariable
         End Sub
 #End Region
 
@@ -139,6 +145,8 @@ Namespace Optimization
             Else
                 ai_iteration = If(ai_iteration = 0, Iteration - m_iteration - 1, Math.Min(ai_iteration, Iteration - m_iteration) - 1)
             End If
+            Dim worstIdx = Me.m_func.NumberOfVariable
+            Dim worst2ndIdx = worstIdx - 1
             For iterate As Integer = 0 To ai_iteration
                 'Counting generation
                 m_iteration += 1
@@ -151,34 +159,87 @@ Namespace Optimization
                     End If
                 End If
 
+#If DEBUG Then
+                Dim debugCount = 0
+#End If
+
                 '-----------------------------------------------------
                 'The following is optimization by Nelder-Mead Method.
                 '-----------------------------------------------------
-                'Calc centroid
-                Dim centroid = Me.GetCentroid(m_points)
-
                 'Reflection
-                Dim refrection = Me.ModifySimplex(Me.WorstPoint, centroid, Me.Refrection)
-                If BestPoint.Eval <= refrection.Eval AndAlso refrection.Eval < Worst2ndPoint.Eval Then
-                    WorstPoint = refrection
-                ElseIf refrection.Eval < BestPoint.Eval Then
-                    'Expantion
-                    Dim expantion = Me.ModifySimplex(Me.WorstPoint, centroid, Me.Expantion)
-                    If expantion.Eval < refrection.Eval Then
-                        WorstPoint = expantion
-                    Else
-                        WorstPoint = refrection
-                    End If
-                Else
-                    'Contraction
-                    Dim contraction = Me.ModifySimplex(WorstPoint, centroid, Me.Contraction)
-                    If contraction.Eval < WorstPoint.Eval Then
-                        WorstPoint = contraction
-                    Else
-                        'Reduction(Shrink) BestPoint以外を縮小
-                        Me.CalcShrink(Me.Shrink)
-                    End If
+                Dim temp = Util.clsUtil.GetIndexSortedEvalFromPoints(Me.m_points)
+                Dim centroid = Me.GetCentroidWithoutWorst()
+                Dim best = Me.m_points(temp(0).Index)
+                Dim worst = Me.m_points(temp(worstIdx).Index)
+                Dim worst2nd = Me.m_points(temp(worst2ndIdx).Index)
+                Dim xr = New clsPoint(Me.m_func, centroid + Me.Refrection * (centroid - worst))
+                If best.Eval <= xr.Eval AndAlso xr.Eval < worst2nd.Eval Then
+                    'replace worst
+                    Me.m_points(temp(worstIdx).Index) = xr
+#If DEBUG Then
+                    debugCount += 1
+#End If
                 End If
+
+                'Expantion
+                'temp = Util.clsUtil.GetIndexSortedEvalFromPoints(Me.m_points)
+                'best = Me.m_points(temp(0).Index)
+                'centroid = Me.GetCentroidWithoutWorst()
+                If xr.Eval < best.Eval Then
+                    Dim xe = New clsPoint(Me.m_func, centroid + Me.Expantion * (xr - centroid))
+                    If xe.Eval < xr.Eval Then
+                        'replace worst
+                        Me.m_points(temp(worstIdx).Index) = xe
+                    Else
+                        'replace worst
+                        Me.m_points(temp(worstIdx).Index) = xr
+                    End If
+#If DEBUG Then
+                    debugCount += 1
+#End If
+                End If
+
+                'Outside Contraction
+                'temp = Util.clsUtil.GetIndexSortedEvalFromPoints(Me.m_points)
+                'worst = Me.m_points(temp(worstIdx).Index)
+                'worst2nd = Me.m_points(temp(worst2ndIdx).Index)
+                'centroid = Me.GetCentroidWithoutWorst()
+                If worst2nd.Eval <= xr.Eval AndAlso xr.Eval < worst.Eval Then
+                    Dim xoc = New clsPoint(Me.m_func, centroid + Me.Contraction * (xr - centroid))
+                    If xoc.Eval <= xr.Eval Then
+                        'replace worst
+                        Me.m_points(temp(worstIdx).Index) = xoc
+                    Else
+                        'Shrink without best
+                        CalcShrink()
+                    End If
+#If DEBUG Then
+                    debugCount += 1
+#End If
+                End If
+
+                'Inside Contraction
+                'temp = Util.clsUtil.GetIndexSortedEvalFromPoints(Me.m_points)
+                'worst = Me.m_points(temp(worstIdx).Index)
+                'centroid = Me.GetCentroidWithoutWorst()
+                If xr.Eval >= worst.Eval Then
+                    Dim xic = New clsPoint(Me.m_func, centroid - Me.Contraction * (xr - centroid))
+                    If xic.Eval < worst.Eval Then
+                        Me.m_points(temp(worstIdx).Index) = xic
+                    Else
+                        'Shrink without best
+                        CalcShrink()
+                    End If
+#If DEBUG Then
+                    debugCount += 1
+#End If
+                End If
+
+#If DEBUG Then
+                If debugCount > 1 Then
+                    Console.WriteLine("")
+                End If
+#End If
             Next
 
             Return False
@@ -230,59 +291,37 @@ Namespace Optimization
 
 #Region "Private Methods"
         ''' <summary>
-        ''' Calc Centroid
+        ''' Calc Centroid without worst
         ''' </summary>
-        ''' <param name="ai_vertexs"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function GetCentroid(ByVal ai_vertexs As List(Of clsPoint)) As clsPoint
-            Dim ret As New clsPoint(ai_vertexs(0))
-
-            Dim numVar As Integer = ai_vertexs(0).Count
-            For i As Integer = 0 To numVar - 1
-                Dim temp As Double = 0.0
-                For numVertex As Integer = 0 To ai_vertexs.Count - 2 'Except Worst
-                    temp += ai_vertexs(numVertex)(i)
-                Next
-                ret(i) = temp / (ai_vertexs.Count - 1)
-            Next
-
-            ret.ReEvaluate()
-            Return ret
-        End Function
-
-        ''' <summary>
-        ''' Simplex
-        ''' </summary>
-        ''' <param name="ai_tgt">Target vertex</param>
-        ''' <param name="ai_base">Base vertex</param>
-        ''' <param name="ai_coeff">Coeffcient</param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' </remarks>
-        Private Function ModifySimplex(ByVal ai_tgt As clsPoint, ByVal ai_base As clsPoint, ByVal ai_coeff As Double) As clsPoint
+        Private Function GetCentroidWithoutWorst() As clsPoint
             Dim ret As New clsPoint(Me.m_func)
-            For i As Integer = 0 To ret.Count - 1
-                Dim temp As Double = ai_base(i) + ai_coeff * (ai_base(i) - ai_tgt(i))
-                ret(i) = temp
+            Dim temp = Util.clsUtil.GetIndexSortedEvalFromPoints(Me.m_points)
+            For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
+                Dim tempVal As Double = 0.0
+                For j As Integer = 0 To Me.m_points.Count - 2
+                    Dim idx = temp(j).Index
+                    tempVal += Me.m_points(idx)(i)
+                Next
+                ret(i) = tempVal / (Me.m_points.Count - 1)
             Next
             ret.ReEvaluate()
             Return ret
         End Function
 
         ''' <summary>
-        ''' Shrink(Except best point)
+        ''' Shrink(without best point)
         ''' </summary>
-        ''' <param name="ai_coeff">Shrink coeffcient</param>
         ''' <remarks>
         ''' </remarks>
-        Private Sub CalcShrink(ByVal ai_coeff As Double)
-            For i As Integer = 1 To m_points.Count - 1 'expect BestPoint
-                For j As Integer = 0 To Me.m_points(0).Count - 1
-                    Dim temp = BestPoint(j) + ai_coeff * (Me.m_points(i)(j) - BestPoint(j))
-                    m_points(i)(j) = temp
-                Next
-                m_points(i).ReEvaluate()
+        Private Sub CalcShrink()
+            'Shrink without best
+            Dim temp = Util.clsUtil.GetIndexSortedEvalFromPoints(Me.m_points)
+            Dim best = Me.m_points(temp(0).Index)
+            For i = 1 To temp.Count - 1
+                Dim idx = temp(i).Index
+                Me.m_points(idx) = New clsPoint(Me.m_func, best + Shrink * (Me.m_points(idx) - best))
             Next
         End Sub
 #End Region

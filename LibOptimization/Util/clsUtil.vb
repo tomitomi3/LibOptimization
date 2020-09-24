@@ -616,6 +616,10 @@ Namespace Util
                 optimizers.Add(opt)
             End With
             With Nothing
+                Dim opt = New clsOptNelderMeadANMS(func)
+                optimizers.Add(opt)
+            End With
+            With Nothing
                 Dim opt = New clsOptNelderMead(func)
                 optimizers.Add(opt)
             End With
