@@ -152,7 +152,95 @@ Build and run the program. You should see the results in the console after a whi
 Check the results obtained.
 
 Are the results extremely large?
+
 Not getting enough iteration?
+
 etc.
 
+# Tips
 
+* Not using stopping criteria
+
+The implemented optimization algorithm has a stopping criterion. This stopping criterion is stopped when the best evaluate value is equal to 70% of the population.
+
+**IsUseCriterion** property is **false**.
+
+```csharp
+//Set objective function to optimizeclass
+var opt = new LibOptimization.Optimization.clsOptPSO(func);
+
+opt.IsUseCriterion = false; //not use criteria
+
+//Initialize(generate initial value)
+opt.Init();
+```
+
+* Evaluate optimization result per 100 iteration
+
+```csharp
+//Evaluate optimization result per 100 iteration
+while (opt.DoIteration(100) == false)
+{
+    clsUtil.DebugValue(opt, ai_isOutValue: false);
+}
+clsUtil.DebugValue(opt);
+```
+
+* Reset Iteration count
+
+```csharp
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var func = new SphereFunction();
+
+            //Set objective function to optimizeclass
+            var opt = new LibOptimization.Optimization.clsOptPSO(func);
+
+            //Initialize(generate initial value)
+            opt.Init();
+
+            //Do Optimization
+            opt.DoIteration();
+
+            //Get result
+            var result = opt.Result;
+
+            //output console
+            Console.WriteLine("Eval : {0}", result.Eval);
+            for (int i = 0; i < result.Count; i++)
+            {
+                Console.WriteLine("{0}", result[i]);
+            }
+
+            //Reset iteration
+            opt.Iteration = 0;
+            opt.DoIteration();
+
+            //Get result
+            var result = opt.Result;
+
+            //output console
+            Console.WriteLine("Eval : {0}", result.Eval);
+            for (int i = 0; i < result.Count; i++)
+            {
+                Console.WriteLine("{0}", result[i]);
+            }
+        }
+    }
+```
+
+* Saving and Restoring Optimization Calculations
+
+You can export and restore the optimization results in binary format. **BinaryFormatter** is used to achieve this functionality.
+
+**Save(Serialize)**
+```csharp
+LibOptimization.Util.clsUtil.SerializeOpt((absOptimization)opt, "saveOptimization.bin");
+```
+
+**Restore(DeSerialize)**
+```csharp
+var restoreOpt = LibOptimization.Util.clsUtil.DeSerializeOpt("saveOptimization.bin");
+```
