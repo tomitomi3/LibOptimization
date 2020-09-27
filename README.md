@@ -4,6 +4,8 @@
 
 <img src="https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png" width=30%>
 
+**[Added LibOptimization  tutorial.](/HowToUse.md)**
+
 LibOptimization
 ===============
 
