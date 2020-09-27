@@ -36,6 +36,9 @@ If you like, f you use LibOptimization for a publication, please cite it as:
 
 # Introduction
 
+LibOptimization has several optimization algorithms implemented.
+You design the objective function, you can use all the optimized algorithms implemented.
+
 ## Implement Optimization algorithm
 
 ### Require derivative algorithm
@@ -45,7 +48,8 @@ If you like, f you use LibOptimization for a publication, please cite it as:
 
 ### Derivative free algorithm (Direct search method)
 
-* Nelder Mead Method (Original ver, Wikipedia ver)
+* Nelder Mead Method / Simplex Method (Original paper ver)
+* Nelder Mead Method (Wikipedia ver. add inside contraction)
 * Adaptive Nelder-Mead Simplex method
 * Hooke and Jeeves of Pattern Search (Direct Search)
 
@@ -94,6 +98,8 @@ Typical Use
 1. Choose an optimization method and implement code.
 1. Do optimization.
 1. Get result and evaluate.
+
+See [this link](/HowToUse.md) for details
 
 # Sample code
 
