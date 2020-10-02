@@ -244,3 +244,20 @@ LibOptimization.Util.clsUtil.SerializeOpt((absOptimization)opt, "saveOptimizatio
 ```csharp
 var restoreOpt = LibOptimization.Util.clsUtil.DeSerializeOpt("saveOptimization.bin");
 ```
+
+* fix Random Number Generator
+
+Fix the seed of the random number generator. It should be used when you want reproducibility.
+
+```csharp
+//This RNG is used for random sequence etc.
+LibOptimization.Util.clsRandomXorshiftSingleton.GetInstance().SetDefaultSeed();
+
+var func = new RosenBrock(2);
+var opt = new LibOptimization.Optimization.clsOptPSO(func);
+//This RNG is used for generate itinial value, position etc.
+opt.Random = new LibOptimization.Util.clsRandomXorshift();
+
+//init
+opt.Init();
+```
