@@ -1,6 +1,6 @@
 # How to use LibOptimization
 
-This tutrial, We design a objective function to find the minimum value of the [2D Sphere function](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda#sphere-function). 
+This tutrial, You design a objective function to find the minimum value of the [2D Sphere function](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda#sphere-function). 
 This function is a unimodal convex function and has a global minimum value.
 
 **Optimization flow using LibOptimization**
@@ -14,7 +14,7 @@ This function is a unimodal convex function and has a global minimum value.
 ## preparation
 
 Create a console application and development language is C#.
-In this example, we use C#. You can also use VisualBasic.NET.
+In this example, You use C#. You can also use VisualBasic.NET.
 
 ## Step1. Get LibOptimization
 
@@ -63,20 +63,8 @@ absObjectiveFunction is the base class for objective functions in the LibOptimiz
         /// <returns></returns>
         public override List<double> Gradient(List<double> x)
         {
-            //for Optimization algorithm using gradient
-            var ret = new List<double>();
-            var dim = this.NumberOfVariable(); //or x.Count
-            for (int i = 0; i < dim; i++)
-            {
-                ret.Add(2.0 * x[i]);
-            }
-            return ret;
-
-            //If you don't use an optimization algorithm that uses derivatives, return null value.
+            //If you use the gradient method or Newton method, implement the derivative of the objective function. otherwise, return null.
             return null;
-
-            //Numerical differentiation of the objective function can be easily implemented using the following API.
-            return base.NumericDerivative(x);
         }
 
         /// <summary>
@@ -86,14 +74,8 @@ absObjectiveFunction is the base class for objective functions in the LibOptimiz
         /// <returns></returns>
         public override List<List<double>> Hessian(List<double> x)
         {
-            //for Optimization algorithm using Hessian matrix
-
-            //If you don't use an optimization algorithm that uses derivatives, return null value.
+            //If you use the Newton method, implement the derivative of the objective function. otherwise, return null.
             return null;
-
-            //Numerical Hessian matrix of the objective function can be easily implemented using the following API.
-            //Diagonal component stores the second derivative of the objective function.
-            return base.NumericHessianToDiagonal(x);
         }
 
         /// <summary>
@@ -105,6 +87,58 @@ absObjectiveFunction is the base class for objective functions in the LibOptimiz
             return 2;
         }
     }
+```
+
+**Gradient(List<double> x)**, **Hessian(List<double> x)** implement the derivative of the objective function. However, it is a little difficult to implement it.
+
+```csharp
+        public override List<double> Gradient(List<double> x)
+        {
+            //Differentiation of sphere function
+            // f(x) = x^2
+            // df/dx = 2 * x
+            var ret = new List<double>();
+            var dim = this.NumberOfVariable(); //or x.Count
+            for (int i = 0; i < dim; i++)
+            {
+                ret.Add(2.0 * x[i]);
+            }
+            return ret;
+        }
+        
+        public override List<List<double>> Hessian(List<double> x)
+        {
+            // Hessian of sphere function
+            // H =
+            // | d^2 f/d^2x1 df1/dx2     |
+            // | df2/dx1     d^2 f/d^2x2 |
+            var h = new List<List<double>>();
+            h.add( new List<double>());
+            h[0].add(0.0);
+            h[0].add(2.0);
+            h.add( new List<double>());
+            h[1].add(2.0);
+            h[1].add(0.0);
+            return h;
+        }
+```
+
+If the function is smooth, it can be approximated by using numerical differentiation.
+Numerical differentiation of the objective function can be easily implemented using the following API.
+
+Hessian uses Newton method only. Newton method can be optimized correctly only if the Hessian matrix is positive definite and the initial values are not near the solution.
+
+```csharp
+        public override List<double> Gradient(List<double> x)
+        {
+            return base.NumericDerivative(x);
+        }
+        
+        public override List<List<double>> Hessian(List<double> x)
+        {
+            //NumericHessianToDiagonal() stores the second derivative of the objective function in the diagonal component.
+            return base.NumericHessianToDiagonal(x);
+        }
 ```
 
 ## Step3. Choose an optimization method
