@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>LibOptimization</RootNamespace>
-    <TargetFrameworks>net35;net46;netcoreapp2.1;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net35;net46;net47;net471;net472;net48;netcoreapp2.1;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
     <Description>LibOptimization is a numerical optimization library that simplifies optimization using C#, VisualBasic.Net and other .NET Framework languages. Implementing optimization algorithm are Steepest Descent Method, Newton Method, Nelder Mead Method (Original ver, Wikipedia ver) ,Hooke and Jeeves of Pattern Search (Direct Search), Real-coded Genetic Algorithm(BLX-alpha and JGG, UNDX and JGG Simplex and JGG, REX and JGG, PCX and G3), Particle Swarm Optimization(Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO), Differential Evolution(DE/rand/1/bin, DE/best/1/bin, DE/rand/2/bin, DE/best/2/bin, JADE), Cuckoo Search(Standard), FireFry, Simulated Annealing, Evolution Strategy((1+1)-ES) and Hill Climbing.</Description>
     <Copyright>tomitomi3</Copyright>
     <Company>tomitomi3</Company>
@@ -37,6 +37,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="My Project\" />
   </ItemGroup>
 
 </Project>
