@@ -193,7 +193,7 @@ etc.
 
 # Tips
 
-* Not using stopping criteria
+## Not using stopping criteria
 
 The implemented optimization algorithm has a stopping criterion. This stopping criterion is stopped when the best evaluate value is equal to 70% of the population.
 
@@ -209,7 +209,7 @@ opt.IsUseCriterion = false; //not use criteria
 opt.Init();
 ```
 
-* Evaluate optimization result per 100 iteration
+## Evaluate optimization result per 100 iteration
 
 ```csharp
 //Evaluate optimization result per 100 iteration
@@ -220,7 +220,7 @@ while (opt.DoIteration(100) == false)
 clsUtil.DebugValue(opt);
 ```
 
-* Reset Iteration count
+## Reset Iteration count
 
 ```csharp
     class Program
@@ -265,21 +265,21 @@ clsUtil.DebugValue(opt);
     }
 ```
 
-* Saving and Restoring Optimization Calculations
+## Saving and Restoring Optimization Calculations
 
 You can export and restore the optimization results in binary format. **BinaryFormatter** is used to achieve this functionality.
 
-**Save(Serialize)**
+* Save(Serialize)**
 ```csharp
 LibOptimization.Util.clsUtil.SerializeOpt((absOptimization)opt, "saveOptimization.bin");
 ```
 
-**Restore(DeSerialize)**
+* Restore(DeSerialize)**
 ```csharp
 var restoreOpt = LibOptimization.Util.clsUtil.DeSerializeOpt("saveOptimization.bin");
 ```
 
-* fix Random Number Generator
+## fix Random Number Generator
 
 Fix the seed of the random number generator. It should be used when you want reproducibility.
 
