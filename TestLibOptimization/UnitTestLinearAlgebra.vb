@@ -1374,4 +1374,65 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         End With
     End Sub
 
+    <TestMethod()> Public Sub Mat_AddRow()
+        Dim v1 = New DenseVector(New Double() {50, 60, 70, 80, 90})
+        Dim v2 = New DenseVector(New Double() {40, 70, 90, 60, 100})
+
+        'error
+        With Nothing
+            Dim mat = New DenseMatrix()
+            Try
+                mat.AddCol(v1)
+                mat.AddRow(v1)
+
+                Assert.Fail("Error")
+            Catch ex As Exception
+                'OK
+            End Try
+        End With
+
+        'correct
+        With Nothing
+            Dim mat = New DenseMatrix()
+            Try
+                mat.AddRow(v1)
+                mat.AddRow(v1)
+                Assert.AreEqual(mat.RowCount, 2)
+                Assert.AreEqual(mat.ColCount, 5)
+            Catch ex As Exception
+                Assert.Fail("Error")
+            End Try
+        End With
+    End Sub
+
+    <TestMethod()> Public Sub Mat_AddCol()
+        Dim v1 = New DenseVector(New Double() {50, 60, 70, 80, 90})
+        Dim v2 = New DenseVector(New Double() {40, 70, 90, 60, 100})
+
+        With Nothing
+            Dim mat = New DenseMatrix()
+            Try
+                mat.AddRow(v1)
+                mat.AddCol(v1)
+
+                Assert.Fail("Error")
+            Catch ex As Exception
+                'OK
+            End Try
+        End With
+
+        'correct
+        With Nothing
+            Dim mat = New DenseMatrix()
+            Try
+                mat.AddCol(v1)
+                mat.AddCol(v1)
+                Assert.AreEqual(mat.RowCount, 5)
+                Assert.AreEqual(mat.ColCount, 2)
+            Catch ex As Exception
+                Assert.Fail("Error")
+            End Try
+        End With
+    End Sub
+
 End Class

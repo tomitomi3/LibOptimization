@@ -809,6 +809,41 @@
             Return sum
         End Function
 
+        ''' <summary>
+        ''' Add row vector
+        ''' </summary>
+        ''' <param name="vector"></param>
+        Public Sub AddRow(ByVal vector As DenseVector)
+            'check
+            For i = 0 To Me.Count - 1
+                If Me(i).Count <> vector.Count Then
+                    Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                End If
+            Next
+
+            Me.Add(vector)
+        End Sub
+
+        ''' <summary>
+        ''' Add col vector
+        ''' </summary>
+        ''' <param name="vector"></param>
+        Public Sub AddCol(ByVal vector As DenseVector)
+            If Me.Count = 0 Then
+                For Each val As Double In vector
+                    Me.Add(New DenseVector(New Double() {val}))
+                Next
+            Else
+                'check 行数とベクター要素数が同じかどうか
+                If Me.Count <> vector.Count Then
+                    Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                End If
+                For i = 0 To Me.RowCount - 1
+                    Me(i).Add(vector(i))
+                Next
+            End If
+        End Sub
+
 #End Region
 
 #Region "Public Func"
