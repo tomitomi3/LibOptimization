@@ -1230,8 +1230,12 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         Dim rng = New Random()
         For i = 2 To 10 - 1
             Dim dimNum = i
-            For j As Integer = 0 To 300 - 1
+            For j As Integer = 0 To 100 - 1
                 Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+
+                'add 対角成分
+                source += New DenseMatrix(dimNum, True)
+
                 Try
                     Dim matLUP = source.LUP()
                     If MathUtil.IsCloseToZero(matLUP.Det) = True Then
@@ -1253,7 +1257,8 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                     End If
                 Catch ex As Exception
                     source.PrintValue(name:="Source matrix")
-                    Assert.Fail("Solve fail: try={0}", j)
+                    Console.WriteLine(ex.Message)
+                    Assert.Fail("Exception. Solve fail: try={0}", j)
                 End Try
             Next
         Next

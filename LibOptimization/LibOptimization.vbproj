@@ -9,7 +9,7 @@
     <Version>1.12.5</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/tomitomi3/LibOptimization</PackageProjectUrl>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <SignAssembly>false</SignAssembly>
     <OptionStrict>On</OptionStrict>
@@ -19,7 +19,8 @@
     <PackageIcon>logo_liboptimization.png</PackageIcon>
     <RepositoryUrl>https://github.com/tomitomi3/LibOptimization</RepositoryUrl>
     <Product>LibOptimization</Product>
-    <PackageReleaseNotes>-some bugfix</PackageReleaseNotes>
+    <PackageReleaseNotes>-some bugfix
+-Renamed the my math library (clsEasyMatrix -&gt; DenseMatrix, clsEasyVector -&gt; DenseVector)</PackageReleaseNotes>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyVersion>1.12.5.0</AssemblyVersion>
   </PropertyGroup>
