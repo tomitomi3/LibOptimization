@@ -131,6 +131,7 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UnitTestMathUtil.vb" />
     <Compile Include="UnitTestLinearAlgebra.vb" />
     <Compile Include="UnitTestOther.vb" />
     <Compile Include="UnitTestLibOptimization.vb" />

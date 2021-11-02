@@ -130,6 +130,9 @@
     <Compile Include="..\TestLibOptimization\UnitTestLinearAlgebra.vb">
       <Link>UnitTestLinearAlgebra.vb</Link>
     </Compile>
+    <Compile Include="..\TestLibOptimization\UnitTestMathUtil.vb">
+      <Link>UnitTestMathUtil.vb</Link>
+    </Compile>
     <Compile Include="..\TestLibOptimization\UnitTestOther.vb">
       <Link>UnitTestOther.vb</Link>
     </Compile>
