@@ -43,28 +43,67 @@
         End Class
 
         ''' <summary>
+        ''' Calculate the variance(sample variance)
+        ''' </summary>
+        ''' <param name="v"></param>
+        ''' <returns></returns>
+        Public Shared Function Var(ByVal v As clsEasyVector) As Double
+            Return (v.SquareSum() / v.Count) - Math.Pow(v.Average(), 2)
+        End Function
+
+        ''' <summary>
+        ''' Calculate the covariance(sample variance) from two vectors.
+        ''' </summary>
+        ''' <param name="v1">vector a</param>
+        ''' <param name="v2">vector b</param>
+        ''' <returns></returns>
+        Public Shared Function CoVar(ByVal v1 As clsEasyVector, ByVal v2 As clsEasyVector) As Double
+            Dim ave_xy = v1.InnerProduct(v2) / v1.Count
+            Return ave_xy - v1.Average() * v2.Average()
+        End Function
+
+        ''' <summary>
+        ''' Calculate the standard deviation
+        ''' </summary>
+        ''' <param name="v">vector</param>
+        ''' <returns></returns>
+        Public Shared Function Stddev(ByVal v As clsEasyVector) As Double
+            Return Math.Sqrt(Var(v))
+        End Function
+
+        ''' <summary>
+        ''' Calculate the correlation
+        ''' </summary>
+        ''' <param name="v1"></param>
+        ''' <param name="v2"></param>
+        ''' <returns></returns>
+        Public Shared Function Cor(ByVal v1 As clsEasyVector, ByVal v2 As clsEasyVector) As Double
+            Return CoVar(v1, v2) / (Stddev(v1) * Stddev(v2))
+        End Function
+
+        ''' <summary>
         ''' Create random symmetric matrix(for Debug)
         ''' </summary>
         ''' <param name="size"></param>
         ''' <param name="rng"></param>
         ''' <returns></returns>
         Public Shared Function CreateRandomSymmetricMatrix(ByVal size As Integer,
-                                                           Optional ByVal rng As Random = Nothing,
-                                                           Optional ByVal isIncludeZero As Boolean = False,
-                                                           Optional ByVal isFloating As Boolean = False,
-                                                           Optional ByVal lower As Double = -10,
-                                                           Optional ByVal upper As Double = 10) As clsEasyMatrix
+                                                               Optional ByVal rng As Random = Nothing,
+                                                               Optional ByVal isIncludeZero As Boolean = False,
+                                                               Optional ByVal isFloating As Boolean = False,
+                                                               Optional ByVal lower As Double = -10,
+                                                               Optional ByVal upper As Double = 10) As clsEasyMatrix
             If rng Is Nothing Then
-                rng = New Util.clsRandomXorshift()
+                rng = New Random()
             End If
-            Dim matTemp = New MathUtil.clsEasyMatrix(size)
+            Dim matTemp = New clsEasyMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 1 + i To matTemp.Count - 1
                     Dim r As Double = 0.0
                     If isFloating = False Then
                         r = rng.Next(CInt(lower), CInt(upper))
                     Else
-                        r = Math.Abs(upper - lower) * rng.NextDouble() + lower
+                        r = System.Math.Abs(upper - lower) * rng.NextDouble() + lower
                     End If
 
                     If isIncludeZero = True Then
@@ -86,7 +125,7 @@
                 If isFloating = False Then
                     matTemp(i)(i) = rng.Next(CInt(lower), CInt(upper))
                 Else
-                    matTemp(i)(i) = Math.Abs(upper - lower) * rng.NextDouble() + lower
+                    matTemp(i)(i) = System.Math.Abs(upper - lower) * rng.NextDouble() + lower
                 End If
             Next
 
@@ -99,22 +138,23 @@
         ''' <param name="size"></param>
         ''' <returns></returns>
         Public Shared Function CreateRandomASymmetricMatrix(ByVal size As Integer,
-                                                           Optional ByVal rng As Random = Nothing,
-                                                           Optional ByVal isIncludeZero As Boolean = True,
-                                                           Optional ByVal isFloating As Boolean = False,
-                                                           Optional ByVal lower As Double = -10,
-                                                           Optional ByVal upper As Double = 10) As clsEasyMatrix
+                                                               Optional ByVal rng As Random = Nothing,
+                                                               Optional ByVal isIncludeZero As Boolean = True,
+                                                               Optional ByVal isFloating As Boolean = False,
+                                                               Optional ByVal lower As Double = -10,
+                                                               Optional ByVal upper As Double = 10) As clsEasyMatrix
             If rng Is Nothing Then
-                rng = New Util.clsRandomXorshift()
+                'rng = New Util.clsRandomXorshift()
+                rng = New Random()
             End If
-            Dim matTemp = New MathUtil.clsEasyMatrix(size)
+            Dim matTemp = New clsEasyMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 0 To matTemp.Count - 1
                     Dim r As Double = 0.0
                     If isFloating = False Then
                         r = rng.Next(CInt(lower), CInt(upper))
                     Else
-                        r = Math.Abs(upper - lower) * rng.NextDouble() + lower
+                        r = System.Math.Abs(upper - lower) * rng.NextDouble() + lower
                     End If
 
                     If isIncludeZero = True Then
@@ -143,7 +183,7 @@
         ''' <param name="eps">default:1E-8</param>
         ''' <returns></returns>
         Public Shared Function IsNearyEqualMatrix(ByVal matA As clsEasyMatrix, ByVal matB As clsEasyMatrix,
-                                                  Optional ByVal eps As Double = 0.00000001) As Boolean
+                                                      Optional ByVal eps As Double = 0.00000001) As Boolean
             Try
                 For i As Integer = 0 To matA.RowCount - 1
                     For j As Integer = 0 To matA.ColCount - 1
@@ -168,7 +208,7 @@
         ''' <param name="eps">default:1E-8</param>
         ''' <returns></returns>
         Public Shared Function IsNearyEqualVector(ByVal vecA As clsEasyVector, ByVal vecB As clsEasyVector,
-                                                  Optional ByVal eps As Double = 0.00000001) As Boolean
+                                                      Optional ByVal eps As Double = 0.00000001) As Boolean
             Try
                 For i As Integer = 0 To vecA.Count - 1
                     Dim tempValA = vecA(i)
@@ -217,7 +257,7 @@
         ''' <param name="eps">2.20E-16</param>
         ''' <returns></returns>
         Public Shared Function IsCloseToZero(ByVal value As Double, Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron) As Boolean
-            If Math.Abs(value + eps) <= eps Then
+            If System.Math.Abs(value + eps) <= eps Then
                 Return True
             Else
                 Return False
@@ -232,7 +272,7 @@
         ''' <param name="eps"></param>
         ''' <returns></returns>
         Public Shared Function IsCloseToValues(ByVal value1 As Double, ByVal value2 As Double, Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron) As Boolean
-            If Math.Abs(value1 - value2) < eps Then
+            If System.Math.Abs(value1 - value2) < eps Then
                 Return True
             Else
                 Return False
@@ -281,46 +321,44 @@
         End Sub
 
         ''' <summary>
-        ''' Create Variane Co-Varianve Matrix
+        ''' Create Covariance Matrix
         ''' </summary>
         ''' <param name="mat"></param>
         ''' <param name="isRowOrder">True:The data sequence is "row".</param>
-        ''' <param name="isUnbalanceVariance">use UnbalanceVariance</param>
+        ''' <param name="isUnbalanceVariance">use UnbalanceVariance. default is true</param>
         ''' <returns></returns>
-        Public Shared Function CreateVarCoVarMat(ByRef mat As clsEasyMatrix,
-                                                 ByVal isRowOrder As Boolean,
-                                                 Optional ByVal isUnbalanceVariance As Boolean = True) As clsEasyMatrix
+        Public Shared Function CreateCovarianceMatrix(ByRef mat As clsEasyMatrix,
+                                                      ByVal isRowOrder As Boolean,
+                                                      Optional ByVal isUnbalanceVariance As Boolean = True) As clsEasyMatrix
+            Dim var_covar As clsEasyMatrix = Nothing
+
             If isRowOrder = True Then
                 'de-mean
-                Dim avev = mat.AverageVector(True)
+                Dim avev = mat.AverageVector(clsEasyVector.VectorDirection.ROW)
                 Dim mat_demean As clsEasyMatrix = mat - avev
 
                 'E[X.T * X] -> 1/N[X.T * X]
                 Dim gramMatrix = mat_demean.T * mat_demean
-                Dim var_covar As clsEasyMatrix = Nothing
                 If isUnbalanceVariance Then
                     var_covar = gramMatrix / (mat.RowCount - 1)
                 Else
                     var_covar = gramMatrix / mat.RowCount
                 End If
-
-                Return var_covar
             Else
                 'de-mean
-                Dim avev = mat.AverageVector(False)
+                Dim avev = mat.AverageVector(clsEasyVector.VectorDirection.COL)
                 Dim mat_demean As clsEasyMatrix = mat - avev
 
                 'E[X.T * X] -> 1/N[X.T * X]
                 Dim gramMatrix = mat_demean * mat_demean.T
-                Dim var_covar As clsEasyMatrix = Nothing
                 If isUnbalanceVariance Then
                     var_covar = gramMatrix / (mat.RowCount - 1)
                 Else
                     var_covar = gramMatrix / mat.RowCount
                 End If
-
-                Return var_covar
             End If
+
+            Return var_covar
         End Function
 
         ''' <summary>
@@ -330,15 +368,15 @@
         ''' <param name="valB"></param>
         ''' <returns></returns>
         Public Shared Function PythagoreanAddition(ByVal valA As Double, ByVal valB As Double) As Double
-            Dim a = Math.Abs(valA)
-            Dim b = Math.Abs(valB)
+            Dim a = System.Math.Abs(valA)
+            Dim b = System.Math.Abs(valB)
 
             If a > b Then
-                Return a * Math.Sqrt(1.0 + (b / a) * (b / a))
+                Return a * System.Math.Sqrt(1.0 + (b / a) * (b / a))
             ElseIf b = 0.0 Then
                 Return 0.0
             Else
-                Return b * Math.Sqrt(1.0 + (a / b) * (a / b))
+                Return b * System.Math.Sqrt(1.0 + (a / b) * (a / b))
             End If
         End Function
 
@@ -349,8 +387,8 @@
         ''' <param name="valB"></param>
         ''' <returns></returns>
         Public Shared Function PythagoreanAddition_MolerMorrison(ByVal valA As Double, ByVal valB As Double) As Double
-            Dim a = Math.Abs(valA)
-            Dim b = Math.Abs(valB)
+            Dim a = System.Math.Abs(valA)
+            Dim b = System.Math.Abs(valB)
 
             If b = 0.0 Then
                 Return 0.0
@@ -361,7 +399,7 @@
             End If
 
             For i = 0 To 4 - 1
-                Dim s = Math.Pow(b / a, 2)
+                Dim s = System.Math.Pow(b / a, 2)
                 s /= 4.0 + s
                 a += 2.0 * a * s
                 b *= s
@@ -371,20 +409,19 @@
         End Function
 
         ''' <summary>
-        ''' set identify matrix
+        ''' 相対誤差 | target - true | / target
         ''' </summary>
-        ''' <param name="mat"></param>
-        Public Shared Sub SetIdentifyMatrix(ByRef mat As clsEasyMatrix)
-            Dim n_dim = mat.RowCount
-            For i = 0 To n_dim - 1
-                For j = 0 To n_dim - 1
-                    If i = j Then
-                        mat(i)(j) = 1.0
-                    Else
-                        mat(i)(j) = 0
-                    End If
-                Next
-            Next
-        End Sub
+        ''' <param name="trueValue"></param>
+        ''' <param name="targetValue"></param>
+        ''' <returns></returns>
+        Public Shared Function RelativeError(ByVal trueValue As Double, ByVal targetValue As Double) As Double
+            If clsMathUtil.IsCloseToValues(trueValue, targetValue) Then
+                Return 0
+            Else
+                '分母が0の場合はNaN
+                Return Math.Abs(targetValue - trueValue) / targetValue
+            End If
+        End Function
     End Class
+
 End Namespace

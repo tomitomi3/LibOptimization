@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>LibOptimization</RootNamespace>
-    <TargetFrameworks>net35;net46;net47;net471;net472;net48;netcoreapp2.1;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net35;net48;netcoreapp2.1;netcoreapp3.0;netcoreapp3.1;net5.0</TargetFrameworks>
     <Description>LibOptimization is a numerical optimization library that simplifies optimization using C#, VisualBasic.Net and other .NET Framework languages. Implementing optimization algorithm are Steepest Descent Method, Newton Method, Nelder Mead Method (Original ver, Wikipedia ver) ,Hooke and Jeeves of Pattern Search (Direct Search), Real-coded Genetic Algorithm(BLX-alpha and JGG, UNDX and JGG Simplex and JGG, REX and JGG, PCX and G3), Particle Swarm Optimization(Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO), Differential Evolution(DE/rand/1/bin, DE/best/1/bin, DE/rand/2/bin, DE/best/2/bin, JADE), Cuckoo Search(Standard), FireFry, Simulated Annealing, Evolution Strategy((1+1)-ES) and Hill Climbing.</Description>
     <Copyright>tomitomi3</Copyright>
     <Company>tomitomi3</Company>
@@ -33,9 +33,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="logo_liboptimization.png">
+    <None Include="..\github_pic\logo_liboptimization.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="My Project\Settings.Designer.vb">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="My Project\Settings.settings">
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
   </ItemGroup>
 

@@ -6,7 +6,6 @@
     ''' Inherits List(of double)
     ''' </remarks>
     <Serializable>
-    <DebuggerDisplay("Count={Me.Count}")>
     Public Class clsEasyVector : Inherits List(Of Double)
         ''' <summary>
         ''' Direction( RowVector or ColVector )
@@ -28,9 +27,9 @@
         ''' Default construcotr
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub New()
-            'nop
-        End Sub
+        'Public Sub New()
+        '    'nop
+        'End Sub
 
         ''' <summary>
         ''' Copy constructor
@@ -71,6 +70,16 @@
             Me.AddRange(ai_val)
             Me.m_direcition = ai_direction
         End Sub
+
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="args">double[]</param>
+        Public Sub New(ParamArray args As Double())
+            Me.AddRange(args)
+            Me.m_direcition = VectorDirection.ROW
+        End Sub
+
 #End Region
 
 #Region "Property"
@@ -113,7 +122,7 @@
         ''' <param name="ai_ar"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' double() -> clsShoddyVector
+        ''' double() -> vector class
         ''' </remarks>
         Public Shared Widening Operator CType(ByVal ai_ar() As Double) As clsEasyVector
             Return New clsEasyVector(ai_ar)
@@ -158,7 +167,7 @@
         End Operator
 
         ''' <summary>
-        ''' Product(scalr * vector)
+        ''' Product(scalar * vector)
         ''' </summary>
         ''' <param name="ai_source"></param>
         ''' <param name="ai_dest"></param>
@@ -220,21 +229,21 @@
                 '------------------------------------------------------------------
                 For i = 0 To n - 1
                     For j = 0 To n - 1
-                                                     ret(j)(i) = ai_source(i) * ai_dest(j)
-                                                 Next
+                        ret(j)(i) = ai_source(i) * ai_dest(j)
+                    Next
                 Next
 #Else
-                '------------------------------------------------------------------
-                '.net 4.0
-                '------------------------------------------------------------------
-                'using Paralle .NET4
-                'Dim pOption = New Threading.Tasks.ParallelOptions()
-                Threading.Tasks.Parallel.For(0, n,
-                                             Sub(i)
-                                                 For j = 0 To n - 1
-                                                     ret(j)(i) = ai_source(i) * ai_dest(j)
-                                                 Next
-                                             End Sub)
+            '------------------------------------------------------------------
+            '.net 4.0
+            '------------------------------------------------------------------
+            'using Paralle .NET4
+            'Dim pOption = New Threading.Tasks.ParallelOptions()
+            Threading.Tasks.Parallel.For(0, n,
+                                         Sub(i)
+                                             For j = 0 To n - 1
+                                                 ret(j)(i) = ai_source(i) * ai_dest(j)
+                                             Next
+                                         End Sub)
 #End If
                 Return ret
             End If
@@ -283,7 +292,7 @@
         Public Shared Operator ^(ByVal ai_source As clsEasyVector, ByVal ai_dest As Double) As clsEasyVector
             Dim ret As New clsEasyVector(ai_source)
             For i As Integer = 0 To ret.Count - 1
-                ret(i) = Math.Pow(ai_source(i), ai_dest)
+                ret(i) = System.Math.Pow(ai_source(i), ai_dest)
             Next
             Return ret
         End Operator
@@ -369,22 +378,34 @@
         ''' For Debug
         ''' </summary>
         ''' <param name="ai_preci"></param>
-        ''' <remarks></remarks>
-        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 4, Optional ByVal name As String = "")
+        ''' <param name="name"></param>
+        ''' <param name="isScientificNotation"></param>
+        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 4,
+                          Optional ByVal name As String = "",
+                          Optional isScientificNotation As Boolean = False)
             Dim str As New System.Text.StringBuilder()
             If String.IsNullOrEmpty(name) = False Then
-                str.Append(String.Format("{0} =", name) & Environment.NewLine)
+                str.Append(String.Format("{0} {1}=", name, Me.Count) & Environment.NewLine)
             Else
-                str.Append("Vec =" & Environment.NewLine)
+                str.Append(String.Format("Vec {0} =", Me.Count) & Environment.NewLine)
             End If
             If Me.m_direcition = VectorDirection.ROW Then
                 For i As Integer = 0 To Me.Count - 1
-                    str.Append(Me(i).ToString("F" & ai_preci.ToString()) & vbTab)
+                    If isScientificNotation = False Then
+                        str.Append(Me(i).ToString("F" & ai_preci.ToString()) & vbTab)
+                    Else
+                        str.Append(Me(i).ToString("G" & ai_preci.ToString()) & vbTab)
+                    End If
                 Next
                 str.AppendLine("")
             Else
                 For i As Integer = 0 To Me.Count - 1
-                    str.Append(Me(i).ToString("F" & ai_preci.ToString()))
+
+                    If isScientificNotation = False Then
+                        str.Append(Me(i).ToString("F" & ai_preci.ToString()))
+                    Else
+                        str.Append(Me(i).ToString("G" & ai_preci.ToString()))
+                    End If
                     str.AppendLine("")
                 Next
             End If
@@ -405,7 +426,7 @@
         Public Function NormL1() As Double
             Dim ret As Double = 0.0
             For Each value As Double In Me
-                ret += Math.Abs(value)
+                ret += System.Math.Abs(value)
             Next
             Return ret
         End Function
@@ -423,7 +444,7 @@
             For Each val As Double In Me
                 ret += val * val
             Next
-            Return Math.Sqrt(ret)
+            Return System.Math.Sqrt(ret)
         End Function
 
         ''' <summary>
@@ -515,27 +536,29 @@
         End Function
 
         ''' <summary>
-        ''' Product(Outer product, cross product)
+        ''' Product(Cross product)
         ''' </summary>
         ''' <param name="ai_source"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function OuterProduct(ByVal ai_source As clsEasyVector) As clsEasyVector
+        Public Function CrossProduct(ByVal ai_source As clsEasyVector) As clsEasyVector
+            'https://en.wikipedia.org/wiki/Cross_product
+
             If IsSameDimension(ai_source, Me) = False Then
                 Throw New clsException(clsException.Series.DifferElementNumber)
             End If
 
             Dim ret = New clsEasyVector(ai_source.Count)
             If ai_source.Count = 0 Then
-                Throw New clsException(clsException.Series.NotComputable, "OuterProduct")
+                Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 1 Then
-                Throw New clsException(clsException.Series.NotComputable, "OuterProduct")
+                Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 2 Then
-                Throw New clsException(clsException.Series.NotComputable, "2 dim outerproduct is scalar. this value is area.")
+                Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 3 Then
                 ret(0) = Me(1) * ai_source(2) - Me(2) * ai_source(1)
-                ret(1) = Me(2) * ai_source(0) - Me(2) * ai_source(2)
-                ret(2) = Me(0) * ai_source(1) - Me(2) * ai_source(0)
+                ret(1) = Me(2) * ai_source(0) - Me(0) * ai_source(2)
+                ret(2) = Me(0) * ai_source(1) - Me(1) * ai_source(0)
             Else
                 Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
             End If
@@ -580,8 +603,8 @@
         ''' <param name="isCheckDirection"></param>
         ''' <returns></returns>
         Private Shared Function IsSameDimension(ByVal ai_vec1 As clsEasyVector,
-                                                ByVal ai_vec2 As clsEasyVector,
-                                                Optional ByVal isCheckDirection As Boolean = False) As Boolean
+                                            ByVal ai_vec2 As clsEasyVector,
+                                            Optional ByVal isCheckDirection As Boolean = False) As Boolean
             If ai_vec1 Is Nothing Then
                 Return False
             End If

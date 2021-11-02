@@ -25,9 +25,9 @@ Namespace Optimization
         ''' Default constructor
         ''' </summary>
         ''' <remarks></remarks>
-        Private Sub New()
-            'nop
-        End Sub
+        'Private Sub New()
+        '    'nop
+        'End Sub
 
         ''' <summary>
         ''' copy constructor

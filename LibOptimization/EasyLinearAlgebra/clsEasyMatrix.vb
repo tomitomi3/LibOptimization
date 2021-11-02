@@ -1,173 +1,12 @@
 ﻿Namespace MathUtil
     ''' <summary>
-    ''' store LU decomposition with solver
-    ''' </summary>
-    <Serializable>
-    Public Class LU
-        ''' <summary>Pivot matrix</summary>
-        Public Property P As clsEasyMatrix = Nothing
-
-        ''' <summary>Lower matrix</summary>
-        Public Property L As clsEasyMatrix = Nothing
-
-        ''' <summary>Upper matrix</summary>
-        Public Property U As clsEasyMatrix = Nothing
-
-        ''' <summary>Determinant</summary>
-        Public Property Det As Double = 0.0
-
-        ''' <summary>pivto row info</summary>
-        Public Property PivotRow As Integer() = Nothing
-
-        ''' <summary>
-        ''' default constructtor
-        ''' </summary>
-        Private Sub New()
-        End Sub
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        ''' <param name="matP"></param>
-        ''' <param name="matL"></param>
-        ''' <param name="matU"></param>
-        ''' <param name="det"></param>
-        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double)
-            Me.P = matP
-            Me.L = matL
-            Me.U = matU
-            Me.Det = det
-        End Sub
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        ''' <param name="matP"></param>
-        ''' <param name="matL"></param>
-        ''' <param name="matU"></param>
-        ''' <param name="det"></param>
-        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double, ByRef p() As Integer)
-            Me.P = matP
-            Me.L = matL
-            Me.U = matU
-            Me.Det = det
-            Me.PivotRow = p
-        End Sub
-
-        ''' <summary>
-        ''' solve(Ax=b)
-        ''' </summary>
-        ''' <param name="b"></param>
-        ''' <returns></returns>
-        Public Function Solve(ByRef b As clsEasyVector) As clsEasyVector
-            Return Me.Solve(Me.P, Me.L, Me.U, Me.PivotRow, b)
-        End Function
-
-        ''' <summary>
-        ''' solve(Ax=b)
-        ''' </summary>
-        ''' <param name="matP">pivot matrix(LU decomposition of A matrix)</param>
-        ''' <param name="matL">lower triangle matrix(LU decomposition of A matrix)</param>
-        ''' <param name="matU">upper triangle matrix(LU decomposition of A matrix)</param>
-        ''' <param name="pivotRow"></param>
-        ''' <param name="vecB"></param>
-        ''' <returns>x</returns>
-        Private Function Solve(ByRef matP As clsEasyMatrix,
-                               ByRef matL As clsEasyMatrix,
-                               ByRef matU As clsEasyMatrix,
-                               ByRef pivotRow() As Integer,
-                               ByRef vecB As clsEasyVector) As clsEasyVector
-            Dim n = matP.ColCount
-            Dim x = New clsEasyVector(n)
-            Dim y = New clsEasyVector(n)
-
-            'transopose
-            'Dim b = vecB * matP
-
-            For i = 0 To n - 1
-                Dim s = 0.0
-                Dim j As Integer = 0
-                For j = 0 To i - 1
-                    s += matL(i)(j) * y(j)
-                Next
-
-                'y(j) = b(i) - s
-                y(j) = vecB(pivotRow(i)) - s
-            Next
-
-            For i = n - 1 To 0 Step -1
-                Dim s = 0.0
-                For k = i + 1 To n - 1
-                    s += matU(i)(k) * x(k)
-                Next
-                x(i) = (y(i) - s) / matU(i)(i)
-            Next
-
-            Return x
-        End Function
-    End Class
-
-    ''' <summary>
-    ''' store SVD decomposition
-    ''' </summary>
-    <Serializable>
-    Public Class SVD
-        ''' <summary></summary>
-        Public Property S As clsEasyMatrix = Nothing
-
-        ''' <summary></summary>
-        Public Property V As clsEasyVector = Nothing
-
-        ''' <summary></summary>
-        Public Property D As clsEasyMatrix = Nothing
-
-        Private Sub New()
-        End Sub
-
-        Public Sub New(ByRef matS As clsEasyMatrix, ByRef matV As clsEasyVector, ByRef matD As clsEasyMatrix)
-            Me.S = matS
-            Me.V = matV
-            Me.D = matD
-        End Sub
-    End Class
-
-    ''' <summary>
-    ''' store Eigen values, vector
-    ''' </summary>
-    <Serializable>
-    Public Class Eigen
-        ''' <summary></summary>
-        Public Property EigenValue As clsEasyVector = Nothing
-
-        ''' <summary></summary>
-        Public Property EigenVector As clsEasyMatrix = Nothing
-
-        ''' <summary></summary>
-        Public Property IsConversion As Boolean = Nothing
-
-        Private Sub New()
-        End Sub
-
-        Public Sub New(ByRef eigeValue As clsEasyVector, ByRef eigenVec As clsEasyMatrix)
-            Me.EigenValue = eigeValue
-            Me.EigenVector = eigenVec
-        End Sub
-
-        Public Sub New(ByRef eigeValue As clsEasyVector, ByRef eigenVec As clsEasyMatrix, ByVal isconversion As Boolean)
-            Me.EigenValue = eigeValue
-            Me.EigenVector = eigenVec
-            Me.IsConversion = isconversion
-        End Sub
-    End Class
-
-    ''' <summary>
     ''' Matrix class
     ''' </summary>
     ''' <remarks>
     ''' Inherits List(Of List(Of Double))
     ''' </remarks>
+    ''' delete DebuggerDisplay
     <Serializable>
-    <DebuggerDisplay("Row={RowCount()}, Col={ColCount()}")>
     Public Class clsEasyMatrix : Inherits List(Of List(Of Double))
         Public Const SAME_ZERO As Double = 2.0E-50 '2.0*10^-50
         Public Const MachineEpsiron As Double = 0.000000000000000222 ' 2.20*E-16 = 2.20*10^-16
@@ -177,9 +16,9 @@
         ''' Default construcotr
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub New()
-            'nop
-        End Sub
+        'Public Sub New()
+        '    'nop
+        'End Sub
 
         ''' <summary>
         ''' Copy constructor
@@ -250,7 +89,7 @@
         ''' </summary>
         ''' <param name="ai_val"></param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_val()() As Double)
+        Public Sub New(ParamArray ai_val As Double()())
             For i As Integer = 0 To ai_val.Length - 1
                 Me.Add(New clsEasyVector(ai_val(i)))
             Next
@@ -306,6 +145,20 @@
         End Property
 
         ''' <summary>
+        ''' DenseMatrix -> double[][]
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function ToArrayMulti() As Double()()
+            Dim ret = New Double(Me.Count - 1)() {}
+
+            For i As Integer = 0 To Me.Count - 1
+                ret(i) = Me(i).ToArray()
+            Next
+
+            Return ret
+        End Function
+
+        ''' <summary>
         ''' Get Collumn count
         ''' </summary>
         ''' <returns></returns>
@@ -345,11 +198,11 @@
         ''' <remarks></remarks>
         Public Property Column(ByVal ai_colIndex As Integer) As clsEasyVector
             Get
-                Dim temp(Me.RowCount - 1) As Double
-                For i As Integer = 0 To temp.Length - 1
-                    temp(i) = Me.Row(i)(ai_colIndex)
+                '            Dim temp(Me.RowCount - 1) As Double
+                Dim tempVector As New clsEasyVector(Me.RowCount)
+                For i As Integer = 0 To tempVector.Count - 1
+                    tempVector(i) = Me.Row(i)(ai_colIndex)
                 Next
-                Dim tempVector As New clsEasyVector(temp)
                 tempVector.Direction = clsEasyVector.VectorDirection.COL
                 Return tempVector
             End Get
@@ -552,21 +405,21 @@
 
             Throw New clsException(clsException.Series.NotComputable, "Matrix * Matrix")
 #Else
-            '------------------------------------------------------------------
-            '.net 4.0
-            '------------------------------------------------------------------
-            'using Paralle .NET4
-            'Dim pOption = New Threading.Tasks.ParallelOptions()
-            '#If DEBUG Then
-            '            pOption.MaxDegreeOfParallelism = 1
-            '#End If
+        '------------------------------------------------------------------
+        '.net 4.0
+        '------------------------------------------------------------------
+        'using Paralle .NET4
+        'Dim pOption = New Threading.Tasks.ParallelOptions()
+        '#If DEBUG Then
+        '            pOption.MaxDegreeOfParallelism = 1
+        '#End If
 
-            If IsSameDimension(ai_source, ai_dest) = True Then
-                '[M*M] X [M*M]
-                Dim size = ai_source.RowCount
-                Dim ret As New clsEasyMatrix(size)
+        If IsSameDimension(ai_source, ai_dest) = True Then
+            '[M*M] X [M*M]
+            Dim size = ai_source.RowCount
+            Dim ret As New clsEasyMatrix(size)
 
-                Threading.Tasks.Parallel.For(0, size,
+            Threading.Tasks.Parallel.For(0, size,
                                              Sub(i)
                                                  For j As Integer = 0 To size - 1
                                                      For k As Integer = 0 To size - 1
@@ -576,13 +429,13 @@
                                                      Next
                                                  Next
                                              End Sub)
-                Return ret
-            ElseIf ai_source.ColCount = ai_dest.RowCount Then
-                '[M*N] X [N*O]
-                Dim rowSize = ai_source.RowCount
-                Dim ret As New clsEasyMatrix(ai_source.RowCount, ai_dest.ColCount)
+            Return ret
+        ElseIf ai_source.ColCount = ai_dest.RowCount Then
+            '[M*N] X [N*O]
+            Dim rowSize = ai_source.RowCount
+            Dim ret As New clsEasyMatrix(ai_source.RowCount, ai_dest.ColCount)
 
-                Threading.Tasks.Parallel.For(0, rowSize,
+            Threading.Tasks.Parallel.For(0, rowSize,
                                              Sub(i)
                                                  For j As Integer = 0 To ret.ColCount - 1
                                                      Dim temp As Double = 0.0
@@ -592,10 +445,10 @@
                                                      ret(i)(j) = temp
                                                  Next
                                              End Sub)
-                Return ret
-            End If
+            Return ret
+        End If
 
-            Throw New clsException(clsException.Series.NotComputable, "Matrix * Matrix")
+        Throw New clsException(clsException.Series.NotComputable, "Matrix * Matrix")
 #End If
         End Operator
 
@@ -640,7 +493,7 @@
             Next
             Return ret
 #Else
-            Threading.Tasks.Parallel.For(0, vSize,
+        Threading.Tasks.Parallel.For(0, vSize,
                                              Sub(i)
                                                  Dim sum As Double = 0.0
                                                  For j As Integer = 0 To mat.ColCount - 1
@@ -648,7 +501,7 @@
                                                  Next
                                                  ret(i) = sum
                                              End Sub)
-            Return ret
+        Return ret
 #End If
         End Operator
 
@@ -691,7 +544,7 @@
             Next
             Return ret
 #Else
-            Threading.Tasks.Parallel.For(0, vSize,
+        Threading.Tasks.Parallel.For(0, vSize,
                                              Sub(j)
                                                  Dim sum As Double = 0.0
                                                  For i As Integer = 0 To mat.RowCount - 1
@@ -699,7 +552,7 @@
                                                  Next
                                                  ret(j) = sum
                                              End Sub)
-            Return ret
+        Return ret
 #End If
         End Operator
 
@@ -765,19 +618,39 @@
                 ret.Row(rowIndex) = Me.Column(rowIndex)
             Next
 #Else
-            '------------------------------------------------------------------
-            '.net 4.0
-            '------------------------------------------------------------------
-            'using Paralle .NET4
-            'Dim pOption = New Threading.Tasks.ParallelOptions()
-            Threading.Tasks.Parallel.For(0, ret.RowCount,
-                                             Sub(rowIndex)
-                                                 ret.Row(rowIndex) = Me.Column(rowIndex)
-                                             End Sub)
+        '------------------------------------------------------------------
+        '.net 4.0
+        '------------------------------------------------------------------
+        'using Paralle .NET4
+        'Dim pOption = New Threading.Tasks.ParallelOptions()
+        Parallel.For(0, ret.RowCount,
+            Sub(rowIndex)
+                ret.Row(rowIndex) = Me.Column(rowIndex)
+            End Sub)
 #End If
 
             Return ret
         End Function
+
+        ''' <summary>
+        ''' set Identify matrix
+        ''' </summary>
+        Public Sub SetIdentifyMatrix()
+            Dim n_dim = Me.RowCount
+            Dim m_dim = Me.ColCount
+            If m_dim <> n_dim Then
+                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+            End If
+            For i = 0 To n_dim - 1
+                For j = 0 To n_dim - 1
+                    If i = j Then
+                        Me(i)(j) = 1.0
+                    Else
+                        Me(i)(j) = 0
+                    End If
+                Next
+            Next
+        End Sub
 
         ''' <summary>
         ''' Convert to a matrix with only diagonal values
@@ -815,17 +688,24 @@
         ''' For Debug
         ''' </summary>
         ''' <param name="ai_preci"></param>
-        ''' <remarks></remarks>
-        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 1, Optional ByVal name As String = "")
+        ''' <param name="name"></param>
+        ''' <param name="isScientificNotation"></param>
+        Public Sub PrintValue(Optional ByVal ai_preci As Integer = 4,
+                              Optional ByVal name As String = "",
+                              Optional isScientificNotation As Boolean = False)
             Dim str As New System.Text.StringBuilder()
             If String.IsNullOrEmpty(name) = False Then
-                str.Append(String.Format("{0} =", name) & Environment.NewLine)
+                str.Append(String.Format("{0} {1}x{2} =", name, Me.RowCount, Me.ColCount) & Environment.NewLine)
             Else
-                str.Append("Mat =" & Environment.NewLine)
+                str.Append(String.Format("Mat {0}x{1} =", Me.RowCount, Me.ColCount) & Environment.NewLine)
             End If
             For Each vec As clsEasyVector In Me
                 For i As Integer = 0 To vec.Count - 1
-                    str.Append(vec(i).ToString("F" & ai_preci.ToString()) & vbTab)
+                    If isScientificNotation = False Then
+                        str.Append(vec(i).ToString("F" & ai_preci.ToString()) & vbTab)
+                    Else
+                        str.Append(vec(i).ToString("G" & ai_preci.ToString()) & vbTab)
+                    End If
                 Next
                 str.Append(Environment.NewLine)
             Next
@@ -889,7 +769,7 @@
             Dim retMaxabs As Double = 0.0
             For Each vec In Me
                 For Each value In vec
-                    Dim absValue = Math.Abs(value)
+                    Dim absValue = System.Math.Abs(value)
                     If retMaxabs > absValue Then
                         retMaxabs = absValue
                     End If
@@ -942,7 +822,7 @@
             Dim col = Me.ColCount
             For i = 0 To row - 1
                 For j = 0 To col - 1
-                    ret(i)(j) = Math.Sqrt(Me(i)(j))
+                    ret(i)(j) = System.Math.Sqrt(Me(i)(j))
                 Next
             Next
             Return ret
@@ -1002,13 +882,13 @@
         ''' <summary>
         ''' Average vector
         ''' </summary>
-        ''' <param name="isRowOrder">True:data sequence is "row".</param>
+        ''' <param name="vectorDirection"></param>
         ''' <returns></returns>
-        Public Function AverageVector(ByVal isRowOrder As Boolean) As clsEasyVector
+        Public Function AverageVector(ByVal vectorDirection As clsEasyVector.VectorDirection) As clsEasyVector
             Dim row = Me.RowCount
             Dim col = Me.ColCount
             Dim ret As clsEasyVector = Nothing
-            If isRowOrder Then
+            If vectorDirection = clsEasyVector.VectorDirection.ROW Then
                 ret = New clsEasyVector(col, clsEasyVector.VectorDirection.COL)
                 For j = 0 To col - 1
                     For i = 0 To row - 1
@@ -1067,11 +947,20 @@
         ''' <summary>
         ''' Inverse
         ''' </summary>
-        ''' <param name="same_zero_value">optional:2.0E-50</param>
+        ''' <param name="eps">default 2.0E-50</param>
+        ''' <param name="isUsingLUDecomposition"></param>
+        ''' <param name="isForceInverse"></param>
         ''' <returns></returns>
-        Public Function Inverse(Optional ByVal same_zero_value As Double = SAME_ZERO) As clsEasyMatrix
+        Public Function Inverse(Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron,
+                                Optional ByVal isUsingLUDecomposition As Boolean = False,
+                                Optional ByVal isForceInverse As Boolean = False
+                                ) As clsEasyMatrix
             If Me.RowCount <> Me.ColCount Then
                 Return New clsEasyMatrix(0)
+            End If
+
+            If isForceInverse = True Then
+                eps = Double.Epsilon
             End If
 
             Dim n As Integer = Me.RowCount
@@ -1080,13 +969,13 @@
             If n = 0 Then
                 'nop
             ElseIf n = 1 Then
-                If clsMathUtil.IsCloseToZero(source(0)(0)) = True Then
+                If clsMathUtil.IsCloseToZero(source(0)(0), eps) = True Then
                     Throw New clsException(clsException.Series.NotComputable, "Inverse 1x1")
                 End If
                 retInverse(0)(0) = 1.0 / source(0)(0)
-            ElseIf n = 2 Then
-                Dim det = Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0)
-                If clsMathUtil.IsCloseToZero(det) = True Then
+            ElseIf n = 2 AndAlso isUsingLUDecomposition = False Then
+                Dim det = Me.Det()
+                If clsMathUtil.IsCloseToZero(det, eps) = True Then
                     Throw New clsException(clsException.Series.NotComputable, "Inverse 2x2")
                 End If
                 det = 1.0 / det
@@ -1094,9 +983,9 @@
                 retInverse(0)(1) = det * -Me(0)(1)
                 retInverse(1)(0) = det * -Me(1)(0)
                 retInverse(1)(1) = det * Me(0)(0)
-            ElseIf n = 3 Then
+            ElseIf n = 3 AndAlso isUsingLUDecomposition = False Then
                 Dim det = Me.Det()
-                If clsMathUtil.IsCloseToZero(det) = True Then
+                If clsMathUtil.IsCloseToZero(det, eps) = True Then
                     Throw New clsException(clsException.Series.NotComputable, "Inverse 3x3")
                 End If
                 retInverse(0)(0) = ((Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))) / det
@@ -1109,35 +998,32 @@
                 retInverse(2)(1) = -((Me(0)(0) * Me(2)(1) - Me(0)(1) * Me(2)(0))) / det
                 retInverse(2)(2) = ((Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))) / det
             Else
-                Try
-                    Dim lup = Me.LUP()
-                    'lup.P = lup.P.T() 'Transopose = Inverse
-                    For j = 0 To n - 1
-                        Dim y = New clsEasyVector(n)
-                        Dim b = lup.P(j)
-                        For i = 0 To n - 1
-                            Dim s = 0.0
-                            Dim k As Integer = 0
-                            For k = 0 To i - 1
-                                s += lup.L(i)(k) * y(k)
-                            Next
-                            y(k) = b(i) - s
-                        Next
-                        For i = n - 1 To 0 Step -1
-                            Dim s = 0.0
-                            For k = i + 1 To n - 1
-                                s += lup.U(i)(k) * retInverse(k)(j)
-                            Next
-                            retInverse(i)(j) = (y(i) - s) / lup.U(i)(i)
-                        Next
-                    Next
+                Dim lup = Me.LUP()
+                Dim det = lup.Det
+                If clsMathUtil.IsCloseToZero(det, eps) = True Then
+                    Throw New clsException(clsException.Series.NotComputable, String.Format("Inverse {0}x{0} det=0", n))
+                End If
 
-                    If clsMathUtil.IsCloseToZero(lup.Det) = True Then
-                        Throw New clsException(clsException.Series.NotComputable, String.Format("Inverse {0}x{0}", n))
-                    End If
-                Catch ex As Exception
-                    Throw New clsException(clsException.Series.NotComputable, String.Format("Inverse {0}x{0}", n) + ex.Message)
-                End Try
+                'lup.P = lup.P.T() 'Transopose = Inverse
+                For j = 0 To n - 1
+                    Dim y = New clsEasyVector(n)
+                    Dim b = lup.P(j)
+                    For i = 0 To n - 1
+                        Dim s = 0.0
+                        Dim k As Integer = 0
+                        For k = 0 To i - 1
+                            s += lup.L(i)(k) * y(k)
+                        Next
+                        y(k) = b(i) - s
+                    Next
+                    For i = n - 1 To 0 Step -1
+                        Dim s = 0.0
+                        For k = i + 1 To n - 1
+                            s += lup.U(i)(k) * retInverse(k)(j)
+                        Next
+                        retInverse(i)(j) = (y(i) - s) / lup.U(i)(i)
+                    Next
+                Next
             End If
             Return retInverse
         End Function
@@ -1165,7 +1051,7 @@
                 pivotrow(i) = i
                 Dim absValue = 0.0
                 For j = 0 To n - 1
-                    Dim temp = Math.Abs(Me(i)(j))
+                    Dim temp = System.Math.Abs(Me(i)(j))
                     If temp >= absValue Then
                         absValue = temp
                     End If
@@ -1195,7 +1081,7 @@
                         sum -= source(i)(k) * source(k)(j)
                     Next
                     source(i)(j) = sum
-                    Dim dum = weight(i) * Math.Abs(sum)
+                    Dim dum = weight(i) * System.Math.Abs(sum)
                     If dum > big Then
                         big = dum
                         imax = i
@@ -1281,7 +1167,7 @@
                 ip(k) = k
                 Dim absValue = 0.0
                 For j = 0 To n - 1
-                    Dim temp = Math.Abs(source(k)(j))
+                    Dim temp = System.Math.Abs(source(k)(j))
                     If temp > absValue Then
                         absValue = temp
                     End If
@@ -1298,7 +1184,7 @@
                 Dim u = -1.0
                 For i = k To n - 1
                     ii = ip(i)
-                    Dim t = Math.Abs(source(ii)(k) * weight(ii))
+                    Dim t = System.Math.Abs(source(ii)(k) * weight(ii))
                     If t > u Then
                         u = t
                         j = i
@@ -1366,10 +1252,10 @@
             Next
 
             For k = 0 To n - 1
-                Dim amax = Math.Abs(a(k)(k))
+                Dim amax = System.Math.Abs(a(k)(k))
                 ip = k
                 For i = k + 1 To n - 1
-                    Dim temp = Math.Abs(a(i)(k))
+                    Dim temp = System.Math.Abs(a(i)(k))
                     If temp > amax Then
                         amax = temp
                         ip = i
@@ -1463,8 +1349,8 @@
                 Throw New clsException(clsException.Series.NotComputable, "Cholesky() not Square")
             End If
 
-            Dim ret As New MathUtil.clsEasyMatrix(Me.RowCount)
-            Dim n = CInt(Math.Sqrt(ret.RowCount * ret.ColCount))
+            Dim ret As New clsEasyMatrix(Me.RowCount)
+            Dim n = CInt(System.Math.Sqrt(ret.RowCount * ret.ColCount))
             For i As Integer = 0 To n - 1
                 For j As Integer = 0 To i
                     If j = i Then
@@ -1472,7 +1358,7 @@
                         For k As Integer = 0 To j
                             sum += ret(j)(k) * ret(j)(k)
                         Next
-                        ret(j)(j) = Math.Sqrt(Me(j)(j) - sum)
+                        ret(j)(j) = System.Math.Sqrt(Me(j)(j) - sum)
                     Else
                         Dim sum = 0.0
                         For k As Integer = 0 To j
@@ -1487,6 +1373,86 @@
         End Function
 
         ''' <summary>
+        ''' Householder Transformation
+        ''' </summary>
+        ''' <remarks>
+        ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
+        ''' 対称行列をハウスホルダー変換 → 三重対角行列
+        ''' </remarks>
+        ''' <returns></returns>
+        Public Function Householder() As clsEasyMatrix
+            Dim a = New clsEasyMatrix(Me)
+            Dim n = a.Count
+            Dim f = New clsEasyVector(n)
+            Dim g = New clsEasyVector(n)
+            Dim u = New clsEasyVector(n)
+
+            For k = 0 To n - 3
+                For i = 0 To k
+                    u(i) = 0
+                Next
+                For i = k + 1 To n - 1
+                    u(i) = a(i)(k) 'col
+                Next
+
+                Dim ss = 0.0
+                For i = k + 2 To n - 1
+                    ss += u(i) * u(i)
+                Next
+                If clsMathUtil.IsCloseToZero(ss) = True Then
+                    Continue For
+                End If
+                Dim s = System.Math.Sqrt(ss + u(k + 1) * u(k + 1))
+                If u(k + 1) > 0.0 Then
+                    s = -s
+                End If
+
+                u(k + 1) -= s
+                Dim uu = System.Math.Sqrt(ss + u(k + 1) * u(k + 1))
+                For i = k + 1 To n - 1
+                    u(i) /= uu
+                Next
+
+                For i = 0 To n - 1
+                    f(i) = 0.0
+                    g(i) = 0.0
+                    For j = k + 1 To n - 1
+                        f(i) += a(i)(j) * u(j)
+                        g(i) += a(j)(i) * u(j)
+                    Next
+                Next
+
+                Dim gamma = 0.0
+                For j = 0 To n - 1
+                    gamma += u(j) * g(j)
+                Next
+
+                For i = 0 To n - 1
+                    f(i) -= gamma * u(i)
+                    g(i) -= gamma * u(i)
+                Next
+
+                For i = 0 To n - 1
+                    For j = 0 To n - 1
+                        a(i)(j) = a(i)(j) - 2.0 * u(i) * g(j) - 2.0 * f(i) * u(j)
+                    Next
+                Next
+            Next
+            Return a
+        End Function
+
+        '--------------------------------------------------------------------------------------------
+        '固有値、固有ベクトルを求める方針
+        ' 反復計算によって求める。計算しやすい行列に変換
+        '対称行列 or 非対称行列
+        ' 対称行列   :べき乗法、ヤコビ法、三重対角行列->QR法
+        ' 非対称行列 :ヘッセンベルグ行列->QR法
+        'QR法の高速
+        ' 原点移動（ウィルキンソンシフト）、減次（デフレーション）
+        ' QR法だと固有値のみ固有ベクトルは別途計算
+        '--------------------------------------------------------------------------------------------
+
+        ''' <summary>
         ''' Eigen decomposition using Jacobi Method. for Symmetric Matrix.
         ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
         ''' </summary>
@@ -1496,21 +1462,15 @@
         ''' <returns></returns>
         Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
                               Optional ByVal Conversion As Double = 0.000000000000001,
-                              Optional ByVal IsSort As Boolean = True) As Eigen
-            '固有値、固有ベクトルを求める方針
-            ' 反復計算によって求める。計算しやすい行列に変換
-            '対称行列 or 非対称行列
-            ' 対称行列   :べき乗法、ヤコビ法、三重対角行列->QR法
-            ' 非対称行列 :ヘッセンベルグ行列->QR法
-            'QR法の高速
-            ' 原点移動（ウィルキンソンシフト）、減次（デフレーション）
-            ' QR法だと固有値のみ固有ベクトルは別途計算
-
+                              Optional ByVal IsSort As Boolean = True,
+                              Optional ByVal IsSymmetricCheck As Boolean = False) As Eigen
             If Me.IsSquare() = False Then
                 Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
             End If
-            If Me.IsSymmetricMatrix() = False Then
-                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+            If IsSymmetricCheck = True Then
+                If Me.IsSymmetricMatrix() = False Then
+                    Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                End If
             End If
 
             Dim size = Me.ColCount()
@@ -1524,13 +1484,13 @@
             'iteration
             For itr As Integer = 0 To Iteration - 1
                 'find abs max value without diag
-                Dim max = Math.Abs(retEigenMat(0)(1))
+                Dim max = System.Math.Abs(retEigenMat(0)(1))
                 Dim p As Integer = 0
                 Dim q As Integer = 1
                 For i As Integer = 0 To size - 1
                     For j As Integer = i + 1 To size - 1
-                        If max < Math.Abs(retEigenMat(i)(j)) Then
-                            max = Math.Abs(retEigenMat(i)(j))
+                        If max < System.Math.Abs(retEigenMat(i)(j)) Then
+                            max = System.Math.Abs(retEigenMat(i)(j))
                             p = i
                             q = j
                         End If
@@ -1548,15 +1508,15 @@
                 Dim temp_pq = retEigenMat(p)(q)
                 Dim theta = 0.0
                 Dim diff = temp_pp - temp_qq
-                If MathUtil.clsMathUtil.IsCloseToZero(diff) = True Then
-                    theta = Math.PI / 4.0
+                If clsMathUtil.IsCloseToZero(diff) = True Then
+                    theta = System.Math.PI / 4.0
                 Else
-                    theta = Math.Atan(-2.0 * temp_pq / diff) * 0.5
+                    theta = System.Math.Atan(-2.0 * temp_pq / diff) * 0.5
                 End If
 
                 Dim D = New clsEasyMatrix(retEigenMat)
-                Dim cosTheta = Math.Cos(theta)
-                Dim sinTheta = Math.Sin(theta)
+                Dim cosTheta = System.Math.Cos(theta)
+                Dim sinTheta = System.Math.Sin(theta)
                 For i As Integer = 0 To size - 1
                     Dim temp = 0.0
                     temp = retEigenMat(p)(i) * cosTheta - retEigenMat(q)(i) * sinTheta
@@ -1593,7 +1553,9 @@
 
             Return New Eigen(eigenValue, rotate, isConversion)
         End Function
+#End Region
 
+#Region "Public experiment Eigen"
         ''' <summary>
         ''' Eigen
         ''' </summary>
@@ -1602,8 +1564,8 @@
         ''' <param name="IsSort">descent sort by EigenValue default:true</param>
         ''' <returns></returns>
         Public Function Eigen2(Optional ByVal Iteration As Integer = 1000,
-                               Optional ByVal Conversion As Double = 0.000000000000001,
-                               Optional ByVal IsSort As Boolean = True) As Eigen
+                                   Optional ByVal Conversion As Double = 0.000000000000001,
+                                   Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
                 Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
             End If
@@ -1634,7 +1596,7 @@
                 Next
 
                 For k = 0 To n - 2
-                    Dim alpha = MathUtil.clsMathUtil.PythagoreanAddition(r(k)(k), r(k + 1)(k))
+                    Dim alpha = clsMathUtil.PythagoreanAddition(r(k)(k), r(k + 1)(k))
                     If clsMathUtil.IsCloseToZero(alpha) = True Then
                         Continue For
                     End If
@@ -1682,7 +1644,7 @@
                 'conversion
                 Dim e = 0.0
                 For i = 0 To n - 1
-                    e += Math.Abs(t(i)(i) - h(i)(i))
+                    e += System.Math.Abs(t(i)(i) - h(i)(i))
                 Next
                 If e < Conversion Then
                     isConversion = True
@@ -1726,14 +1688,14 @@
                     mu = v.InnerProduct(y)
                     v2 = v.NormL2()
                     y = v / v2
-                    Dim e = Math.Abs((mu - mu0) / mu)
+                    Dim e = System.Math.Abs((mu - mu0) / mu)
                     If e < Conversion Then
                         For j = 0 To n - 1
                             eigenVector(i)(j) = y(j)
                         Next
                         Exit While
                     End If
-                    'If MathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
+                    'If clsMathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
                     '    For j = 0 To n - 1
                     '        eigenVector(i)(j) = y(j)
                     '    Next
@@ -1765,8 +1727,8 @@
         ''' <param name="IsSort">descent sort by EigenValue default:true</param>
         ''' <returns></returns>
         Public Function Eigen3(Optional ByVal Iteration As Integer = 1000,
-                               Optional ByVal Conversion As Double = 0.000000000000001,
-                               Optional ByVal IsSort As Boolean = True) As Eigen
+                                   Optional ByVal Conversion As Double = 0.000000000000001,
+                                   Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
                 Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
             End If
@@ -1781,7 +1743,7 @@
                 Dim m = n - 1
                 While (m > 1)
                     Dim dVal = a(m)(m - 1)
-                    If Math.Abs(dVal) < Conversion Then
+                    If System.Math.Abs(dVal) < Conversion Then
                         m -= 1
                     End If
 
@@ -1799,13 +1761,13 @@
                     End If
 
                     '単位行列に初期化
-                    clsMathUtil.SetIdentifyMatrix(q)
+                    q.SetIdentifyMatrix()
 
                     For i = 0 To m - 1
                         Dim sint = 0.0
                         Dim cost = 0.0
                         'Dim r = Math.Sqrt(a(i)(i) * a(i)(i) + a(i + 1)(i) * a(i + 1)(i))
-                        Dim r = MathUtil.clsMathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
+                        Dim r = clsMathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
                         If clsMathUtil.IsCloseToZero(r) = True Then
                             sint = 0.0
                             cost = 0.0
@@ -1876,14 +1838,14 @@
                     mu = v.InnerProduct(y)
                     v2 = v.NormL2()
                     y = v / v2
-                    Dim e = Math.Abs((mu - mu0) / mu)
+                    Dim e = System.Math.Abs((mu - mu0) / mu)
                     If e < Conversion Then
                         For j = 0 To n - 1
                             eigenVectors(i)(j) = y(j)
                         Next
                         Exit While
                     End If
-                    'If MathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
+                    'If clsMathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
                     '    For j = 0 To n - 1
                     '        eigenVector(i)(j) = y(j)
                     '    Next
@@ -1915,8 +1877,8 @@
         ''' <param name="IsSort">descent sort by EigenValue default:true</param>
         ''' <returns></returns>
         Public Function Eigen4(Optional ByVal Iteration As Integer = 1000,
-                               Optional ByVal Conversion As Double = 0.000000000000001,
-                               Optional ByVal IsSort As Boolean = True) As Eigen
+                                   Optional ByVal Conversion As Double = 0.000000000000001,
+                                   Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
                 Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
             End If
@@ -1931,7 +1893,7 @@
                 Dim m = n - 1
                 While (m > 1)
                     Dim dVal = a(m)(m - 1)
-                    If Math.Abs(dVal) < Conversion Then
+                    If System.Math.Abs(dVal) < Conversion Then
                         m -= 1
                     End If
 
@@ -1949,13 +1911,13 @@
                     End If
 
                     '単位行列に初期化
-                    clsMathUtil.SetIdentifyMatrix(q)
+                    q.SetIdentifyMatrix()
 
                     For i = 0 To m - 1
                         Dim sint = 0.0
                         Dim cost = 0.0
                         'Dim r = Math.Sqrt(a(i)(i) * a(i)(i) + a(i + 1)(i) * a(i + 1)(i))
-                        Dim r = MathUtil.clsMathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
+                        Dim r = clsMathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
                         If clsMathUtil.IsCloseToZero(r) = True Then
                             sint = 0.0
                             cost = 0.0
@@ -2057,7 +2019,7 @@
                     '    Next
                     '    Exit While
                     'End If
-                    If MathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
+                    If clsMathUtil.IsCloseToValues(mu, mu0) Then
                         For j = 0 To n - 1
                             eigenVectors(eIdx)(j) = y(j)
                         Next
@@ -2090,10 +2052,10 @@
                 pivotRow(i) = i
             Next
             For k = 0 To n - 1
-                Dim amax = Math.Abs(a(k)(k))
+                Dim amax = System.Math.Abs(a(k)(k))
                 ip = k
                 For i = k + 1 To n - 1
-                    Dim temp = Math.Abs(a(i)(k))
+                    Dim temp = System.Math.Abs(a(i)(k))
                     If temp > amax Then
                         amax = temp
                         ip = i
@@ -2132,72 +2094,6 @@
             Next
         End Sub
 
-        ''' <summary>
-        ''' Householder Transformation
-        ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
-        ''' 対称行列をハウスホルダー変換 → 三重対角行列
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function Householder() As clsEasyMatrix
-            Dim a = New clsEasyMatrix(Me)
-            Dim n = a.Count
-            Dim f = New clsEasyVector(n)
-            Dim g = New clsEasyVector(n)
-            Dim u = New clsEasyVector(n)
-
-            For k = 0 To n - 3
-                For i = 0 To k
-                    u(i) = 0
-                Next
-                For i = k + 1 To n - 1
-                    u(i) = a(i)(k) 'col
-                Next
-
-                Dim ss = 0.0
-                For i = k + 2 To n - 1
-                    ss += u(i) * u(i)
-                Next
-                If MathUtil.clsMathUtil.IsCloseToZero(ss) = True Then
-                    Continue For
-                End If
-                Dim s = Math.Sqrt(ss + u(k + 1) * u(k + 1))
-                If u(k + 1) > 0.0 Then
-                    s = -s
-                End If
-
-                u(k + 1) -= s
-                Dim uu = Math.Sqrt(ss + u(k + 1) * u(k + 1))
-                For i = k + 1 To n - 1
-                    u(i) /= uu
-                Next
-
-                For i = 0 To n - 1
-                    f(i) = 0.0
-                    g(i) = 0.0
-                    For j = k + 1 To n - 1
-                        f(i) += a(i)(j) * u(j)
-                        g(i) += a(j)(i) * u(j)
-                    Next
-                Next
-
-                Dim gamma = 0.0
-                For j = 0 To n - 1
-                    gamma += u(j) * g(j)
-                Next
-
-                For i = 0 To n - 1
-                    f(i) -= gamma * u(i)
-                    g(i) -= gamma * u(i)
-                Next
-
-                For i = 0 To n - 1
-                    For j = 0 To n - 1
-                        a(i)(j) = a(i)(j) - 2.0 * u(i) * g(j) - 2.0 * f(i) * u(j)
-                    Next
-                Next
-            Next
-            Return a
-        End Function
 #End Region
 
 #Region "Public Shared"
@@ -2258,4 +2154,166 @@
         End Function
 #End Region
     End Class
+
+    ''' <summary>
+    ''' store LU decomposition with solver
+    ''' </summary>
+    <Serializable>
+    Public Class LU
+        ''' <summary>Pivot matrix</summary>
+        Public Property P As clsEasyMatrix = Nothing
+
+        ''' <summary>Lower matrix</summary>
+        Public Property L As clsEasyMatrix = Nothing
+
+        ''' <summary>Upper matrix</summary>
+        Public Property U As clsEasyMatrix = Nothing
+
+        ''' <summary>Determinant</summary>
+        Public Property Det As Double = 0.0
+
+        ''' <summary>pivto row info</summary>
+        Public Property PivotRow As Integer() = Nothing
+
+        ''' <summary>
+        ''' default constructtor
+        ''' </summary>
+        Private Sub New()
+        End Sub
+
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="matP"></param>
+        ''' <param name="matL"></param>
+        ''' <param name="matU"></param>
+        ''' <param name="det"></param>
+        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double)
+            Me.P = matP
+            Me.L = matL
+            Me.U = matU
+            Me.Det = det
+        End Sub
+
+        ''' <summary>
+        ''' Constructor
+        ''' </summary>
+        ''' <param name="matP"></param>
+        ''' <param name="matL"></param>
+        ''' <param name="matU"></param>
+        ''' <param name="det"></param>
+        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double, ByRef p() As Integer)
+            Me.P = matP
+            Me.L = matL
+            Me.U = matU
+            Me.Det = det
+            Me.PivotRow = p
+        End Sub
+
+        ''' <summary>
+        ''' solve(Ax=b)
+        ''' </summary>
+        ''' <param name="b"></param>
+        ''' <returns></returns>
+        Public Function Solve(ByRef b As clsEasyVector) As clsEasyVector
+            Return Me.Solve(Me.P, Me.L, Me.U, Me.PivotRow, b)
+        End Function
+
+        ''' <summary>
+        ''' solve(Ax=b)
+        ''' </summary>
+        ''' <param name="matP">pivot matrix(LU decomposition of A matrix)</param>
+        ''' <param name="matL">lower triangle matrix(LU decomposition of A matrix)</param>
+        ''' <param name="matU">upper triangle matrix(LU decomposition of A matrix)</param>
+        ''' <param name="pivotRow"></param>
+        ''' <param name="vecB"></param>
+        ''' <returns>x</returns>
+        Private Function Solve(ByRef matP As clsEasyMatrix,
+                                   ByRef matL As clsEasyMatrix,
+                                   ByRef matU As clsEasyMatrix,
+                                   ByRef pivotRow() As Integer,
+                                   ByRef vecB As clsEasyVector) As clsEasyVector
+            Dim n = matP.ColCount
+            Dim x = New clsEasyVector(n)
+            Dim y = New clsEasyVector(n)
+
+            'transopose
+            'Dim b = vecB * matP
+
+            For i = 0 To n - 1
+                Dim s = 0.0
+                Dim j As Integer = 0
+                For j = 0 To i - 1
+                    s += matL(i)(j) * y(j)
+                Next
+
+                'y(j) = b(i) - s
+                y(j) = vecB(pivotRow(i)) - s
+            Next
+
+            For i = n - 1 To 0 Step -1
+                Dim s = 0.0
+                For k = i + 1 To n - 1
+                    s += matU(i)(k) * x(k)
+                Next
+                x(i) = (y(i) - s) / matU(i)(i)
+            Next
+
+            Return x
+        End Function
+    End Class
+
+    ''' <summary>
+    ''' store SVD decomposition
+    ''' </summary>
+    <Serializable>
+    Public Class SVD
+        ''' <summary></summary>
+        Public Property S As clsEasyMatrix = Nothing
+
+        ''' <summary></summary>
+        Public Property V As clsEasyVector = Nothing
+
+        ''' <summary></summary>
+        Public Property D As clsEasyMatrix = Nothing
+
+        Private Sub New()
+        End Sub
+
+        Public Sub New(ByRef matS As clsEasyMatrix, ByRef matV As clsEasyVector, ByRef matD As clsEasyMatrix)
+            Me.S = matS
+            Me.V = matV
+            Me.D = matD
+        End Sub
+    End Class
+
+    ''' <summary>
+    ''' store Eigen values, vector
+    ''' </summary>
+    <Serializable>
+    Public Class Eigen
+        ''' <summary></summary>
+        Public Property EigenValue As clsEasyVector = Nothing
+
+        ''' <summary></summary>
+        Public Property EigenVector As clsEasyMatrix = Nothing
+
+        ''' <summary></summary>
+        Public Property IsConversion As Boolean = Nothing
+
+        Private Sub New()
+        End Sub
+
+        Public Sub New(ByRef eigeValue As clsEasyVector, ByRef eigenVec As clsEasyMatrix)
+            Me.EigenValue = eigeValue
+            Me.EigenVector = eigenVec
+        End Sub
+
+        Public Sub New(ByRef eigeValue As clsEasyVector, ByRef eigenVec As clsEasyMatrix, ByVal isconversion As Boolean)
+            Me.EigenValue = eigeValue
+            Me.EigenVector = eigenVec
+            Me.IsConversion = isconversion
+        End Sub
+    End Class
+
 End Namespace

@@ -1,8 +1,14 @@
 ﻿Namespace MathUtil
+    ''' <summary>
+    ''' Exception class for SimpleLinearAlgebra lib
+    ''' </summary>
     Public Class clsException : Inherits Exception
+        ''' <summary>
+        ''' Error series
+        ''' </summary>
         Public Enum Series
             UnknownError
-            NotImpementaion
+            NotImplementaion
             NotSquare
             DifferRowNumberAndCollumnNumber
             NotComputable
@@ -20,7 +26,7 @@
         ''' <summary>
         ''' Constructor
         ''' </summary>
-        ''' <param name="ai_series"></param>
+        ''' <param name="ai_series">error series</param>
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_series As Series)
             MyBase.New(String.Format("ErrorCode:{0}", ai_series))
@@ -29,8 +35,8 @@
         ''' <summary>
         ''' Constructor
         ''' </summary>
-        ''' <param name="ai_series"></param>
-        ''' <param name="ai_msg"></param>
+        ''' <param name="ai_series">error series</param>
+        ''' <param name="ai_msg">message</param>
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_series As Series, ByVal ai_msg As String)
             MyBase.New(String.Format("ErrorCode:{0}\nErrorMsg:{1}", ai_series, ai_msg))
