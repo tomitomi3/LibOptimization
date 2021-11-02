@@ -26,15 +26,15 @@ Module Module1
             '                             New Double() {2, 1, 0},
             '                             New Double() {1, 2, 1},
             '                             New Double() {1, 5, 3}})
-            Dim mat As New clsEasyMatrix(New Double()() {
-                                         New Double() {16, -1, 1, 2},
-                                         New Double() {2, 12, 1, -1},
-                                         New Double() {1, 3, -24, 2},
-                                         New Double() {4, -2, 1, 20}})
+            Dim mat As New DenseMatrix(New Double()() {
+                                       New Double() {16, -1, 1, 2},
+                                       New Double() {2, 12, 1, -1},
+                                       New Double() {1, 3, -24, 2},
+                                       New Double() {4, -2, 1, 20}})
             'Dim mat As New clsEasyMatrix(New Double()() {
             '                             New Double() {2, 1},
             '                             New Double() {1, 2}})
-            mat = clsMathUtil.CreateRandomSymmetricMatrix(2)
+            mat = MathUtil.CreateRandomSymmetricMatrix(2)
             mat.PrintValue(4, "Source")
 
             'eigen
@@ -203,14 +203,14 @@ Module Module1
                     sw.Start()
                     For i = 0 To trynum - 1
                         Dim dimNum = 4
-                        Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng2)
+                        Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng2)
                         Dim resultLU As LU = Nothing
                         Try
                             resultLU = source.LUP()
                             Dim P = resultLU.P
                             Dim L = resultLU.L
                             Dim U = resultLU.U
-                            Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
+                            Dim flg = MathUtil.IsNearyEqualMatrix(P * L * U, source)
                             If flg = False Then
                                 Return
                             End If
@@ -232,14 +232,14 @@ Module Module1
                     sw.Start()
                     For i = 0 To trynum - 1
                         Dim dimNum = 4
-                        Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng1)
+                        Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng1)
                         Dim resultLU As LU = Nothing
                         Try
                             resultLU = source.LUP()
                             Dim P = resultLU.P
                             Dim L = resultLU.L
                             Dim U = resultLU.U
-                            Dim flg = clsMathUtil.IsNearyEqualMatrix(P * L * U, source)
+                            Dim flg = MathUtil.IsNearyEqualMatrix(P * L * U, source)
                             If flg = False Then
                                 Return
                             End If

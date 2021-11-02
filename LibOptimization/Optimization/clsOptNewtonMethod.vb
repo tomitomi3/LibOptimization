@@ -34,7 +34,7 @@ Namespace Optimization
         Public Property ALPHA As Double = 1.0
 
         'vector
-        Private m_vect As clsEasyVector = Nothing
+        Private m_vect As DenseVector = Nothing
 #End Region
 
 #Region "Constructor"
@@ -46,7 +46,7 @@ Namespace Optimization
         Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
 
-            Me.m_vect = New clsEasyVector(ai_func.NumberOfVariable)
+            Me.m_vect = New DenseVector(ai_func.NumberOfVariable)
         End Sub
 #End Region
 
@@ -64,10 +64,10 @@ Namespace Optimization
 
                 'init initial position
                 If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                    Me.m_vect = New clsEasyVector(InitialPosition)
+                    Me.m_vect = New DenseVector(InitialPosition)
                 Else
                     Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                    Me.m_vect = New clsEasyVector(array)
+                    Me.m_vect = New DenseVector(array)
                 End If
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
@@ -87,8 +87,8 @@ Namespace Optimization
             End If
 
             'Do Iterate
-            Dim grad As New clsEasyVector(MyBase.m_func.NumberOfVariable, clsEasyVector.VectorDirection.COL)
-            Dim h As New clsEasyMatrix()
+            Dim grad As New DenseVector(MyBase.m_func.NumberOfVariable, DenseVector.VectorDirection.COL)
+            Dim h As New DenseMatrix()
             If Me.Iteration <= m_iteration Then
                 Return True
             Else

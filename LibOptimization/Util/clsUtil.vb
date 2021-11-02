@@ -433,7 +433,7 @@ Namespace Util
         ''' <returns></returns>
         Public Shared Function IsExistZeroLength(ByVal points() As clsPoint) As Boolean
             Dim isCanCrossover As Boolean = True
-            Dim vec As MathUtil.clsEasyVector = Nothing
+            Dim vec As MathUtil.DenseVector = Nothing
             For i As Integer = 0 To points.Length - 2
                 vec = points(i) - points(i + 1)
                 If vec.NormL1() = 0 Then
@@ -717,10 +717,10 @@ Namespace Util
         ''' </summary>
         ''' <param name="results"></param>
         ''' <returns></returns>
-        Public Shared Function ToConvertMat(ByVal results As List(Of clsPoint)) As MathUtil.clsEasyMatrix
+        Public Shared Function ToConvertMat(ByVal results As List(Of clsPoint)) As MathUtil.DenseMatrix
             Dim row = results.Count
             Dim col = results(0).Count
-            Dim ret As New MathUtil.clsEasyMatrix(row, col)
+            Dim ret As New MathUtil.DenseMatrix(row, col)
             For i As Integer = 0 To row - 1
                 For j As Integer = 0 To col - 1
                     ret(i)(j) = results(i)(j)
@@ -736,7 +736,7 @@ Namespace Util
         ''' </summary>
         ''' <param name="vec"></param>
         ''' <returns></returns>
-        Public Shared Function Average(ByVal vec As clsEasyVector) As Double
+        Public Shared Function Average(ByVal vec As DenseVector) As Double
             Dim ret As Double = 0.0
             For Each value In vec
                 ret += value

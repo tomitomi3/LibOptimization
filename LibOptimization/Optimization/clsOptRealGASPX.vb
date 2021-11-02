@@ -186,7 +186,7 @@ Namespace Optimization
         Private Function CrossOverSPX(ByVal ai_childSize As Integer,
                                       ByVal ai_parents As List(Of KeyValuePair(Of Integer, clsPoint))) As List(Of clsPoint)
             'Calc Centroid
-            Dim g As New clsEasyVector(MyBase.m_func.NumberOfVariable)
+            Dim g As New DenseVector(MyBase.m_func.NumberOfVariable)
             For Each p As KeyValuePair(Of Integer, clsPoint) In ai_parents
                 g += p.Value
             Next
@@ -197,14 +197,14 @@ Namespace Optimization
 
             'CrossOver
             For i As Integer = 0 To ai_childSize - 1
-                Dim c_k As New List(Of clsEasyVector)
-                Dim x_k As New List(Of clsEasyVector)
+                Dim c_k As New List(Of DenseVector)
+                Dim x_k As New List(Of DenseVector)
                 Dim k As Integer = 0
                 For Each p_k As KeyValuePair(Of Integer, clsPoint) In ai_parents
                     x_k.Add(g + Alpha * (p_k.Value - g))
 
                     If k = 0 Then
-                        c_k.Add(New clsEasyVector(MyBase.m_func.NumberOfVariable)) 'all zero
+                        c_k.Add(New DenseVector(MyBase.m_func.NumberOfVariable)) 'all zero
                     Else
                         Dim rk As Double = m_rand.NextDouble() ^ (1 / k)
                         'If (k-1) >= Me.m_func.NumberOfVariable Then

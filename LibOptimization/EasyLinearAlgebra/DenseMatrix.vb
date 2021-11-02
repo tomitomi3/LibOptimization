@@ -7,7 +7,7 @@
     ''' </remarks>
     ''' delete DebuggerDisplay
     <Serializable>
-    Public Class clsEasyMatrix : Inherits List(Of List(Of Double))
+    Public Class DenseMatrix : Inherits List(Of List(Of Double))
         Public Const SAME_ZERO As Double = 2.0E-50 '2.0*10^-50
         Public Const MachineEpsiron As Double = 0.000000000000000222 ' 2.20*E-16 = 2.20*10^-16
 
@@ -25,9 +25,9 @@
         ''' </summary>
         ''' <param name="ai_base"></param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_base As clsEasyMatrix)
+        Public Sub New(ByVal ai_base As DenseMatrix)
             For i As Integer = 0 To ai_base.Count - 1
-                Dim temp As New clsEasyVector(ai_base(i))
+                Dim temp As New DenseVector(ai_base(i))
                 Me.Add(temp)
             Next
         End Sub
@@ -40,7 +40,7 @@
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_dim As Integer, Optional ai_isIdentity As Boolean = False)
             For i As Integer = 0 To ai_dim - 1
-                Dim temp As New clsEasyVector(ai_dim)
+                Dim temp As New DenseVector(ai_dim)
                 If ai_isIdentity Then
                     temp(i) = 1.0
                 End If
@@ -55,7 +55,7 @@
         ''' <param name="diagonalValue"></param>
         Public Sub New(ByVal ai_dim As Integer, diagonalValue As Double)
             For i As Integer = 0 To ai_dim - 1
-                Dim temp As New clsEasyVector(ai_dim)
+                Dim temp As New DenseVector(ai_dim)
                 temp(i) = diagonalValue
                 Me.Add(temp)
             Next
@@ -69,7 +69,7 @@
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_rowSize As Integer, ByVal ai_colSize As Integer)
             For i As Integer = 0 To ai_rowSize - 1
-                Me.Add(New clsEasyVector(ai_colSize))
+                Me.Add(New DenseVector(ai_colSize))
             Next
         End Sub
 
@@ -80,7 +80,7 @@
         ''' <remarks></remarks>
         Public Sub New(ByVal ai_val As List(Of List(Of Double)))
             For i As Integer = 0 To ai_val.Count - 1
-                Me.Add(New clsEasyVector(ai_val(i)))
+                Me.Add(New DenseVector(ai_val(i)))
             Next
         End Sub
 
@@ -91,7 +91,7 @@
         ''' <remarks></remarks>
         Public Sub New(ParamArray ai_val As Double()())
             For i As Integer = 0 To ai_val.Length - 1
-                Me.Add(New clsEasyVector(ai_val(i)))
+                Me.Add(New DenseVector(ai_val(i)))
             Next
         End Sub
 
@@ -101,13 +101,13 @@
         ''' <param name="ai_val"></param>
         ''' <param name="ai_direction">Row or Col</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_val As List(Of Double), ByVal ai_direction As clsEasyVector.VectorDirection)
-            If ai_direction = clsEasyVector.VectorDirection.ROW Then
-                Dim temp As New clsEasyVector(ai_val)
+        Public Sub New(ByVal ai_val As List(Of Double), ByVal ai_direction As DenseVector.VectorDirection)
+            If ai_direction = DenseVector.VectorDirection.ROW Then
+                Dim temp As New DenseVector(ai_val)
                 Me.Add(temp)
             Else
                 For i As Integer = 0 To ai_val.Count - 1
-                    Me.Add(New clsEasyVector({ai_val(i)}))
+                    Me.Add(New DenseVector({ai_val(i)}))
                 Next
             End If
         End Sub
@@ -120,7 +120,7 @@
         Public Sub New(ByVal vector As List(Of Double), ByVal order As Integer)
             For i As Integer = 0 To order - 1
                 Dim temp(order - 1) As Double
-                Me.Add(New clsEasyVector(temp))
+                Me.Add(New DenseVector(temp))
             Next
             Dim index As Integer = 0
             For i As Integer = 0 To order - 1
@@ -180,12 +180,12 @@
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property Row(ByVal ai_rowIndex As Integer) As clsEasyVector
+        Public Property Row(ByVal ai_rowIndex As Integer) As DenseVector
             Get
-                Return New clsEasyVector(Me(ai_rowIndex))
+                Return New DenseVector(Me(ai_rowIndex))
             End Get
-            Set(ByVal value As clsEasyVector)
-                Me(ai_rowIndex) = New clsEasyVector(value)
+            Set(ByVal value As DenseVector)
+                Me(ai_rowIndex) = New DenseVector(value)
             End Set
         End Property
 
@@ -196,17 +196,17 @@
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property Column(ByVal ai_colIndex As Integer) As clsEasyVector
+        Public Property Column(ByVal ai_colIndex As Integer) As DenseVector
             Get
                 '            Dim temp(Me.RowCount - 1) As Double
-                Dim tempVector As New clsEasyVector(Me.RowCount)
+                Dim tempVector As New DenseVector(Me.RowCount)
                 For i As Integer = 0 To tempVector.Count - 1
                     tempVector(i) = Me.Row(i)(ai_colIndex)
                 Next
-                tempVector.Direction = clsEasyVector.VectorDirection.COL
+                tempVector.Direction = DenseVector.VectorDirection.COL
                 Return tempVector
             End Get
-            Set(ByVal value As clsEasyVector)
+            Set(ByVal value As DenseVector)
                 For i As Integer = 0 To value.Count - 1
                     Me(i)(ai_colIndex) = value(i)
                 Next
@@ -238,11 +238,11 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator +(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
+        Public Shared Operator +(ByVal ai_source As DenseMatrix, ByVal ai_dest As DenseMatrix) As DenseMatrix
             If IsSameDimension(ai_source, ai_dest) = False Then
-                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
-            Dim ret As New clsEasyMatrix(ai_source)
+            Dim ret As New DenseMatrix(ai_source)
             For i As Integer = 0 To ret.RowCount() - 1
                 ret.Row(i) = ai_source.Row(i) + ai_dest.Row(i)
             Next
@@ -256,11 +256,11 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator +(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyVector) As clsEasyVector
+        Public Shared Operator +(ByVal ai_source As DenseMatrix, ByVal ai_dest As DenseVector) As DenseVector
             If IsComputableMatrixVector(ai_source, ai_dest) = False Then
-                Throw New clsException(clsException.Series.NotComputable)
+                Throw New MyException(MyException.ErrorSeries.NotComputable)
             End If
-            Dim ret As New clsEasyVector(ai_dest)
+            Dim ret As New DenseVector(ai_dest)
             For i As Integer = 0 To ai_dest.Count - 1
                 ret(i) = ai_source(i)(0) + ai_dest(i)
             Next
@@ -274,11 +274,11 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator +(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyMatrix) As clsEasyVector
+        Public Shared Operator +(ByVal ai_source As DenseVector, ByVal ai_dest As DenseMatrix) As DenseVector
             If IsComputableMatrixVector(ai_dest, ai_source) = False Then
-                Throw New clsException(clsException.Series.NotComputable)
+                Throw New MyException(MyException.ErrorSeries.NotComputable)
             End If
-            Dim ret As New clsEasyVector(ai_source)
+            Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ai_source.Count - 1
                 ret(i) = ai_source(i) + ai_dest(i)(0)
             Next
@@ -292,11 +292,11 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator -(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
+        Public Shared Operator -(ByVal ai_source As DenseMatrix, ByVal ai_dest As DenseMatrix) As DenseMatrix
             If IsSameDimension(ai_source, ai_dest) = False Then
-                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
-            Dim ret As New clsEasyMatrix(ai_source)
+            Dim ret As New DenseMatrix(ai_source)
             Dim row = ret.RowCount()
             Dim col = ret.ColCount()
             For i As Integer = 0 To row - 1
@@ -314,9 +314,9 @@
         ''' <param name="vec"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator -(ByVal mat As clsEasyMatrix, ByVal vec As clsEasyVector) As clsEasyMatrix
-            If vec.Direction = clsEasyVector.VectorDirection.COL AndAlso mat.ColCount = vec.Count Then
-                Dim ret As New clsEasyMatrix(mat)
+        Public Shared Operator -(ByVal mat As DenseMatrix, ByVal vec As DenseVector) As DenseMatrix
+            If vec.Direction = DenseVector.VectorDirection.COL AndAlso mat.ColCount = vec.Count Then
+                Dim ret As New DenseMatrix(mat)
                 Dim row = mat.RowCount
                 Dim col = mat.ColCount
                 For j = 0 To col - 1
@@ -325,8 +325,8 @@
                     Next
                 Next
                 Return ret
-            ElseIf vec.Direction = clsEasyVector.VectorDirection.ROW AndAlso mat.RowCount = vec.Count Then
-                Dim ret As New clsEasyMatrix(mat)
+            ElseIf vec.Direction = DenseVector.VectorDirection.ROW AndAlso mat.RowCount = vec.Count Then
+                Dim ret As New DenseMatrix(mat)
                 Dim row = mat.RowCount
                 Dim col = mat.ColCount
                 For i = 0 To row - 1
@@ -336,7 +336,7 @@
                 Next
                 Return ret
             Else
-                Throw New clsException(clsException.Series.NotComputable, "The number of dimensions of matrices and vectors is different.")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "The number of dimensions of matrices and vectors is different.")
             End If
         End Operator
 
@@ -347,11 +347,11 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator -(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyMatrix) As clsEasyVector
+        Public Shared Operator -(ByVal ai_source As DenseVector, ByVal ai_dest As DenseMatrix) As DenseVector
             If IsComputableMatrixVector(ai_dest, ai_source) = False Then
-                Throw New clsException(clsException.Series.NotComputable)
+                Throw New MyException(MyException.ErrorSeries.NotComputable)
             End If
-            Dim ret As New clsEasyVector(ai_source)
+            Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ai_source.Count - 1
                 ret(i) = ai_source(i) - ai_dest(i)(0)
             Next
@@ -366,7 +366,7 @@
         ''' <returns></returns>
         ''' <remarks>
         ''' </remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
+        Public Shared Operator *(ByVal ai_source As DenseMatrix, ByVal ai_dest As DenseMatrix) As DenseMatrix
             '.NET Frameworkのバージョンで区分け
 #If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
             '------------------------------------------------------------------
@@ -375,7 +375,7 @@
             If IsSameDimension(ai_source, ai_dest) = True Then
                 '[M*M] X [M*M]
                 Dim size = ai_source.RowCount
-                Dim ret As New clsEasyMatrix(size)
+                Dim ret As New DenseMatrix(size)
 
                 For i As Integer = 0 To size - 1
                     For j As Integer = 0 To size - 1
@@ -389,7 +389,7 @@
                 Return ret
             ElseIf ai_source.ColCount = ai_dest.RowCount Then
                 '[M*N] X [N*O]
-                Dim ret As New clsEasyMatrix(ai_source.RowCount, ai_dest.ColCount)
+                Dim ret As New DenseMatrix(ai_source.RowCount, ai_dest.ColCount)
 
                 For i As Integer = 0 To ret.RowCount - 1
                     For j As Integer = 0 To ret.ColCount - 1
@@ -403,7 +403,7 @@
                 Return ret
             End If
 
-            Throw New clsException(clsException.Series.NotComputable, "Matrix * Matrix")
+            Throw New MyException(MyException.ErrorSeries.NotComputable, "Matrix * Matrix")
 #Else
         '------------------------------------------------------------------
         '.net 4.0
@@ -417,7 +417,7 @@
         If IsSameDimension(ai_source, ai_dest) = True Then
             '[M*M] X [M*M]
             Dim size = ai_source.RowCount
-            Dim ret As New clsEasyMatrix(size)
+            Dim ret As New DenseMatrix(size)
 
             Threading.Tasks.Parallel.For(0, size,
                                              Sub(i)
@@ -433,7 +433,7 @@
         ElseIf ai_source.ColCount = ai_dest.RowCount Then
             '[M*N] X [N*O]
             Dim rowSize = ai_source.RowCount
-            Dim ret As New clsEasyMatrix(ai_source.RowCount, ai_dest.ColCount)
+            Dim ret As New DenseMatrix(ai_source.RowCount, ai_dest.ColCount)
 
             Threading.Tasks.Parallel.For(0, rowSize,
                                              Sub(i)
@@ -448,7 +448,7 @@
             Return ret
         End If
 
-        Throw New clsException(clsException.Series.NotComputable, "Matrix * Matrix")
+        Throw New MyException(MyException.ErrorSeries.NotComputable, "Matrix * Matrix")
 #End If
         End Operator
 
@@ -460,7 +460,7 @@
         ''' <returns></returns>
         ''' <remarks>
         ''' </remarks>
-        Public Shared Operator *(ByVal mat As clsEasyMatrix, ByVal vec As clsEasyVector) As clsEasyVector
+        Public Shared Operator *(ByVal mat As DenseMatrix, ByVal vec As DenseVector) As DenseVector
             'ベクトルと行列のサイズ確認
             ' M*M * M
             ' |a11 a12| * |v1| = cv1
@@ -475,14 +475,14 @@
             ' |a31 a32|          cv3
             '
             If mat.ColCount <> vec.Count Then
-                Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector - size error")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "Matrix * Vector - size error")
             End If
             'If vec.Direction <> clsEasyVector.VectorDirection.COL Then
             '    Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector - vector direction is row")
             'End If
 
             Dim vSize As Integer = mat.RowCount
-            Dim ret As New clsEasyVector(vSize, clsEasyVector.VectorDirection.COL)
+            Dim ret As New DenseVector(vSize, DenseVector.VectorDirection.COL)
 #If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
             For i As Integer = 0 To vSize - 1
                 Dim sum As Double = 0.0
@@ -513,7 +513,7 @@
         ''' <returns></returns>
         ''' <remarks>
         ''' </remarks>
-        Public Shared Operator *(ByVal vec As clsEasyVector, ByVal mat As clsEasyMatrix) As clsEasyVector
+        Public Shared Operator *(ByVal vec As DenseVector, ByVal mat As DenseMatrix) As DenseVector
             'ベクトルと行列のサイズ確認
             'OK
             ' |v1 v2| * |a11| = |c1|
@@ -526,14 +526,14 @@
             '           |a21 a22 a23|   
             '
             If vec.Count <> mat.RowCount Then
-                Throw New clsException(clsException.Series.NotComputable, "Vector * Matrix - size error")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "Vector * Matrix - size error")
             End If
             'If vec.Direction <> clsEasyVector.VectorDirection.COL Then
             '    Throw New clsException(clsException.Series.NotComputable, "Vector * Matrix - vector direction is col")
             'End If
 
             Dim vSize As Integer = mat.ColCount '行列の行サイズ
-            Dim ret As New clsEasyVector(vSize, clsEasyVector.VectorDirection.ROW)
+            Dim ret As New DenseVector(vSize, DenseVector.VectorDirection.ROW)
 #If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
             For j As Integer = 0 To vSize - 1
                 Dim sum As Double = 0.0
@@ -563,8 +563,8 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator *(ByVal ai_source As Double, ByVal ai_dest As clsEasyMatrix) As clsEasyMatrix
-            Dim ret As New clsEasyMatrix(ai_dest)
+        Public Shared Operator *(ByVal ai_source As Double, ByVal ai_dest As DenseMatrix) As DenseMatrix
+            Dim ret As New DenseMatrix(ai_dest)
             For i As Integer = 0 To ret.RowCount() - 1
                 ret.Row(i) = ai_source * ai_dest.Row(i)
             Next
@@ -578,8 +578,8 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As Double) As clsEasyMatrix
-            Dim ret As New clsEasyMatrix(ai_source)
+        Public Shared Operator *(ByVal ai_source As DenseMatrix, ByVal ai_dest As Double) As DenseMatrix
+            Dim ret As New DenseMatrix(ai_source)
             For i As Integer = 0 To ret.RowCount() - 1
                 ret.Row(i) = ai_source.Row(i) * ai_dest
             Next
@@ -593,8 +593,8 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator /(ByVal ai_source As clsEasyMatrix, ByVal ai_dest As Double) As clsEasyMatrix
-            Dim ret As New clsEasyMatrix(ai_source)
+        Public Shared Operator /(ByVal ai_source As DenseMatrix, ByVal ai_dest As Double) As DenseMatrix
+            Dim ret As New DenseMatrix(ai_source)
             For i As Integer = 0 To ret.RowCount() - 1
                 ret.Row(i) = ai_source.Row(i) / ai_dest
             Next
@@ -607,8 +607,8 @@
         ''' Transpose
         ''' </summary>
         ''' <remarks></remarks>
-        Public Function T() As clsEasyMatrix
-            Dim ret As New clsEasyMatrix(Me.ColCount, Me.RowCount)
+        Public Function T() As DenseMatrix
+            Dim ret As New DenseMatrix(Me.ColCount, Me.RowCount)
 
 #If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
             '------------------------------------------------------------------
@@ -639,7 +639,7 @@
             Dim n_dim = Me.RowCount
             Dim m_dim = Me.ColCount
             If m_dim <> n_dim Then
-                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
             For i = 0 To n_dim - 1
                 For j = 0 To n_dim - 1
@@ -657,11 +657,11 @@
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ToDiagonalMatrix() As clsEasyMatrix
+        Public Function ToDiagonalMatrix() As DenseMatrix
             If Me.RowCount <> Me.ColCount Then
-                Throw New clsException(clsException.Series.NotComputable, "ToDiagonalMatrix()")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "ToDiagonalMatrix()")
             End If
-            Dim ret As New clsEasyMatrix(Me.RowCount)
+            Dim ret As New DenseMatrix(Me.RowCount)
             For i As Integer = 0 To Me.Count - 1
                 ret(i)(i) = Me(i)(i)
             Next
@@ -673,11 +673,11 @@
         ''' </summary>
         ''' <param name="direction">direction of vector(default:row)</param>
         ''' <returns></returns>
-        Public Function ToDiagonalVector(Optional ByVal direction As clsEasyVector.VectorDirection = clsEasyVector.VectorDirection.ROW) As clsEasyVector
+        Public Function ToDiagonalVector(Optional ByVal direction As DenseVector.VectorDirection = DenseVector.VectorDirection.ROW) As DenseVector
             If Me.RowCount <> Me.ColCount Then
-                Throw New clsException(clsException.Series.NotComputable, "ToVectorFromDiagonal")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "ToVectorFromDiagonal")
             End If
-            Dim ret As New clsEasyVector(Me.RowCount, direction)
+            Dim ret As New DenseVector(Me.RowCount, direction)
             For i As Integer = 0 To Me.Count - 1
                 ret(i) = Me(i)(i)
             Next
@@ -699,7 +699,7 @@
             Else
                 str.Append(String.Format("Mat {0}x{1} =", Me.RowCount, Me.ColCount) & Environment.NewLine)
             End If
-            For Each vec As clsEasyVector In Me
+            For Each vec As DenseVector In Me
                 For i As Integer = 0 To vec.Count - 1
                     If isScientificNotation = False Then
                         str.Append(vec(i).ToString("F" & ai_preci.ToString()) & vbTab)
@@ -816,8 +816,8 @@
         ''' Sqrt(Mat)
         ''' </summary>
         ''' <returns></returns>
-        Public Function Sqrt() As clsEasyMatrix
-            Dim ret = New clsEasyMatrix(Me)
+        Public Function Sqrt() As DenseMatrix
+            Dim ret = New DenseMatrix(Me)
             Dim row = Me.RowCount
             Dim col = Me.ColCount
             For i = 0 To row - 1
@@ -832,9 +832,9 @@
         ''' Hadamard product ( a1 * b1, a2 * b2, ... )
         ''' </summary>
         ''' <param name="b">( a1 * a1, a2 * a2, ... )</param>
-        Public Function HadamardProduct(Optional ByRef b As clsEasyMatrix = Nothing) As clsEasyMatrix
+        Public Function HadamardProduct(Optional ByRef b As DenseMatrix = Nothing) As DenseMatrix
             If b Is Nothing Then
-                Dim ret = New clsEasyMatrix(Me)
+                Dim ret = New DenseMatrix(Me)
                 Dim row = Me.RowCount
                 Dim col = Me.ColCount
                 For i = 0 To row - 1
@@ -845,9 +845,9 @@
                 Return ret
             Else
                 If IsSameDimension(b, Me) = False Then
-                    Throw New clsException(clsException.Series.DifferElementNumber)
+                    Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
                 End If
-                Dim ret = New clsEasyMatrix(Me)
+                Dim ret = New DenseMatrix(Me)
                 Dim row = Me.RowCount
                 Dim col = Me.ColCount
                 For i = 0 To row - 1
@@ -864,11 +864,11 @@
         ''' </summary>
         ''' <param name="b"></param>
         ''' <returns></returns>
-        Public Function HadamardDivide(ByRef b As clsEasyMatrix) As clsEasyMatrix
+        Public Function HadamardDivide(ByRef b As DenseMatrix) As DenseMatrix
             If IsSameDimension(b, Me) = False Then
-                Throw New clsException(clsException.Series.DifferElementNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
             End If
-            Dim ret = New clsEasyMatrix(Me)
+            Dim ret = New DenseMatrix(Me)
             Dim row = Me.RowCount
             Dim col = Me.ColCount
             For i = 0 To row - 1
@@ -884,12 +884,12 @@
         ''' </summary>
         ''' <param name="vectorDirection"></param>
         ''' <returns></returns>
-        Public Function AverageVector(ByVal vectorDirection As clsEasyVector.VectorDirection) As clsEasyVector
+        Public Function AverageVector(ByVal vectorDirection As DenseVector.VectorDirection) As DenseVector
             Dim row = Me.RowCount
             Dim col = Me.ColCount
-            Dim ret As clsEasyVector = Nothing
-            If vectorDirection = clsEasyVector.VectorDirection.ROW Then
-                ret = New clsEasyVector(col, clsEasyVector.VectorDirection.COL)
+            Dim ret As DenseVector = Nothing
+            If vectorDirection = DenseVector.VectorDirection.ROW Then
+                ret = New DenseVector(col, DenseVector.VectorDirection.COL)
                 For j = 0 To col - 1
                     For i = 0 To row - 1
                         ret(j) += Me(i)(j)
@@ -898,7 +898,7 @@
                 Next
                 Return ret
             Else
-                ret = New clsEasyVector(row, clsEasyVector.VectorDirection.ROW)
+                ret = New DenseVector(row, DenseVector.VectorDirection.ROW)
                 For i = 0 To row - 1
                     For j = 0 To col - 1
                         ret(i) += Me(i)(j)
@@ -951,12 +951,12 @@
         ''' <param name="isUsingLUDecomposition"></param>
         ''' <param name="isForceInverse"></param>
         ''' <returns></returns>
-        Public Function Inverse(Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron,
+        Public Function Inverse(Optional ByVal eps As Double = DenseMatrix.MachineEpsiron,
                                 Optional ByVal isUsingLUDecomposition As Boolean = False,
                                 Optional ByVal isForceInverse As Boolean = False
-                                ) As clsEasyMatrix
+                                ) As DenseMatrix
             If Me.RowCount <> Me.ColCount Then
-                Return New clsEasyMatrix(0)
+                Return New DenseMatrix(0)
             End If
 
             If isForceInverse = True Then
@@ -964,19 +964,19 @@
             End If
 
             Dim n As Integer = Me.RowCount
-            Dim source As New clsEasyMatrix(Me)
-            Dim retInverse As New clsEasyMatrix(n, False)
+            Dim source As New DenseMatrix(Me)
+            Dim retInverse As New DenseMatrix(n, False)
             If n = 0 Then
                 'nop
             ElseIf n = 1 Then
-                If clsMathUtil.IsCloseToZero(source(0)(0), eps) = True Then
-                    Throw New clsException(clsException.Series.NotComputable, "Inverse 1x1")
+                If MathUtil.IsCloseToZero(source(0)(0), eps) = True Then
+                    Throw New MyException(MyException.ErrorSeries.NotComputable, "Inverse 1x1")
                 End If
                 retInverse(0)(0) = 1.0 / source(0)(0)
             ElseIf n = 2 AndAlso isUsingLUDecomposition = False Then
                 Dim det = Me.Det()
-                If clsMathUtil.IsCloseToZero(det, eps) = True Then
-                    Throw New clsException(clsException.Series.NotComputable, "Inverse 2x2")
+                If MathUtil.IsCloseToZero(det, eps) = True Then
+                    Throw New MyException(MyException.ErrorSeries.NotComputable, "Inverse 2x2")
                 End If
                 det = 1.0 / det
                 retInverse(0)(0) = det * Me(1)(1)
@@ -985,8 +985,8 @@
                 retInverse(1)(1) = det * Me(0)(0)
             ElseIf n = 3 AndAlso isUsingLUDecomposition = False Then
                 Dim det = Me.Det()
-                If clsMathUtil.IsCloseToZero(det, eps) = True Then
-                    Throw New clsException(clsException.Series.NotComputable, "Inverse 3x3")
+                If MathUtil.IsCloseToZero(det, eps) = True Then
+                    Throw New MyException(MyException.ErrorSeries.NotComputable, "Inverse 3x3")
                 End If
                 retInverse(0)(0) = ((Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))) / det
                 retInverse(0)(1) = -((Me(0)(1) * Me(2)(2) - Me(0)(2) * Me(2)(1))) / det
@@ -1000,13 +1000,13 @@
             Else
                 Dim lup = Me.LUP()
                 Dim det = lup.Det
-                If clsMathUtil.IsCloseToZero(det, eps) = True Then
-                    Throw New clsException(clsException.Series.NotComputable, String.Format("Inverse {0}x{0} det=0", n))
+                If MathUtil.IsCloseToZero(det, eps) = True Then
+                    Throw New MyException(MyException.ErrorSeries.NotComputable, String.Format("Inverse {0}x{0} det=0", n))
                 End If
 
                 'lup.P = lup.P.T() 'Transopose = Inverse
                 For j = 0 To n - 1
-                    Dim y = New clsEasyVector(n)
+                    Dim y = New DenseVector(n)
                     Dim b = lup.P(j)
                     For i = 0 To n - 1
                         Dim s = 0.0
@@ -1039,8 +1039,8 @@
             '[2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
 
             Dim n = Me.ColCount
-            Dim source = New clsEasyMatrix(Me)
-            Dim matP = New clsEasyMatrix(n, True)
+            Dim source = New DenseMatrix(Me)
+            Dim matP = New DenseMatrix(n, True)
 
             Dim det = 1.0
             Dim weight = New Double(n - 1) {}
@@ -1057,8 +1057,8 @@
                     End If
                 Next
                 '列要素の絶対最大値が0に近い場合
-                If clsMathUtil.IsCloseToZero(absValue, eps) Then
-                    Throw New clsException(clsException.Series.NotComputable, "LUP() singular matrix")
+                If MathUtil.IsCloseToZero(absValue, eps) Then
+                    Throw New MyException(MyException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
                 weight(i) = 1.0 / absValue
             Next
@@ -1090,8 +1090,8 @@
 
                 'interchange row
                 If j <> imax Then
-                    clsMathUtil.SwapRow(source, imax, j)
-                    clsMathUtil.SwapRow(matP, imax, j)
+                    MathUtil.SwapRow(source, imax, j)
+                    MathUtil.SwapRow(matP, imax, j)
                     weight(imax) = weight(j)
 
                     'change sign
@@ -1103,7 +1103,7 @@
                     pivotrow(j) = temp
                 End If
                 'diagonal value is close to 0.
-                If clsMathUtil.IsCloseToZero(source(j)(j), eps) Then
+                If MathUtil.IsCloseToZero(source(j)(j), eps) Then
                     source(j)(j) = SAME_ZERO
                 End If
 
@@ -1122,8 +1122,8 @@
             matP = matP.T
 
             'replace
-            Dim matL = New clsEasyMatrix(n, True)
-            Dim matU = New clsEasyMatrix(n, True)
+            Dim matL = New DenseMatrix(n, True)
+            Dim matU = New DenseMatrix(n, True)
             For i = 1 To n - 1
                 For j = 0 To i - 1
                     matL(i)(j) = source(i)(j)
@@ -1149,10 +1149,10 @@
             '[2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
 
             Dim n = Me.ColCount
-            Dim source = New clsEasyMatrix(Me)
-            Dim matL = New clsEasyMatrix(n, True)
-            Dim matU = New clsEasyMatrix(n, True)
-            Dim matP = New clsEasyMatrix(n, True)
+            Dim source = New DenseMatrix(Me)
+            Dim matL = New DenseMatrix(n, True)
+            Dim matU = New DenseMatrix(n, True)
+            Dim matP = New DenseMatrix(n, True)
 
             Dim det = 1.0
             Dim imax As Integer = 0
@@ -1174,7 +1174,7 @@
                 Next
                 If absValue = 0.0 Then
                     'If absValue < SAME_ZERO Then
-                    Throw New clsException(clsException.Series.NotComputable, "singular matrix")
+                    Throw New MyException(MyException.ErrorSeries.NotComputable, "singular matrix")
                 End If
                 weight(k) = 1.0 / absValue
             Next
@@ -1196,11 +1196,11 @@
                 If j <> k Then
                     ip(j) = ip(k)
                     ip(k) = ik
-                    clsMathUtil.SwapRow(matP, j, k)
+                    MathUtil.SwapRow(matP, j, k)
                     det = -det
                 End If
                 u = source(ik)(k)
-                If clsMathUtil.IsCloseToZero(u) Then
+                If MathUtil.IsCloseToZero(u) Then
                     u = SAME_ZERO
                 End If
                 det *= u
@@ -1241,8 +1241,8 @@
         ''' <returns></returns>
         Public Function LUP2(Optional ByVal eps As Double = MachineEpsiron) As LU
             Dim n = Me.ColCount
-            Dim a = New clsEasyMatrix(Me)
-            Dim matP = New clsEasyMatrix(n, True)
+            Dim a = New DenseMatrix(Me)
+            Dim matP = New DenseMatrix(n, True)
             Dim ip = 0
             Dim pivotRow = New Integer(n - 1) {}
             Dim det = 1.0
@@ -1263,8 +1263,8 @@
                 Next
 
                 '列要素の絶対最大値が0に近い場合
-                If clsMathUtil.IsCloseToZero(amax, eps) Then
-                    Throw New clsException(clsException.Series.NotComputable, "LUP() singular matrix")
+                If MathUtil.IsCloseToZero(amax, eps) Then
+                    Throw New MyException(MyException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
 
                 'ピボット選択行を保存
@@ -1276,7 +1276,7 @@
                         a(ip)(j) = tempVal
                     Next
 
-                    clsMathUtil.SwapRow(matP, k, ip)
+                    MathUtil.SwapRow(matP, k, ip)
                     Dim temp = pivotRow(ip)
                     pivotRow(ip) = pivotRow(k)
                     pivotRow(k) = temp
@@ -1286,7 +1286,7 @@
                 End If
 
                 'diagonal value is close to 0.
-                If clsMathUtil.IsCloseToZero(a(k)(k), eps) Then
+                If MathUtil.IsCloseToZero(a(k)(k), eps) Then
                     a(k)(k) = SAME_ZERO
                 End If
 
@@ -1308,8 +1308,8 @@
             'a.PrintValue(10)
 
             'replace
-            Dim matL = New clsEasyMatrix(n, True)
-            Dim matU = New clsEasyMatrix(n, True)
+            Dim matL = New DenseMatrix(n, True)
+            Dim matU = New DenseMatrix(n, True)
             For i = 1 To n - 1
                 For j = 0 To i - 1
                     matL(i)(j) = a(i)(j)
@@ -1344,12 +1344,12 @@
         ''' Cholesky decomposition A=LL^T
         ''' </summary>
         ''' <returns></returns>
-        Public Function Cholesky() As clsEasyMatrix
+        Public Function Cholesky() As DenseMatrix
             If Me.IsSquare() = False Then
-                Throw New clsException(clsException.Series.NotComputable, "Cholesky() not Square")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "Cholesky() not Square")
             End If
 
-            Dim ret As New clsEasyMatrix(Me.RowCount)
+            Dim ret As New DenseMatrix(Me.RowCount)
             Dim n = CInt(System.Math.Sqrt(ret.RowCount * ret.ColCount))
             For i As Integer = 0 To n - 1
                 For j As Integer = 0 To i
@@ -1380,12 +1380,12 @@
         ''' 対称行列をハウスホルダー変換 → 三重対角行列
         ''' </remarks>
         ''' <returns></returns>
-        Public Function Householder() As clsEasyMatrix
-            Dim a = New clsEasyMatrix(Me)
+        Public Function Householder() As DenseMatrix
+            Dim a = New DenseMatrix(Me)
             Dim n = a.Count
-            Dim f = New clsEasyVector(n)
-            Dim g = New clsEasyVector(n)
-            Dim u = New clsEasyVector(n)
+            Dim f = New DenseVector(n)
+            Dim g = New DenseVector(n)
+            Dim u = New DenseVector(n)
 
             For k = 0 To n - 3
                 For i = 0 To k
@@ -1399,7 +1399,7 @@
                 For i = k + 2 To n - 1
                     ss += u(i) * u(i)
                 Next
-                If clsMathUtil.IsCloseToZero(ss) = True Then
+                If MathUtil.IsCloseToZero(ss) = True Then
                     Continue For
                 End If
                 Dim s = System.Math.Sqrt(ss + u(k + 1) * u(k + 1))
@@ -1465,17 +1465,17 @@
                               Optional ByVal IsSort As Boolean = True,
                               Optional ByVal IsSymmetricCheck As Boolean = False) As Eigen
             If Me.IsSquare() = False Then
-                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
             If IsSymmetricCheck = True Then
                 If Me.IsSymmetricMatrix() = False Then
-                    Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                    Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
                 End If
             End If
 
             Dim size = Me.ColCount()
-            Dim retEigenMat = New clsEasyMatrix(Me)
-            Dim rotate = New clsEasyMatrix(size, True)
+            Dim retEigenMat = New DenseMatrix(Me)
+            Dim rotate = New DenseMatrix(size, True)
             Dim isConversion = False
             Dim rowIdx() = New Integer(size * 4 - 1) {}
             Dim colIdx() = New Integer(size * 4 - 1) {}
@@ -1508,13 +1508,13 @@
                 Dim temp_pq = retEigenMat(p)(q)
                 Dim theta = 0.0
                 Dim diff = temp_pp - temp_qq
-                If clsMathUtil.IsCloseToZero(diff) = True Then
+                If MathUtil.IsCloseToZero(diff) = True Then
                     theta = System.Math.PI / 4.0
                 Else
                     theta = System.Math.Atan(-2.0 * temp_pq / diff) * 0.5
                 End If
 
-                Dim D = New clsEasyMatrix(retEigenMat)
+                Dim D = New DenseMatrix(retEigenMat)
                 Dim cosTheta = System.Math.Cos(theta)
                 Dim sinTheta = System.Math.Sin(theta)
                 For i As Integer = 0 To size - 1
@@ -1537,7 +1537,7 @@
                 retEigenMat = D
 
                 'rotate
-                Dim rotateNew = New clsEasyMatrix(size, True)
+                Dim rotateNew = New DenseMatrix(size, True)
                 rotateNew(p)(p) = cosTheta
                 rotateNew(p)(q) = sinTheta
                 rotateNew(q)(p) = -sinTheta
@@ -1548,7 +1548,7 @@
             'sort by Eigen value
             Dim eigenValue = retEigenMat.ToDiagonalVector()
             If IsSort = True Then
-                clsMathUtil.EigenSort(eigenValue, rotate, True)
+                MathUtil.EigenSort(eigenValue, rotate, True)
             End If
 
             Return New Eigen(eigenValue, rotate, isConversion)
@@ -1567,7 +1567,7 @@
                                    Optional ByVal Conversion As Double = 0.000000000000001,
                                    Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
-                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
 
             'Householder変換
@@ -1575,12 +1575,12 @@
 
             'QR method
             Dim n As Integer = h.RowCount
-            Dim r = New clsEasyMatrix(h)
-            Dim q = New clsEasyMatrix(n)
-            Dim t = New clsEasyMatrix(n)
+            Dim r = New DenseMatrix(h)
+            Dim q = New DenseMatrix(n)
+            Dim t = New DenseMatrix(n)
 
-            Dim u = New clsEasyVector(n)
-            Dim vv = New clsEasyVector(n)
+            Dim u = New DenseVector(n)
+            Dim vv = New DenseVector(n)
 
             Dim cnt = 0
             Dim isConversion = False
@@ -1596,8 +1596,8 @@
                 Next
 
                 For k = 0 To n - 2
-                    Dim alpha = clsMathUtil.PythagoreanAddition(r(k)(k), r(k + 1)(k))
-                    If clsMathUtil.IsCloseToZero(alpha) = True Then
+                    Dim alpha = MathUtil.PythagoreanAddition(r(k)(k), r(k + 1)(k))
+                    If MathUtil.IsCloseToZero(alpha) = True Then
                         Continue For
                     End If
 
@@ -1667,13 +1667,13 @@
             Dim eigenValue = h.ToDiagonalVector()
 
             'EigenVector
-            Dim eigenVector = New clsEasyMatrix(n)
+            Dim eigenVector = New DenseMatrix(n)
             For i = 0 To n - 1
                 'initialize
-                Dim y = New clsEasyVector(n)
+                Dim y = New DenseVector(n)
                 y(i) = 1.0
 
-                Dim tempMat = Me - (New clsEasyMatrix(n, eigenValue(i)))
+                Dim tempMat = Me - (New DenseMatrix(n, eigenValue(i)))
                 Dim luSolver = tempMat.LUP()
 
                 'iteration
@@ -1713,7 +1713,7 @@
 
             'sort by Eigen value
             If IsSort = True Then
-                clsMathUtil.EigenSort(eigenValue, eigenVector, False)
+                MathUtil.EigenSort(eigenValue, eigenVector, False)
             End If
 
             Return New Eigen(eigenValue, eigenVector, True)
@@ -1730,7 +1730,7 @@
                                    Optional ByVal Conversion As Double = 0.000000000000001,
                                    Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
-                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
 
             'Householder transform
@@ -1738,8 +1738,8 @@
             Dim n = a.RowCount
             With Nothing
                 'QR method
-                Dim q = New clsEasyMatrix(n)
-                Dim work = New clsEasyVector(n)
+                Dim q = New DenseMatrix(n)
+                Dim work = New DenseVector(n)
                 Dim m = n - 1
                 While (m > 1)
                     Dim dVal = a(m)(m - 1)
@@ -1767,8 +1767,8 @@
                         Dim sint = 0.0
                         Dim cost = 0.0
                         'Dim r = Math.Sqrt(a(i)(i) * a(i)(i) + a(i + 1)(i) * a(i + 1)(i))
-                        Dim r = clsMathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
-                        If clsMathUtil.IsCloseToZero(r) = True Then
+                        Dim r = MathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
+                        If MathUtil.IsCloseToZero(r) = True Then
                             sint = 0.0
                             cost = 0.0
                         Else
@@ -1817,13 +1817,13 @@
             Dim eigenValues = a.ToDiagonalVector()
 
             'Eigen vector
-            Dim eigenVectors = New clsEasyMatrix(n)
+            Dim eigenVectors = New DenseMatrix(n)
             For i = 0 To n - 1
                 'initialize
-                Dim y = New clsEasyVector(n)
+                Dim y = New DenseVector(n)
                 y(i) = 1.0
 
-                Dim tempMat = Me - (New clsEasyMatrix(n, eigenValues(i)))
+                Dim tempMat = Me - (New DenseMatrix(n, eigenValues(i)))
                 Dim luSolver = tempMat.LUP()
 
                 'iteration
@@ -1863,7 +1863,7 @@
 
             'sort by Eigen value
             If IsSort = True Then
-                clsMathUtil.EigenSort(eigenValues, eigenVectors, False)
+                MathUtil.EigenSort(eigenValues, eigenVectors, False)
             End If
 
             Return New Eigen(eigenValues, eigenVectors, True)
@@ -1880,7 +1880,7 @@
                                    Optional ByVal Conversion As Double = 0.000000000000001,
                                    Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
-                Throw New clsException(clsException.Series.DifferRowNumberAndCollumnNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
 
             'Householder transform
@@ -1888,8 +1888,8 @@
             Dim n = a.RowCount
             With Nothing
                 'QR method
-                Dim q = New clsEasyMatrix(n)
-                Dim work = New clsEasyVector(n)
+                Dim q = New DenseMatrix(n)
+                Dim work = New DenseVector(n)
                 Dim m = n - 1
                 While (m > 1)
                     Dim dVal = a(m)(m - 1)
@@ -1917,8 +1917,8 @@
                         Dim sint = 0.0
                         Dim cost = 0.0
                         'Dim r = Math.Sqrt(a(i)(i) * a(i)(i) + a(i + 1)(i) * a(i + 1)(i))
-                        Dim r = clsMathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
-                        If clsMathUtil.IsCloseToZero(r) = True Then
+                        Dim r = MathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
+                        If MathUtil.IsCloseToZero(r) = True Then
                             sint = 0.0
                             cost = 0.0
                         Else
@@ -1967,15 +1967,15 @@
             Dim eigenValues = a.ToDiagonalVector()
 
             'eigen vector
-            Dim eigenVectors = New clsEasyMatrix(n)
+            Dim eigenVectors = New DenseMatrix(n)
             Dim cnt = 0
             For eIdx = 0 To n - 1
                 'initialize
-                Dim y = New clsEasyVector(n)
+                Dim y = New DenseVector(n)
                 y(eIdx) = 1.0
 
                 'LU decomp
-                Dim ludecomp = Me - (New clsEasyMatrix(n, eigenValues(eIdx)))
+                Dim ludecomp = Me - (New DenseMatrix(n, eigenValues(eIdx)))
                 Dim p() As Integer = Nothing
                 LUPForEigen(ludecomp, p, MachineEpsiron)
 
@@ -1987,7 +1987,7 @@
                 cnt = 0
                 While (True)
                     mu0 = mu
-                    Dim v = New clsEasyVector(y)
+                    Dim v = New DenseVector(y)
 
                     'solve
                     For k = 0 To n - 2
@@ -2019,7 +2019,7 @@
                     '    Next
                     '    Exit While
                     'End If
-                    If clsMathUtil.IsCloseToValues(mu, mu0) Then
+                    If MathUtil.IsCloseToValues(mu, mu0) Then
                         For j = 0 To n - 1
                             eigenVectors(eIdx)(j) = y(j)
                         Next
@@ -2044,7 +2044,7 @@
         ''' <param name="a"></param>
         ''' <param name="pivotRow"></param>
         ''' <param name="Conversion"></param>
-        Private Sub LUPForEigen(ByRef a As clsEasyMatrix, ByRef pivotRow() As Integer, Conversion As Double)
+        Private Sub LUPForEigen(ByRef a As DenseMatrix, ByRef pivotRow() As Integer, Conversion As Double)
             Dim n = a.RowCount
             Dim ip = 0
             pivotRow = New Integer(n - 1) {}
@@ -2063,8 +2063,8 @@
                 Next
 
                 '列要素の絶対最大値が0に近い場合
-                If clsMathUtil.IsCloseToZero(amax, Conversion) Then
-                    Throw New clsException(clsException.Series.NotComputable, "LUP() singular matrix")
+                If MathUtil.IsCloseToZero(amax, Conversion) Then
+                    Throw New MyException(MyException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
 
                 'ピボット選択行を保存
@@ -2080,7 +2080,7 @@
                 End If
 
                 'diagonal value is close to 0.
-                If clsMathUtil.IsCloseToZero(a(k)(k), Conversion) Then
+                If MathUtil.IsCloseToZero(a(k)(k), Conversion) Then
                     a(k)(k) = SAME_ZERO
                 End If
 
@@ -2108,7 +2108,7 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared Function IsSameDimension(ByRef ai_source As clsEasyMatrix, ByRef ai_dest As clsEasyMatrix) As Boolean
+        Private Shared Function IsSameDimension(ByRef ai_source As DenseMatrix, ByRef ai_dest As DenseMatrix) As Boolean
             If ai_source.RowCount <> ai_dest.RowCount Then
                 Return False
             End If
@@ -2125,7 +2125,7 @@
         ''' <param name="ai_vector"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared Function IsComputableMatrixVector(ByRef ai_matrix As clsEasyMatrix, ByRef ai_vector As clsEasyVector) As Boolean
+        Private Shared Function IsComputableMatrixVector(ByRef ai_matrix As DenseMatrix, ByRef ai_vector As DenseVector) As Boolean
             If (ai_matrix.ColCount = 1) AndAlso (ai_matrix.RowCount = ai_vector.Count) Then
                 Return True
             ElseIf (ai_matrix.RowCount = 1) AndAlso (ai_matrix.ColCount = ai_vector.Count) Then
@@ -2161,13 +2161,13 @@
     <Serializable>
     Public Class LU
         ''' <summary>Pivot matrix</summary>
-        Public Property P As clsEasyMatrix = Nothing
+        Public Property P As DenseMatrix = Nothing
 
         ''' <summary>Lower matrix</summary>
-        Public Property L As clsEasyMatrix = Nothing
+        Public Property L As DenseMatrix = Nothing
 
         ''' <summary>Upper matrix</summary>
-        Public Property U As clsEasyMatrix = Nothing
+        Public Property U As DenseMatrix = Nothing
 
         ''' <summary>Determinant</summary>
         Public Property Det As Double = 0.0
@@ -2188,7 +2188,7 @@
         ''' <param name="matL"></param>
         ''' <param name="matU"></param>
         ''' <param name="det"></param>
-        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double)
+        Public Sub New(ByRef matP As DenseMatrix, ByRef matL As DenseMatrix, ByRef matU As DenseMatrix, ByVal det As Double)
             Me.P = matP
             Me.L = matL
             Me.U = matU
@@ -2202,7 +2202,7 @@
         ''' <param name="matL"></param>
         ''' <param name="matU"></param>
         ''' <param name="det"></param>
-        Public Sub New(ByRef matP As clsEasyMatrix, ByRef matL As clsEasyMatrix, ByRef matU As clsEasyMatrix, ByVal det As Double, ByRef p() As Integer)
+        Public Sub New(ByRef matP As DenseMatrix, ByRef matL As DenseMatrix, ByRef matU As DenseMatrix, ByVal det As Double, ByRef p() As Integer)
             Me.P = matP
             Me.L = matL
             Me.U = matU
@@ -2215,7 +2215,7 @@
         ''' </summary>
         ''' <param name="b"></param>
         ''' <returns></returns>
-        Public Function Solve(ByRef b As clsEasyVector) As clsEasyVector
+        Public Function Solve(ByRef b As DenseVector) As DenseVector
             Return Me.Solve(Me.P, Me.L, Me.U, Me.PivotRow, b)
         End Function
 
@@ -2228,14 +2228,14 @@
         ''' <param name="pivotRow"></param>
         ''' <param name="vecB"></param>
         ''' <returns>x</returns>
-        Private Function Solve(ByRef matP As clsEasyMatrix,
-                                   ByRef matL As clsEasyMatrix,
-                                   ByRef matU As clsEasyMatrix,
+        Private Function Solve(ByRef matP As DenseMatrix,
+                                   ByRef matL As DenseMatrix,
+                                   ByRef matU As DenseMatrix,
                                    ByRef pivotRow() As Integer,
-                                   ByRef vecB As clsEasyVector) As clsEasyVector
+                                   ByRef vecB As DenseVector) As DenseVector
             Dim n = matP.ColCount
-            Dim x = New clsEasyVector(n)
-            Dim y = New clsEasyVector(n)
+            Dim x = New DenseVector(n)
+            Dim y = New DenseVector(n)
 
             'transopose
             'Dim b = vecB * matP
@@ -2269,18 +2269,18 @@
     <Serializable>
     Public Class SVD
         ''' <summary></summary>
-        Public Property S As clsEasyMatrix = Nothing
+        Public Property S As DenseMatrix = Nothing
 
         ''' <summary></summary>
-        Public Property V As clsEasyVector = Nothing
+        Public Property V As DenseVector = Nothing
 
         ''' <summary></summary>
-        Public Property D As clsEasyMatrix = Nothing
+        Public Property D As DenseMatrix = Nothing
 
         Private Sub New()
         End Sub
 
-        Public Sub New(ByRef matS As clsEasyMatrix, ByRef matV As clsEasyVector, ByRef matD As clsEasyMatrix)
+        Public Sub New(ByRef matS As DenseMatrix, ByRef matV As DenseVector, ByRef matD As DenseMatrix)
             Me.S = matS
             Me.V = matV
             Me.D = matD
@@ -2293,10 +2293,10 @@
     <Serializable>
     Public Class Eigen
         ''' <summary></summary>
-        Public Property EigenValue As clsEasyVector = Nothing
+        Public Property EigenValue As DenseVector = Nothing
 
         ''' <summary></summary>
-        Public Property EigenVector As clsEasyMatrix = Nothing
+        Public Property EigenVector As DenseMatrix = Nothing
 
         ''' <summary></summary>
         Public Property IsConversion As Boolean = Nothing
@@ -2304,12 +2304,12 @@
         Private Sub New()
         End Sub
 
-        Public Sub New(ByRef eigeValue As clsEasyVector, ByRef eigenVec As clsEasyMatrix)
+        Public Sub New(ByRef eigeValue As DenseVector, ByRef eigenVec As DenseMatrix)
             Me.EigenValue = eigeValue
             Me.EigenVector = eigenVec
         End Sub
 
-        Public Sub New(ByRef eigeValue As clsEasyVector, ByRef eigenVec As clsEasyMatrix, ByVal isconversion As Boolean)
+        Public Sub New(ByRef eigeValue As DenseVector, ByRef eigenVec As DenseMatrix, ByVal isconversion As Boolean)
             Me.EigenValue = eigeValue
             Me.EigenVector = eigenVec
             Me.IsConversion = isconversion

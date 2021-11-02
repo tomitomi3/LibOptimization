@@ -11,14 +11,14 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Vec_CreateVector()
         With Nothing
-            Dim v As New clsEasyVector(3)
+            Dim v As New DenseVector(3)
             For i As Integer = 0 To 3 - 1
                 Assert.AreEqual(v(i), CType(0, Double))
             Next
         End With
 
         With Nothing
-            Dim v As New clsEasyVector(New Double() {1, 2, 3})
+            Dim v As New DenseVector(New Double() {1, 2, 3})
             For i As Integer = 0 To 3 - 1
                 Assert.AreEqual(v(i), CType(i + 1, Double))
             Next
@@ -30,10 +30,10 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_CreateMatrix()
         With Nothing
-            Dim mat = New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat = New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0, 0},
                                                   New Double() {0, 1, 0},
-                                                  New Double() {0, 0, 1}})
+                                                  New Double() {0, 0, 1}}))
 
             If mat.RowCount <> 3 Then
                 Assert.Fail("Row Error")
@@ -55,7 +55,7 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim mat = New MathUtil.clsEasyMatrix(3, True)
+            Dim mat = New LibOptimization.MathUtil.DenseMatrix(3, True)
 
             If mat.RowCount <> 3 Then
                 Assert.Fail("Row Error")
@@ -85,8 +85,8 @@ Imports LibOptimization.MathUtil
         'OK
         '------------------------
         With Nothing
-            Dim v As New clsEasyVector(New Double() {1, 1, 1})
-            Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
+            Dim v As New DenseVector(New Double() {1, 1, 1})
+            Dim matV As New DenseMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
             Try
                 Dim result = v + matV
                 If result(0) = 2.0 AndAlso result(1) = 3.0 AndAlso result(2) = 4.0 Then
@@ -103,13 +103,13 @@ Imports LibOptimization.MathUtil
         'Bad
         '------------------------
         With Nothing
-            Dim v As New clsEasyVector(New Double() {1, 1, 1})
-            Dim matV As New clsEasyMatrix(New Double()() {New Double() {1, 2, 3}})
+            Dim v As New DenseVector(New Double() {1, 1, 1})
+            Dim matV As New DenseMatrix(New Double()() {New Double() {1, 2, 3}})
             Try
                 v.PrintValue(name:="v")
                 matV.PrintValue(name:="matV")
 
-                v.Direction = clsEasyVector.VectorDirection.COL
+                v.Direction = DenseVector.VectorDirection.COL
                 Dim result = v + matV
 
                 'error
@@ -126,8 +126,8 @@ Imports LibOptimization.MathUtil
     <TestMethod()> Public Sub Mat_Mat_Add_MatrixMatrix()
         With Nothing
             Try
-                Dim v1 = New clsEasyMatrix(4, True)
-                Dim v2 = New clsEasyMatrix(5, True)
+                Dim v1 = New DenseMatrix(4, True)
+                Dim v2 = New DenseMatrix(5, True)
                 Dim temp = v1 + v2
 
                 Assert.Fail()
@@ -138,8 +138,8 @@ Imports LibOptimization.MathUtil
 
         With Nothing
             Try
-                Dim v1 = New clsEasyMatrix(5, True)
-                Dim v2 = New clsEasyMatrix(5, True)
+                Dim v1 = New DenseMatrix(5, True)
+                Dim v2 = New DenseMatrix(5, True)
                 Dim temp = v1 + v2
                 Dim diag = temp.ToDiagonalVector()
                 For Each val As Double In diag
@@ -155,8 +155,8 @@ Imports LibOptimization.MathUtil
     ''' Matrix + vector
     ''' </summary>
     <TestMethod()> Public Sub Mat_Mat_Add_MatrixVector()
-        Dim v As New clsEasyVector(New Double() {1, 1, 1})
-        Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
+        Dim v As New DenseVector(New Double() {1, 1, 1})
+        Dim matV As New DenseMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
         Try
             v = matV + v
             If v(0) = 2.0 AndAlso v(1) = 3.0 AndAlso v(2) = 4.0 Then
@@ -173,8 +173,8 @@ Imports LibOptimization.MathUtil
     ''' Vector - Matrix
     ''' </summary>
     <TestMethod()> Public Sub Mat_Sub_VectorMatrix()
-        Dim v As New clsEasyVector(New Double() {1, 1, 1})
-        Dim matV As New clsEasyMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
+        Dim v As New DenseVector(New Double() {1, 1, 1})
+        Dim matV As New DenseMatrix(New Double()() {New Double() {1}, New Double() {2}, New Double() {3}})
         Try
             v = v - matV
             If v(0) = 0 AndAlso v(1) = -1.0 AndAlso v(2) = -2.0 Then
@@ -193,8 +193,8 @@ Imports LibOptimization.MathUtil
     <TestMethod()> Public Sub Mat_Sub_MatrixVector()
         '3x2 ok
         With Nothing
-            Dim v As New clsEasyVector(New Double() {1, 1}, clsEasyVector.VectorDirection.COL)
-            Dim matV As New clsEasyMatrix(New Double()() {New Double() {1, 1}, New Double() {1, 1}, New Double() {1, 1}})
+            Dim v As New DenseVector(New Double() {1, 1}, DenseVector.VectorDirection.COL)
+            Dim matV As New DenseMatrix(New Double()() {New Double() {1, 1}, New Double() {1, 1}, New Double() {1, 1}})
             Dim ret = matV - v
             For Each vec In ret
                 For Each value In vec
@@ -211,8 +211,8 @@ Imports LibOptimization.MathUtil
 
         '3x2 ok
         With Nothing
-            Dim v As New clsEasyVector(New Double() {1, 1}, clsEasyVector.VectorDirection.ROW)
-            Dim matV As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {1, 1, 1}})
+            Dim v As New DenseVector(New Double() {1, 1}, DenseVector.VectorDirection.ROW)
+            Dim matV As New DenseMatrix(New Double()() {New Double() {1, 1, 1}, New Double() {1, 1, 1}})
             Dim ret = matV - v
             For Each vec In ret
                 For Each value In vec
@@ -228,8 +228,8 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim v As New clsEasyVector(New Double() {1, 1}, clsEasyVector.VectorDirection.COL)
-            Dim matV As New clsEasyMatrix(New Double()() {New Double() {1, 1}, New Double() {1, 1}, New Double() {1, 1}})
+            Dim v As New DenseVector(New Double() {1, 1}, DenseVector.VectorDirection.COL)
+            Dim matV As New DenseMatrix(New Double()() {New Double() {1, 1}, New Double() {1, 1}, New Double() {1, 1}})
             Try
                 v.PrintValue()
                 matV.PrintValue()
@@ -246,8 +246,8 @@ Imports LibOptimization.MathUtil
     <TestMethod()> Public Sub Mat_Sub_MatrixMatrix()
         With Nothing
             Try
-                Dim v1 = New clsEasyMatrix(4, True)
-                Dim v2 = New clsEasyMatrix(5, True)
+                Dim v1 = New DenseMatrix(4, True)
+                Dim v2 = New DenseMatrix(5, True)
                 Dim temp = v1 - v2
 
                 Assert.Fail()
@@ -258,8 +258,8 @@ Imports LibOptimization.MathUtil
 
         With Nothing
             Try
-                Dim v1 = New clsEasyMatrix(5, True)
-                Dim v2 = New clsEasyMatrix(5, True)
+                Dim v1 = New DenseMatrix(5, True)
+                Dim v2 = New DenseMatrix(5, True)
                 Dim temp = v1 - v2
                 Dim diag = temp.ToDiagonalVector()
                 For Each val As Double In diag
@@ -279,14 +279,14 @@ Imports LibOptimization.MathUtil
         'bad
         '----------------
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0, 0},
                                                   New Double() {0, 1, 0},
-                                                  New Double() {0, 0, 1}})
-            Dim v As New clsEasyVector(New Double() {2, 2}, clsEasyVector.VectorDirection.ROW)
+                                                  New Double() {0, 0, 1}}))
+            Dim v As New DenseVector(New Double() {2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = mat * v
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
                 Return
             End Try
@@ -295,14 +295,14 @@ Imports LibOptimization.MathUtil
 
         'bad
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0},
                                                   New Double() {0, 1},
-                                                  New Double() {0, 0}})
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+                                                  New Double() {0, 0}}))
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = mat * v
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
                 Return
             End Try
@@ -311,13 +311,13 @@ Imports LibOptimization.MathUtil
 
         'bad
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0, 0},
-                                                  New Double() {0, 0, 1}})
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+                                                  New Double() {0, 0, 1}}))
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = mat * v
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
                 Return
             End Try
@@ -328,11 +328,11 @@ Imports LibOptimization.MathUtil
         'OK
         '----------------
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0, 0},
                                                   New Double() {0, 1, 0},
-                                                  New Double() {0, 0, 1}})
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.COL)
+                                                  New Double() {0, 0, 1}}))
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.COL)
             Try
                 mat.PrintValue()
                 Dim temp = mat * v
@@ -343,7 +343,7 @@ Imports LibOptimization.MathUtil
                 End If
 
                 'dirction check
-                If temp.Direction = clsEasyVector.VectorDirection.ROW Then
+                If temp.Direction = DenseVector.VectorDirection.ROW Then
                     Assert.Fail()
                 End If
 
@@ -359,9 +359,9 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
-                                                  New Double() {1, 2, 3}})
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.COL)
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
+                                                  New Double() {1, 2, 3}}))
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.COL)
             Try
                 Dim temp = mat * v
 
@@ -371,7 +371,7 @@ Imports LibOptimization.MathUtil
                 End If
 
                 'dirction check
-                If temp.Direction = clsEasyVector.VectorDirection.ROW Then
+                If temp.Direction = DenseVector.VectorDirection.ROW Then
                     Assert.Fail()
                 End If
 
@@ -387,11 +387,11 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0},
                                                   New Double() {1, 0},
-                                                  New Double() {1, 0}})
-            Dim v As New clsEasyVector(New Double() {2, 2}, clsEasyVector.VectorDirection.COL)
+                                                  New Double() {1, 0}}))
+            Dim v As New DenseVector(New Double() {2, 2}, DenseVector.VectorDirection.COL)
             Try
                 Dim temp = mat * v
 
@@ -401,7 +401,7 @@ Imports LibOptimization.MathUtil
                 End If
 
                 'dirction check
-                If temp.Direction = clsEasyVector.VectorDirection.ROW Then
+                If temp.Direction = DenseVector.VectorDirection.ROW Then
                     Assert.Fail()
                 End If
 
@@ -422,7 +422,7 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_Determinant()
         With Nothing
-            Dim detMat As New clsEasyMatrix(New Double()() {New Double() {1, 0},
+            Dim detMat As New DenseMatrix(New Double()() {New Double() {1, 0},
                                                        New Double() {0, 1}})
             detMat.PrintValue()
             Dim d As Double = 0
@@ -433,7 +433,7 @@ Imports LibOptimization.MathUtil
             End If
 
             'swap col -> sign *-1
-            MathUtil.clsMathUtil.SwapCol(detMat, 0, 1)
+            LibOptimization.MathUtil.MathUtil.SwapCol(detMat, 0, 1)
             detMat.PrintValue()
             d = detMat.Det()
             Console.WriteLine("Determinant:{0}", d)
@@ -443,7 +443,7 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim detMat As New clsEasyMatrix(New Double()() {New Double() {1, 0, 0},
+            Dim detMat As New DenseMatrix(New Double()() {New Double() {1, 0, 0},
                                                        New Double() {0, 1, 0},
                                                        New Double() {0, 0, 1}})
             detMat.PrintValue()
@@ -455,7 +455,7 @@ Imports LibOptimization.MathUtil
             End If
 
             'swap col -> sign *-1
-            MathUtil.clsMathUtil.SwapCol(detMat, 0, 1)
+            LibOptimization.MathUtil.MathUtil.SwapCol(detMat, 0, 1)
             detMat.PrintValue()
             d = detMat.Det()
             Console.WriteLine("Determinant:{0}", d)
@@ -466,7 +466,7 @@ Imports LibOptimization.MathUtil
 
         With Nothing
             'swap
-            Dim detMat As New clsEasyMatrix(New Double()() {New Double() {1, 0, 0, 0},
+            Dim detMat As New DenseMatrix(New Double()() {New Double() {1, 0, 0, 0},
                                                             New Double() {0, 1, 0, 0},
                                                             New Double() {0, 0, 1, 0},
                                                             New Double() {0, 0, 0, 1}})
@@ -475,12 +475,12 @@ Imports LibOptimization.MathUtil
             d = detMat.Det()
             Console.WriteLine("Determinant:{0}", d)
 
-            If clsMathUtil.IsCloseToValues(d, 1.0) = False Then
+            If MathUtil.IsCloseToValues(d, 1.0) = False Then
                 Assert.Fail()
             End If
 
             'swap col -> sign *-1
-            MathUtil.clsMathUtil.SwapCol(detMat, 0, 1)
+            LibOptimization.MathUtil.MathUtil.SwapCol(detMat, 0, 1)
             detMat.PrintValue()
             d = detMat.Det()
             Console.WriteLine("Determinant:{0}", d)
@@ -498,14 +498,14 @@ Imports LibOptimization.MathUtil
         'bad
         '----------------
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0, 0},
                                                   New Double() {0, 1, 0},
-                                                  New Double() {0, 0, 1}})
-            Dim v As New clsEasyVector(New Double() {2, 2}, clsEasyVector.VectorDirection.ROW)
+                                                  New Double() {0, 0, 1}}))
+            Dim v As New DenseVector(New Double() {2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = v * mat
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
                 Return
             End Try
@@ -514,14 +514,14 @@ Imports LibOptimization.MathUtil
 
         'bad
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0},
                                                   New Double() {0, 1},
-                                                  New Double() {0, 0}})
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+                                                  New Double() {0, 0}}))
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = v * mat
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
                 Return
             End Try
@@ -530,13 +530,13 @@ Imports LibOptimization.MathUtil
 
         'bad
         With Nothing
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 0, 0},
-                                                  New Double() {0, 0, 1}})
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
+                                                  New Double() {0, 0, 1}}))
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = v * mat
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
                 Return
             End Try
@@ -547,8 +547,8 @@ Imports LibOptimization.MathUtil
         'OK
         '----------------
         With Nothing
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
-            Dim mat As New MathUtil.clsEasyMatrix(v.Count, True)
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix(v.Count, True)
             Try
                 Dim temp = v * mat
 
@@ -558,7 +558,7 @@ Imports LibOptimization.MathUtil
                 End If
 
                 'dirction check
-                If temp.Direction <> clsEasyVector.VectorDirection.ROW Then
+                If temp.Direction <> DenseVector.VectorDirection.ROW Then
                     Assert.Fail()
                 End If
 
@@ -574,11 +574,11 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1},
                                                   New Double() {1},
-                                                  New Double() {1}})
+                                                  New Double() {1}}))
 
             Try
                 Dim temp = v * mat
@@ -589,7 +589,7 @@ Imports LibOptimization.MathUtil
                 End If
 
                 'dirction check
-                If temp.Direction <> clsEasyVector.VectorDirection.ROW Then
+                If temp.Direction <> DenseVector.VectorDirection.ROW Then
                     Assert.Fail()
                 End If
 
@@ -605,11 +605,11 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim v As New clsEasyVector(New Double() {2, 2, 2}, clsEasyVector.VectorDirection.ROW)
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {1, 1},
                                                   New Double() {1, 1},
-                                                  New Double() {1, 1}})
+                                                  New Double() {1, 1}}))
             Try
                 Dim temp = v * mat
 
@@ -619,7 +619,7 @@ Imports LibOptimization.MathUtil
                 End If
 
                 'dirction check
-                If temp.Direction <> clsEasyVector.VectorDirection.ROW Then
+                If temp.Direction <> DenseVector.VectorDirection.ROW Then
                     Assert.Fail()
                 End If
 
@@ -635,10 +635,10 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim v As New clsEasyVector(New Double() {2, 2}, clsEasyVector.VectorDirection.ROW)
-            Dim mat As New MathUtil.clsEasyMatrix(New Double()() {
+            Dim v As New DenseVector(New Double() {2, 2}, DenseVector.VectorDirection.ROW)
+            Dim mat As New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                   New Double() {2, 2, 2},
-                                                  New Double() {0, 0, 0}})
+                                                  New Double() {0, 0, 0}}))
             Try
                 Dim temp = v * mat
 
@@ -648,7 +648,7 @@ Imports LibOptimization.MathUtil
                 End If
 
                 'dirction check
-                If temp.Direction <> clsEasyVector.VectorDirection.ROW Then
+                If temp.Direction <> DenseVector.VectorDirection.ROW Then
                     Assert.Fail()
                 End If
 
@@ -669,7 +669,7 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Vec_Product_VectorScalar()
         With Nothing
-            Dim v = New clsEasyVector(3)
+            Dim v = New DenseVector(3)
             Try
                 For i As Integer = 0 To v.Count - 1
                     v(i) = 1
@@ -692,8 +692,8 @@ Imports LibOptimization.MathUtil
     ''' Vector * Vector
     ''' </summary>
     <TestMethod()> Public Sub Vec_Product_VectorVector()
-        Dim vec1 = New clsEasyVector(New Double() {1, 2, 3}, clsEasyVector.VectorDirection.ROW)
-        Dim vec2 = New clsEasyVector(New Double() {4, 5, 6}, clsEasyVector.VectorDirection.COL)
+        Dim vec1 = New DenseVector(New Double() {1, 2, 3}, DenseVector.VectorDirection.ROW)
+        Dim vec2 = New DenseVector(New Double() {4, 5, 6}, DenseVector.VectorDirection.COL)
 
         With Nothing
             '|v1 v2| * |v3|
@@ -703,7 +703,7 @@ Imports LibOptimization.MathUtil
                 vec1vec2.PrintValue(name:="vec1vec2")
                 Assert.Fail("error : vector * vector")
             End If
-            If MathUtil.clsMathUtil.IsCloseToValues(vec1vec2(0)(0), 32.0) = False Then
+            If LibOptimization.MathUtil.MathUtil.IsCloseToValues(vec1vec2(0)(0), 32.0) = False Then
                 vec1vec2.PrintValue(name:="vec1vec2")
                 Assert.Fail("error : vector * vector")
             End If
@@ -718,10 +718,10 @@ Imports LibOptimization.MathUtil
                 Assert.Fail("error : vector * vector")
             End If
 
-            Dim correctMat As New clsEasyMatrix(New Double()() {(vec2 * 1.0).ToArray(),
+            Dim correctMat As New DenseMatrix(New Double()() {(vec2 * 1.0).ToArray(),
                                                                 (vec2 * 2.0).ToArray(),
                                                                 (vec2 * 3.0).ToArray()})
-            If MathUtil.clsMathUtil.IsNearyEqualMatrix(vec2vec1, correctMat) = False Then
+            If LibOptimization.MathUtil.MathUtil.IsNearyEqualMatrix(vec2vec1, correctMat) = False Then
                 vec2vec1.PrintValue(name:="vec2vec1")
                 Assert.Fail("error : vector * vector")
             End If
@@ -733,7 +733,7 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_Product_ScalarVector()
         With Nothing
-            Dim v = New clsEasyVector(3)
+            Dim v = New DenseVector(3)
             Try
                 For i As Integer = 0 To v.Count - 1
                     v(i) = 1
@@ -758,7 +758,7 @@ Imports LibOptimization.MathUtil
     <TestMethod()> Public Sub Mat_Product_MatrixScalar()
         With Nothing
             Dim dimNum = 3
-            Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
+            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
             Try
                 For i As Integer = 0 To matA.RowCount - 1
                     For j As Integer = 0 To matA.ColCount - 1
@@ -777,7 +777,7 @@ Imports LibOptimization.MathUtil
                         End If
                     Next
                 Next
-            Catch myex As clsException
+            Catch myex As MyException
                 Assert.Fail()
             End Try
         End With
@@ -789,7 +789,7 @@ Imports LibOptimization.MathUtil
     <TestMethod()> Public Sub Mat_Product_ScalarMatrix()
         With Nothing
             Dim dimNum = 3
-            Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
+            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
             Try
                 For i As Integer = 0 To matA.RowCount - 1
                     For j As Integer = 0 To matA.ColCount - 1
@@ -808,7 +808,7 @@ Imports LibOptimization.MathUtil
                         End If
                     Next
                 Next
-            Catch myex As clsException
+            Catch myex As MyException
                 Assert.Fail()
             End Try
         End With
@@ -824,12 +824,12 @@ Imports LibOptimization.MathUtil
         '3x3 * 2x2
         With Nothing
             Dim dimNum = 3
-            Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
-            Dim matB = New clsEasyMatrix(dimNum - 1, True)
+            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+            Dim matB = New DenseMatrix(dimNum - 1, True)
             Try
                 Dim temp = matA * matB
                 Assert.Fail("error : 3x3 * 2x2")
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
             End Try
         End With
@@ -837,27 +837,27 @@ Imports LibOptimization.MathUtil
         '2x2 * 3x3
         With Nothing
             Dim dimNum = 3
-            Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum - 1)
-            Dim matB = New clsEasyMatrix(dimNum, True)
+            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum - 1)
+            Dim matB = New DenseMatrix(dimNum, True)
             Try
                 Dim temp = matA * matB
 
                 Assert.Fail("error : 2x2 * 3x3")
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
             End Try
         End With
 
         '3x3 * 2x3
         With Nothing
-            Dim matA As New clsEasyMatrix(3, True)
-            Dim matB As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1},
+            Dim matA As New DenseMatrix(3, True)
+            Dim matB As New DenseMatrix(New Double()() {New Double() {1, 1, 1},
                                                      New Double() {2, 2, 2}})
             Try
                 Dim temp = matA * matB
 
                 Assert.Fail("error : 3x3 * 2x3")
-            Catch myex As clsException
+            Catch myex As MyException
                 'OK
             End Try
         End With
@@ -867,40 +867,40 @@ Imports LibOptimization.MathUtil
         '---------
         For dimNum = 2 To 10 - 1
             With Nothing
-                Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
-                Dim matB = New clsEasyMatrix(dimNum, True)
+                Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim matB = New DenseMatrix(dimNum, True)
                 Try
                     Dim temp = matA * matB
                     temp.PrintValue(name:="A*B")
 
-                    If clsMathUtil.IsNearyEqualMatrix(temp, matA) = False Then
+                    If MathUtil.IsNearyEqualMatrix(temp, matA) = False Then
                         Assert.Fail("error : {0}x{0}", dimNum)
                     End If
-                Catch myex As clsException
+                Catch myex As MyException
                     Assert.Fail()
                 End Try
             End With
 
             With Nothing
-                Dim matA = clsMathUtil.CreateRandomSymmetricMatrix(dimNum)
-                Dim matB = New clsEasyMatrix(dimNum, False)
+                Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim matB = New DenseMatrix(dimNum, False)
                 Try
                     Dim temp = matA * matB
                     temp.PrintValue(name:="B(zero)*A")
 
-                    If clsMathUtil.IsNearyEqualMatrix(temp, matB) = False Then
+                    If MathUtil.IsNearyEqualMatrix(temp, matB) = False Then
                         Assert.Fail("error : {0}x{0}", dimNum)
                     End If
-                Catch myex As clsException
+                Catch myex As MyException
                     Assert.Fail()
                 End Try
             End With
         Next
 
         With Nothing
-            Dim matA As New clsEasyMatrix(New Double()() {New Double() {1, 1, 1},
+            Dim matA As New DenseMatrix(New Double()() {New Double() {1, 1, 1},
                                                      New Double() {2, 2, 2}})
-            Dim matB As New clsEasyMatrix(3, True)
+            Dim matB As New DenseMatrix(3, True)
             Try
                 Dim temp = matA * matB
                 temp.PrintValue()
@@ -914,10 +914,10 @@ Imports LibOptimization.MathUtil
                 End If
 
                 'check value
-                If clsMathUtil.IsNearyEqualMatrix(temp, matA) = False Then
+                If MathUtil.IsNearyEqualMatrix(temp, matA) = False Then
                     Assert.Fail()
                 End If
-            Catch myex As clsException
+            Catch myex As MyException
                 Assert.Fail()
             End Try
         End With
@@ -930,14 +930,14 @@ Imports LibOptimization.MathUtil
         Dim rng = New Util.clsRandomXorshift()
         For i As Integer = 2 To 50 - 1
             Dim dimNum = i
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng)
+            Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng)
 
             '転置
             Dim t = source.T()
             t = t.T()
 
             'check
-            If clsMathUtil.IsNearyEqualMatrix(t, source) = True Then
+            If MathUtil.IsNearyEqualMatrix(t, source) = True Then
                 'OK
             Else
                 source.PrintValue(name:="source")
@@ -954,11 +954,11 @@ Imports LibOptimization.MathUtil
         With Nothing
             Dim dimNum = 1
             Dim rng = New Util.clsRandomXorshift()
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng)
+            Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng)
             Dim product = source * source.Inverse()
 
             'check
-            If clsMathUtil.IsNearyEqualMatrix(product, New clsEasyMatrix(dimNum, True)) = True Then
+            If MathUtil.IsNearyEqualMatrix(product, New DenseMatrix(dimNum, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -967,12 +967,12 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim source As New clsEasyMatrix(New Double()() {New Double() {3, 1}, New Double() {-2, 5}})
-            Dim sourceInv As clsEasyMatrix = source.Inverse()
+            Dim source As New DenseMatrix(New Double()() {New Double() {3, 1}, New Double() {-2, 5}})
+            Dim sourceInv As DenseMatrix = source.Inverse()
 
             'check Identy matrix I = A * A^-1
             Dim productMat = source * sourceInv
-            If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(source.RowCount, True)) = True Then
+            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -980,11 +980,11 @@ Imports LibOptimization.MathUtil
             End If
 
             'col swap
-            MathUtil.clsMathUtil.SwapCol(source, 0, 1)
+            LibOptimization.MathUtil.MathUtil.SwapCol(source, 0, 1)
             sourceInv = source.Inverse()
             productMat = source * sourceInv
             'check
-            If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
+            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(3, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -993,14 +993,14 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim source As New clsEasyMatrix(New Double()() {New Double() {3, 1, 1},
+            Dim source As New DenseMatrix(New Double()() {New Double() {3, 1, 1},
                                                     New Double() {5, 1, 3},
                                                     New Double() {2, 0, 1}})
-            Dim sourceInv As clsEasyMatrix = source.Inverse()
+            Dim sourceInv As DenseMatrix = source.Inverse()
 
             'check Identy matrix I = A * A^-1
             Dim productMat = source * sourceInv
-            If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(source.RowCount, True)) = True Then
+            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -1008,11 +1008,11 @@ Imports LibOptimization.MathUtil
             End If
 
             'col swap
-            MathUtil.clsMathUtil.SwapCol(source, 0, 1)
+            LibOptimization.MathUtil.MathUtil.SwapCol(source, 0, 1)
             sourceInv = source.Inverse()
             productMat = source * sourceInv
             'check
-            If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(3, True)) = True Then
+            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(3, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -1022,16 +1022,16 @@ Imports LibOptimization.MathUtil
 
         With Nothing
             'ピボット選択が必須の場合（対角成分が０になる場合）
-            Dim source = New MathUtil.clsEasyMatrix(New Double()() {
+            Dim source = New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                      New Double() {1.0, -1.0, -4.0, 8.0},
                                      New Double() {-1.0, 1.0, 6.0, 6.0},
                                      New Double() {-4.0, 6.0, 1.0, 9.0},
-                                     New Double() {8.0, 6.0, 9.0, 1.0}})
-            Dim sourceInv As clsEasyMatrix = source.Inverse()
+                                     New Double() {8.0, 6.0, 9.0, 1.0}}))
+            Dim sourceInv As DenseMatrix = source.Inverse()
 
             'check Identy matrix I = A * A^-1
             Dim productMat = source * sourceInv
-            If clsMathUtil.IsNearyEqualMatrix(productMat, New clsEasyMatrix(source.RowCount, True)) = True Then
+            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -1042,13 +1042,13 @@ Imports LibOptimization.MathUtil
             Dim rng = New LibOptimization.Util.clsRandomXorshift()
             For i = 0 To 100 - 1
                 Dim dimNum = 4
-                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng, isIncludeZero:=True, isFloating:=True)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng, isIncludeZero:=True, isFloating:=True)
                 Try
                     Dim souceInv = source.Inverse()
                     Dim product = source * souceInv
 
                     'check
-                    If clsMathUtil.IsNearyEqualMatrix(product, New clsEasyMatrix(dimNum, True)) = True Then
+                    If MathUtil.IsNearyEqualMatrix(product, New DenseMatrix(dimNum, True)) = True Then
                         'OK
                     Else
                         source.PrintValue(name:="is not equal Source matrix")
@@ -1065,13 +1065,13 @@ Imports LibOptimization.MathUtil
             Dim rng = New LibOptimization.Util.clsRandomXorshift()
             For i = 5 To 10 - 1
                 Dim dimNum = i
-                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
                 Try
                     Dim souceInv = source.Inverse()
                     Dim product = source * souceInv
 
                     'check
-                    If clsMathUtil.IsNearyEqualMatrix(product, New clsEasyMatrix(dimNum, True)) = True Then
+                    If MathUtil.IsNearyEqualMatrix(product, New DenseMatrix(dimNum, True)) = True Then
                         'OK
                     Else
                         source.PrintValue(name:="Source matrix")
@@ -1090,14 +1090,14 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_Cholesky()
         With Nothing
-            Dim tempMat As New clsEasyMatrix(New Double()() {New Double() {4.0, 1.0, 1.0},
+            Dim tempMat As New DenseMatrix(New Double()() {New Double() {4.0, 1.0, 1.0},
                                                     New Double() {1.0, 7.0, 1.0},
                                                     New Double() {1.0, 1.0, 5.0}})
             'A = LL^T
             Dim c = tempMat.Cholesky()
             Dim check = c * c.T()
 
-            If clsMathUtil.IsNearyEqualMatrix(tempMat, check) = False Then
+            If MathUtil.IsNearyEqualMatrix(tempMat, check) = False Then
                 tempMat.PrintValue(name:=String.Format("error source(dim={0})", tempMat.RowCount))
                 c.PrintValue(name:="L")
                 Assert.Fail()
@@ -1105,7 +1105,7 @@ Imports LibOptimization.MathUtil
         End With
 
         With Nothing
-            Dim tempMat As New clsEasyMatrix(New Double()() {New Double() {9.0, 2.0, 2.0, 6.0},
+            Dim tempMat As New DenseMatrix(New Double()() {New Double() {9.0, 2.0, 2.0, 6.0},
                                                     New Double() {2.0, 9.0, 7.0, 4.0},
                                                     New Double() {2.0, 7.0, 9.0, 1.0},
                                                     New Double() {6.0, 4.0, 1.0, 8.0}})
@@ -1113,7 +1113,7 @@ Imports LibOptimization.MathUtil
             Dim c = tempMat.Cholesky()
             Dim check = c * c.T()
 
-            If clsMathUtil.IsNearyEqualMatrix(tempMat, check) = False Then
+            If MathUtil.IsNearyEqualMatrix(tempMat, check) = False Then
                 tempMat.PrintValue(name:=String.Format("error source(dim={0})", tempMat.RowCount))
                 c.PrintValue(name:="L")
                 Assert.Fail()
@@ -1129,7 +1129,7 @@ Imports LibOptimization.MathUtil
         For j As Integer = 2 To 20 - 1
             For i As Integer = 0 To 50 - 1
                 Dim matDim = j
-                Dim srcMat = clsMathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
+                Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
 
                 'eigen
                 Dim eigen As Eigen = Nothing
@@ -1142,7 +1142,7 @@ Imports LibOptimization.MathUtil
                 ' I = V * V^T
                 Dim matI = retM * retM.T
                 'matI.PrintValue(name:="EigenVector * EivenVector^T")
-                If clsMathUtil.IsNearyEqualMatrix(matI, New clsEasyMatrix(matDim, True)) = False Then
+                If MathUtil.IsNearyEqualMatrix(matI, New DenseMatrix(matDim, True)) = False Then
                     srcMat.PrintValue(name:="Source")
                     Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0} try={1}", matDim, i)
                 End If
@@ -1151,7 +1151,7 @@ Imports LibOptimization.MathUtil
                 ' Source = V * D * V^T
                 Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
                 'temp.PrintValue(name:="V*D*V^T")
-                If clsMathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
+                If MathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
                     srcMat.PrintValue(name:="Source")
                     Assert.Fail("Error eigen() V*D*V^T dim={0} try={1}", matDim, i)
                 End If
@@ -1168,7 +1168,7 @@ Imports LibOptimization.MathUtil
             Console.WriteLine("Dim={0} run", j)
             For i = 0 To 1000 - 1
                 Dim dimNum = j
-                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
                 If i Mod 2 = 0 Then
                     source(0)(0) = 0.0
@@ -1182,7 +1182,7 @@ Imports LibOptimization.MathUtil
 
                 'check
                 Dim flg = True
-                If clsMathUtil.IsNearyEqualMatrix(source, P * L * U) = True Then
+                If MathUtil.IsNearyEqualMatrix(source, P * L * U) = True Then
                     'OK
                 Else
                     flg = False
@@ -1200,7 +1200,7 @@ Imports LibOptimization.MathUtil
 
         With Nothing
             Dim dimNum = 4
-            Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+            Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
             '列を0に
             source(2)(0) = 0.0
@@ -1234,19 +1234,19 @@ Imports LibOptimization.MathUtil
         For i = 2 To 10 - 1
             Dim dimNum = i
             For j As Integer = 0 To 300 - 1
-                Dim source = clsMathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
                 Try
                     Dim matLUP = source.LUP()
-                    If clsMathUtil.IsCloseToZero(matLUP.Det) = True Then
+                    If MathUtil.IsCloseToZero(matLUP.Det) = True Then
                         Continue For
                     End If
 
                     '1列目
                     Dim colVec = source.Inverse().Column(0)
-                    Dim result = matLUP.Solve((New clsEasyMatrix(dimNum, True))(0))
+                    Dim result = matLUP.Solve((New DenseMatrix(dimNum, True))(0))
 
                     'check
-                    If clsMathUtil.IsNearyEqualVector(colVec, result) = True Then
+                    If MathUtil.IsNearyEqualVector(colVec, result) = True Then
                         'OK
                     Else
                         source.PrintValue(name:="Source vector")
@@ -1267,21 +1267,21 @@ Imports LibOptimization.MathUtil
     ''' </summary>
     <TestMethod()> Public Sub Mat_Householder()
         Try
-            Dim source = New MathUtil.clsEasyMatrix(New Double()() {
+            Dim source = New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                     New Double() {8, -4, 2, -2},
                                                     New Double() {-4, -2, 4, 9},
                                                     New Double() {2, 4, 3, -6},
-                                                    New Double() {-2, 9, -6, 2}})
-            Dim correct = New MathUtil.clsEasyMatrix(New Double()() {
+                                                    New Double() {-2, 9, -6, 2}}))
+            Dim correct = New LibOptimization.MathUtil.DenseMatrix((New Double()() {
                                                     New Double() {8, 4.89898, 0, 0},
                                                     New Double() {4.89898, 4.83333, 9.46778, 0},
                                                     New Double() {0, 9.46778, -6.97526, -1.62287},
-                                                    New Double() {0, 0, -1.62287, 5.14193}})
+                                                    New Double() {0, 0, -1.62287, 5.14193}}))
             Dim result = source.Householder()
 
             'check
             Dim isOK = False
-            If clsMathUtil.IsNearyEqualMatrix(result, correct, 0.0001) = True Then
+            If MathUtil.IsNearyEqualMatrix(result, correct, 0.0001) = True Then
                 isOK = True
             End If
             If isOK = False Then
@@ -1296,7 +1296,7 @@ Imports LibOptimization.MathUtil
     ''' test Resize()
     ''' </summary>
     <TestMethod()> Public Sub Vec_ResizeVector()
-        Dim tempVec = New clsEasyVector(3)
+        Dim tempVec = New DenseVector(3)
         tempVec.Resize(0)
         Assert.AreEqual(tempVec.Count, 0)
         tempVec.Resize(1)
@@ -1307,7 +1307,7 @@ Imports LibOptimization.MathUtil
     ''' test Resize()
     ''' </summary>
     <TestMethod()> Public Sub Mat_ResizeMatrix()
-        Dim tempMat = New clsEasyMatrix(3)
+        Dim tempMat = New DenseMatrix(3)
         tempMat.Resize(0, 0)
         Assert.AreEqual(tempMat.RowCount, 0)
         Assert.AreEqual(tempMat.ColCount, 0)

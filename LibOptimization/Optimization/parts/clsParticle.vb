@@ -12,7 +12,7 @@ Namespace Optimization
     Public Class clsParticle : Implements IComparable
         Private m_point As clsPoint
         Private m_bestPoint As clsPoint
-        Private m_velocity As clsEasyVector
+        Private m_velocity As DenseVector
 
         ''' <summary>
         ''' Default construtor
@@ -29,7 +29,7 @@ Namespace Optimization
         ''' <param name="ai_velocity"></param>
         ''' <param name="ai_bestPoint"></param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_point As clsPoint, ByVal ai_velocity As clsEasyVector, ByVal ai_bestPoint As clsPoint)
+        Public Sub New(ByVal ai_point As clsPoint, ByVal ai_velocity As DenseVector, ByVal ai_bestPoint As clsPoint)
             Me.m_point = ai_point
             Me.m_velocity = ai_velocity
             Me.m_bestPoint = ai_bestPoint
@@ -67,11 +67,11 @@ Namespace Optimization
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property Velocity As clsEasyVector
+        Public Property Velocity As DenseVector
             Get
                 Return Me.m_velocity
             End Get
-            Set(value As clsEasyVector)
+            Set(value As DenseVector)
                 Me.m_velocity = value
             End Set
         End Property

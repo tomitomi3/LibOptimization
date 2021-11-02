@@ -6,7 +6,7 @@
     ''' Inherits List(of double)
     ''' </remarks>
     <Serializable>
-    Public Class clsEasyVector : Inherits List(Of Double)
+    Public Class DenseVector : Inherits List(Of Double)
         ''' <summary>
         ''' Direction( RowVector or ColVector )
         ''' </summary>
@@ -36,7 +36,7 @@
         ''' </summary>
         ''' <param name="ai_base"></param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_base As clsEasyVector)
+        Public Sub New(ByVal ai_base As DenseVector)
             Me.AddRange(ai_base)
             Me.m_direcition = ai_base.Direction
         End Sub
@@ -124,8 +124,8 @@
         ''' <remarks>
         ''' double() -> vector class
         ''' </remarks>
-        Public Shared Widening Operator CType(ByVal ai_ar() As Double) As clsEasyVector
-            Return New clsEasyVector(ai_ar)
+        Public Shared Widening Operator CType(ByVal ai_ar() As Double) As DenseVector
+            Return New DenseVector(ai_ar)
         End Operator
 
         ''' <summary>
@@ -135,12 +135,12 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator +(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyVector) As clsEasyVector
+        Public Shared Operator +(ByVal ai_source As DenseVector, ByVal ai_dest As DenseVector) As DenseVector
             If IsSameDimension(ai_source, ai_dest) = False Then
-                Throw New clsException(clsException.Series.DifferElementNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
             End If
 
-            Dim ret As New clsEasyVector(ai_source)
+            Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ret.Count - 1
                 ret(i) = ai_source(i) + ai_dest(i)
             Next
@@ -154,12 +154,12 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator -(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyVector) As clsEasyVector
+        Public Shared Operator -(ByVal ai_source As DenseVector, ByVal ai_dest As DenseVector) As DenseVector
             If IsSameDimension(ai_source, ai_dest) = False Then
-                Throw New clsException(clsException.Series.DifferElementNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
             End If
 
-            Dim ret As New clsEasyVector(ai_source)
+            Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ret.Count - 1
                 ret(i) = ai_source(i) - ai_dest(i)
             Next
@@ -173,8 +173,8 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator *(ByVal ai_source As Double, ByVal ai_dest As clsEasyVector) As clsEasyVector
-            Dim ret As New clsEasyVector(ai_dest)
+        Public Shared Operator *(ByVal ai_source As Double, ByVal ai_dest As DenseVector) As DenseVector
+            Dim ret As New DenseVector(ai_dest)
             For i As Integer = 0 To ret.Count - 1
                 ret(i) = ai_source * ai_dest(i)
             Next
@@ -188,8 +188,8 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyVector, ByVal ai_dest As Double) As clsEasyVector
-            Dim ret As New clsEasyVector(ai_source)
+        Public Shared Operator *(ByVal ai_source As DenseVector, ByVal ai_dest As Double) As DenseVector
+            Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ret.Count - 1
                 ret(i) = ai_source(i) * ai_dest
             Next
@@ -203,10 +203,10 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator *(ByVal ai_source As clsEasyVector, ByVal ai_dest As clsEasyVector) As clsEasyMatrix
+        Public Shared Operator *(ByVal ai_source As DenseVector, ByVal ai_dest As DenseVector) As DenseMatrix
             Dim n = ai_source.Count
             If n <> ai_dest.Count Then
-                Throw New clsException(clsException.Series.NotComputable, "Vector * Vector - size error")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "Vector * Vector - size error")
             End If
             If ai_source.Direction = VectorDirection.ROW AndAlso ai_dest.Direction = VectorDirection.COL Then
                 '|v1 v2| * |v3|
@@ -215,13 +215,13 @@
                 For i As Integer = 0 To n - 1
                     temp += ai_source(i) * ai_dest(i)
                 Next
-                Dim ret = New clsEasyMatrix(1)
+                Dim ret = New DenseMatrix(1)
                 ret(0)(0) = temp
                 Return ret
             ElseIf ai_source.Direction = VectorDirection.COL AndAlso ai_dest.Direction = VectorDirection.ROW Then
                 '|v1| * |v3 v4|
                 '|v2|
-                Dim ret = New clsEasyMatrix(n)
+                Dim ret = New DenseMatrix(n)
 
 #If (NET30_CUSTOM OrElse NET35_CUSTOM OrElse NET35) = True Then
                 '------------------------------------------------------------------
@@ -249,7 +249,7 @@
             End If
 
             'error
-            Throw New clsException(clsException.Series.NotComputable, "Vector * Vector - direction error")
+            Throw New MyException(MyException.ErrorSeries.NotComputable, "Vector * Vector - direction error")
         End Operator
 
         ''' <summary>
@@ -259,8 +259,8 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator /(ByVal ai_source As Double, ByVal ai_dest As clsEasyVector) As clsEasyVector
-            Dim ret As New clsEasyVector(ai_dest)
+        Public Shared Operator /(ByVal ai_source As Double, ByVal ai_dest As DenseVector) As DenseVector
+            Dim ret As New DenseVector(ai_dest)
             For i As Integer = 0 To ret.Count - 1
                 ret(i) = ai_source / ai_dest(i)
             Next
@@ -274,8 +274,8 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator /(ByVal ai_source As clsEasyVector, ByVal ai_dest As Double) As clsEasyVector
-            Dim ret As New clsEasyVector(ai_source)
+        Public Shared Operator /(ByVal ai_source As DenseVector, ByVal ai_dest As Double) As DenseVector
+            Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ret.Count - 1
                 ret(i) = ai_source(i) / ai_dest
             Next
@@ -289,8 +289,8 @@
         ''' <param name="ai_dest"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Operator ^(ByVal ai_source As clsEasyVector, ByVal ai_dest As Double) As clsEasyVector
-            Dim ret As New clsEasyVector(ai_source)
+        Public Shared Operator ^(ByVal ai_source As DenseVector, ByVal ai_dest As Double) As DenseVector
+            Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ret.Count - 1
                 ret(i) = System.Math.Pow(ai_source(i), ai_dest)
             Next
@@ -328,11 +328,11 @@
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ToMatrix() As clsEasyMatrix
+        Public Function ToMatrix() As DenseMatrix
             If Me.m_direcition = VectorDirection.ROW Then
-                Return New clsEasyMatrix(Me, VectorDirection.ROW)
+                Return New DenseMatrix(Me, VectorDirection.ROW)
             Else
-                Return New clsEasyMatrix(Me, VectorDirection.COL)
+                Return New DenseMatrix(Me, VectorDirection.COL)
             End If
         End Function
 
@@ -341,8 +341,8 @@
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function T() As clsEasyVector
-            Dim temp As New clsEasyVector(Me)
+        Public Function T() As DenseVector
+            Dim temp As New DenseVector(Me)
             If temp.Direction = VectorDirection.ROW Then
                 temp.Direction = VectorDirection.COL
             Else
@@ -355,8 +355,8 @@
         ''' create diagonal matrix from vector
         ''' </summary>
         ''' <returns></returns>
-        Public Function ToDiagonalMatrix() As clsEasyMatrix
-            Dim ret = New clsEasyMatrix(Me.Count)
+        Public Function ToDiagonalMatrix() As DenseMatrix
+            Dim ret = New DenseMatrix(Me.Count)
             For i As Integer = 0 To ret.Count - 1
                 ret(i)(i) = Me(i)
             Next
@@ -524,9 +524,9 @@
         ''' <remarks>
         ''' a dot b = |a||b|cos(theta)
         ''' </remarks>
-        Public Function InnerProduct(ByVal ai_source As clsEasyVector) As Double
+        Public Function InnerProduct(ByVal ai_source As DenseVector) As Double
             If IsSameDimension(ai_source, Me) = False Then
-                Throw New clsException(clsException.Series.DifferElementNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
             End If
             Dim ret As Double = 0
             For i As Integer = 0 To ai_source.Count - 1
@@ -541,26 +541,26 @@
         ''' <param name="ai_source"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function CrossProduct(ByVal ai_source As clsEasyVector) As clsEasyVector
+        Public Function CrossProduct(ByVal ai_source As DenseVector) As DenseVector
             'https://en.wikipedia.org/wiki/Cross_product
 
             If IsSameDimension(ai_source, Me) = False Then
-                Throw New clsException(clsException.Series.DifferElementNumber)
+                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
             End If
 
-            Dim ret = New clsEasyVector(ai_source.Count)
+            Dim ret = New DenseVector(ai_source.Count)
             If ai_source.Count = 0 Then
-                Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 1 Then
-                Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 2 Then
-                Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 3 Then
                 ret(0) = Me(1) * ai_source(2) - Me(2) * ai_source(1)
                 ret(1) = Me(2) * ai_source(0) - Me(0) * ai_source(2)
                 ret(2) = Me(0) * ai_source(1) - Me(1) * ai_source(0)
             Else
-                Throw New clsException(clsException.Series.NotComputable, "sorry, not implementation")
+                Throw New MyException(MyException.ErrorSeries.NotComputable, "sorry, not implementation")
             End If
             Return ret
         End Function
@@ -570,18 +570,18 @@
         ''' </summary>
         ''' <param name="b">( a1 * a1, a2 * a2, ... )</param>
         ''' <returns></returns>
-        Public Function HadamardProduct(Optional ByRef b As clsEasyVector = Nothing) As clsEasyVector
+        Public Function HadamardProduct(Optional ByRef b As DenseVector = Nothing) As DenseVector
             If b Is Nothing Then
-                Dim ret = New clsEasyVector(Me.Count)
+                Dim ret = New DenseVector(Me.Count)
                 For i As Integer = 0 To Me.Count - 1
                     ret(i) = Me(i) * Me(i)
                 Next
                 Return ret
             Else
                 If IsSameDimension(b, Me) = False Then
-                    Throw New clsException(clsException.Series.DifferElementNumber)
+                    Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
                 End If
-                Dim ret = New clsEasyVector(Me.Count)
+                Dim ret = New DenseVector(Me.Count)
                 For i As Integer = 0 To Me.Count - 1
                     ret(i) = Me(i) * b(i)
                 Next
@@ -602,8 +602,8 @@
         ''' <param name="ai_vec2"></param>
         ''' <param name="isCheckDirection"></param>
         ''' <returns></returns>
-        Private Shared Function IsSameDimension(ByVal ai_vec1 As clsEasyVector,
-                                            ByVal ai_vec2 As clsEasyVector,
+        Private Shared Function IsSameDimension(ByVal ai_vec1 As DenseVector,
+                                            ByVal ai_vec2 As DenseVector,
                                             Optional ByVal isCheckDirection As Boolean = False) As Boolean
             If ai_vec1 Is Nothing Then
                 Return False

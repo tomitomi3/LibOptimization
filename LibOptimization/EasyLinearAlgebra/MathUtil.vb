@@ -2,7 +2,7 @@
     ''' <summary>
     ''' Utility class for Math
     ''' </summary>
-    Public Class clsMathUtil
+    Public Class MathUtil
         ''' <summary>
         ''' for sort
         ''' </summary>
@@ -47,7 +47,7 @@
         ''' </summary>
         ''' <param name="v"></param>
         ''' <returns></returns>
-        Public Shared Function Var(ByVal v As clsEasyVector) As Double
+        Public Shared Function Var(ByVal v As DenseVector) As Double
             Return (v.SquareSum() / v.Count) - Math.Pow(v.Average(), 2)
         End Function
 
@@ -57,7 +57,7 @@
         ''' <param name="v1">vector a</param>
         ''' <param name="v2">vector b</param>
         ''' <returns></returns>
-        Public Shared Function CoVar(ByVal v1 As clsEasyVector, ByVal v2 As clsEasyVector) As Double
+        Public Shared Function CoVar(ByVal v1 As DenseVector, ByVal v2 As DenseVector) As Double
             Dim ave_xy = v1.InnerProduct(v2) / v1.Count
             Return ave_xy - v1.Average() * v2.Average()
         End Function
@@ -67,7 +67,7 @@
         ''' </summary>
         ''' <param name="v">vector</param>
         ''' <returns></returns>
-        Public Shared Function Stddev(ByVal v As clsEasyVector) As Double
+        Public Shared Function Stddev(ByVal v As DenseVector) As Double
             Return Math.Sqrt(Var(v))
         End Function
 
@@ -77,7 +77,7 @@
         ''' <param name="v1"></param>
         ''' <param name="v2"></param>
         ''' <returns></returns>
-        Public Shared Function Cor(ByVal v1 As clsEasyVector, ByVal v2 As clsEasyVector) As Double
+        Public Shared Function Cor(ByVal v1 As DenseVector, ByVal v2 As DenseVector) As Double
             Return CoVar(v1, v2) / (Stddev(v1) * Stddev(v2))
         End Function
 
@@ -92,11 +92,11 @@
                                                                Optional ByVal isIncludeZero As Boolean = False,
                                                                Optional ByVal isFloating As Boolean = False,
                                                                Optional ByVal lower As Double = -10,
-                                                               Optional ByVal upper As Double = 10) As clsEasyMatrix
+                                                               Optional ByVal upper As Double = 10) As DenseMatrix
             If rng Is Nothing Then
                 rng = New Random()
             End If
-            Dim matTemp = New clsEasyMatrix(size)
+            Dim matTemp = New DenseMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 1 + i To matTemp.Count - 1
                     Dim r As Double = 0.0
@@ -142,12 +142,12 @@
                                                                Optional ByVal isIncludeZero As Boolean = True,
                                                                Optional ByVal isFloating As Boolean = False,
                                                                Optional ByVal lower As Double = -10,
-                                                               Optional ByVal upper As Double = 10) As clsEasyMatrix
+                                                               Optional ByVal upper As Double = 10) As DenseMatrix
             If rng Is Nothing Then
                 'rng = New Util.clsRandomXorshift()
                 rng = New Random()
             End If
-            Dim matTemp = New clsEasyMatrix(size)
+            Dim matTemp = New DenseMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
                 For j As Integer = 0 To matTemp.Count - 1
                     Dim r As Double = 0.0
@@ -182,14 +182,14 @@
         ''' <param name="matB"></param>
         ''' <param name="eps">default:1E-8</param>
         ''' <returns></returns>
-        Public Shared Function IsNearyEqualMatrix(ByVal matA As clsEasyMatrix, ByVal matB As clsEasyMatrix,
+        Public Shared Function IsNearyEqualMatrix(ByVal matA As DenseMatrix, ByVal matB As DenseMatrix,
                                                       Optional ByVal eps As Double = 0.00000001) As Boolean
             Try
                 For i As Integer = 0 To matA.RowCount - 1
                     For j As Integer = 0 To matA.ColCount - 1
                         Dim tempValA = matA(i)(j)
                         Dim tempValB = matB(i)(j)
-                        If clsMathUtil.IsCloseToValues(tempValA, tempValB, eps) = False Then
+                        If MathUtil.IsCloseToValues(tempValA, tempValB, eps) = False Then
                             Return False
                         End If
                     Next
@@ -207,13 +207,13 @@
         ''' <param name="vecB"></param>
         ''' <param name="eps">default:1E-8</param>
         ''' <returns></returns>
-        Public Shared Function IsNearyEqualVector(ByVal vecA As clsEasyVector, ByVal vecB As clsEasyVector,
+        Public Shared Function IsNearyEqualVector(ByVal vecA As DenseVector, ByVal vecB As DenseVector,
                                                       Optional ByVal eps As Double = 0.00000001) As Boolean
             Try
                 For i As Integer = 0 To vecA.Count - 1
                     Dim tempValA = vecA(i)
                     Dim tempValB = vecB(i)
-                    If clsMathUtil.IsCloseToValues(tempValA, tempValB, eps) = False Then
+                    If MathUtil.IsCloseToValues(tempValA, tempValB, eps) = False Then
                         Return False
                     End If
                 Next
@@ -229,7 +229,7 @@
         ''' <param name="source"></param>
         ''' <param name="fromIdx"></param>
         ''' <param name="destIdx"></param>
-        Public Shared Sub SwapRow(ByRef source As clsEasyMatrix, ByVal fromIdx As Integer, ByVal destIdx As Integer)
+        Public Shared Sub SwapRow(ByRef source As DenseMatrix, ByVal fromIdx As Integer, ByVal destIdx As Integer)
             Dim temp = source(fromIdx)
             source(fromIdx) = source(destIdx)
             source(destIdx) = temp
@@ -241,7 +241,7 @@
         ''' <param name="source"></param>
         ''' <param name="fromIdx"></param>
         ''' <param name="destIdx"></param>
-        Public Shared Sub SwapCol(ByRef source As clsEasyMatrix, ByVal fromIdx As Integer, ByVal destIdx As Integer)
+        Public Shared Sub SwapCol(ByRef source As DenseMatrix, ByVal fromIdx As Integer, ByVal destIdx As Integer)
             Dim rowCount = source.RowCount
             For i As Integer = 0 To rowCount - 1
                 Dim temp As Double = source(i)(fromIdx)
@@ -256,7 +256,7 @@
         ''' <param name="value"></param>
         ''' <param name="eps">2.20E-16</param>
         ''' <returns></returns>
-        Public Shared Function IsCloseToZero(ByVal value As Double, Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron) As Boolean
+        Public Shared Function IsCloseToZero(ByVal value As Double, Optional ByVal eps As Double = DenseMatrix.MachineEpsiron) As Boolean
             If System.Math.Abs(value + eps) <= eps Then
                 Return True
             Else
@@ -271,7 +271,7 @@
         ''' <param name="value2"></param>
         ''' <param name="eps"></param>
         ''' <returns></returns>
-        Public Shared Function IsCloseToValues(ByVal value1 As Double, ByVal value2 As Double, Optional ByVal eps As Double = clsEasyMatrix.MachineEpsiron) As Boolean
+        Public Shared Function IsCloseToValues(ByVal value1 As Double, ByVal value2 As Double, Optional ByVal eps As Double = DenseMatrix.MachineEpsiron) As Boolean
             If System.Math.Abs(value1 - value2) < eps Then
                 Return True
             Else
@@ -285,7 +285,7 @@
         ''' <param name="eigenValue"></param>
         ''' <param name="eigenVector"></param>
         ''' <param name="isColOrder"></param>
-        Public Shared Sub EigenSort(ByRef eigenValue As clsEasyVector, ByRef eigenVector As clsEasyMatrix, ByVal isColOrder As Boolean)
+        Public Shared Sub EigenSort(ByRef eigenValue As DenseVector, ByRef eigenVector As DenseMatrix, ByVal isColOrder As Boolean)
             Dim n = eigenValue.Count
             Dim colSwapInfo = New List(Of ValueDescSort)
             For i As Integer = 0 To n - 1
@@ -294,7 +294,7 @@
             colSwapInfo.Sort()
 
             If isColOrder = True Then
-                Dim newEigenVector = New clsEasyMatrix(n)
+                Dim newEigenVector = New DenseMatrix(n)
                 For j As Integer = 0 To n - 1
                     'eigen value
                     eigenValue(j) = colSwapInfo(j).v
@@ -307,7 +307,7 @@
                 Next
                 eigenVector = newEigenVector
             Else
-                Dim newEigenVector = New clsEasyMatrix(n)
+                Dim newEigenVector = New DenseMatrix(n)
                 For i = 0 To n - 1
                     'eigen value
                     eigenValue(i) = colSwapInfo(i).v
@@ -327,15 +327,15 @@
         ''' <param name="isRowOrder">True:The data sequence is "row".</param>
         ''' <param name="isUnbalanceVariance">use UnbalanceVariance. default is true</param>
         ''' <returns></returns>
-        Public Shared Function CreateCovarianceMatrix(ByRef mat As clsEasyMatrix,
+        Public Shared Function CreateCovarianceMatrix(ByRef mat As DenseMatrix,
                                                       ByVal isRowOrder As Boolean,
-                                                      Optional ByVal isUnbalanceVariance As Boolean = True) As clsEasyMatrix
-            Dim var_covar As clsEasyMatrix = Nothing
+                                                      Optional ByVal isUnbalanceVariance As Boolean = True) As DenseMatrix
+            Dim var_covar As DenseMatrix = Nothing
 
             If isRowOrder = True Then
                 'de-mean
-                Dim avev = mat.AverageVector(clsEasyVector.VectorDirection.ROW)
-                Dim mat_demean As clsEasyMatrix = mat - avev
+                Dim avev = mat.AverageVector(DenseVector.VectorDirection.ROW)
+                Dim mat_demean As DenseMatrix = mat - avev
 
                 'E[X.T * X] -> 1/N[X.T * X]
                 Dim gramMatrix = mat_demean.T * mat_demean
@@ -346,8 +346,8 @@
                 End If
             Else
                 'de-mean
-                Dim avev = mat.AverageVector(clsEasyVector.VectorDirection.COL)
-                Dim mat_demean As clsEasyMatrix = mat - avev
+                Dim avev = mat.AverageVector(DenseVector.VectorDirection.COL)
+                Dim mat_demean As DenseMatrix = mat - avev
 
                 'E[X.T * X] -> 1/N[X.T * X]
                 Dim gramMatrix = mat_demean * mat_demean.T
@@ -415,7 +415,7 @@
         ''' <param name="targetValue"></param>
         ''' <returns></returns>
         Public Shared Function RelativeError(ByVal trueValue As Double, ByVal targetValue As Double) As Double
-            If clsMathUtil.IsCloseToValues(trueValue, targetValue) Then
+            If MathUtil.IsCloseToValues(trueValue, targetValue) Then
                 Return 0
             Else
                 '分母が0の場合はNaN

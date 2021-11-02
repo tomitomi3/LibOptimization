@@ -144,8 +144,8 @@ Imports LibOptimization.Util
 
                 'initial position check
                 Dim results = opt.Results.ToArray()
-                Dim resultMat As clsEasyMatrix = clsUtil.ToConvertMat(opt.Results)
-                Dim g As New clsEasyVector()
+                Dim resultMat As DenseMatrix = clsUtil.ToConvertMat(opt.Results)
+                Dim g As New DenseVector()
                 For i As Integer = 0 To results(0).Count - 1
                     Dim ar = resultMat.Column(i)
                     Dim tempVal = clsUtil.Average(ar)
@@ -377,7 +377,7 @@ Imports LibOptimization.Util
             Assert.Fail(String.Format("not same iteration count"))
         End If
 
-        flg = flg And clsMathUtil.IsNearyEqualVector(result1, result2)
+        flg = flg And MathUtil.IsNearyEqualVector(result1, result2)
         If flg = False Then
             Assert.Fail(String.Format("not same result"))
         End If
