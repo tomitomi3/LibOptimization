@@ -408,10 +408,11 @@ This Library's license was MS-PL until [this commit](https://github.com/tomitomi
 
 # Support .NET Framework
 
+* .NET 5
 * .NET Core 3.1
 * .NET Core 3.0
 * .NET Core 2.1
-* .NET Framework 4.6
+* .NET Framework 4.8
 * .NET Framework 3.5
 
 # Refference
