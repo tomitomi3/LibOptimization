@@ -103,7 +103,27 @@ Namespace Optimization
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride Function IsRecentError() As Boolean
+        Public Overridable Function IsRecentError() As Boolean
+            Return Me.m_error.IsError()
+        End Function
+
+        ''' <summary>
+        ''' Get recent Error
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overridable Function GetRecentErrors() As clsError
+            Return Me.m_error
+        End Function
+
+        ''' <summary>
+        ''' Get recent Error
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overridable Function GetRecentError() As clsError.clsErrorInfomation
+            Return Me.m_error.GetLastErrorInfomation()
+        End Function
 
         ''' <summary>
         ''' Max Iteration

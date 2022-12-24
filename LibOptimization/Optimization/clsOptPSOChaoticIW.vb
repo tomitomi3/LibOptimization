@@ -201,15 +201,6 @@ Namespace Optimization
         End Function
 
         ''' <summary>
-        ''' Recent Error
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Overrides Function IsRecentError() As Boolean
-            Return Me.m_error.IsError()
-        End Function
-
-        ''' <summary>
         ''' Result (return global best)
         ''' </summary>
         ''' <value></value>

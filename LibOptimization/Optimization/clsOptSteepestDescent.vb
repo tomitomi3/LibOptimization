@@ -3,7 +3,7 @@ Imports LibOptimization.MathUtil
 
 Namespace Optimization
     ''' <summary>
-    ''' Steepest descent(gradient) method
+    ''' Steepest descent method / gradient method
     ''' </summary>
     ''' <remarks>
     ''' Features:
@@ -143,24 +143,6 @@ Namespace Optimization
                 Return ret
             End Get
         End Property
-
-        ''' <summary>
-        ''' Get recent error infomation
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function GetLastErrorInfomation() As clsError.clsErrorInfomation
-            Return Me.m_error.GetLastErrorInfomation()
-        End Function
-
-        ''' <summary>
-        ''' Get recent error
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Overrides Function IsRecentError() As Boolean
-            Return Me.m_error.IsError()
-        End Function
 #End Region
     End Class
 

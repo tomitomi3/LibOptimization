@@ -130,15 +130,6 @@ Namespace Optimization
         End Property
 
         ''' <summary>
-        ''' Get recent error
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Overrides Function IsRecentError() As Boolean
-            Return Me.m_error.IsError()
-        End Function
-
-        ''' <summary>
         ''' All Result
         ''' </summary>
         ''' <value></value>
