@@ -1,4 +1,4 @@
-﻿Namespace MathUtil
+﻿Namespace MathTool
     ''' <summary>
     ''' Utility class for Math
     ''' </summary>
@@ -88,13 +88,13 @@
         ''' <param name="rng"></param>
         ''' <returns></returns>
         Public Shared Function CreateRandomSymmetricMatrix(ByVal size As Integer,
-                                                               Optional ByVal rng As Random = Nothing,
+                                                               Optional ByVal rng As System.Random = Nothing,
                                                                Optional ByVal isIncludeZero As Boolean = False,
                                                                Optional ByVal isFloating As Boolean = False,
                                                                Optional ByVal lower As Double = -10,
                                                                Optional ByVal upper As Double = 10) As DenseMatrix
             If rng Is Nothing Then
-                rng = New Random()
+                rng = New System.Random()
             End If
             Dim matTemp = New DenseMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
@@ -138,14 +138,14 @@
         ''' <param name="size"></param>
         ''' <returns></returns>
         Public Shared Function CreateRandomASymmetricMatrix(ByVal size As Integer,
-                                                               Optional ByVal rng As Random = Nothing,
+                                                               Optional ByVal rng As System.Random = Nothing,
                                                                Optional ByVal isIncludeZero As Boolean = True,
                                                                Optional ByVal isFloating As Boolean = False,
                                                                Optional ByVal lower As Double = -10,
                                                                Optional ByVal upper As Double = 10) As DenseMatrix
             If rng Is Nothing Then
                 'rng = New Util.clsRandomXorshift()
-                rng = New Random()
+                rng = New System.Random()
             End If
             Dim matTemp = New DenseMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
@@ -421,6 +421,61 @@
                 '分母が0の場合はNaN
                 Return Math.Abs(targetValue - trueValue) / targetValue
             End If
+        End Function
+
+        ''' <summary>
+        ''' Log Gamma function
+        ''' </summary>
+        ''' <param name="x"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Refference:
+        ''' C言語による最新アルゴリズム事典
+        ''' </remarks>
+        Public Shared Function LogGamma(ByVal x As Double) As Double
+            Dim LOG_2PI = 1.8378770664093456
+            Dim N = 8
+
+            Dim B0 = 1              '   /* 以下はBernoulli数 */
+            Dim B1 = (-1.0 / 2.0)
+            Dim B2 = (1.0 / 6.0)
+            Dim B4 = (-1.0 / 30.0)
+            Dim B6 = (1.0 / 42.0)
+            Dim B8 = (-1.0 / 30.0)
+            Dim B10 = (5.0 / 66.0)
+            Dim B12 = (-691.0 / 2730.0)
+            Dim B14 = (7.0 / 6.0)
+            Dim B16 = (-3617.0 / 510.0)
+
+            Dim v As Double = 1
+            Dim w As Double
+
+            While x < N
+                v *= x
+                x += 1
+            End While
+            w = 1 / (x * x)
+            Return ((((((((B16 / (16 * 15)) * w + (B14 / (14 * 13))) * w _
+                        + (B12 / (12 * 11))) * w + (B10 / (10 * 9))) * w _
+                        + (B8 / (8 * 7))) * w + (B6 / (6 * 5))) * w _
+                        + (B4 / (4 * 3))) * w + (B2 / (2 * 1))) / x _
+                        + 0.5 * LOG_2PI - Math.Log(v) - x + (x - 0.5) * Math.Log(x)
+        End Function
+
+        ''' <summary>
+        ''' Gamma function
+        ''' </summary>
+        ''' <param name="x"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Refference:
+        ''' C言語による最新アルゴリズム事典
+        ''' </remarks>
+        Public Shared Function Gamma(ByVal x As Double) As Double
+            If (x < 0) Then
+                Return Math.PI / (Math.Sin(Math.PI * x) * Math.Exp(LogGamma(1 - x)))
+            End If
+            Return Math.Exp(LogGamma(x))
         End Function
     End Class
 

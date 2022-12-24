@@ -1,4 +1,4 @@
-﻿Namespace MathUtil
+﻿Namespace MathTool
     ''' <summary>
     ''' Vector class
     ''' </summary>
@@ -137,7 +137,7 @@
         ''' <remarks></remarks>
         Public Shared Operator +(ByVal ai_source As DenseVector, ByVal ai_dest As DenseVector) As DenseVector
             If IsSameDimension(ai_source, ai_dest) = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
             End If
 
             Dim ret As New DenseVector(ai_source)
@@ -156,7 +156,7 @@
         ''' <remarks></remarks>
         Public Shared Operator -(ByVal ai_source As DenseVector, ByVal ai_dest As DenseVector) As DenseVector
             If IsSameDimension(ai_source, ai_dest) = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
             End If
 
             Dim ret As New DenseVector(ai_source)
@@ -206,7 +206,7 @@
         Public Shared Operator *(ByVal ai_source As DenseVector, ByVal ai_dest As DenseVector) As DenseMatrix
             Dim n = ai_source.Count
             If n <> ai_dest.Count Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "Vector * Vector - size error")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "Vector * Vector - size error")
             End If
             If ai_source.Direction = VectorDirection.ROW AndAlso ai_dest.Direction = VectorDirection.COL Then
                 '|v1 v2| * |v3|
@@ -249,7 +249,7 @@
             End If
 
             'error
-            Throw New MyException(MyException.ErrorSeries.NotComputable, "Vector * Vector - direction error")
+            Throw New MathException(MathException.ErrorSeries.NotComputable, "Vector * Vector - direction error")
         End Operator
 
         ''' <summary>
@@ -526,7 +526,7 @@
         ''' </remarks>
         Public Function InnerProduct(ByVal ai_source As DenseVector) As Double
             If IsSameDimension(ai_source, Me) = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
             End If
             Dim ret As Double = 0
             For i As Integer = 0 To ai_source.Count - 1
@@ -545,22 +545,22 @@
             'https://en.wikipedia.org/wiki/Cross_product
 
             If IsSameDimension(ai_source, Me) = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
             End If
 
             Dim ret = New DenseVector(ai_source.Count)
             If ai_source.Count = 0 Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "sorry, not implementation")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 1 Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "sorry, not implementation")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 2 Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "sorry, not implementation")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "sorry, not implementation")
             ElseIf ai_source.Count = 3 Then
                 ret(0) = Me(1) * ai_source(2) - Me(2) * ai_source(1)
                 ret(1) = Me(2) * ai_source(0) - Me(0) * ai_source(2)
                 ret(2) = Me(0) * ai_source(1) - Me(1) * ai_source(0)
             Else
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "sorry, not implementation")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "sorry, not implementation")
             End If
             Return ret
         End Function
@@ -579,7 +579,7 @@
                 Return ret
             Else
                 If IsSameDimension(b, Me) = False Then
-                    Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                    Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
                 End If
                 Dim ret = New DenseVector(Me.Count)
                 For i As Integer = 0 To Me.Count - 1

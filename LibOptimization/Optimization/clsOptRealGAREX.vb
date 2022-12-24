@@ -1,5 +1,6 @@
 ﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
+Imports LibOptimization.MathTool.RNG
 
 Namespace Optimization
     ''' <summary>
@@ -215,7 +216,7 @@ Namespace Optimization
                     'rand parameter
                     Dim randVal As Double = 0.0
                     If ai_randomMode = RexRandomMode.NORMAL_DIST Then
-                        randVal = clsUtil.NormRand(0, normalDistParam)
+                        randVal = RandomUtil.NormRand(0, normalDistParam)
                     Else
                         randVal = Math.Abs(2.0 * uniformRandParam) * m_rand.NextDouble() - range
                     End If

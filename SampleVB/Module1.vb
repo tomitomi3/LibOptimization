@@ -1,7 +1,8 @@
 ﻿Imports LibOptimization
+Imports LibOptimization.BenchmarkFunction
+Imports LibOptimization.MathTool.RNG
 Imports LibOptimization.Optimization
 Imports LibOptimization.Util
-Imports LibOptimization.BenchmarkFunction
 
 Module Module1
     '------------------------------------------------------------------------------------------------------------------
@@ -100,9 +101,9 @@ Module Module1
 
         'fix random seed.
         With Nothing
-            Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+            clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
             Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
-            optimization.Random = New Util.clsRandomXorshift()
+            optimization.Random = New clsRandomXorshift()
             'init
             optimization.Init()
             'do optimization

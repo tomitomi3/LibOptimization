@@ -1,4 +1,5 @@
-﻿Imports LibOptimization.Util
+﻿Imports LibOptimization.MathTool.RNG
+Imports LibOptimization.Util
 
 Namespace Optimization
     ''' <summary>

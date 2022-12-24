@@ -1,12 +1,6 @@
-﻿Imports System.Text
-Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
+﻿
 'LibOptimization
-Imports LibOptimization
-Imports LibOptimization.MathUtil
-Imports LibOptimization.Optimization
-Imports LibOptimization.BenchmarkFunction
-Imports LibOptimization.Util
+Imports LibOptimization.MathTool.RNG
 
 ''' <summary>
 ''' 単体テスト 最適化、線形代数以外

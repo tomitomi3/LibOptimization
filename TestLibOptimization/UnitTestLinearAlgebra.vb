@@ -1,5 +1,5 @@
 ﻿Imports System.Text
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 <TestClass()> Public Class UnitTestLinearAlgebra
@@ -283,7 +283,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim v As New DenseVector(New Double() {2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = mat * v
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
                 Return
             End Try
@@ -299,7 +299,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = mat * v
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
                 Return
             End Try
@@ -314,7 +314,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = mat * v
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
                 Return
             End Try
@@ -502,7 +502,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim v As New DenseVector(New Double() {2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = v * mat
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
                 Return
             End Try
@@ -518,7 +518,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = v * mat
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
                 Return
             End Try
@@ -533,7 +533,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim v As New DenseVector(New Double() {2, 2, 2}, DenseVector.VectorDirection.ROW)
             Try
                 Dim temp = v * mat
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
                 Return
             End Try
@@ -774,7 +774,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                         End If
                     Next
                 Next
-            Catch myex As MyException
+            Catch myex As MathException
                 Assert.Fail()
             End Try
         End With
@@ -805,7 +805,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                         End If
                     Next
                 Next
-            Catch myex As MyException
+            Catch myex As MathException
                 Assert.Fail()
             End Try
         End With
@@ -826,7 +826,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Try
                 Dim temp = matA * matB
                 Assert.Fail("error : 3x3 * 2x2")
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
             End Try
         End With
@@ -840,7 +840,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                 Dim temp = matA * matB
 
                 Assert.Fail("error : 2x2 * 3x3")
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
             End Try
         End With
@@ -854,7 +854,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                 Dim temp = matA * matB
 
                 Assert.Fail("error : 3x3 * 2x3")
-            Catch myex As MyException
+            Catch myex As MathException
                 'OK
             End Try
         End With
@@ -873,7 +873,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                     If MathUtil.IsNearyEqualMatrix(temp, matA) = False Then
                         Assert.Fail("error : {0}x{0}", dimNum)
                     End If
-                Catch myex As MyException
+                Catch myex As MathException
                     Assert.Fail()
                 End Try
             End With
@@ -888,7 +888,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                     If MathUtil.IsNearyEqualMatrix(temp, matB) = False Then
                         Assert.Fail("error : {0}x{0}", dimNum)
                     End If
-                Catch myex As MyException
+                Catch myex As MathException
                     Assert.Fail()
                 End Try
             End With
@@ -914,7 +914,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                 If MathUtil.IsNearyEqualMatrix(temp, matA) = False Then
                     Assert.Fail()
                 End If
-            Catch myex As MyException
+            Catch myex As MathException
                 Assert.Fail()
             End Try
         End With

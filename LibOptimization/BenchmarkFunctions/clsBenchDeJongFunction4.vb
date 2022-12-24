@@ -1,4 +1,5 @@
-﻿Imports LibOptimization.Optimization
+﻿Imports LibOptimization.MathTool.RNG
+Imports LibOptimization.Optimization
 
 Namespace BenchmarkFunction
     ''' <summary>
@@ -23,7 +24,7 @@ Namespace BenchmarkFunction
         ''' <remarks></remarks>
         Public Sub New()
             For i As Integer = 0 To 29
-                Me.normRand.Add(Util.clsUtil.NormRand())
+                Me.normRand.Add(RandomUtil.NormRand())
             Next
         End Sub
 

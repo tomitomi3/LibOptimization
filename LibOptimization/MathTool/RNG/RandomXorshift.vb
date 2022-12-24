@@ -1,4 +1,4 @@
-﻿Namespace Util
+﻿Namespace MathTool.RNG
     ''' <summary>
     ''' Xorshift random algorithm
     ''' Inherits System.Random
@@ -8,7 +8,9 @@
     ''' George Marsaglia, "Xorshift RNGs", Journal of Statistical Software Vol. 8, Issue 14, Jul 2003
     ''' </remarks>
     <Serializable>
-    Public Class clsRandomXorshift : Inherits System.Random
+    Public Class clsRandomXorshift
+
+        Inherits System.Random
         'DefaultParameter
         Private x As UInt32 = 123456789
         Private y As UInt32 = 362436069

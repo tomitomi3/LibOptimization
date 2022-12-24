@@ -1,5 +1,5 @@
-﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
+﻿Imports LibOptimization.MathTool.RNG
+Imports LibOptimization.Util
 
 Namespace Optimization
     ''' <summary>
@@ -87,6 +87,15 @@ Namespace Optimization
                 Me.m_nests.Clear()
                 Me.m_error.Clear()
 
+                'check initialposition
+                If MyBase.InitialPosition IsNot Nothing Then
+                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
+                        'nothing
+                    Else
+                        Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
+                    End If
+                End If
+
                 'initial position
                 For i As Integer = 0 To Me.PopulationSize - 1
                     Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
@@ -102,7 +111,7 @@ Namespace Optimization
                     Me.HigherNPercentIndex = Me.m_nests.Count - 1
                 End If
             Catch ex As Exception
-                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
+                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, ex.Message)
             End Try
         End Sub
 
@@ -122,7 +131,7 @@ Namespace Optimization
             Me.m_currentBest = Me.m_nests(clsUtil.FindCurrentBestIndex(Me.m_nests))
 
             'levy flight parameter
-            Dim sigma = (Me.Gamma(1 + Beta) * Math.Sin(Math.PI * Beta / 2) / (Me.Gamma((1 + Beta) / 2) * Beta * 2 ^ ((Beta - 1) / 2))) ^ (1 / Beta)
+            Dim sigma = (MathTool.MathUtil.Gamma(1 + Beta) * Math.Sin(Math.PI * Beta / 2) / (MathTool.MathUtil.Gamma((1 + Beta) / 2) * Beta * 2 ^ ((Beta - 1) / 2))) ^ (1 / Beta)
 
             'Do Iterate
             If Me.Iteration <= m_iteration Then
@@ -153,11 +162,11 @@ Namespace Optimization
                     Dim s = Me.m_nests(i)
                     Dim newNest = New clsPoint(Me.m_func)
                     For j = 0 To Me.m_func.NumberOfVariable - 1
-                        Dim u = clsUtil.NormRand(0) * sigma
-                        Dim v = Math.Abs(clsUtil.NormRand(0))
+                        Dim u = RandomUtil.NormRand(0) * sigma
+                        Dim v = Math.Abs(RandomUtil.NormRand(0))
                         Dim tempStep = u / Math.Pow(v, 1 / Beta)
                         Dim stepSize = 0.01 * tempStep * (s(j) - Me.m_currentBest(j))
-                        Dim temp = s(j) + stepSize * clsUtil.NormRand(0)
+                        Dim temp = s(j) + stepSize * RandomUtil.NormRand(0)
                         newNest(j) = temp
                     Next
                     newNest.ReEvaluate()
@@ -223,6 +232,15 @@ Namespace Optimization
         End Property
 
         ''' <summary>
+        ''' Get recent error
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function IsRecentError() As Boolean
+            Return Me.m_error.IsError()
+        End Function
+
+        ''' <summary>
         ''' All Result
         ''' </summary>
         ''' <value></value>
@@ -238,60 +256,7 @@ Namespace Optimization
 #End Region
 
 #Region "Private"
-        ''' <summary>
-        ''' Log Gamma function
-        ''' </summary>
-        ''' <param name="x"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Refference:
-        ''' C言語による最新アルゴリズム事典
-        ''' </remarks>
-        Private Function LogGamma(ByVal x As Double) As Double
-            Dim LOG_2PI = 1.8378770664093456
-            Dim N = 8
 
-            Dim B0 = 1              '   /* 以下はBernoulli数 */
-            Dim B1 = (-1.0 / 2.0)
-            Dim B2 = (1.0 / 6.0)
-            Dim B4 = (-1.0 / 30.0)
-            Dim B6 = (1.0 / 42.0)
-            Dim B8 = (-1.0 / 30.0)
-            Dim B10 = (5.0 / 66.0)
-            Dim B12 = (-691.0 / 2730.0)
-            Dim B14 = (7.0 / 6.0)
-            Dim B16 = (-3617.0 / 510.0)
-
-            Dim v As Double = 1
-            Dim w As Double
-
-            While x < N
-                v *= x
-                x += 1
-            End While
-            w = 1 / (x * x)
-            Return ((((((((B16 / (16 * 15)) * w + (B14 / (14 * 13))) * w _
-                        + (B12 / (12 * 11))) * w + (B10 / (10 * 9))) * w _
-                        + (B8 / (8 * 7))) * w + (B6 / (6 * 5))) * w _
-                        + (B4 / (4 * 3))) * w + (B2 / (2 * 1))) / x _
-                        + 0.5 * LOG_2PI - Math.Log(v) - x + (x - 0.5) * Math.Log(x)
-        End Function
-
-        ''' <summary>
-        ''' Gamma function
-        ''' </summary>
-        ''' <param name="x"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Refference:
-        ''' C言語による最新アルゴリズム事典
-        ''' </remarks>
-        Private Function Gamma(ByVal x As Double) As Double
-            If (x < 0) Then
-                Return Math.PI / (Math.Sin(Math.PI * x) * Math.Exp(LogGamma(1 - x)))
-            End If
-            Return Math.Exp(LogGamma(x))
-        End Function
 #End Region
     End Class
 End Namespace

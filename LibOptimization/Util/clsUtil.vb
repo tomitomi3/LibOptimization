@@ -1,6 +1,6 @@
-﻿Imports LibOptimization.MathUtil
+﻿Imports LibOptimization.MathTool
+Imports LibOptimization.MathTool.RNG
 Imports LibOptimization.Optimization
-Imports LibOptimization.Util
 
 Namespace Util
     ''' <summary>
@@ -8,64 +8,6 @@ Namespace Util
     ''' </summary>
     ''' <remarks></remarks>
     Public Class clsUtil
-        Public Const SAME_ZERO As Double = 2.0E-50 '2^-50
-
-        ''' <summary>
-        ''' Normal Distribution
-        ''' </summary>
-        ''' <param name="ai_ave">Average</param>
-        ''' <param name="ai_sigma2">Varianse s^2</param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' using Box-Muller method
-        ''' </remarks>
-        Public Shared Function NormRand(Optional ByVal ai_ave As Double = 0,
-                                        Optional ByVal ai_sigma2 As Double = 1) As Double
-            Dim x As Double = clsRandomXorshiftSingleton.GetInstance().NextDouble()
-            Dim y As Double = clsRandomXorshiftSingleton.GetInstance().NextDouble()
-
-            Dim c As Double = Math.Sqrt(-2.0 * Math.Log(x))
-            If (0.5 - clsRandomXorshiftSingleton.GetInstance().NextDouble() > 0.0) Then
-                Return c * Math.Sin(2.0 * Math.PI * y) * ai_sigma2 + ai_ave
-            Else
-                Return c * Math.Cos(2.0 * Math.PI * y) * ai_sigma2 + ai_ave
-            End If
-        End Function
-
-        ''' <summary>
-        ''' Normal Distribution using Box-Muller method
-        ''' </summary>
-        ''' <param name="oRand"></param>
-        ''' <param name="ai_ave">ai_ave</param>
-        ''' <param name="ai_sigma2">Varianse s^2</param>
-        ''' <returns></returns>
-        Public Shared Function NormRand(ByVal oRand As System.Random,
-                                        Optional ByVal ai_ave As Double = 0,
-                                        Optional ByVal ai_sigma2 As Double = 1) As Double
-            Dim x As Double = oRand.NextDouble()
-            Dim y As Double = oRand.NextDouble()
-
-            Dim c As Double = Math.Sqrt(-2.0 * Math.Log(x))
-            If (0.5 - clsRandomXorshiftSingleton.GetInstance().NextDouble() > 0.0) Then
-                Return c * Math.Sin(2.0 * Math.PI * y) * ai_sigma2 + ai_ave
-            Else
-                Return c * Math.Cos(2.0 * Math.PI * y) * ai_sigma2 + ai_ave
-            End If
-        End Function
-
-        ''' <summary>
-        ''' Cauchy Distribution
-        ''' </summary>
-        ''' <param name="ai_mu">default:0</param>
-        ''' <param name="ai_gamma">default:1</param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' http://www.sat.t.u-tokyo.ac.jp/~omi/random_variables_generation.html#Cauchy
-        ''' </remarks>
-        Public Shared Function CauchyRand(Optional ByVal ai_mu As Double = 0, Optional ByVal ai_gamma As Double = 1) As Double
-            Return ai_mu + ai_gamma * Math.Tan(Math.PI * (clsRandomXorshiftSingleton.GetInstance().NextDouble() - 0.5))
-        End Function
-
         ''' <summary>
         ''' Generate Random permutation
         ''' </summary>
@@ -223,7 +165,7 @@ Namespace Util
         ''' </remarks>
         Public Shared Function IsCriterion(ByVal ai_eps As Double,
                                            ByVal ai_comparisonA As Double, ByVal ai_comparisonB As Double,
-                                           Optional ByVal ai_tiny As Double = SAME_ZERO) As Boolean
+                                           Optional ByVal ai_tiny As Double = ConstantValues.SAME_ZERO) As Boolean
             'check division by zero
             Dim denominator = (Math.Abs(ai_comparisonB) + Math.Abs(ai_comparisonA)) + ai_tiny
             If denominator = 0 Then
@@ -250,7 +192,7 @@ Namespace Util
         ''' <remarks></remarks>
         Public Shared Function IsCriterion(ByVal ai_eps As Double,
                                            ByVal ai_comparisonA As clsPoint, ByVal ai_comparisonB As clsPoint,
-                                           Optional ByVal ai_tiny As Double = SAME_ZERO) As Boolean
+                                           Optional ByVal ai_tiny As Double = ConstantValues.SAME_ZERO) As Boolean
             Return clsUtil.IsCriterion(ai_eps, ai_comparisonA.Eval, ai_comparisonB.Eval, ai_tiny)
         End Function
 
@@ -265,7 +207,7 @@ Namespace Util
         Public Shared Function IsCriterion(ByVal eps As Double,
                                            ByVal points As List(Of clsPoint),
                                            ByVal higherNPercentIndex As Integer,
-                                           Optional ByVal tiny As Double = SAME_ZERO) As Boolean
+                                           Optional ByVal tiny As Double = ConstantValues.SAME_ZERO) As Boolean
             Dim evalIndexs = clsUtil.GetIndexSortedEvalFromPoints(points)
 
             'global
@@ -290,7 +232,7 @@ Namespace Util
         Public Shared Function IsCriterion(ByVal eps As Double,
                                            ByVal particles As List(Of clsParticle),
                                            ByVal higherNPercentIndex As Integer,
-                                           Optional ByVal tiny As Double = SAME_ZERO) As Boolean
+                                           Optional ByVal tiny As Double = ConstantValues.SAME_ZERO) As Boolean
             Dim evalIndexs = clsUtil.GetIndexSortedEvalFromParticles(particles)
 
             'global
@@ -433,7 +375,7 @@ Namespace Util
         ''' <returns></returns>
         Public Shared Function IsExistZeroLength(ByVal points() As clsPoint) As Boolean
             Dim isCanCrossover As Boolean = True
-            Dim vec As MathUtil.DenseVector = Nothing
+            Dim vec As MathTool.DenseVector = Nothing
             For i As Integer = 0 To points.Length - 2
                 vec = points(i) - points(i + 1)
                 If vec.NormL1() = 0 Then
@@ -717,10 +659,10 @@ Namespace Util
         ''' </summary>
         ''' <param name="results"></param>
         ''' <returns></returns>
-        Public Shared Function ToConvertMat(ByVal results As List(Of clsPoint)) As MathUtil.DenseMatrix
+        Public Shared Function ToConvertMat(ByVal results As List(Of clsPoint)) As MathTool.DenseMatrix
             Dim row = results.Count
             Dim col = results(0).Count
-            Dim ret As New MathUtil.DenseMatrix(row, col)
+            Dim ret As New MathTool.DenseMatrix(row, col)
             For i As Integer = 0 To row - 1
                 For j As Integer = 0 To col - 1
                     ret(i)(j) = results(i)(j)

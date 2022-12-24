@@ -1,8 +1,8 @@
-﻿Namespace MathUtil
+﻿Namespace MathTool
     ''' <summary>
     ''' Exception class for SimpleLinearAlgebra lib
     ''' </summary>
-    Public Class MyException : Inherits Exception
+    Public Class MathException : Inherits Exception
         ''' <summary>
         ''' Error series
         ''' </summary>

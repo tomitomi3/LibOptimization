@@ -1,5 +1,6 @@
 ﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
+Imports LibOptimization.MathTool.RNG
 
 Namespace Optimization
     ''' <summary>
@@ -272,10 +273,10 @@ Namespace Optimization
                 Dim meanD As Double = DD.Average()
                 Dim tempV1 As New DenseVector(Me.m_func.NumberOfVariable)
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
-                    tempV1(i) = clsUtil.NormRand(0.0, meanD * Eta)
+                    tempV1(i) = RandomUtil.NormRand(0.0, meanD * Eta)
                 Next
                 Dim tempInnerP As Double = tempV1.InnerProduct(d)
-                Dim tempNRand As Double = clsUtil.NormRand(0.0, Zeta)
+                Dim tempNRand As Double = RandomUtil.NormRand(0.0, Zeta)
                 For i As Integer = 0 To Me.m_func.NumberOfVariable - 1
                     tempV1(i) = tempV1(i) - tempInnerP * DD(i) / Math.Pow(dist, 2.0)
                     tempV1(i) += tempNRand * d(i)

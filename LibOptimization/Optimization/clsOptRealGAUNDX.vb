@@ -1,5 +1,5 @@
 ﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
 
 Namespace Optimization
     ''' <summary>
@@ -292,14 +292,14 @@ Namespace Optimization
             Dim t = New DenseVector(ObjectiveFunction.NumberOfVariable)
             For genChild As Integer = 0 To CInt(ChildrenSize / 2 - 1)
                 For i As Integer = 0 To ObjectiveFunction.NumberOfVariable - 1
-                    t(i) = clsUtil.NormRand(0, sd2)
+                    t(i) = RNG.RandomUtil.NormRand(0, sd2)
                 Next
                 t = t - (t.InnerProduct(e)) * e
 
                 'child
                 Dim child1(ObjectiveFunction.NumberOfVariable - 1) As Double
                 Dim child2(ObjectiveFunction.NumberOfVariable - 1) As Double
-                Dim ndRand = clsUtil.NormRand(0, sd1)
+                Dim ndRand = RNG.RandomUtil.NormRand(0, sd1)
                 For i As Integer = 0 To ObjectiveFunction.NumberOfVariable - 1
                     Dim temp = t(i) + ndRand * e(i)
                     child1(i) = g(i) + temp

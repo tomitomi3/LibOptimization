@@ -1,5 +1,6 @@
 ﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
+Imports LibOptimization.MathTool.RNG
 
 Namespace Optimization
     ''' <summary>
@@ -181,7 +182,7 @@ Namespace Optimization
                     'update F
                     Dim F As Double = 0.0
                     While True
-                        F = clsUtil.CauchyRand(MuF, 0.1)
+                        F = RandomUtil.CauchyRand(MuF, 0.1)
                         If F < 0 Then
                             Continue While
                         End If
@@ -192,7 +193,7 @@ Namespace Optimization
                     End While
 
                     'update CR 0 to 1
-                    Dim CR As Double = clsUtil.NormRand(MuCR, 0.1)
+                    Dim CR As Double = RandomUtil.NormRand(MuCR, 0.1)
                     If CR < 0 Then
                         CR = 0.0
                     ElseIf CR > 1 Then

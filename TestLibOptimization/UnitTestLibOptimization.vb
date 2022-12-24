@@ -1,11 +1,7 @@
-﻿Imports System.Text
-Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
-'LibOptimization
-Imports LibOptimization
-Imports LibOptimization.MathUtil
+﻿Imports LibOptimization.BenchmarkFunction
+Imports LibOptimization.MathTool
+Imports LibOptimization.MathTool.RNG
 Imports LibOptimization.Optimization
-Imports LibOptimization.BenchmarkFunction
 Imports LibOptimization.Util
 
 ''' <summary>
@@ -15,7 +11,7 @@ Imports LibOptimization.Util
 
     Public Sub New()
         'fix rng
-        Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
     End Sub
 
     Dim lock As Object
@@ -354,7 +350,7 @@ Imports LibOptimization.Util
 
         'serialize
         opt.DoIteration(10)
-        Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
         Dim PATH_SERIALIZE = "serialize_file.txt"
         clsUtil.SerializeOpt(CType(opt, absOptimization), PATH_SERIALIZE)
         opt.DoIteration(10)
@@ -364,7 +360,7 @@ Imports LibOptimization.Util
         'deserialize
         Dim temp = clsUtil.DeSerializeOpt(PATH_SERIALIZE)
         opt = CType(temp, clsOptCS)
-        Util.clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
         opt.DoIteration(10)
         Dim result2 = opt.Result()
         Dim itr2 = opt.IterationCount

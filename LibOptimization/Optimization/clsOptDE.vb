@@ -1,5 +1,5 @@
 ﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
 
 Namespace Optimization
     ''' <summary>
@@ -131,6 +131,15 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
                 Me.m_error.Clear()
+
+                'check initialposition
+                If MyBase.InitialPosition IsNot Nothing Then
+                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
+                        'nothing
+                    Else
+                        Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
+                    End If
+                End If
 
                 'bound check
                 If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then

@@ -1,4 +1,4 @@
-﻿Namespace MathUtil
+﻿Namespace MathTool
     ''' <summary>
     ''' Matrix class
     ''' </summary>
@@ -240,7 +240,7 @@
         ''' <remarks></remarks>
         Public Shared Operator +(ByVal ai_source As DenseMatrix, ByVal ai_dest As DenseMatrix) As DenseMatrix
             If IsSameDimension(ai_source, ai_dest) = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
             Dim ret As New DenseMatrix(ai_source)
             For i As Integer = 0 To ret.RowCount() - 1
@@ -258,7 +258,7 @@
         ''' <remarks></remarks>
         Public Shared Operator +(ByVal ai_source As DenseMatrix, ByVal ai_dest As DenseVector) As DenseVector
             If IsComputableMatrixVector(ai_source, ai_dest) = False Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable)
+                Throw New MathException(MathException.ErrorSeries.NotComputable)
             End If
             Dim ret As New DenseVector(ai_dest)
             For i As Integer = 0 To ai_dest.Count - 1
@@ -276,7 +276,7 @@
         ''' <remarks></remarks>
         Public Shared Operator +(ByVal ai_source As DenseVector, ByVal ai_dest As DenseMatrix) As DenseVector
             If IsComputableMatrixVector(ai_dest, ai_source) = False Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable)
+                Throw New MathException(MathException.ErrorSeries.NotComputable)
             End If
             Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ai_source.Count - 1
@@ -294,7 +294,7 @@
         ''' <remarks></remarks>
         Public Shared Operator -(ByVal ai_source As DenseMatrix, ByVal ai_dest As DenseMatrix) As DenseMatrix
             If IsSameDimension(ai_source, ai_dest) = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
             Dim ret As New DenseMatrix(ai_source)
             Dim row = ret.RowCount()
@@ -336,7 +336,7 @@
                 Next
                 Return ret
             Else
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "The number of dimensions of matrices and vectors is different.")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "The number of dimensions of matrices and vectors is different.")
             End If
         End Operator
 
@@ -349,7 +349,7 @@
         ''' <remarks></remarks>
         Public Shared Operator -(ByVal ai_source As DenseVector, ByVal ai_dest As DenseMatrix) As DenseVector
             If IsComputableMatrixVector(ai_dest, ai_source) = False Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable)
+                Throw New MathException(MathException.ErrorSeries.NotComputable)
             End If
             Dim ret As New DenseVector(ai_source)
             For i As Integer = 0 To ai_source.Count - 1
@@ -403,7 +403,7 @@
                 Return ret
             End If
 
-            Throw New MyException(MyException.ErrorSeries.NotComputable, "Matrix * Matrix")
+            Throw New MathException(MathException.ErrorSeries.NotComputable, "Matrix * Matrix")
 #Else
         '------------------------------------------------------------------
         '.net 4.0
@@ -448,7 +448,7 @@
             Return ret
         End If
 
-        Throw New MyException(MyException.ErrorSeries.NotComputable, "Matrix * Matrix")
+        Throw New MathException(MathException.ErrorSeries.NotComputable, "Matrix * Matrix")
 #End If
         End Operator
 
@@ -475,7 +475,7 @@
             ' |a31 a32|          cv3
             '
             If mat.ColCount <> vec.Count Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "Matrix * Vector - size error")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "Matrix * Vector - size error")
             End If
             'If vec.Direction <> clsEasyVector.VectorDirection.COL Then
             '    Throw New clsException(clsException.Series.NotComputable, "Matrix * Vector - vector direction is row")
@@ -526,7 +526,7 @@
             '           |a21 a22 a23|   
             '
             If vec.Count <> mat.RowCount Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "Vector * Matrix - size error")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "Vector * Matrix - size error")
             End If
             'If vec.Direction <> clsEasyVector.VectorDirection.COL Then
             '    Throw New clsException(clsException.Series.NotComputable, "Vector * Matrix - vector direction is col")
@@ -639,7 +639,7 @@
             Dim n_dim = Me.RowCount
             Dim m_dim = Me.ColCount
             If m_dim <> n_dim Then
-                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
             For i = 0 To n_dim - 1
                 For j = 0 To n_dim - 1
@@ -659,7 +659,7 @@
         ''' <remarks></remarks>
         Public Function ToDiagonalMatrix() As DenseMatrix
             If Me.RowCount <> Me.ColCount Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "ToDiagonalMatrix()")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "ToDiagonalMatrix()")
             End If
             Dim ret As New DenseMatrix(Me.RowCount)
             For i As Integer = 0 To Me.Count - 1
@@ -675,7 +675,7 @@
         ''' <returns></returns>
         Public Function ToDiagonalVector(Optional ByVal direction As DenseVector.VectorDirection = DenseVector.VectorDirection.ROW) As DenseVector
             If Me.RowCount <> Me.ColCount Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "ToVectorFromDiagonal")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "ToVectorFromDiagonal")
             End If
             Dim ret As New DenseVector(Me.RowCount, direction)
             For i As Integer = 0 To Me.Count - 1
@@ -817,7 +817,7 @@
             'check
             For i = 0 To Me.Count - 1
                 If Me(i).Count <> vector.Count Then
-                    Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                    Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
                 End If
             Next
 
@@ -836,7 +836,7 @@
             Else
                 'check 行数とベクター要素数が同じかどうか
                 If Me.Count <> vector.Count Then
-                    Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                    Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
                 End If
                 For i = 0 To Me.RowCount - 1
                     Me(i).Add(vector(i))
@@ -880,7 +880,7 @@
                 Return ret
             Else
                 If IsSameDimension(b, Me) = False Then
-                    Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                    Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
                 End If
                 Dim ret = New DenseMatrix(Me)
                 Dim row = Me.RowCount
@@ -901,7 +901,7 @@
         ''' <returns></returns>
         Public Function HadamardDivide(ByRef b As DenseMatrix) As DenseMatrix
             If IsSameDimension(b, Me) = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferElementNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferElementNumber)
             End If
             Dim ret = New DenseMatrix(Me)
             Dim row = Me.RowCount
@@ -1005,13 +1005,13 @@
                 'nop
             ElseIf n = 1 Then
                 If MathUtil.IsCloseToZero(source(0)(0), eps) = True Then
-                    Throw New MyException(MyException.ErrorSeries.NotComputable, "Inverse 1x1")
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, "Inverse 1x1")
                 End If
                 retInverse(0)(0) = 1.0 / source(0)(0)
             ElseIf n = 2 AndAlso isUsingLUDecomposition = False Then
                 Dim det = Me.Det()
                 If MathUtil.IsCloseToZero(det, eps) = True Then
-                    Throw New MyException(MyException.ErrorSeries.NotComputable, "Inverse 2x2")
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, "Inverse 2x2")
                 End If
                 det = 1.0 / det
                 retInverse(0)(0) = det * Me(1)(1)
@@ -1021,7 +1021,7 @@
             ElseIf n = 3 AndAlso isUsingLUDecomposition = False Then
                 Dim det = Me.Det()
                 If MathUtil.IsCloseToZero(det, eps) = True Then
-                    Throw New MyException(MyException.ErrorSeries.NotComputable, "Inverse 3x3")
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, "Inverse 3x3")
                 End If
                 retInverse(0)(0) = ((Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))) / det
                 retInverse(0)(1) = -((Me(0)(1) * Me(2)(2) - Me(0)(2) * Me(2)(1))) / det
@@ -1036,7 +1036,7 @@
                 Dim lup = Me.LUP()
                 Dim det = lup.Det
                 If MathUtil.IsCloseToZero(det, eps) = True Then
-                    Throw New MyException(MyException.ErrorSeries.NotComputable, String.Format("Inverse {0}x{0} det=0", n))
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, String.Format("Inverse {0}x{0} det=0", n))
                 End If
 
                 'lup.P = lup.P.T() 'Transopose = Inverse
@@ -1093,7 +1093,7 @@
                 Next
                 '列要素の絶対最大値が0に近い場合
                 If MathUtil.IsCloseToZero(absValue, eps) Then
-                    Throw New MyException(MyException.ErrorSeries.NotComputable, "LUP() singular matrix")
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
                 weight(i) = 1.0 / absValue
             Next
@@ -1209,7 +1209,7 @@
                 Next
                 If absValue = 0.0 Then
                     'If absValue < SAME_ZERO Then
-                    Throw New MyException(MyException.ErrorSeries.NotComputable, "singular matrix")
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, "singular matrix")
                 End If
                 weight(k) = 1.0 / absValue
             Next
@@ -1299,7 +1299,7 @@
 
                 '列要素の絶対最大値が0に近い場合
                 If MathUtil.IsCloseToZero(amax, eps) Then
-                    Throw New MyException(MyException.ErrorSeries.NotComputable, "LUP() singular matrix")
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
 
                 'ピボット選択行を保存
@@ -1381,7 +1381,7 @@
         ''' <returns></returns>
         Public Function Cholesky() As DenseMatrix
             If Me.IsSquare() = False Then
-                Throw New MyException(MyException.ErrorSeries.NotComputable, "Cholesky() not Square")
+                Throw New MathException(MathException.ErrorSeries.NotComputable, "Cholesky() not Square")
             End If
 
             Dim ret As New DenseMatrix(Me.RowCount)
@@ -1500,11 +1500,11 @@
                               Optional ByVal IsSort As Boolean = True,
                               Optional ByVal IsSymmetricCheck As Boolean = False) As Eigen
             If Me.IsSquare() = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
             If IsSymmetricCheck = True Then
                 If Me.IsSymmetricMatrix() = False Then
-                    Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+                    Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
                 End If
             End If
 
@@ -1602,7 +1602,7 @@
                                    Optional ByVal Conversion As Double = 0.000000000000001,
                                    Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
 
             'Householder変換
@@ -1765,7 +1765,7 @@
                                    Optional ByVal Conversion As Double = 0.000000000000001,
                                    Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
 
             'Householder transform
@@ -1915,7 +1915,7 @@
                                    Optional ByVal Conversion As Double = 0.000000000000001,
                                    Optional ByVal IsSort As Boolean = True) As Eigen
             If Me.IsSquare() = False Then
-                Throw New MyException(MyException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
 
             'Householder transform
@@ -2099,7 +2099,7 @@
 
                 '列要素の絶対最大値が0に近い場合
                 If MathUtil.IsCloseToZero(amax, Conversion) Then
-                    Throw New MyException(MyException.ErrorSeries.NotComputable, "LUP() singular matrix")
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
 
                 'ピボット選択行を保存

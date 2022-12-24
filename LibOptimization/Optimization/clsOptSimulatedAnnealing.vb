@@ -1,5 +1,6 @@
 ﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
+Imports LibOptimization.MathTool.RNG
 
 Namespace Optimization
 
@@ -18,7 +19,7 @@ Namespace Optimization
         Public Property NeighborRange As Double = 0.01
 
         ''' <summary>random class</summary>
-        Public Property Random As System.Random = New Util.clsRandomXorshift()
+        Public Property Random As System.Random = New clsRandomXorshift()
 
         ''' <summary>
         ''' search function

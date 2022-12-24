@@ -1,5 +1,5 @@
 ﻿Imports System.Text
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 <TestClass()> Public Class UnitTestMathUtil

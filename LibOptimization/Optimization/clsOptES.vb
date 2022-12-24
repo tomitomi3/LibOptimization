@@ -1,5 +1,6 @@
 ﻿Imports LibOptimization.Util
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
+Imports LibOptimization.MathTool.RNG
 
 Namespace Optimization
     ''' <summary>
@@ -174,7 +175,7 @@ Namespace Optimization
                 'mutate
                 Dim child = _populations(0).Copy()
                 For i As Integer = 0 To _populations(0).Count - 1
-                    child(i) = _populations(0)(i) + clsUtil.NormRand(m_rand, 0, _variance)
+                    child(i) = _populations(0)(i) + RandomUtil.NormRand(m_rand, 0, _variance)
                 Next
                 child.ReEvaluate()
 

@@ -1,5 +1,5 @@
 ﻿Imports LibOptimization.Optimization
-Imports LibOptimization.MathUtil
+Imports LibOptimization.MathTool
 
 Namespace Optimization
     ''' <summary>

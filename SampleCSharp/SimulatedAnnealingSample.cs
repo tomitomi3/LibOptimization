@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LibOptimization.MathTool.RNG;
 using LibOptimization.Optimization;
 using LibOptimization.Util;
 
@@ -105,10 +106,10 @@ namespace SampleCSharp
         public void Run()
         {
             var func = new MyObjecticeFunctionForSA();
-            var opt = new LibOptimization.Optimization.clsOptSimulatedAnnealing(func);
+            var opt = new clsOptSimulatedAnnealing(func);
 
             //initial position using random
-            var rng = new LibOptimization.Util.clsRandomXorshift((UInt32)DateTime.Now.Millisecond);
+            var rng = new clsRandomXorshift((UInt32)DateTime.Now.Millisecond);
             opt.InitialPosition = new double[] { rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2) };
 
             //parameter for SA

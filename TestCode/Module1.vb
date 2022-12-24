@@ -1,10 +1,7 @@
-﻿Imports LibOptimization
-Imports LibOptimization.BenchmarkFunction
-Imports LibOptimization.MathUtil
+﻿Imports LibOptimization.MathTool
+Imports LibOptimization.MathTool.RNG
 Imports LibOptimization.Optimization
 Imports LibOptimization.Util
-
-Imports Dbl = System.Double
 
 Module Module1
     Sub Main()
@@ -34,7 +31,7 @@ Module Module1
             'Dim mat As New clsEasyMatrix(New Double()() {
             '                             New Double() {2, 1},
             '                             New Double() {1, 2}})
-            mat = MathUtil.CreateRandomSymmetricMatrix(2)
+            mat = LibOptimization.MathTool.MathUtil.CreateRandomSymmetricMatrix(2)
             mat.PrintValue(4, "Source")
 
             'eigen
@@ -196,7 +193,7 @@ Module Module1
         Dim trynum = 2000
         For kk = 0 To 10 - 1
             With Nothing
-                rng2 = New LibOptimization.Util.clsRandomXorshift()
+                rng2 = New clsRandomXorshift()
                 Dim plu2 = 0.0
                 For j = 0 To loopNum - 1
                     Dim sw = New Stopwatch()
@@ -226,7 +223,7 @@ Module Module1
             End With
             With Nothing
                 Dim plu1 = 0.0
-                rng1 = New LibOptimization.Util.clsRandomXorshift()
+                rng1 = New clsRandomXorshift()
                 For j = 0 To loopNum - 1
                     Dim sw = New Stopwatch()
                     sw.Start()
