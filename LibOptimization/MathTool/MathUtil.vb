@@ -256,7 +256,7 @@
         ''' <param name="value"></param>
         ''' <param name="eps">2.20E-16</param>
         ''' <returns></returns>
-        Public Shared Function IsCloseToZero(ByVal value As Double, Optional ByVal eps As Double = DenseMatrix.MachineEpsiron) As Boolean
+        Public Shared Function IsCloseToZero(ByVal value As Double, Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As Boolean
             If System.Math.Abs(value + eps) <= eps Then
                 Return True
             Else
@@ -271,7 +271,7 @@
         ''' <param name="value2"></param>
         ''' <param name="eps"></param>
         ''' <returns></returns>
-        Public Shared Function IsCloseToValues(ByVal value1 As Double, ByVal value2 As Double, Optional ByVal eps As Double = DenseMatrix.MachineEpsiron) As Boolean
+        Public Shared Function IsCloseToValues(ByVal value1 As Double, ByVal value2 As Double, Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As Boolean
             If System.Math.Abs(value1 - value2) < eps Then
                 Return True
             Else

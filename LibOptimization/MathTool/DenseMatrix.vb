@@ -8,9 +8,6 @@
     ''' delete DebuggerDisplay
     <Serializable>
     Public Class DenseMatrix : Inherits List(Of List(Of Double))
-        Public Const SAME_ZERO As Double = 2.0E-50 '2.0*10^-50
-        Public Const MachineEpsiron As Double = 0.000000000000000222 ' 2.20*E-16 = 2.20*10^-16
-
 #Region "Constructor"
         ''' <summary>
         ''' Default construcotr
@@ -653,6 +650,30 @@
         End Sub
 
         ''' <summary>
+        ''' Condition number. only square and symmetric matrix
+        ''' </summary>
+        ''' <returns></returns>
+        'Public Function Cond() As Double
+        '    If Me.IsSquare() = False Then
+        '        Return Double.PositiveInfinity
+        '    End If
+        '    If Me.IsSymmetricMatrix() = False Then
+        '        Return Double.PositiveInfinity
+        '    End If
+        '    Dim eig = Me.EigenValue()
+        '    Return eig.Max() / eig.Min()
+        'End Function
+
+        ''' <summary>
+        ''' Create Identifiy matrix
+        ''' </summary>
+        ''' <param name="count"></param>
+        ''' <returns></returns>
+        Public Shared Function Eye(count As Integer) As DenseMatrix
+            Return New DenseMatrix(count, True)
+        End Function
+
+        ''' <summary>
         ''' Convert to a matrix with only diagonal values
         ''' </summary>
         ''' <returns></returns>
@@ -953,8 +974,8 @@
             If Me.RowCount <> Me.ColCount Then
                 Return 0
             End If
-            Dim n = Me.RowCount
 
+            Dim n = Me.RowCount
             If n = 1 Then
                 Return Me(0)(0)
             ElseIf n = 2 Then
@@ -986,7 +1007,7 @@
         ''' <param name="isUsingLUDecomposition"></param>
         ''' <param name="isForceInverse"></param>
         ''' <returns></returns>
-        Public Function Inverse(Optional ByVal eps As Double = DenseMatrix.MachineEpsiron,
+        Public Function Inverse(Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
                                 Optional ByVal isUsingLUDecomposition As Boolean = False,
                                 Optional ByVal isForceInverse As Boolean = False
                                 ) As DenseMatrix
@@ -1068,7 +1089,7 @@
         ''' </summary>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function LUP(Optional ByVal eps As Double = MachineEpsiron) As LU
+        Public Function LUP(Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As LU
             'Refference
             '[1]奧村晴彥. C 言語による最新アルゴリズム事典. 技術評論社, 1991.
             '[2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
@@ -1092,7 +1113,7 @@
                     End If
                 Next
                 '列要素の絶対最大値が0に近い場合
-                If MathUtil.IsCloseToZero(absValue, eps) Then
+                If MathUtil.IsCloseToZero(absValue) Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
                 weight(i) = 1.0 / absValue
@@ -1138,8 +1159,8 @@
                     pivotrow(j) = temp
                 End If
                 'diagonal value is close to 0.
-                If MathUtil.IsCloseToZero(source(j)(j), eps) Then
-                    source(j)(j) = SAME_ZERO
+                If MathUtil.IsCloseToZero(source(j)(j)) Then
+                    source(j)(j) = ConstantValues.SAME_ZERO
                 End If
 
                 'calc det
@@ -1178,7 +1199,7 @@
         ''' </summary>
         ''' <param name="eps">2.20*10^-16</param>
         ''' <returns></returns>
-        Public Function LUP_CALGO(Optional ByVal eps As Double = MachineEpsiron) As LU
+        Public Function LUP_CALGO(Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As LU
             'Refference
             '[1]奧村晴彥. C 言語による最新アルゴリズム事典. 技術評論社, 1991.
             '[2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
@@ -1236,7 +1257,7 @@
                 End If
                 u = source(ik)(k)
                 If MathUtil.IsCloseToZero(u) Then
-                    u = SAME_ZERO
+                    u = ConstantValues.SAME_ZERO
                 End If
                 det *= u
 
@@ -1274,7 +1295,7 @@
         ''' </summary>
         ''' <param name="eps"></param>
         ''' <returns></returns>
-        Public Function LUP2(Optional ByVal eps As Double = MachineEpsiron) As LU
+        Public Function LUP2(Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As LU
             Dim n = Me.ColCount
             Dim a = New DenseMatrix(Me)
             Dim matP = New DenseMatrix(n, True)
@@ -1322,7 +1343,7 @@
 
                 'diagonal value is close to 0.
                 If MathUtil.IsCloseToZero(a(k)(k), eps) Then
-                    a(k)(k) = SAME_ZERO
+                    a(k)(k) = ConstantValues.SAME_ZERO
                 End If
 
                 'calc det
@@ -2012,7 +2033,7 @@
                 'LU decomp
                 Dim ludecomp = Me - (New DenseMatrix(n, eigenValues(eIdx)))
                 Dim p() As Integer = Nothing
-                LUPForEigen(ludecomp, p, MachineEpsiron)
+                LUPForEigen(ludecomp, p, ConstantValues.MachineEpsiron)
 
                 'iteration
                 Dim mu0 = 0.0
@@ -2116,7 +2137,7 @@
 
                 'diagonal value is close to 0.
                 If MathUtil.IsCloseToZero(a(k)(k), Conversion) Then
-                    a(k)(k) = SAME_ZERO
+                    a(k)(k) = ConstantValues.SAME_ZERO
                 End If
 
                 For i = k + 1 To n - 1
@@ -2190,165 +2211,9 @@
 #End Region
     End Class
 
-    ''' <summary>
-    ''' store LU decomposition with solver
-    ''' </summary>
-    <Serializable>
-    Public Class LU
-        ''' <summary>Pivot matrix</summary>
-        Public Property P As DenseMatrix = Nothing
 
-        ''' <summary>Lower matrix</summary>
-        Public Property L As DenseMatrix = Nothing
 
-        ''' <summary>Upper matrix</summary>
-        Public Property U As DenseMatrix = Nothing
 
-        ''' <summary>Determinant</summary>
-        Public Property Det As Double = 0.0
 
-        ''' <summary>pivto row info</summary>
-        Public Property PivotRow As Integer() = Nothing
-
-        ''' <summary>
-        ''' default constructtor
-        ''' </summary>
-        Private Sub New()
-        End Sub
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        ''' <param name="matP"></param>
-        ''' <param name="matL"></param>
-        ''' <param name="matU"></param>
-        ''' <param name="det"></param>
-        Public Sub New(ByRef matP As DenseMatrix, ByRef matL As DenseMatrix, ByRef matU As DenseMatrix, ByVal det As Double)
-            Me.P = matP
-            Me.L = matL
-            Me.U = matU
-            Me.Det = det
-        End Sub
-
-        ''' <summary>
-        ''' Constructor
-        ''' </summary>
-        ''' <param name="matP"></param>
-        ''' <param name="matL"></param>
-        ''' <param name="matU"></param>
-        ''' <param name="det"></param>
-        Public Sub New(ByRef matP As DenseMatrix, ByRef matL As DenseMatrix, ByRef matU As DenseMatrix, ByVal det As Double, ByRef p() As Integer)
-            Me.P = matP
-            Me.L = matL
-            Me.U = matU
-            Me.Det = det
-            Me.PivotRow = p
-        End Sub
-
-        ''' <summary>
-        ''' solve(Ax=b)
-        ''' </summary>
-        ''' <param name="b"></param>
-        ''' <returns></returns>
-        Public Function Solve(ByRef b As DenseVector) As DenseVector
-            Return Me.Solve(Me.P, Me.L, Me.U, Me.PivotRow, b)
-        End Function
-
-        ''' <summary>
-        ''' solve(Ax=b)
-        ''' </summary>
-        ''' <param name="matP">pivot matrix(LU decomposition of A matrix)</param>
-        ''' <param name="matL">lower triangle matrix(LU decomposition of A matrix)</param>
-        ''' <param name="matU">upper triangle matrix(LU decomposition of A matrix)</param>
-        ''' <param name="pivotRow"></param>
-        ''' <param name="vecB"></param>
-        ''' <returns>x</returns>
-        Private Function Solve(ByRef matP As DenseMatrix,
-                                   ByRef matL As DenseMatrix,
-                                   ByRef matU As DenseMatrix,
-                                   ByRef pivotRow() As Integer,
-                                   ByRef vecB As DenseVector) As DenseVector
-            Dim n = matP.ColCount
-            Dim x = New DenseVector(n)
-            Dim y = New DenseVector(n)
-
-            'transopose
-            'Dim b = vecB * matP
-
-            For i = 0 To n - 1
-                Dim s = 0.0
-                Dim j As Integer = 0
-                For j = 0 To i - 1
-                    s += matL(i)(j) * y(j)
-                Next
-
-                'y(j) = b(i) - s
-                y(j) = vecB(pivotRow(i)) - s
-            Next
-
-            For i = n - 1 To 0 Step -1
-                Dim s = 0.0
-                For k = i + 1 To n - 1
-                    s += matU(i)(k) * x(k)
-                Next
-                x(i) = (y(i) - s) / matU(i)(i)
-            Next
-
-            Return x
-        End Function
-    End Class
-
-    ''' <summary>
-    ''' store SVD decomposition
-    ''' </summary>
-    <Serializable>
-    Public Class SVD
-        ''' <summary></summary>
-        Public Property S As DenseMatrix = Nothing
-
-        ''' <summary></summary>
-        Public Property V As DenseVector = Nothing
-
-        ''' <summary></summary>
-        Public Property D As DenseMatrix = Nothing
-
-        Private Sub New()
-        End Sub
-
-        Public Sub New(ByRef matS As DenseMatrix, ByRef matV As DenseVector, ByRef matD As DenseMatrix)
-            Me.S = matS
-            Me.V = matV
-            Me.D = matD
-        End Sub
-    End Class
-
-    ''' <summary>
-    ''' store Eigen values, vector
-    ''' </summary>
-    <Serializable>
-    Public Class Eigen
-        ''' <summary></summary>
-        Public Property EigenValue As DenseVector = Nothing
-
-        ''' <summary></summary>
-        Public Property EigenVector As DenseMatrix = Nothing
-
-        ''' <summary></summary>
-        Public Property IsConversion As Boolean = Nothing
-
-        Private Sub New()
-        End Sub
-
-        Public Sub New(ByRef eigeValue As DenseVector, ByRef eigenVec As DenseMatrix)
-            Me.EigenValue = eigeValue
-            Me.EigenVector = eigenVec
-        End Sub
-
-        Public Sub New(ByRef eigeValue As DenseVector, ByRef eigenVec As DenseMatrix, ByVal isconversion As Boolean)
-            Me.EigenValue = eigeValue
-            Me.EigenVector = eigenVec
-            Me.IsConversion = isconversion
-        End Sub
-    End Class
 
 End Namespace

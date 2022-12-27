@@ -418,9 +418,10 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' Determinant
     ''' </summary>
     <TestMethod()> Public Sub Mat_Determinant()
+        ' 2x2
         With Nothing
             Dim detMat As New DenseMatrix(New Double()() {New Double() {1, 0},
-                                                       New Double() {0, 1}})
+                                                          New Double() {0, 1}})
             detMat.PrintValue()
             Dim d As Double = 0
             d = detMat.Det()
@@ -439,10 +440,11 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             End If
         End With
 
+        ' 3x3
         With Nothing
             Dim detMat As New DenseMatrix(New Double()() {New Double() {1, 0, 0},
-                                                       New Double() {0, 1, 0},
-                                                       New Double() {0, 0, 1}})
+                                                          New Double() {0, 1, 0},
+                                                          New Double() {0, 0, 1}})
             detMat.PrintValue()
             Dim d As Double = 0
             d = detMat.Det()
@@ -461,12 +463,13 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             End If
         End With
 
+        ' 4x4
         With Nothing
             'swap
             Dim detMat As New DenseMatrix(New Double()() {New Double() {1, 0, 0, 0},
-                                                            New Double() {0, 1, 0, 0},
-                                                            New Double() {0, 0, 1, 0},
-                                                            New Double() {0, 0, 0, 1}})
+                                                          New Double() {0, 1, 0, 0},
+                                                          New Double() {0, 0, 1, 0},
+                                                          New Double() {0, 0, 0, 1}})
             detMat.PrintValue()
             Dim d As Double = 0
             d = detMat.Det()
