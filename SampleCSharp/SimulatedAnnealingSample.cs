@@ -109,7 +109,7 @@ namespace SampleCSharp
             var opt = new clsOptSimulatedAnnealing(func);
 
             //initial position using random
-            var rng = new clsRandomXorshift((UInt32)DateTime.Now.Millisecond);
+            var rng = new RandomXorshift((UInt32)DateTime.Now.Millisecond);
             opt.InitialPosition = new double[] { rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2), rng.NextDouble(-2, 2) };
 
             //parameter for SA

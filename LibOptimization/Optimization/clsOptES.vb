@@ -96,6 +96,15 @@ Namespace Optimization
                     End If
                 End If
 
+                'check initialposition
+                If MyBase.InitialPosition IsNot Nothing Then
+                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
+                        'nothing
+                    Else
+                        Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
+                    End If
+                End If
+
                 'generate population
                 For i As Integer = 0 To Me.PopulationSize - 1
                     'initial position

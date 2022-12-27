@@ -19,7 +19,7 @@ Namespace Optimization
         Public Property NeighborRange As Double = 0.01
 
         ''' <summary>random class</summary>
-        Public Property Random As System.Random = New clsRandomXorshift()
+        Public Property Random As System.Random = New RandomXorshift()
 
         ''' <summary>
         ''' search function
@@ -105,11 +105,20 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_point.Clear()
 
+                'check initialposition
+                If MyBase.InitialPosition IsNot Nothing Then
+                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
+                        'nothing
+                    Else
+                        Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
+                    End If
+                End If
+
                 'init Temperature
                 Me._nowTemprature = Me.Temperature
 
                 'init initial position
-                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                If InitialPosition IsNot Nothing Then
                     Me.m_point = New clsPoint(Me.m_func, InitialPosition)
                 Else
                     Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)

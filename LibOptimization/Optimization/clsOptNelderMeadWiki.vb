@@ -68,6 +68,15 @@ Namespace Optimization
                 Me.m_iteration = 0
                 Me.m_points.Clear()
 
+                'check initialposition
+                If MyBase.InitialPosition IsNot Nothing Then
+                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
+                        'nothing
+                    Else
+                        Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
+                    End If
+                End If
+
                 'initial position
                 Dim tempSimplex()() As Double = Nothing
                 ReDim tempSimplex(MyBase.m_func.NumberOfVariable)

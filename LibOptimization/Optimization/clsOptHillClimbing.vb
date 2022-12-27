@@ -67,8 +67,17 @@ Namespace Optimization
                 Me._populations.Clear()
                 Me.m_error.Clear()
 
+                'check initialposition
+                If MyBase.InitialPosition IsNot Nothing Then
+                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
+                        'nothing
+                    Else
+                        Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
+                    End If
+                End If
+
                 'init initial position
-                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
+                If InitialPosition IsNot Nothing Then
                     Me._populations.Add(New clsPoint(Me.m_func, InitialPosition))
                 Else
                     Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)

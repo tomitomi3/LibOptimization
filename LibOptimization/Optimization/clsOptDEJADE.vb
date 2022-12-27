@@ -98,6 +98,15 @@ Namespace Optimization
                 MuCR = 0.5
                 MuF = 0.5
 
+                'check initialposition
+                If MyBase.InitialPosition IsNot Nothing Then
+                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
+                        'nothing
+                    Else
+                        Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
+                    End If
+                End If
+
                 'bound check
                 If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
                     If UpperBounds.Length <> Me.m_func.NumberOfVariable Then

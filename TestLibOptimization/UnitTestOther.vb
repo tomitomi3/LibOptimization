@@ -13,21 +13,21 @@ Imports LibOptimization.MathTool.RNG
     <TestMethod()> Public Sub Other_Random()
         Dim rand As System.Random = Nothing
         Try
-            rand = New clsRandomXorshift()
+            rand = New RandomXorshift()
         Catch ex As Exception
             Assert.Fail("clsRandomXorshift error")
         End Try
 
         Try
             Dim temp As Integer = 123456
-            rand = New clsRandomXorshift(BitConverter.ToUInt32(BitConverter.GetBytes(temp), 0))
+            rand = New RandomXorshift(BitConverter.ToUInt32(BitConverter.GetBytes(temp), 0))
         Catch ex As Exception
             Assert.Fail("clsRandomXorshift seed error using positive value.")
         End Try
 
         Try
             Dim temp As Integer = -123456
-            rand = New clsRandomXorshift(BitConverter.ToUInt32(BitConverter.GetBytes(temp), 0))
+            rand = New RandomXorshift(BitConverter.ToUInt32(BitConverter.GetBytes(temp), 0))
         Catch ex As Exception
             Assert.Fail("clsRandomXorshift seed error using negative value.")
         End Try

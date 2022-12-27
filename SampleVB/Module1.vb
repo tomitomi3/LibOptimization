@@ -101,9 +101,9 @@ Module Module1
 
         'fix random seed.
         With Nothing
-            clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+            RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
             Dim optimization As New Optimization.clsOptDE(New clsBenchSphere(2))
-            optimization.Random = New clsRandomXorshift()
+            optimization.Random = New RandomXorshift()
             'init
             optimization.Init()
             'do optimization

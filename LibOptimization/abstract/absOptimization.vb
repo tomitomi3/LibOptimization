@@ -15,7 +15,7 @@ Namespace Optimization
         Protected m_iteration As Integer = 0
 
         ''' <summary>Random object</summary>
-        Protected m_rand As System.Random = New clsRandomXorshift(BitConverter.ToUInt32(BitConverter.GetBytes(Environment.TickCount), 0))
+        Protected m_rand As System.Random = New RandomXorshift(BitConverter.ToUInt32(BitConverter.GetBytes(Environment.TickCount), 0))
 
         ''' <summary>Error manage class</summary>
         Protected m_error As New clsError

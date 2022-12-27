@@ -184,8 +184,8 @@ Module Module1
     ''' LU decompostion benchmark
     ''' </summary>
     Public Sub BenchmarkLU()
-        Dim rng1 As clsRandomXorshift = Nothing
-        Dim rng2 As clsRandomXorshift = Nothing
+        Dim rng1 As RandomXorshift = Nothing
+        Dim rng2 As RandomXorshift = Nothing
         'bench mark
         System.Threading.Thread.Sleep(1000)
 
@@ -193,7 +193,7 @@ Module Module1
         Dim trynum = 2000
         For kk = 0 To 10 - 1
             With Nothing
-                rng2 = New clsRandomXorshift()
+                rng2 = New RandomXorshift()
                 Dim plu2 = 0.0
                 For j = 0 To loopNum - 1
                     Dim sw = New Stopwatch()
@@ -223,7 +223,7 @@ Module Module1
             End With
             With Nothing
                 Dim plu1 = 0.0
-                rng1 = New clsRandomXorshift()
+                rng1 = New RandomXorshift()
                 For j = 0 To loopNum - 1
                     Dim sw = New Stopwatch()
                     sw.Start()

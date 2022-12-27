@@ -11,7 +11,7 @@ Imports LibOptimization.Util
 
     Public Sub New()
         'fix rng
-        clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
     End Sub
 
     Dim lock As Object
@@ -345,12 +345,12 @@ Imports LibOptimization.Util
     ''' </summary>
     <TestMethod()> Public Sub Opt_SerializeAndDesrialize()
         Dim opt = New LibOptimization.Optimization.clsOptCS(New clsBenchSphere(5))
-        opt.Random = New clsRandomXorshift()
+        opt.Random = New RandomXorshift()
         opt.Init()
 
         'serialize
         opt.DoIteration(10)
-        clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
         Dim PATH_SERIALIZE = "serialize_file.txt"
         clsUtil.SerializeOpt(CType(opt, absOptimization), PATH_SERIALIZE)
         opt.DoIteration(10)
@@ -360,7 +360,7 @@ Imports LibOptimization.Util
         'deserialize
         Dim temp = clsUtil.DeSerializeOpt(PATH_SERIALIZE)
         opt = CType(temp, clsOptCS)
-        clsRandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
         opt.DoIteration(10)
         Dim result2 = opt.Result()
         Dim itr2 = opt.IterationCount
@@ -385,13 +385,13 @@ Imports LibOptimization.Util
     ''' </summary>
     Public Class nothingFunc : Inherits LibOptimization.Optimization.absObjectiveFunction
         Public Overrides Function F(x As List(Of Double)) As Double
-            Return clsRandomXorshiftSingleton.GetInstance().NextDouble * 10
+            Return RandomXorshiftSingleton.GetInstance().NextDouble * 10
         End Function
 
         Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
             Dim aa = New List(Of Double)
-            aa.Add(clsRandomXorshiftSingleton.GetInstance().NextDouble * 10)
-            aa.Add(clsRandomXorshiftSingleton.GetInstance().NextDouble * 10)
+            aa.Add(RandomXorshiftSingleton.GetInstance().NextDouble * 10)
+            aa.Add(RandomXorshiftSingleton.GetInstance().NextDouble * 10)
             Return aa
         End Function
 

@@ -69,7 +69,7 @@ Namespace Util
             Dim n As Integer = ary.Count
             While n > 1
                 n -= 1
-                Dim k As Integer = clsRandomXorshiftSingleton.GetInstance().Next(0, n + 1)
+                Dim k As Integer = RandomXorshiftSingleton.GetInstance().Next(0, n + 1)
                 Dim tmp As Integer = ary(k)
                 ary(k) = ary(n)
                 ary(n) = tmp
@@ -86,7 +86,7 @@ Namespace Util
             Dim n As Integer = arPoint.Count
             While n > 1
                 n -= 1
-                Dim k As Integer = clsRandomXorshiftSingleton.GetInstance().Next(0, n + 1)
+                Dim k As Integer = RandomXorshiftSingleton.GetInstance().Next(0, n + 1)
                 Dim tmp = arPoint(k)
                 arPoint(k) = arPoint(n)
                 arPoint(n) = tmp
@@ -254,7 +254,7 @@ Namespace Util
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Shared Function GenRandomRange(ByVal ai_min As Double, ByVal ai_max As Double) As Double
-            Dim ret = Math.Abs(ai_max - ai_min) * clsRandomXorshiftSingleton.GetInstance().NextDouble() + ai_min
+            Dim ret = Math.Abs(ai_max - ai_min) * RandomXorshiftSingleton.GetInstance().NextDouble() + ai_min
             Return ret
         End Function
 
