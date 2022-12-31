@@ -1319,6 +1319,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' <summary>
     ''' test Householder
     ''' </summary>
+    <Ignore>
     <TestMethod()> Public Sub TestHouseholder_ASymmetricMatrix()
         Try
             With Nothing
