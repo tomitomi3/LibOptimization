@@ -14,48 +14,6 @@ Module Module1
             clsUtil.DebugValue(opt)
             Return
         End With
-        With Nothing
-            'Dim mat As New clsEasyMatrix(New Double()() {
-            '                             New Double() {3, 0, 0},
-            '                             New Double() {-2, -2, 4},
-            '                             New Double() {0, -1, 3}})
-            'Dim mat As New clsEasyMatrix(New Double()() {
-            '                             New Double() {2, 1, 0},
-            '                             New Double() {1, 2, 1},
-            '                             New Double() {1, 5, 3}})
-            Dim mat As New DenseMatrix(New Double()() {
-                                       New Double() {16, -1, 1, 2},
-                                       New Double() {2, 12, 1, -1},
-                                       New Double() {1, 3, -24, 2},
-                                       New Double() {4, -2, 1, 20}})
-            'Dim mat As New clsEasyMatrix(New Double()() {
-            '                             New Double() {2, 1},
-            '                             New Double() {1, 2}})
-            mat = LibOptimization.MathTool.MathUtil.CreateRandomSymmetricMatrix(2)
-            mat.PrintValue(4, "Source")
-
-            'eigen
-            Dim eigen = mat.Eigen3()
-            Dim retV = eigen.EigenValue
-            Dim retM = eigen.EigenVector
-            retV.PrintValue(4, "EigenValue")
-            retM.PrintValue(4, "EigenVector")
-            Dim matI = retM * retM.T()
-            matI.PrintValue(ai_preci:=4)
-            Dim prodSource = retM * retV.ToDiagonalMatrix() * retM.T
-            prodSource.PrintValue(ai_preci:=4)
-
-            'jacobi
-            eigen = mat.Eigen()
-            retV = eigen.EigenValue
-            retM = eigen.EigenVector
-            retV.PrintValue(4, "EigenValue")
-            retM.PrintValue(4, "EigenVector")
-            matI = retM * retM.T()
-            matI.PrintValue(ai_preci:=4)
-            prodSource = retM * retV.ToDiagonalMatrix() * retM.T
-            prodSource.PrintValue(ai_preci:=4)
-        End With
     End Sub
 
     ''' <summary>

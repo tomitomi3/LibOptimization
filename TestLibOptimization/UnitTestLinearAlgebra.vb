@@ -1126,36 +1126,56 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' </summary>
     <TestMethod()> Public Sub Mat_Eigen()
         Dim rng = New Random()
-        For j As Integer = 2 To 20 - 1
-            For i As Integer = 0 To 50 - 1
-                Dim matDim = j
-                Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
 
-                'eigen
-                Dim eigen As Eigen = Nothing
-                eigen = srcMat.Eigen()
-                Dim retV = eigen.EigenValue
-                Dim retM = eigen.EigenVector
+        For i As Integer = 2 To 5
+            Dim srcMat = DenseMatrix.CreateDiagonalMatrix(Enumerable.Range(1, i).Select(Function(v) v * 1.0).ToArray())
+            srcMat.PrintValue(name:="Source Matrix")
 
-                'check
-                '固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交
-                ' I = V * V^T
-                Dim matI = retM * retM.T
-                'matI.PrintValue(name:="EigenVector * EivenVector^T")
-                If MathUtil.IsNearyEqualMatrix(matI, New DenseMatrix(matDim, True)) = False Then
-                    srcMat.PrintValue(name:="Source")
-                    Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0} try={1}", matDim, i)
-                End If
+            'eigen
+            Dim eigen = srcMat.Eigen()
+            Dim retV = eigen.EigenValue
+            Dim retM = eigen.EigenVector
+            retV.PrintValue(name:="Eigen value")
+            retM.PrintValue(name:="Eigen vector")
 
-                'check
-                ' Source = V * D * V^T
-                Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
-                'temp.PrintValue(name:="V*D*V^T")
-                If MathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
-                    srcMat.PrintValue(name:="Source")
-                    Assert.Fail("Error eigen() V*D*V^T dim={0} try={1}", matDim, i)
-                End If
-            Next
+            'check 元に戻るか Source = V * D * V^T
+            Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
+            temp.PrintValue(name:="V * D * V^T")
+            If MathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
+                Assert.Fail("Error eigen() V*D*V^T dim={0} try={1}", i, 0)
+            End If
+
+            '下記のチェックも
+            'a * eigen.EigenVector - eigen.EigenVector * eigen.EigenValue.ToDiagonalMatrix();
+        Next
+
+        'ランダム
+        For i As Integer = 4 To 6
+            Dim matDim = i
+            Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
+            srcMat.PrintValue(name:="Source Matrix")
+
+            'eigen
+            Dim eigen = srcMat.Eigen()
+            Dim retV = eigen.EigenValue
+            Dim retM = eigen.EigenVector
+            retV.PrintValue(name:="Eigen value")
+            retM.PrintValue(name:="Eigen vector")
+
+            ''check 固有ベクトルの転置と固有ベクトルの逆行列は同じ＝直交 I = V * V^T
+            'Dim matI = retM * retM.T
+            ''matI.PrintValue(name:="EigenVector * EivenVector^T")
+            'If MathUtil.IsNearyEqualMatrix(matI, New DenseMatrix(matDim, True)) = False Then
+            '    srcMat.PrintValue(name:="Source")
+            '    Assert.Fail("Error eigen() EigenVector * EivenVector^T dim={0} try={1}", matDim, 0)
+            'End If
+
+            'check 元に戻るか Source = V * D * V^T
+            Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
+            temp.PrintValue(name:="V * D * V^T")
+            If MathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
+                Assert.Fail("Error eigen() V*D*V^T dim={0} try={1}", matDim, 0)
+            End If
         Next
     End Sub
 
@@ -1163,14 +1183,14 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test LU decomposition
     ''' </summary>
     <TestMethod()> Public Sub Mat_LU()
-        Dim rng = New Random()
-        For j = 3 To 4
+        Dim rng = New Random(12345)
+        For j = 2 To 5
             Console.WriteLine("Dim={0} run", j)
-            For i = 0 To 1000 - 1
+            For i = 0 To 100 - 1
                 Dim dimNum = j
                 Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
-                If i Mod 2 = 0 Then
+                If j > 2 AndAlso i Mod 2 = 0 Then
                     source(0)(0) = 0.0
                     source(2)(2) = 0.0
                 End If
@@ -1182,12 +1202,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
                 'check
                 Dim flg = True
-                If MathUtil.IsNearyEqualMatrix(source, P * L * U) = True Then
-                    'OK
-                Else
-                    flg = False
-                End If
-                If flg = False Then
+                If MathUtil.IsNearyEqualMatrix(source, P * L * U) = False Then
                     Console.WriteLine("No={0} det={1}", i, resultLU.Det)
                     source.PrintValue(name:="souce")
                     P.PrintValue(name:="P")
@@ -1270,30 +1285,63 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' <summary>
     ''' test Householder
     ''' </summary>
-    <TestMethod()> Public Sub Mat_Householder()
+    <TestMethod()> Public Sub TestHouseholder_SymmetricMatrix()
         Try
-            Dim source = New DenseMatrix(New Double()() {
+            With Nothing
+                Dim symmetricMatrix = New DenseMatrix(New Double()() {
                                                     New Double() {8, -4, 2, -2},
                                                     New Double() {-4, -2, 4, 9},
                                                     New Double() {2, 4, 3, -6},
                                                     New Double() {-2, 9, -6, 2}})
-            Dim correct = New DenseMatrix(New Double()() {
+
+                ' 対称行列をハウスホルダー変換 → 三重対角行列
+                ' 対象行列になり。直交行列となる。 -> H=H^T, H = H^-1
+                Dim eps = 0.00001
+                Dim h = symmetricMatrix.Householder()
+                Assert.IsTrue(h.IsSymmetricMatrix(eps))
+
+                Dim h_t = h.T()
+                Assert.IsTrue(MathUtil.IsNearyEqualMatrix(h, h_t, eps))
+
+                'check
+                Dim correct = New DenseMatrix(New Double()() {
                                                     New Double() {8, 4.89898, 0, 0},
                                                     New Double() {4.89898, 4.83333, 9.46778, 0},
                                                     New Double() {0, 9.46778, -6.97526, -1.62287},
                                                     New Double() {0, 0, -1.62287, 5.14193}})
-            Dim result = source.Householder()
-
-            'check
-            Dim isOK = False
-            If MathUtil.IsNearyEqualMatrix(result, correct, 0.0001) = True Then
-                isOK = True
-            End If
-            If isOK = False Then
-                Assert.Fail()
-            End If
+                Assert.IsTrue(MathUtil.IsNearyEqualMatrix(h, correct, eps))
+            End With
         Catch ex As Exception
-            Assert.Fail("throw exception")
+            Assert.Fail("throw exception" + ex.Message)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' test Householder
+    ''' </summary>
+    <TestMethod()> Public Sub TestHouseholder_ASymmetricMatrix()
+        Try
+            With Nothing
+                Dim asymmetricMatrix = New DenseMatrix(New Double()() {
+                                                   New Double() {-1.0616, -0.1924, -1.4224, 1.4193},
+                                                   New Double() {2.3505, 0.8886, 0.4882, 0.2916},
+                                                   New Double() {-0.6156, -0.7648, -0.1774, 0.1978},
+                                                   New Double() {0.7481, -1.4023, -0.1961, 1.5877}})
+
+                ' 非対称行列をハウスホルダー変換 → ヘッセンベルグ型 Hessenberg
+                Dim h = asymmetricMatrix.Householder()
+
+                Dim correct = New DenseMatrix(New Double()() {
+                                              New Double() {2.755, 0.6224, 0.951, 0.0888},
+                                              New Double() {0.0000, -1.7293, -0.3043, 1.415},
+                                              New Double() {0.0000, 0.0000, -1.1552, 1.6246},
+                                              New Double() {0.0000, 0.0000, 0.0000, -0.1006}})
+                Dim eps = 0.00001
+                Assert.IsTrue(MathUtil.IsNearyEqualMatrix(h, correct, eps))
+            End With
+
+        Catch ex As Exception
+            Assert.Fail("throw exception" + ex.Message)
         End Try
     End Sub
 

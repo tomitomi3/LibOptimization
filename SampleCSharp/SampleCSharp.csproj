@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SampleCSharp</RootNamespace>
     <AssemblyName>SampleCSharp</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -99,7 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibOptimization\LibOptimization.vbproj">
-      <Project>{c9b49eb1-e2a6-4534-b2cd-7379b2525182}</Project>
+      <Project>{2c280eed-8de4-43bb-9466-000d65794e2d}</Project>
       <Name>LibOptimization</Name>
     </ProjectReference>
   </ItemGroup>

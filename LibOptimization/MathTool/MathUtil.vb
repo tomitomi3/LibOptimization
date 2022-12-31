@@ -82,7 +82,7 @@
         End Function
 
         ''' <summary>
-        ''' Create random symmetric matrix(for Debug)
+        ''' Create random symmetric matrix(for Debug) 対象行列を生成
         ''' </summary>
         ''' <param name="size"></param>
         ''' <param name="rng"></param>
@@ -133,7 +133,7 @@
         End Function
 
         ''' <summary>
-        ''' Create random Asymmetric matrix(for Debug)
+        ''' Create random Asymmetric matrix(for Debug) 非対象行列を生成
         ''' </summary>
         ''' <param name="size"></param>
         ''' <returns></returns>
@@ -362,50 +362,50 @@
         End Function
 
         ''' <summary>
-        ''' Pythagorean Addition (sqrt(x1^2 + x2^2))
-        ''' </summary>
-        ''' <param name="valA"></param>
-        ''' <param name="valB"></param>
-        ''' <returns></returns>
-        Public Shared Function PythagoreanAddition(ByVal valA As Double, ByVal valB As Double) As Double
-            Dim a = System.Math.Abs(valA)
-            Dim b = System.Math.Abs(valB)
-
-            If a > b Then
-                Return a * System.Math.Sqrt(1.0 + (b / a) * (b / a))
-            ElseIf b = 0.0 Then
-                Return 0.0
-            Else
-                Return b * System.Math.Sqrt(1.0 + (a / b) * (a / b))
-            End If
-        End Function
-
-        ''' <summary>
         ''' Pythagorean Addition (sqrt(x1^2 + x2^2)) using Moler-Morrison Algorithm
         ''' </summary>
         ''' <param name="valA"></param>
         ''' <param name="valB"></param>
         ''' <returns></returns>
-        Public Shared Function PythagoreanAddition_MolerMorrison(ByVal valA As Double, ByVal valB As Double) As Double
-            Dim a = System.Math.Abs(valA)
-            Dim b = System.Math.Abs(valB)
+        Public Shared Function PythagoreanAddition(ByVal valA As Double, ByVal valB As Double) As Double
+            Dim aMax = System.Math.Abs(valA)
+            Dim bMin = System.Math.Abs(valB)
 
-            If b = 0.0 Then
+            If bMin = 0.0 Then
                 Return 0.0
-            ElseIf a < b Then
-                Dim temp = a
-                a = b
-                b = temp
+            ElseIf aMax < bMin Then
+                Dim temp = aMax
+                aMax = bMin
+                bMin = temp
             End If
 
-            For i = 0 To 4 - 1
-                Dim s = System.Math.Pow(b / a, 2)
-                s /= 4.0 + s
-                a += 2.0 * a * s
-                b *= s
-            Next
+            'For i = 0 To 4 - 1
+            '    Dim b = System.Math.Pow(a / f, 2)
+            '    Dim c = b / (4.0 + b)
+            '    f = f + 2.0 * c * f
+            '    a = c * a
+            'Next
 
-            Return a
+            ' 平方根を使わない計算
+            ' Loop1
+            Dim b = System.Math.Pow(bMin / aMax, 2)
+            Dim c = b / (4.0 + b)
+            aMax = aMax + 2.0 * c * aMax
+            bMin = c * bMin
+
+            ' Loop2
+            b = System.Math.Pow(bMin / aMax, 2)
+            c = b / (4.0 + b)
+            aMax = aMax + 2.0 * c * aMax
+            bMin = c * bMin
+
+            ' Loop3
+            b = System.Math.Pow(bMin / aMax, 2)
+            c = b / (4.0 + b)
+            aMax = aMax + 2.0 * c * aMax
+            bMin = c * bMin
+
+            Return aMax
         End Function
 
         ''' <summary>

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LibOptimization": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

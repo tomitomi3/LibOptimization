@@ -8,6 +8,10 @@
 
         Public Property EigenVector As DenseMatrix = Nothing
 
+        ''' <summary>
+        ''' 収束したかのフラグ
+        ''' </summary>
+        ''' <returns></returns>
         Public Property IsConversion As Boolean = Nothing
 
         Private Sub New()

@@ -630,26 +630,6 @@
         End Function
 
         ''' <summary>
-        ''' set Identify matrix
-        ''' </summary>
-        Public Sub SetIdentifyMatrix()
-            Dim n_dim = Me.RowCount
-            Dim m_dim = Me.ColCount
-            If m_dim <> n_dim Then
-                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
-            End If
-            For i = 0 To n_dim - 1
-                For j = 0 To n_dim - 1
-                    If i = j Then
-                        Me(i)(j) = 1.0
-                    Else
-                        Me(i)(j) = 0
-                    End If
-                Next
-            Next
-        End Sub
-
-        ''' <summary>
         ''' Condition number. only square and symmetric matrix
         ''' </summary>
         ''' <returns></returns>
@@ -663,15 +643,6 @@
         '    Dim eig = Me.EigenValue()
         '    Return eig.Max() / eig.Min()
         'End Function
-
-        ''' <summary>
-        ''' Create Identifiy matrix
-        ''' </summary>
-        ''' <param name="count"></param>
-        ''' <returns></returns>
-        Public Shared Function Eye(count As Integer) As DenseMatrix
-            Return New DenseMatrix(count, True)
-        End Function
 
         ''' <summary>
         ''' Convert to a matrix with only diagonal values
@@ -752,6 +723,24 @@
         End Function
 
         ''' <summary>
+        ''' check SymmetricMatrix
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function IsSymmetricMatrix(Optional eps As Double = ConstantValues.MachineEpsiron) As Boolean
+            Dim s = Me
+            Dim n = s.ColCount
+            For i = 0 To n - 1
+                For j = 0 To i - 1
+                    Dim flg = MathUtil.IsCloseToValues(s(i)(j), s(j)(i), eps)
+                    If flg = False Then
+                        Return False
+                    End If
+                Next
+            Next
+            Return True
+        End Function
+
+        ''' <summary>
         ''' Resize matrix dimension
         ''' </summary>
         ''' <param name="row">number of row</param>
@@ -767,14 +756,14 @@
         End Sub
 
         ''' <summary>
-        ''' find Max value
+        ''' Max value
         ''' </summary>
         ''' <returns></returns>
-        Public Function MaxValue() As Double
-            Dim retMax As Double = 0.0
+        Public Function MaxElementValue() As Double
+            Dim retMax As Double = Double.NegativeInfinity
             For Each vec In Me
                 For Each value In vec
-                    If retMax > value Then
+                    If value > retMax Then
                         retMax = value
                     End If
                 Next
@@ -783,21 +772,37 @@
         End Function
 
         ''' <summary>
-        ''' find Absolute Max value
+        ''' Min value
         ''' </summary>
         ''' <returns></returns>
-        Public Function MaxAbs() As Double
-            Dim retMaxabs As Double = 0.0
+        Public Function MinElementValue() As Double
+            Dim retMin As Double = Double.PositiveInfinity
             For Each vec In Me
                 For Each value In vec
-                    Dim absValue = System.Math.Abs(value)
-                    If retMaxabs > absValue Then
-                        retMaxabs = absValue
+                    If value < retMin Then
+                        retMin = value
                     End If
                 Next
             Next
-            Return retMaxabs
+            Return retMin
         End Function
+
+        ''' <summary>
+        ''' Absolute Max value
+        ''' </summary>
+        ''' <returns></returns>
+        'Public Function MaxAbsElementValue() As Double
+        '    Dim retMaxabs As Double = 0.0
+        '    For Each vec In Me
+        '        For Each value In vec
+        '            Dim absValue = System.Math.Abs(value)
+        '            If retMaxabs > absValue Then
+        '                retMaxabs = absValue
+        '            End If
+        '        Next
+        '    Next
+        '    Return retMaxabs
+        'End Function
 
         ''' <summary>
         ''' Multiply the diagonal values(a_00 * a_11 * ...)
@@ -814,6 +819,32 @@
                 ret *= Me(i)(i)
             Next
             Return ret
+        End Function
+
+        ''' <summary>
+        ''' Swap value
+        ''' </summary>
+        ''' <param name="rowA"></param>
+        ''' <param name="colA"></param>
+        ''' <param name="rowB"></param>
+        ''' <param name="colB"></param>
+        Public Sub SwapValue(rowA As Integer, colA As Integer, rowB As Integer, colB As Integer)
+            Dim temp = Me(rowA)(colA)
+            Me(rowA)(colA) = Me(rowB)(colB)
+            Me(rowB)(colB) = temp
+        End Sub
+
+        ''' <summary>
+        ''' Norm L2 (Euclid norm)
+        ''' </summary>
+        Public Function NormL2FromAllElement() As Double
+            Dim sum = 0.0
+            For Each vec In Me
+                For Each v In vec
+                    sum += v * v
+                Next
+            Next
+            Return Math.Sqrt(sum)
         End Function
 
         ''' <summary>
@@ -864,7 +895,6 @@
                 Next
             End If
         End Sub
-
 #End Region
 
 #Region "Public Func"
@@ -970,7 +1000,7 @@
         ''' Determinant
         ''' </summary>
         ''' <remarks></remarks>
-        Public Function Det() As Double
+        Public Function Det(Optional ByVal eps As Double = ConstantValues.MachineEpsiron, Optional ByVal samezero As Double = ConstantValues.SAME_ZERO) As Double
             If Me.RowCount <> Me.ColCount Then
                 Return 0
             End If
@@ -995,7 +1025,7 @@
                 Return d
             Else
                 'over 4 dim using LUP decomposition
-                Dim detVal = Me.LUP().Det()
+                Dim detVal = Me.LUP(eps, samezero).Det()
                 Return detVal
             End If
         End Function
@@ -1003,20 +1033,16 @@
         ''' <summary>
         ''' Inverse
         ''' </summary>
-        ''' <param name="eps">default 2.0E-50</param>
+        ''' <param name="eps"></param>
+        ''' <param name="samezero"></param>
         ''' <param name="isUsingLUDecomposition"></param>
         ''' <param name="isForceInverse"></param>
         ''' <returns></returns>
         Public Function Inverse(Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
-                                Optional ByVal isUsingLUDecomposition As Boolean = False,
-                                Optional ByVal isForceInverse As Boolean = False
-                                ) As DenseMatrix
+                                Optional ByVal samezero As Double = ConstantValues.SAME_ZERO,
+                                Optional ByVal isUsingLUDecomposition As Boolean = False) As DenseMatrix
             If Me.RowCount <> Me.ColCount Then
                 Return New DenseMatrix(0)
-            End If
-
-            If isForceInverse = True Then
-                eps = Double.Epsilon
             End If
 
             Dim n As Integer = Me.RowCount
@@ -1030,7 +1056,7 @@
                 End If
                 retInverse(0)(0) = 1.0 / source(0)(0)
             ElseIf n = 2 AndAlso isUsingLUDecomposition = False Then
-                Dim det = Me.Det()
+                Dim det = Me.Det(eps, samezero)
                 If MathUtil.IsCloseToZero(det, eps) = True Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, "Inverse 2x2")
                 End If
@@ -1040,7 +1066,7 @@
                 retInverse(1)(0) = det * -Me(1)(0)
                 retInverse(1)(1) = det * Me(0)(0)
             ElseIf n = 3 AndAlso isUsingLUDecomposition = False Then
-                Dim det = Me.Det()
+                Dim det = Me.Det(eps, samezero)
                 If MathUtil.IsCloseToZero(det, eps) = True Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, "Inverse 3x3")
                 End If
@@ -1054,9 +1080,9 @@
                 retInverse(2)(1) = -((Me(0)(0) * Me(2)(1) - Me(0)(1) * Me(2)(0))) / det
                 retInverse(2)(2) = ((Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))) / det
             Else
-                Dim lup = Me.LUP()
+                Dim lup = Me.LUP(eps, samezero)
                 Dim det = lup.Det
-                If MathUtil.IsCloseToZero(det, eps) = True Then
+                If MathUtil.IsCloseToZero(det, samezero) = True Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, String.Format("Inverse {0}x{0} det=0", n))
                 End If
 
@@ -1081,6 +1107,7 @@
                     Next
                 Next
             End If
+
             Return retInverse
         End Function
 
@@ -1088,12 +1115,14 @@
         ''' LUP decomposition( X=PLU -> P^-1X=LU )
         ''' </summary>
         ''' <param name="eps">2.20*10^-16</param>
+        ''' <remarks>
+        ''' Refference
+        ''' [1]奧村晴彥. C 言語による最新アルゴリズム事典. 技術評論社, 1991.
+        ''' [2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
+        ''' </remarks>
         ''' <returns></returns>
-        Public Function LUP(Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As LU
-            'Refference
-            '[1]奧村晴彥. C 言語による最新アルゴリズム事典. 技術評論社, 1991.
-            '[2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
-
+        Public Function LUP(Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
+                            Optional ByVal samezero As Double = ConstantValues.SAME_ZERO) As LU
             Dim n = Me.ColCount
             Dim source = New DenseMatrix(Me)
             Dim matP = New DenseMatrix(n, True)
@@ -1113,7 +1142,7 @@
                     End If
                 Next
                 '列要素の絶対最大値が0に近い場合
-                If MathUtil.IsCloseToZero(absValue) Then
+                If MathUtil.IsCloseToZero(absValue, eps) Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
                 weight(i) = 1.0 / absValue
@@ -1159,8 +1188,8 @@
                     pivotrow(j) = temp
                 End If
                 'diagonal value is close to 0.
-                If MathUtil.IsCloseToZero(source(j)(j)) Then
-                    source(j)(j) = ConstantValues.SAME_ZERO
+                If MathUtil.IsCloseToZero(source(j)(j), eps) Then
+                    source(j)(j) = samezero
                 End If
 
                 'calc det
@@ -1192,208 +1221,6 @@
             Next
 
             Return New LU(matP, matL, matU, det, pivotrow)
-        End Function
-
-        ''' <summary>
-        ''' LUP decomposition
-        ''' </summary>
-        ''' <param name="eps">2.20*10^-16</param>
-        ''' <returns></returns>
-        Public Function LUP_CALGO(Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As LU
-            'Refference
-            '[1]奧村晴彥. C 言語による最新アルゴリズム事典. 技術評論社, 1991.
-            '[2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
-
-            Dim n = Me.ColCount
-            Dim source = New DenseMatrix(Me)
-            Dim matL = New DenseMatrix(n, True)
-            Dim matU = New DenseMatrix(n, True)
-            Dim matP = New DenseMatrix(n, True)
-
-            Dim det = 1.0
-            Dim imax As Integer = 0
-            Dim weight = New Double(n - 1) {}
-            Dim ip = New Integer(n - 1) {}
-            Dim j = 0
-            Dim ik = 0
-            Dim ii = 0
-
-            'Find absolute max value of each row
-            For k = 0 To n - 1
-                ip(k) = k
-                Dim absValue = 0.0
-                For j = 0 To n - 1
-                    Dim temp = System.Math.Abs(source(k)(j))
-                    If temp > absValue Then
-                        absValue = temp
-                    End If
-                Next
-                If absValue = 0.0 Then
-                    'If absValue < SAME_ZERO Then
-                    Throw New MathException(MathException.ErrorSeries.NotComputable, "singular matrix")
-                End If
-                weight(k) = 1.0 / absValue
-            Next
-
-            'calc LUP
-            For k = 0 To n - 1
-                Dim u = -1.0
-                For i = k To n - 1
-                    ii = ip(i)
-                    Dim t = System.Math.Abs(source(ii)(k) * weight(ii))
-                    If t > u Then
-                        u = t
-                        j = i
-                    End If
-                Next
-                ik = ip(j)
-
-                'interchange row
-                If j <> k Then
-                    ip(j) = ip(k)
-                    ip(k) = ik
-                    MathUtil.SwapRow(matP, j, k)
-                    det = -det
-                End If
-                u = source(ik)(k)
-                If MathUtil.IsCloseToZero(u) Then
-                    u = ConstantValues.SAME_ZERO
-                End If
-                det *= u
-
-                'gauss eimination
-                For i = k + 1 To n - 1
-                    ii = ip(i)
-                    source(ii)(k) /= u
-                    Dim t = source(ii)(k)
-                    For j = k + 1 To n - 1
-                        source(ii)(j) -= t * source(ik)(j)
-                    Next
-                Next
-            Next
-
-            source = matP * source
-            matP = matP.T()
-
-            'replace
-            For i = 1 To n - 1
-                For j = 0 To i - 1
-                    matL(i)(j) = source(i)(j)
-                Next
-            Next
-            For i = 0 To n - 1
-                For j = i To n - 1
-                    matU(i)(j) = source(i)(j)
-                Next
-            Next
-
-            Return New LU(matP, matL, matU, det)
-        End Function
-
-        ''' <summary>
-        ''' LUP decomposition
-        ''' </summary>
-        ''' <param name="eps"></param>
-        ''' <returns></returns>
-        Public Function LUP2(Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As LU
-            Dim n = Me.ColCount
-            Dim a = New DenseMatrix(Me)
-            Dim matP = New DenseMatrix(n, True)
-            Dim ip = 0
-            Dim pivotRow = New Integer(n - 1) {}
-            Dim det = 1.0
-
-            For i = 0 To n - 1
-                pivotRow(i) = i
-            Next
-
-            For k = 0 To n - 1
-                Dim amax = System.Math.Abs(a(k)(k))
-                ip = k
-                For i = k + 1 To n - 1
-                    Dim temp = System.Math.Abs(a(i)(k))
-                    If temp > amax Then
-                        amax = temp
-                        ip = i
-                    End If
-                Next
-
-                '列要素の絶対最大値が0に近い場合
-                If MathUtil.IsCloseToZero(amax, eps) Then
-                    Throw New MathException(MathException.ErrorSeries.NotComputable, "LUP() singular matrix")
-                End If
-
-                'ピボット選択行を保存
-                If k <> ip Then
-                    'clsMathUtil.SwapRow(a, k, ip)
-                    For j = k To n - 1
-                        Dim tempVal = a(k)(j)
-                        a(k)(j) = a(ip)(j)
-                        a(ip)(j) = tempVal
-                    Next
-
-                    MathUtil.SwapRow(matP, k, ip)
-                    Dim temp = pivotRow(ip)
-                    pivotRow(ip) = pivotRow(k)
-                    pivotRow(k) = temp
-
-                    'change sign
-                    det = -det
-                End If
-
-                'diagonal value is close to 0.
-                If MathUtil.IsCloseToZero(a(k)(k), eps) Then
-                    a(k)(k) = ConstantValues.SAME_ZERO
-                End If
-
-                'calc det
-                det *= a(k)(k)
-
-                For i = k + 1 To n - 1
-                    Dim alpha = -a(i)(k) / a(k)(k)
-                    a(i)(k) = alpha
-                    For j = k + 1 To n - 1
-                        a(i)(j) = a(i)(j) + alpha * a(k)(j)
-                    Next
-                Next
-            Next
-
-            'transopose
-            'matP = matP.T
-
-            'a.PrintValue(10)
-
-            'replace
-            Dim matL = New DenseMatrix(n, True)
-            Dim matU = New DenseMatrix(n, True)
-            For i = 1 To n - 1
-                For j = 0 To i - 1
-                    matL(i)(j) = a(i)(j)
-                Next
-            Next
-            For i = 0 To n - 1
-                For j = i To n - 1
-                    matU(i)(j) = a(i)(j)
-                Next
-            Next
-            matL.PrintValue(10)
-            matU.PrintValue(10)
-            'For i = 0 To n - 1
-            '    For j = 0 To i
-            '        matL(i)(j) = a(i)(j)
-            '    Next
-            'Next
-            'For i = 0 To n - 1
-            '    For j = i + 1 To n - 1
-            '        matU(i)(j) = a(i)(j)
-            '    Next
-            'Next
-
-            Dim c = Me.LUP()
-            c.L.PrintValue(10)
-            c.U.PrintValue(10)
-
-            Return New LU(matP, matL, matU, det, pivotRow)
         End Function
 
         ''' <summary>
@@ -1432,13 +1259,13 @@
         ''' Householder Transformation
         ''' </summary>
         ''' <remarks>
-        ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
         ''' 対称行列をハウスホルダー変換 → 三重対角行列
+        ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
         ''' </remarks>
         ''' <returns></returns>
         Public Function Householder() As DenseMatrix
-            Dim a = New DenseMatrix(Me)
-            Dim n = a.Count
+            Dim ret = New DenseMatrix(Me)
+            Dim n = ret.Count
             Dim f = New DenseVector(n)
             Dim g = New DenseVector(n)
             Dim u = New DenseVector(n)
@@ -1448,7 +1275,7 @@
                     u(i) = 0
                 Next
                 For i = k + 1 To n - 1
-                    u(i) = a(i)(k) 'col
+                    u(i) = ret(i)(k) 'col
                 Next
 
                 Dim ss = 0.0
@@ -1458,13 +1285,13 @@
                 If MathUtil.IsCloseToZero(ss) = True Then
                     Continue For
                 End If
-                Dim s = System.Math.Sqrt(ss + u(k + 1) * u(k + 1))
+                Dim s = Math.Sqrt(ss + u(k + 1) * u(k + 1))
                 If u(k + 1) > 0.0 Then
                     s = -s
                 End If
 
                 u(k + 1) -= s
-                Dim uu = System.Math.Sqrt(ss + u(k + 1) * u(k + 1))
+                Dim uu = Math.Sqrt(ss + u(k + 1) * u(k + 1))
                 For i = k + 1 To n - 1
                     u(i) /= uu
                 Next
@@ -1473,8 +1300,8 @@
                     f(i) = 0.0
                     g(i) = 0.0
                     For j = k + 1 To n - 1
-                        f(i) += a(i)(j) * u(j)
-                        g(i) += a(j)(i) * u(j)
+                        f(i) += ret(i)(j) * u(j)
+                        g(i) += ret(j)(i) * u(j)
                     Next
                 Next
 
@@ -1490,40 +1317,43 @@
 
                 For i = 0 To n - 1
                     For j = 0 To n - 1
-                        a(i)(j) = a(i)(j) - 2.0 * u(i) * g(j) - 2.0 * f(i) * u(j)
+                        ret(i)(j) = ret(i)(j) - 2.0 * u(i) * g(j) - 2.0 * f(i) * u(j)
                     Next
                 Next
             Next
-            Return a
+            Return ret
         End Function
-
-        '--------------------------------------------------------------------------------------------
-        '固有値、固有ベクトルを求める方針
-        ' 反復計算によって求める。計算しやすい行列に変換
-        '対称行列 or 非対称行列
-        ' 対称行列   :べき乗法、ヤコビ法、三重対角行列->QR法
-        ' 非対称行列 :ヘッセンベルグ行列->QR法
-        'QR法の高速
-        ' 原点移動（ウィルキンソンシフト）、減次（デフレーション）
-        ' QR法だと固有値のみ固有ベクトルは別途計算
-        '--------------------------------------------------------------------------------------------
 
         ''' <summary>
         ''' Eigen decomposition using Jacobi Method. for Symmetric Matrix.
         ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
         ''' </summary>
-        ''' <param name="Iteration">default:1000</param>
-        ''' <param name="Conversion">default:1.0e-15</param>
-        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
+        ''' <param name="iteration">default:1000</param>
+        ''' <param name="eps"><see cref="ConstantValues.MachineEpsiron"/></param>
+        ''' <param name="isSort">descent sort by EigenValue default:true</param>
+        ''' <param name="isSymmetricCheck">symetric check default:false</param>
+        ''' <param name="nearlyZero"></param>
+        ''' <remarks>
+        ''' 固有値、固有ベクトルを求める方針
+        '''  反復計算によって求める。計算しやすい行列に変換
+        ''' 対称行列 or 非対称行列
+        '''  対称行列   :べき乗法、ヤコビ法、三重対角行列->QR法
+        '''  非対称行列 :ヘッセンベルグ行列->QR法
+        ''' QR法の高速
+        '''  原点移動（ウィルキンソンシフト）、減次（デフレーション）
+        '''  QR法だと固有値のみ固有ベクトルは別途計算
+        ''' </remarks>
         ''' <returns></returns>
-        Public Function Eigen(Optional ByVal Iteration As Integer = 1000,
-                              Optional ByVal Conversion As Double = 0.000000000000001,
-                              Optional ByVal IsSort As Boolean = True,
-                              Optional ByVal IsSymmetricCheck As Boolean = False) As Eigen
+        Public Function Eigen(Optional ByVal iteration As Integer = 1000,
+                              Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
+                              Optional ByVal isSort As Boolean = True,
+                              Optional ByVal isSymmetricCheck As Boolean = False,
+                              Optional ByVal nearlyZero As Double = Double.Epsilon) As Eigen
+            '正方行列、対象行列チェック
             If Me.IsSquare() = False Then
                 Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
             End If
-            If IsSymmetricCheck = True Then
+            If isSymmetricCheck = True Then
                 If Me.IsSymmetricMatrix() = False Then
                     Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
                 End If
@@ -1538,15 +1368,16 @@
             Dim value() = New Double(size * 4 - 1) {}
 
             'iteration
-            For itr As Integer = 0 To Iteration - 1
+            For itr As Integer = 0 To iteration - 1
                 'find abs max value without diag
                 Dim max = System.Math.Abs(retEigenMat(0)(1))
                 Dim p As Integer = 0
                 Dim q As Integer = 1
                 For i As Integer = 0 To size - 1
                     For j As Integer = i + 1 To size - 1
-                        If max < System.Math.Abs(retEigenMat(i)(j)) Then
-                            max = System.Math.Abs(retEigenMat(i)(j))
+                        Dim tempMax = System.Math.Abs(retEigenMat(i)(j))
+                        If max < tempMax Then
+                            max = tempMax
                             p = i
                             q = j
                         End If
@@ -1554,7 +1385,7 @@
                 Next
 
                 'check conversion
-                If max < Conversion Then
+                If max < eps Then
                     isConversion = True
                     Exit For
                 End If
@@ -1564,7 +1395,7 @@
                 Dim temp_pq = retEigenMat(p)(q)
                 Dim theta = 0.0
                 Dim diff = temp_pp - temp_qq
-                If MathUtil.IsCloseToZero(diff) = True Then
+                If MathUtil.IsCloseToZero(diff, nearlyZero) = True Then
                     theta = System.Math.PI / 4.0
                 Else
                     theta = System.Math.Atan(-2.0 * temp_pq / diff) * 0.5
@@ -1603,7 +1434,7 @@
 
             'sort by Eigen value
             Dim eigenValue = retEigenMat.ToDiagonalVector()
-            If IsSort = True Then
+            If isSort = True Then
                 MathUtil.EigenSort(eigenValue, rotate, True)
             End If
 
@@ -1611,549 +1442,28 @@
         End Function
 #End Region
 
-#Region "Public experiment Eigen"
-        ''' <summary>
-        ''' Eigen
-        ''' </summary>
-        ''' <param name="Iteration">default:1000</param>
-        ''' <param name="Conversion">default:1.0e-15</param>
-        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
-        ''' <returns></returns>
-        Public Function Eigen2(Optional ByVal Iteration As Integer = 1000,
-                                   Optional ByVal Conversion As Double = 0.000000000000001,
-                                   Optional ByVal IsSort As Boolean = True) As Eigen
-            If Me.IsSquare() = False Then
-                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
-            End If
-
-            'Householder変換
-            Dim h = Me.Householder()
-
-            'QR method
-            Dim n As Integer = h.RowCount
-            Dim r = New DenseMatrix(h)
-            Dim q = New DenseMatrix(n)
-            Dim t = New DenseMatrix(n)
-
-            Dim u = New DenseVector(n)
-            Dim vv = New DenseVector(n)
-
-            Dim cnt = 0
-            Dim isConversion = False
-            While (True)
-                For i = 0 To n - 1
-                    For j = 0 To n - 1
-                        If i = j Then
-                            q(i)(j) = 1.0
-                        Else
-                            q(i)(j) = 0
-                        End If
-                    Next
-                Next
-
-                For k = 0 To n - 2
-                    Dim alpha = MathUtil.PythagoreanAddition(r(k)(k), r(k + 1)(k))
-                    If MathUtil.IsCloseToZero(alpha) = True Then
-                        Continue For
-                    End If
-
-                    Dim c = r(k)(k) / alpha
-                    Dim s = -r(k + 1)(k) / alpha
-
-                    'calc R
-                    For j = k + 1 To n - 1
-                        u(j) = c * r(k)(j) - s * r(k + 1)(j)
-                        vv(j) = s * r(k)(j) + c * r(k + 1)(j)
-                    Next
-                    r(k)(k) = alpha
-                    r(k + 1)(k) = 0.0
-
-                    For j = k + 1 To n - 1
-                        r(k)(j) = u(j)
-                        r(k + 1)(j) = vv(j)
-                    Next
-
-                    'calc Q
-                    For j = 0 To k
-                        u(j) = c * q(k)(j)
-                        vv(j) = s * q(k)(j)
-                    Next
-                    q(k)(k + 1) = -s
-                    q(k + 1)(k + 1) = c
-                    For j = 0 To k
-                        q(k)(j) = u(j)
-                        q(k + 1)(j) = vv(j)
-                    Next
-                Next
-
-                'calc RQ
-                For i = 0 To n - 1
-                    For j = 0 To n - 1
-                        Dim rq = 0.0
-                        For m = 0 To n - 1
-                            rq += r(i)(m) * q(j)(m)
-                        Next
-                        t(i)(j) = rq
-                    Next
-                Next
-
-                'conversion
-                Dim e = 0.0
-                For i = 0 To n - 1
-                    e += System.Math.Abs(t(i)(i) - h(i)(i))
-                Next
-                If e < Conversion Then
-                    isConversion = True
-                    Exit While
-                End If
-                If cnt > Iteration Then
-                    Exit While
-                End If
-                cnt += 1
-
-                For i = 0 To n - 1
-                    For j = 0 To n - 1
-                        r(i)(j) = t(i)(j)
-                        h(i)(j) = t(i)(j)
-                    Next
-                Next
-            End While
-
-            'EigenValue
-            Dim eigenValue = h.ToDiagonalVector()
-
-            'EigenVector
-            Dim eigenVector = New DenseMatrix(n)
-            For i = 0 To n - 1
-                'initialize
-                Dim y = New DenseVector(n)
-                y(i) = 1.0
-
-                Dim tempMat = Me - (New DenseMatrix(n, eigenValue(i)))
-                Dim luSolver = tempMat.LUP()
-
-                'iteration
-                Dim mu0 = 0.0
-                Dim mu = 0.0
-                Dim v2 = 0.0
-                Dim v2s = 0.0
-                cnt = 0
-                While (True)
-                    mu0 = mu
-                    Dim v = luSolver.Solve(y)
-                    mu = v.InnerProduct(y)
-                    v2 = v.NormL2()
-                    y = v / v2
-                    Dim e = System.Math.Abs((mu - mu0) / mu)
-                    If e < Conversion Then
-                        For j = 0 To n - 1
-                            eigenVector(i)(j) = y(j)
-                        Next
-                        Exit While
-                    End If
-                    'If clsMathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
-                    '    For j = 0 To n - 1
-                    '        eigenVector(i)(j) = y(j)
-                    '    Next
-                    '    Exit While
-                    'End If
-                    If cnt > Iteration Then
-                        For j = 0 To n - 1
-                            eigenVector(j)(i) = y(j)
-                        Next
-                        Exit While
-                    End If
-                    cnt += 1
-                End While
-            Next
-
-            'sort by Eigen value
-            If IsSort = True Then
-                MathUtil.EigenSort(eigenValue, eigenVector, False)
-            End If
-
-            Return New Eigen(eigenValue, eigenVector, True)
-        End Function
-
-        ''' <summary>
-        ''' Eigen
-        ''' </summary>
-        ''' <param name="Iteration">default:1000</param>
-        ''' <param name="Conversion">default:1.0e-15</param>
-        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
-        ''' <returns></returns>
-        Public Function Eigen3(Optional ByVal Iteration As Integer = 1000,
-                                   Optional ByVal Conversion As Double = 0.000000000000001,
-                                   Optional ByVal IsSort As Boolean = True) As Eigen
-            If Me.IsSquare() = False Then
-                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
-            End If
-
-            'Householder transform
-            Dim a = Me.Householder()
-            Dim n = a.RowCount
-            With Nothing
-                'QR method
-                Dim q = New DenseMatrix(n)
-                Dim work = New DenseVector(n)
-                Dim m = n - 1
-                While (m > 1)
-                    Dim dVal = a(m)(m - 1)
-                    If System.Math.Abs(dVal) < Conversion Then
-                        m -= 1
-                    End If
-
-                    '原点移動 右下
-                    Dim s = 0.0
-                    If m = (n - 1) Then
-                        '原点移動なし
-                        s = 0.0
-                    Else
-                        '原点移動あり
-                        s = a(n - 1)(n - 1)
-                        For i = 0 To m - 1
-                            a(i)(i) -= s
-                        Next
-                    End If
-
-                    '単位行列に初期化
-                    q.SetIdentifyMatrix()
-
-                    For i = 0 To m - 1
-                        Dim sint = 0.0
-                        Dim cost = 0.0
-                        'Dim r = Math.Sqrt(a(i)(i) * a(i)(i) + a(i + 1)(i) * a(i + 1)(i))
-                        Dim r = MathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
-                        If MathUtil.IsCloseToZero(r) = True Then
-                            sint = 0.0
-                            cost = 0.0
-                        Else
-                            sint = a(i + 1)(i) / r
-                            cost = a(i)(i) / r
-                        End If
-
-                        For j = i + 1 To m
-                            Dim tmp = a(i)(j) * cost + a(i + 1)(j) * sint
-                            a(i + 1)(j) = -a(i)(j) * sint + a(i + 1)(j) * cost
-                            a(i)(j) = tmp
-                        Next
-                        a(i + 1)(i) = 0.0
-                        a(i)(i) = r
-                        For j = 0 To m
-                            Dim tmp = q(j)(i) * cost + q(j)(i + 1) * sint
-                            q(j)(i + 1) = -q(j)(i) * sint + q(j)(i + 1) * cost
-                            q(j)(i) = tmp
-                        Next
-                    Next
-
-                    'calc RQ
-                    For i = 0 To m
-                        For j = i To m
-                            work(j) = a(i)(j)
-                        Next
-                        For j = 0 To m
-                            Dim tmp = 0.0
-                            For k = i To m
-                                tmp += work(k) * q(k)(j)
-                            Next
-                            a(i)(j) = tmp
-                        Next
-                    Next
-
-                    '原点補正
-                    If s <> 0.0 Then
-                        For i = 0 To m - 1
-                            a(i)(i) = a(i)(i) + s
-                        Next
-                    End If
-                End While
-            End With
-
-            'Eigen value
-            Dim eigenValues = a.ToDiagonalVector()
-
-            'Eigen vector
-            Dim eigenVectors = New DenseMatrix(n)
-            For i = 0 To n - 1
-                'initialize
-                Dim y = New DenseVector(n)
-                y(i) = 1.0
-
-                Dim tempMat = Me - (New DenseMatrix(n, eigenValues(i)))
-                Dim luSolver = tempMat.LUP()
-
-                'iteration
-                Dim mu0 = 0.0
-                Dim mu = 0.0
-                Dim v2 = 0.0
-                Dim v2s = 0.0
-                Dim cnt = 0
-                While (True)
-                    mu0 = mu
-                    Dim v = luSolver.Solve(y)
-                    mu = v.InnerProduct(y)
-                    v2 = v.NormL2()
-                    y = v / v2
-                    Dim e = System.Math.Abs((mu - mu0) / mu)
-                    If e < Conversion Then
-                        For j = 0 To n - 1
-                            eigenVectors(i)(j) = y(j)
-                        Next
-                        Exit While
-                    End If
-                    'If clsMathUtil.clsMathUtil.IsCloseToValues(mu, mu0) Then
-                    '    For j = 0 To n - 1
-                    '        eigenVector(i)(j) = y(j)
-                    '    Next
-                    '    Exit While
-                    'End If
-                    If cnt > Iteration Then
-                        For j = 0 To n - 1
-                            eigenVectors(j)(i) = y(j)
-                        Next
-                        Exit While
-                    End If
-                    cnt += 1
-                End While
-            Next
-
-            'sort by Eigen value
-            If IsSort = True Then
-                MathUtil.EigenSort(eigenValues, eigenVectors, False)
-            End If
-
-            Return New Eigen(eigenValues, eigenVectors, True)
-        End Function
-
-        ''' <summary>
-        ''' Eigen
-        ''' </summary>
-        ''' <param name="Iteration">default:1000</param>
-        ''' <param name="Conversion">default:1.0e-15</param>
-        ''' <param name="IsSort">descent sort by EigenValue default:true</param>
-        ''' <returns></returns>
-        Public Function Eigen4(Optional ByVal Iteration As Integer = 1000,
-                                   Optional ByVal Conversion As Double = 0.000000000000001,
-                                   Optional ByVal IsSort As Boolean = True) As Eigen
-            If Me.IsSquare() = False Then
-                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
-            End If
-
-            'Householder transform
-            Dim a = Me.Householder()
-            Dim n = a.RowCount
-            With Nothing
-                'QR method
-                Dim q = New DenseMatrix(n)
-                Dim work = New DenseVector(n)
-                Dim m = n - 1
-                While (m > 1)
-                    Dim dVal = a(m)(m - 1)
-                    If System.Math.Abs(dVal) < Conversion Then
-                        m -= 1
-                    End If
-
-                    '原点 右下
-                    Dim s = 0.0
-                    If m = (n - 1) Then
-                        '原点移動なし
-                        s = 0.0
-                    Else
-                        '原点移動あり
-                        s = a(n - 1)(n - 1)
-                        For i = 0 To m - 1
-                            a(i)(i) -= s
-                        Next
-                    End If
-
-                    '単位行列に初期化
-                    q.SetIdentifyMatrix()
-
-                    For i = 0 To m - 1
-                        Dim sint = 0.0
-                        Dim cost = 0.0
-                        'Dim r = Math.Sqrt(a(i)(i) * a(i)(i) + a(i + 1)(i) * a(i + 1)(i))
-                        Dim r = MathUtil.PythagoreanAddition(a(i)(i), a(i + 1)(i))
-                        If MathUtil.IsCloseToZero(r) = True Then
-                            sint = 0.0
-                            cost = 0.0
-                        Else
-                            sint = a(i + 1)(i) / r
-                            cost = a(i)(i) / r
-                        End If
-
-                        For j = i + 1 To m
-                            Dim tmp = a(i)(j) * cost + a(i + 1)(j) * sint
-                            a(i + 1)(j) = -a(i)(j) * sint + a(i + 1)(j) * cost
-                            a(i)(j) = tmp
-                        Next
-                        a(i + 1)(i) = 0.0
-                        a(i)(i) = r
-                        For j = 0 To m
-                            Dim tmp = q(j)(i) * cost + q(j)(i + 1) * sint
-                            q(j)(i + 1) = -q(j)(i) * sint + q(j)(i + 1) * cost
-                            q(j)(i) = tmp
-                        Next
-                    Next
-
-                    'calc RQ
-                    For i = 0 To m
-                        For j = i To m
-                            work(j) = a(i)(j)
-                        Next
-                        For j = 0 To m
-                            Dim tmp = 0.0
-                            For k = i To m
-                                tmp += work(k) * q(k)(j)
-                            Next
-                            a(i)(j) = tmp
-                        Next
-                    Next
-
-                    '原点補正
-                    If s <> 0.0 Then
-                        For i = 0 To m - 1
-                            a(i)(i) = a(i)(i) + s
-                        Next
-                    End If
-                End While
-            End With
-
-            'eigen value
-            Dim eigenValues = a.ToDiagonalVector()
-
-            'eigen vector
-            Dim eigenVectors = New DenseMatrix(n)
-            Dim cnt = 0
-            For eIdx = 0 To n - 1
-                'initialize
-                Dim y = New DenseVector(n)
-                y(eIdx) = 1.0
-
-                'LU decomp
-                Dim ludecomp = Me - (New DenseMatrix(n, eigenValues(eIdx)))
-                Dim p() As Integer = Nothing
-                LUPForEigen(ludecomp, p, ConstantValues.MachineEpsiron)
-
-                'iteration
-                Dim mu0 = 0.0
-                Dim mu = 0.0
-                Dim v2 = 0.0
-                Dim v2s = 0.0
-                cnt = 0
-                While (True)
-                    mu0 = mu
-                    Dim v = New DenseVector(y)
-
-                    'solve
-                    For k = 0 To n - 2
-                        Dim temp = v(k)
-                        v(k) = v(p(k))
-                        v(p(k)) = temp
-                        For i = k + 1 To n - 1
-                            v(i) = v(i) + ludecomp(i)(k) * v(k)
-                        Next
-                    Next
-                    v(n - 1) /= ludecomp(n - 1)(n - 1)
-                    For k = n - 2 To 0 Step -1
-                        Dim temp = v(k)
-                        For j = k + 1 To n - 1
-                            temp = temp - ludecomp(k)(j) * v(j)
-                        Next
-                        v(k) = temp / ludecomp(k)(k)
-                    Next
-                    'v.PrintValue()
-
-                    mu = v.InnerProduct(y)
-                    v2 = v.NormL2()
-                    y = v / v2
-
-                    'Dim e = Math.Abs((mu - mu0) / mu)
-                    'If e < Conversion Then
-                    '    For j = 0 To n - 1
-                    '        eigenVector(i)(j) = y(j)
-                    '    Next
-                    '    Exit While
-                    'End If
-                    If MathUtil.IsCloseToValues(mu, mu0) Then
-                        For j = 0 To n - 1
-                            eigenVectors(eIdx)(j) = y(j)
-                        Next
-                        Exit While
-                    End If
-                    If cnt > Iteration Then
-                        For j = 0 To n - 1
-                            eigenVectors(j)(eIdx) = y(j)
-                        Next
-                        Exit While
-                    End If
-                    cnt += 1
-                End While
-            Next
-
-            Return New Eigen(eigenValues, eigenVectors, True)
-        End Function
-
-        ''' <summary>
-        ''' LUP for Eigen
-        ''' </summary>
-        ''' <param name="a"></param>
-        ''' <param name="pivotRow"></param>
-        ''' <param name="Conversion"></param>
-        Private Sub LUPForEigen(ByRef a As DenseMatrix, ByRef pivotRow() As Integer, Conversion As Double)
-            Dim n = a.RowCount
-            Dim ip = 0
-            pivotRow = New Integer(n - 1) {}
-            For i = 0 To n - 1
-                pivotRow(i) = i
-            Next
-            For k = 0 To n - 1
-                Dim amax = System.Math.Abs(a(k)(k))
-                ip = k
-                For i = k + 1 To n - 1
-                    Dim temp = System.Math.Abs(a(i)(k))
-                    If temp > amax Then
-                        amax = temp
-                        ip = i
-                    End If
-                Next
-
-                '列要素の絶対最大値が0に近い場合
-                If MathUtil.IsCloseToZero(amax, Conversion) Then
-                    Throw New MathException(MathException.ErrorSeries.NotComputable, "LUP() singular matrix")
-                End If
-
-                'ピボット選択行を保存
-                If k <> ip Then
-                    For j = k To n - 1
-                        Dim tempVal = a(k)(j)
-                        a(k)(j) = a(ip)(j)
-                        a(ip)(j) = tempVal
-                    Next
-                    Dim temp = pivotRow(ip)
-                    pivotRow(ip) = pivotRow(k)
-                    pivotRow(k) = temp
-                End If
-
-                'diagonal value is close to 0.
-                If MathUtil.IsCloseToZero(a(k)(k), Conversion) Then
-                    a(k)(k) = ConstantValues.SAME_ZERO
-                End If
-
-                For i = k + 1 To n - 1
-                    Dim alpha = -a(i)(k) / a(k)(k)
-                    a(i)(k) = alpha
-                    For j = k + 1 To n - 1
-                        a(i)(j) = a(i)(j) + alpha * a(k)(j)
-                    Next
-                Next
-            Next
-        End Sub
-
-#End Region
-
 #Region "Public Shared"
+        ''' <summary>
+        ''' 対角行列を作る
+        ''' </summary>
+        ''' <param name="v"></param>
+        ''' <returns></returns>
+        Public Shared Function CreateDiagonalMatrix(v() As Double) As DenseMatrix
+            Return (New DenseVector(v)).ToDiagonalMatrix()
+        End Function
 
+        Public Shared Function CreateDiagonalMatrix(ByRef v As DenseVector) As DenseMatrix
+            Return v.ToDiagonalMatrix()
+        End Function
+
+        ''' <summary>
+        ''' Create Identifiy matrix
+        ''' </summary>
+        ''' <param name="count"></param>
+        ''' <returns></returns>
+        Public Shared Function Eye(count As Integer) As DenseMatrix
+            Return New DenseMatrix(count, True)
+        End Function
 #End Region
 
 #Region "Private"
@@ -2190,30 +1500,7 @@
 
             Return False
         End Function
-
-        ''' <summary>
-        ''' check SymmetricMatrix
-        ''' </summary>
-        ''' <returns></returns>
-        Private Function IsSymmetricMatrix() As Boolean
-            Dim s = Me
-            Dim n = s.ColCount
-            For i = 0 To n - 1
-                For j = 0 To i - 1
-                    Dim flg = s(i)(j) = s(j)(i)
-                    If flg = False Then
-                        Return False
-                    End If
-                Next
-            Next
-            Return True
-        End Function
 #End Region
     End Class
-
-
-
-
-
 
 End Namespace
