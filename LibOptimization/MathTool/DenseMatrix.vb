@@ -1120,7 +1120,7 @@
         ''' [1]奧村晴彥. C 言語による最新アルゴリズム事典. 技術評論社, 1991.
         ''' [2]Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
         ''' </remarks>
-        ''' <returns></returns>
+        ''' <returns><see cref="MathTool.LU"/></returns>
         Public Function LUP(Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
                             Optional ByVal samezero As Double = ConstantValues.SAME_ZERO) As LU
             Dim n = Me.ColCount
@@ -1254,192 +1254,312 @@
 
             Return ret
         End Function
+#End Region
 
+#Region "Public Eigen"
         ''' <summary>
-        ''' Householder Transformation
+        ''' Eigen (実対称行列)
         ''' </summary>
+        ''' <param name="iteration">iteration default 100</param>
+        ''' <param name="eps">eps default:<see cref="ConstantValues.MachineEpsiron"/></param>
+        ''' <returns><see cref="MathTool.Eigen"/></returns>
         ''' <remarks>
-        ''' 対称行列をハウスホルダー変換 → 三重対角行列
-        ''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
+        ''' Refference
+        ''' Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
         ''' </remarks>
-        ''' <returns></returns>
-        Public Function Householder() As DenseMatrix
-            Dim ret = New DenseMatrix(Me)
-            Dim n = ret.Count
-            Dim f = New DenseVector(n)
-            Dim g = New DenseVector(n)
-            Dim u = New DenseVector(n)
+        Public Function Eigen(Optional iteration As Integer = 100, Optional eps As Double = ConstantValues.MachineEpsiron) As Eigen
+            Dim n = Me.RowCount()
+            Dim eigenVec = New DenseMatrix(Me)
+            Dim subDiag = New DenseVector(n)    '3重対角行列の副対角要素
+            Dim eigenValue = New DenseVector(n) '3重対角行列の対角要素
 
-            For k = 0 To n - 3
-                For i = 0 To k
-                    u(i) = 0
-                Next
-                For i = k + 1 To n - 1
-                    u(i) = ret(i)(k) 'col
-                Next
+            'calc Eigen value and vector
+            tred2(eigenVec, subDiag, eigenValue)
+            Dim isConversion = Me.tqli(eigenVec, subDiag, eigenValue, iteration, eps)
+            MathUtil.EigenSort(eigenValue, eigenVec, True)
 
-                Dim ss = 0.0
-                For i = k + 2 To n - 1
-                    ss += u(i) * u(i)
-                Next
-                If MathUtil.IsCloseToZero(ss) = True Then
-                    Continue For
-                End If
-                Dim s = Math.Sqrt(ss + u(k + 1) * u(k + 1))
-                If u(k + 1) > 0.0 Then
-                    s = -s
-                End If
-
-                u(k + 1) -= s
-                Dim uu = Math.Sqrt(ss + u(k + 1) * u(k + 1))
-                For i = k + 1 To n - 1
-                    u(i) /= uu
-                Next
-
-                For i = 0 To n - 1
-                    f(i) = 0.0
-                    g(i) = 0.0
-                    For j = k + 1 To n - 1
-                        f(i) += ret(i)(j) * u(j)
-                        g(i) += ret(j)(i) * u(j)
-                    Next
-                Next
-
-                Dim gamma = 0.0
-                For j = 0 To n - 1
-                    gamma += u(j) * g(j)
-                Next
-
-                For i = 0 To n - 1
-                    f(i) -= gamma * u(i)
-                    g(i) -= gamma * u(i)
-                Next
-
-                For i = 0 To n - 1
-                    For j = 0 To n - 1
-                        ret(i)(j) = ret(i)(j) - 2.0 * u(i) * g(j) - 2.0 * f(i) * u(j)
-                    Next
-                Next
-            Next
-            Return ret
+            Return New Eigen(eigenValue, eigenVec, isConversion)
         End Function
 
         ''' <summary>
-        ''' Eigen decomposition using Jacobi Method. for Symmetric Matrix.
-        ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
+        ''' 実対称行列のHouseholder変換 -> 3重対角行列
         ''' </summary>
-        ''' <param name="iteration">default:1000</param>
-        ''' <param name="eps"><see cref="ConstantValues.MachineEpsiron"/></param>
-        ''' <param name="isSort">descent sort by EigenValue default:true</param>
-        ''' <param name="isSymmetricCheck">symetric check default:false</param>
-        ''' <param name="nearlyZero"></param>
+        ''' <param name="eigenVec"></param>
+        ''' <param name="subDiag">subdiagonal elements</param>
+        ''' <param name="eigenValue"></param>
         ''' <remarks>
-        ''' 固有値、固有ベクトルを求める方針
-        '''  反復計算によって求める。計算しやすい行列に変換
-        ''' 対称行列 or 非対称行列
-        '''  対称行列   :べき乗法、ヤコビ法、三重対角行列->QR法
-        '''  非対称行列 :ヘッセンベルグ行列->QR法
-        ''' QR法の高速
-        '''  原点移動（ウィルキンソンシフト）、減次（デフレーション）
-        '''  QR法だと固有値のみ固有ベクトルは別途計算
+        ''' Refference
+        ''' Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
         ''' </remarks>
-        ''' <returns></returns>
-        Public Function Eigen(Optional ByVal iteration As Integer = 1000,
-                              Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
-                              Optional ByVal isSort As Boolean = True,
-                              Optional ByVal isSymmetricCheck As Boolean = False,
-                              Optional ByVal nearlyZero As Double = Double.Epsilon) As Eigen
-            '正方行列、対象行列チェック
-            If Me.IsSquare() = False Then
-                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
-            End If
-            If isSymmetricCheck = True Then
-                If Me.IsSymmetricMatrix() = False Then
-                    Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+        Private Sub tred2(ByRef eigenVec As DenseMatrix, ByRef subDiag As DenseVector, ByRef eigenValue As DenseVector)
+            Dim n = subDiag.Count()
+
+            Dim l, k, j, i As Integer
+            Dim scale, hh, h, g, f As Double
+
+            For i = n - 1 To 1 Step -1
+                l = i - 1
+                h = 0.0
+                scale = 0.0
+
+                If l > 0.0 Then
+
+                    For k = 0 To i - 1
+                        scale += Math.Abs(eigenVec(i)(k))
+                    Next
+
+                    If scale = 0.0 Then
+                        subDiag(i) = eigenVec(i)(l)
+                    Else
+                        For k = 0 To i - 1
+                            eigenVec(i)(k) = eigenVec(i)(k) / scale
+                            h += eigenVec(i)(k) * eigenVec(i)(k)
+                        Next
+
+                        f = eigenVec(i)(l)
+
+                        If f > 0.0 Then
+                            g = -Math.Sqrt(h)
+                        Else
+                            g = Math.Sqrt(h)
+                        End If
+
+                        subDiag(i) = scale * g
+                        h -= f * g
+                        eigenVec(i)(l) = f - g
+                        f = 0.0
+
+                        For j = 0 To i - 1
+
+                            eigenVec(j)(i) = eigenVec(i)(j) / h
+
+                            g = 0.0
+
+                            For k = 0 To j + 1 - 1
+                                g += eigenVec(j)(k) * eigenVec(i)(k)
+                            Next
+
+                            For k = j + 1 To i - 1
+                                g += eigenVec(k)(j) * eigenVec(i)(k)
+                            Next
+
+                            subDiag(j) = g / h
+                            f += subDiag(j) * eigenVec(i)(j)
+                        Next
+
+                        hh = f / (h + h)
+
+                        For j = 0 To i - 1
+                            f = eigenVec(i)(j)
+                            g = subDiag(j) - hh * f
+                            subDiag(j) = g
+
+                            For k = 0 To j + 1 - 1
+                                eigenVec(j)(k) -= (f * subDiag(k) + g * eigenVec(i)(k))
+                            Next
+                        Next
+                    End If
+                Else
+                    subDiag(i) = eigenVec(i)(l)
                 End If
-            End If
 
-            Dim size = Me.ColCount()
-            Dim retEigenMat = New DenseMatrix(Me)
-            Dim rotate = New DenseMatrix(size, True)
-            Dim isConversion = False
-            Dim rowIdx() = New Integer(size * 4 - 1) {}
-            Dim colIdx() = New Integer(size * 4 - 1) {}
-            Dim value() = New Double(size * 4 - 1) {}
+                eigenValue(i) = h
+            Next
 
-            'iteration
-            For itr As Integer = 0 To iteration - 1
-                'find abs max value without diag
-                Dim max = System.Math.Abs(retEigenMat(0)(1))
-                Dim p As Integer = 0
-                Dim q As Integer = 1
-                For i As Integer = 0 To size - 1
-                    For j As Integer = i + 1 To size - 1
-                        Dim tempMax = System.Math.Abs(retEigenMat(i)(j))
-                        If max < tempMax Then
-                            max = tempMax
-                            p = i
-                            q = j
+            eigenValue(0) = 0.0
+            subDiag(0) = 0.0
+            For i = 0 To n - 1
+                If eigenValue(i) <> 0.0 Then
+
+                    For j = 0 To i - 1
+                        g = 0.0
+
+                        For k = 0 To i - 1
+                            g += eigenVec(i)(k) * eigenVec(k)(j)
+                        Next
+
+                        For k = 0 To i - 1
+                            eigenVec(k)(j) -= g * eigenVec(k)(i)
+                        Next
+                    Next
+                End If
+
+                eigenValue(i) = eigenVec(i)(i)
+                eigenVec(i)(i) = 1.0
+
+                For j = 0 To i - 1
+                    eigenVec(j)(i) = 0.0
+                    eigenVec(i)(j) = 0.0
+                Next
+            Next
+        End Sub
+
+        ''' <summary>
+        ''' 3重対角陰的QL法 実対称3重対角行列の固有値と固有ベクトルを求める
+        ''' </summary>
+        ''' <param name="eigenVec"></param>
+        ''' <param name="subDiag">subdiagonal elements</param>
+        ''' <param name="iteration">iteration</param>
+        ''' <param name="eps">eps</param>
+        ''' <remarks>
+        ''' Refference
+        ''' Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
+        ''' </remarks>
+        Private Function tqli(ByRef eigenVec As DenseMatrix, ByRef subDiag As DenseVector, ByRef eigenValue As DenseVector,
+                              ByVal iteration As Integer, ByVal eps As Double) As Boolean
+            Dim n = Me.RowCount
+
+            Dim m, l, iter, i, k As Integer
+            Dim s, r, p, g, f, dd, c, b As Double
+            For i = 1 To n - 1
+                subDiag(i - 1) = subDiag(i)
+            Next
+            subDiag(n - 1) = 0.0
+
+            For l = 0 To n - 1
+                iter = 0
+                Do
+                    For m = l To n - 1 - 1
+                        dd = Math.Abs(eigenValue(m)) + Math.Abs(eigenValue(m + 1))
+                        If Math.Abs(subDiag(m)) <= eps * dd Then
+                            Exit For
                         End If
                     Next
-                Next
 
-                'check conversion
-                If max < eps Then
-                    isConversion = True
-                    Exit For
-                End If
+                    If m <> l Then
+                        iter += 1
+                        If iter = iteration Then
+                            'not conversion
+                            Return False
+                        End If
 
-                Dim temp_pp = retEigenMat(p)(p)
-                Dim temp_qq = retEigenMat(q)(q)
-                Dim temp_pq = retEigenMat(p)(q)
-                Dim theta = 0.0
-                Dim diff = temp_pp - temp_qq
-                If MathUtil.IsCloseToZero(diff, nearlyZero) = True Then
-                    theta = System.Math.PI / 4.0
-                Else
-                    theta = System.Math.Atan(-2.0 * temp_pq / diff) * 0.5
-                End If
+                        g = (eigenValue(l + 1) - eigenValue(l)) / (2.0 * subDiag(l))
+                        r = MathUtil.PythagoreanAddition(g, 1.0)
+                        g = eigenValue(m) - eigenValue(l) + subDiag(l) / (g + SIGN(r, g))
+                        s = 1.0
+                        c = 1.0
+                        p = 0.0
 
-                Dim D = New DenseMatrix(retEigenMat)
-                Dim cosTheta = System.Math.Cos(theta)
-                Dim sinTheta = System.Math.Sin(theta)
-                For i As Integer = 0 To size - 1
-                    Dim temp = 0.0
-                    temp = retEigenMat(p)(i) * cosTheta - retEigenMat(q)(i) * sinTheta
-                    D(p)(i) = temp
-                    D(i)(p) = temp
-                    temp = retEigenMat(p)(i) * sinTheta + retEigenMat(q)(i) * cosTheta
-                    D(i)(q) = temp
-                    D(q)(i) = temp
-                Next
-                Dim cosThetasinTheta = cosTheta * cosTheta - sinTheta * sinTheta
-                Dim tempA = (temp_pp + temp_qq) / 2.0
-                Dim tempB = (temp_pp - temp_qq) / 2.0
-                Dim tempC = temp_pq * (sinTheta * cosTheta) * 2.0
-                D(p)(p) = tempA + tempB * cosThetasinTheta - tempC
-                D(q)(q) = tempA - tempB * cosThetasinTheta + tempC
-                D(p)(q) = 0.0
-                D(q)(p) = 0.0
-                retEigenMat = D
+                        For i = m - 1 To l Step -1
+                            f = s * subDiag(i)
+                            b = c * subDiag(i)
+                            r = MathUtil.PythagoreanAddition(f, g)
+                            subDiag(i + 1) = r
 
-                'rotate
-                Dim rotateNew = New DenseMatrix(size, True)
-                rotateNew(p)(p) = cosTheta
-                rotateNew(p)(q) = sinTheta
-                rotateNew(q)(p) = -sinTheta
-                rotateNew(q)(q) = cosTheta
-                rotate = rotate * rotateNew
+                            If r = 0.0 Then
+                                eigenValue(i + 1) -= p
+                                subDiag(m) = 0.0
+                                Exit For
+                            End If
+
+                            s = f / r
+                            c = g / r
+                            g = eigenValue(i + 1) - p
+                            r = (eigenValue(i) - g) * s + 2.0 * c * b
+                            p = s * r
+                            eigenValue(i + 1) = g + p
+                            g = c * r - b
+
+                            For k = 0 To n - 1
+                                f = eigenVec(k)(i + 1)
+                                eigenVec(k)(i + 1) = s * eigenVec(k)(i) + c * f
+                                eigenVec(k)(i) = c * eigenVec(k)(i) - s * f
+                            Next
+                        Next
+
+                        If r = 0.0 AndAlso i >= l Then Continue Do
+                        eigenValue(l) -= p
+                        subDiag(l) = g
+                        subDiag(m) = 0.0
+                    End If
+                Loop While m <> l
             Next
 
-            'sort by Eigen value
-            Dim eigenValue = retEigenMat.ToDiagonalVector()
-            If isSort = True Then
-                MathUtil.EigenSort(eigenValue, rotate, True)
-            End If
-
-            Return New Eigen(eigenValue, rotate, isConversion)
+            Return True
         End Function
+
+        ''' <summary>
+        ''' 符号 Eigenで使用
+        ''' </summary>
+        ''' <param name="a"></param>
+        ''' <param name="b"></param>
+        ''' <returns></returns>
+        Private Function SIGN(ByVal a As Double, ByVal b As Double) As Double
+            Return If(b >= 0, (If(a >= 0, a, -a)), (If(a >= 0, -a, a)))
+        End Function
+#End Region
+
+#Region "Experiment"
+
+        '''' <summary>
+        '''' Householder Transformation
+        '''' </summary>
+        '''' <remarks>
+        '''' 対称行列をハウスホルダー変換 → 三重対角行列
+        '''' 非対称行列をハウスホルダー変換 → ヘッセンベルグ行列
+        '''' </remarks>
+        '''' <returns></returns>
+        'Public Function Householder() As DenseMatrix
+        '    Dim ret = New DenseMatrix(Me)
+        '    Dim n = ret.Count
+        '    Dim f = New DenseVector(n)
+        '    Dim g = New DenseVector(n)
+        '    Dim u = New DenseVector(n)
+
+        '    For k = 0 To n - 3
+        '        For i = 0 To k
+        '            u(i) = 0
+        '        Next
+        '        For i = k + 1 To n - 1
+        '            u(i) = ret(i)(k) 'col
+        '        Next
+
+        '        Dim ss = 0.0
+        '        For i = k + 2 To n - 1
+        '            ss += u(i) * u(i)
+        '        Next
+        '        If MathUtil.IsCloseToZero(ss) = True Then
+        '            Continue For
+        '        End If
+        '        Dim s = Math.Sqrt(ss + u(k + 1) * u(k + 1))
+        '        If u(k + 1) > 0.0 Then
+        '            s = -s
+        '        End If
+
+        '        u(k + 1) -= s
+        '        Dim uu = Math.Sqrt(ss + u(k + 1) * u(k + 1))
+        '        For i = k + 1 To n - 1
+        '            u(i) /= uu
+        '        Next
+
+        '        For i = 0 To n - 1
+        '            f(i) = 0.0
+        '            g(i) = 0.0
+        '            For j = k + 1 To n - 1
+        '                f(i) += ret(i)(j) * u(j)
+        '                g(i) += ret(j)(i) * u(j)
+        '            Next
+        '        Next
+
+        '        Dim gamma = 0.0
+        '        For j = 0 To n - 1
+        '            gamma += u(j) * g(j)
+        '        Next
+
+        '        For i = 0 To n - 1
+        '            f(i) -= gamma * u(i)
+        '            g(i) -= gamma * u(i)
+        '        Next
+
+        '        For i = 0 To n - 1
+        '            For j = 0 To n - 1
+        '                ret(i)(j) = ret(i)(j) - 2.0 * u(i) * g(j) - 2.0 * f(i) * u(j)
+        '            Next
+        '        Next
+        '    Next
+        '    Return ret
+        'End Function
+
 #End Region
 
 #Region "Public Shared"

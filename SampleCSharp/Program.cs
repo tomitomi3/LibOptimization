@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LibOptimization.MathTool;
 using LibOptimization.Optimization;
 using LibOptimization.Util;
 
@@ -77,6 +78,19 @@ namespace SampleCSharp
     {
         static void Main(string[] args)
         {
+            {
+                var a = new DenseMatrix(new double[][]{
+                    new double[]{8   , -4,     2  ,  -2},
+                    new double[]{-4 ,   -2   ,  4   ,  9},
+                    new double[]{2  ,   4  ,   3  ,  -6},
+                    new double[]{-2 ,    9   , -6 ,    2 }
+                });
+                a.PrintValue();
+                a.Eigen();
+            }
+
+            return;
+
             //for SA
             (new SimulatedAnnealingSample()).Run();
 

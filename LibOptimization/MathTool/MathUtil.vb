@@ -82,7 +82,7 @@
         End Function
 
         ''' <summary>
-        ''' Create random symmetric matrix(for Debug) 対象行列を生成
+        ''' Create random symmetric matrix(for Debug) 対称行列を生成
         ''' </summary>
         ''' <param name="size"></param>
         ''' <param name="rng"></param>
@@ -133,7 +133,7 @@
         End Function
 
         ''' <summary>
-        ''' Create random Asymmetric matrix(for Debug) 非対象行列を生成
+        ''' Create random Asymmetric matrix(for Debug) 非対称行列を生成
         ''' </summary>
         ''' <param name="size"></param>
         ''' <returns></returns>
