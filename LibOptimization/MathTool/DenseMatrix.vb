@@ -1258,6 +1258,116 @@
 
 #Region "Public Eigen"
         ''' <summary>
+        ''' Eigen decomposition using Jacobi Method. for Symmetric Matrix.
+        ''' Memo: A = V*D*V−1, D is diag(eigen value1 ... eigen valueN), V is eigen vectors. V is orthogonal matrix.
+        ''' </summary>
+        ''' <param name="iteration">default:1000</param>
+        ''' <param name="eps"><see cref="ConstantValues.MachineEpsiron"/></param>
+        ''' <param name="isSort">descent sort by EigenValue default:true</param>
+        ''' <param name="nearlyZero"></param>
+        ''' <remarks>
+        ''' 固有値、固有ベクトルを求める方針
+        '''  反復計算によって求める。計算しやすい行列に変換
+        ''' 対称行列 or 非対称行列
+        '''  対称行列   :べき乗法、ヤコビ法、三重対角行列->QR法
+        '''  非対称行列 :ヘッセンベルグ行列->QR法
+        ''' QR法の高速
+        '''  原点移動（ウィルキンソンシフト）、減次（デフレーション）
+        '''  QR法だと固有値のみ固有ベクトルは別途計算
+        ''' </remarks>
+        ''' <returns></returns>
+        <Obsolete>
+        Public Function EigenJacobi(Optional ByVal iteration As Integer = 1000,
+                                    Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
+                                    Optional ByVal isSort As Boolean = True,
+                                    Optional ByVal nearlyZero As Double = Double.Epsilon) As Eigen
+            '正方行列、対象行列チェック
+            If Me.IsSquare() = False Then
+                Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
+            End If
+
+            Dim size = Me.ColCount()
+            Dim retEigenMat = New DenseMatrix(Me)
+            Dim rotate = New DenseMatrix(size, True)
+            Dim isConversion = False
+            Dim rowIdx() = New Integer(size * 4 - 1) {}
+            Dim colIdx() = New Integer(size * 4 - 1) {}
+            Dim value() = New Double(size * 4 - 1) {}
+
+            'iteration
+            For itr As Integer = 0 To iteration - 1
+                'find abs max value without diag
+                Dim max = System.Math.Abs(retEigenMat(0)(1))
+                Dim p As Integer = 0
+                Dim q As Integer = 1
+                For i As Integer = 0 To size - 1
+                    For j As Integer = i + 1 To size - 1
+                        Dim tempMax = System.Math.Abs(retEigenMat(i)(j))
+                        If max < tempMax Then
+                            max = tempMax
+                            p = i
+                            q = j
+                        End If
+                    Next
+                Next
+
+                'check conversion
+                If max < eps Then
+                    isConversion = True
+                    Exit For
+                End If
+
+                Dim temp_pp = retEigenMat(p)(p)
+                Dim temp_qq = retEigenMat(q)(q)
+                Dim temp_pq = retEigenMat(p)(q)
+                Dim theta = 0.0
+                Dim diff = temp_pp - temp_qq
+                If MathUtil.IsCloseToZero(diff, nearlyZero) = True Then
+                    theta = System.Math.PI / 4.0
+                Else
+                    theta = System.Math.Atan(-2.0 * temp_pq / diff) * 0.5
+                End If
+
+                Dim D = New DenseMatrix(retEigenMat)
+                Dim cosTheta = System.Math.Cos(theta)
+                Dim sinTheta = System.Math.Sin(theta)
+                For i As Integer = 0 To size - 1
+                    Dim temp = retEigenMat(p)(i) * cosTheta - retEigenMat(q)(i) * sinTheta
+                    D(p)(i) = temp
+                    D(i)(p) = temp
+                    temp = retEigenMat(p)(i) * sinTheta + retEigenMat(q)(i) * cosTheta
+                    D(i)(q) = temp
+                    D(q)(i) = temp
+                Next
+                Dim cosThetasinTheta = cosTheta * cosTheta - sinTheta * sinTheta
+                Dim tempA = (temp_pp + temp_qq) / 2.0
+                Dim tempB = (temp_pp - temp_qq) / 2.0
+                Dim tempC = temp_pq * (sinTheta * cosTheta) * 2.0
+                D(p)(p) = tempA + tempB * cosThetasinTheta - tempC
+                D(q)(q) = tempA - tempB * cosThetasinTheta + tempC
+                D(p)(q) = 0.0
+                D(q)(p) = 0.0
+                retEigenMat = D
+
+                'rotate
+                Dim rotateNew = New DenseMatrix(size, True)
+                rotateNew(p)(p) = cosTheta
+                rotateNew(p)(q) = sinTheta
+                rotateNew(q)(p) = -sinTheta
+                rotateNew(q)(q) = cosTheta
+                rotate = rotate * rotateNew
+            Next
+
+            'sort by Eigen value
+            Dim eigenValue = retEigenMat.ToDiagonalVector()
+            If isSort = True Then
+                MathUtil.EigenSort(eigenValue, rotate, True)
+            End If
+
+            Return New Eigen(eigenValue, rotate, isConversion)
+        End Function
+
+        ''' <summary>
         ''' Eigen (実対称行列)
         ''' </summary>
         ''' <param name="iteration">iteration default 100</param>

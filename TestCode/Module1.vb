@@ -5,6 +5,46 @@ Imports LibOptimization.Util
 
 Module Module1
     Sub Main()
+        'benchmark
+        With Nothing
+            Dim rng = New Random(System.DateTime.Now.Millisecond)
+            Dim sw As New Stopwatch()
+            Dim eigen_tred2 As New List(Of Double)
+            Dim eigen_jacobi As New List(Of Double)
+            Dim MAX_DIM = 100
+            For l = 0 To 10 - 1
+                Console.WriteLine("{0} times", l)
+                sw.Start()
+                MathUtil.CreateRandomSymmetricMatrix(MAX_DIM, rng:=rng).Eigen()
+                'For i As Integer = 2 To MAX_DIM - 1
+                '    Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(i, rng:=rng)
+                '    Dim eigen = srcMat.Eigen()
+                'Next
+                sw.Stop()
+                Console.WriteLine("using 三重対角化->QL. elapsed time {0} ms", sw.ElapsedMilliseconds)
+                eigen_tred2.Add(sw.ElapsedMilliseconds)
+                sw.Reset()
+
+                sw.Start()
+                MathUtil.CreateRandomSymmetricMatrix(MAX_DIM, rng:=rng).EigenJacobi()
+                'For i As Integer = 2 To MAX_DIM - 1
+                '    Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(i, rng:=rng)
+                '    Dim eigen = srcMat.EigenJacobi()
+                'Next
+                sw.Stop()
+                Console.WriteLine("using Jacobi. elapsed time {0} ms", sw.ElapsedMilliseconds)
+                eigen_jacobi.Add(sw.ElapsedMilliseconds)
+                sw.Reset()
+                Console.WriteLine("")
+            Next
+
+            Console.WriteLine("Compute eigenvalue and vector of {0}dim real symmetric matrixnd vector.", MAX_DIM)
+            Console.WriteLine("10times average")
+            Console.WriteLine("三重対角化->QL    elapsed time {0} ms", eigen_tred2.Average())
+            Console.WriteLine("Jacobi            elapsed time {0} ms", eigen_jacobi.Average())
+            Return
+        End With
+
         With Nothing
             Dim opt = New LibOptimization.Optimization.clsOptNelderMeadANMS(New LibOptimization.BenchmarkFunction.clsBenchRosenblock(20))
             opt.Iteration = 20000
