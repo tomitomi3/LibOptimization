@@ -2,7 +2,7 @@
 Imports LibOptimization.MathTool
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
-<TestClass()> Public Class UnitTestMathUtil
+<TestClass> Public Class UnitTestMathUtil
     Public Const delta = 0.0000000001
 
     <TestMethod()> Public Sub CoVariance()

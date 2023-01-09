@@ -953,7 +953,6 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     <TestMethod()> Public Sub Mat_Inverse()
         With Nothing
             Dim dimNum = 1
-            Dim rng = New Random()
             Dim source = New DenseMatrix(1)
             source(0)(0) = 2
             Dim product = source * source.Inverse()
@@ -1040,10 +1039,9 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         End With
 
         With Nothing
-            Dim rng = New Random()
             For i = 0 To 10 - 1
                 Dim dimNum = 4
-                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng, isIncludeZero:=True, isFloating:=True)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, isIncludeZero:=True, isFloating:=True)
                 Try
                     Dim souceInv = source.Inverse()
                     Dim product = source * souceInv
@@ -1063,10 +1061,9 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         End With
 
         With Nothing
-            Dim rng = New Random()
             For i = 5 To 10 - 1
                 Dim dimNum = i
-                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum)
                 Try
                     Dim souceInv = source.Inverse()
                     Dim product = source * souceInv
@@ -1126,8 +1123,6 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test Eigen decomposition
     ''' </summary>
     <TestMethod()> Public Sub Mat_Eigen()
-        Dim rng = New Random()
-
         For i As Integer = 2 To 5
             Dim srcMat = DenseMatrix.CreateDiagonalMatrix(Enumerable.Range(1, i).Select(Function(v) v * 1.0).ToArray())
             srcMat.PrintValue(name:="Source Matrix")
@@ -1153,7 +1148,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         'ランダム
         For i As Integer = 4 To 6
             Dim matDim = i
-            Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
+            Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(matDim)
             srcMat.PrintValue(name:="Source Matrix")
 
             'eigen
@@ -1184,12 +1179,11 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test LU decomposition
     ''' </summary>
     <TestMethod()> Public Sub Mat_LU()
-        Dim rng = New Random(12345)
         For j = 2 To 5
             Console.WriteLine("Dim={0} run", j)
             For i = 0 To 100 - 1
                 Dim dimNum = j
-                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum)
 
                 If j > 2 AndAlso i Mod 2 = 0 Then
                     source(0)(0) = 0.0
@@ -1216,7 +1210,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
         With Nothing
             Dim dimNum = 4
-            Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+            Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum)
 
             '列を0に
             source(2)(0) = 0.0
@@ -1246,11 +1240,9 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test Solve() Ax=b
     ''' </summary>
     <TestMethod()> Public Sub Mat_Solve()
-        Dim rng = New Random()
-        For i = 2 To 10 - 1
-            Dim dimNum = i
-            For j As Integer = 0 To 100 - 1
-                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
+        For dimNum = 2 To 20 - 1
+            For j As Integer = 0 To 10 - 1
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum)
 
                 'add 対角成分
                 source += New DenseMatrix(dimNum, True)

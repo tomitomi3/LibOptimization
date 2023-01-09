@@ -88,13 +88,13 @@
         ''' <param name="rng"></param>
         ''' <returns></returns>
         Public Shared Function CreateRandomSymmetricMatrix(ByVal size As Integer,
-                                                               Optional ByVal rng As System.Random = Nothing,
-                                                               Optional ByVal isIncludeZero As Boolean = False,
-                                                               Optional ByVal isFloating As Boolean = False,
-                                                               Optional ByVal lower As Double = -10,
-                                                               Optional ByVal upper As Double = 10) As DenseMatrix
+                                                           Optional ByVal rng As System.Random = Nothing,
+                                                           Optional ByVal isIncludeZero As Boolean = False,
+                                                           Optional ByVal isFloating As Boolean = False,
+                                                           Optional ByVal lower As Double = -10,
+                                                           Optional ByVal upper As Double = 10) As DenseMatrix
             If rng Is Nothing Then
-                rng = New System.Random()
+                rng = New System.Random(123456)
             End If
             Dim matTemp = New DenseMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1
@@ -145,7 +145,7 @@
                                                                Optional ByVal upper As Double = 10) As DenseMatrix
             If rng Is Nothing Then
                 'rng = New Util.clsRandomXorshift()
-                rng = New System.Random()
+                rng = New System.Random(123456)
             End If
             Dim matTemp = New DenseMatrix(size)
             For i As Integer = 0 To matTemp.Count - 1

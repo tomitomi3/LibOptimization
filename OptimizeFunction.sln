@@ -15,6 +15,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestLibOptimizationDotNet3.
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "LibOptimization", "LibOptimization\LibOptimization.vbproj", "{2C280EED-8DE4-43BB-9466-000D65794E2D}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestLibOptimizationDotNetCore", "TestLibOptimizationDotNetCore\TestLibOptimizationDotNetCore.vbproj", "{903A86B9-3C51-4381-811C-685DB6678B16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,18 @@ Global
 		{2C280EED-8DE4-43BB-9466-000D65794E2D}.Release|x64.Build.0 = Release|Any CPU
 		{2C280EED-8DE4-43BB-9466-000D65794E2D}.Release|x86.ActiveCfg = Release|Any CPU
 		{2C280EED-8DE4-43BB-9466-000D65794E2D}.Release|x86.Build.0 = Release|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Debug|x64.Build.0 = Debug|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Debug|x86.ActiveCfg = Debug|x86
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Debug|x86.Build.0 = Debug|x86
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Release|x64.ActiveCfg = Release|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Release|x64.Build.0 = Release|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Release|x86.ActiveCfg = Release|Any CPU
+		{903A86B9-3C51-4381-811C-685DB6678B16}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

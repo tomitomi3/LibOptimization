@@ -3,13 +3,15 @@ Imports LibOptimization.MathTool
 Imports LibOptimization.MathTool.RNG
 Imports LibOptimization.Optimization
 Imports LibOptimization.Util
+Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 ''' <summary>
 ''' 単体テスト 最適化
 ''' </summary>
-<TestClass()> Public Class UnitTestLibOptimization
+<TestClass> Public Class UnitTestLibOptimization
 
-    Public Sub New()
+    <TestInitialize>
+    Public Sub Init()
         'fix rng
         RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
     End Sub
@@ -21,9 +23,6 @@ Imports LibOptimization.Util
             Dim EVAL As Double = 0.0001
             Try
                 Console.Write("{0,-40}", opt.GetType().Name)
-
-                'fix rng
-                'opt.Random = New clsRandomXorshift()
 
                 Dim sw As New Stopwatch()
                 sw.Start()
@@ -344,6 +343,10 @@ Imports LibOptimization.Util
     ''' test serialize and deserialize
     ''' </summary>
     <TestMethod()> Public Sub Opt_SerializeAndDesrialize()
+#If NETCOREAPP Then
+        'net frameworkの時はテストしない
+        'https://github.com/dotnet/runtime/issues/27429
+#Else
         Dim opt = New LibOptimization.Optimization.clsOptCS(New clsBenchSphere(5))
         opt.Random = New RandomXorshift()
         opt.Init()
@@ -352,7 +355,7 @@ Imports LibOptimization.Util
         opt.DoIteration(10)
         RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
         Dim PATH_SERIALIZE = "serialize_file.txt"
-        clsUtil.SerializeOpt(CType(opt, absOptimization), PATH_SERIALIZE)
+        clsUtil.SerializeOpt(CType(opt, clsOptCS), PATH_SERIALIZE)
         opt.DoIteration(10)
         Dim result1 = opt.Result()
         Dim itr1 = opt.IterationCount
@@ -377,6 +380,7 @@ Imports LibOptimization.Util
         If flg = False Then
             Assert.Fail(String.Format("not same result"))
         End If
+#End If
     End Sub
 
 #Region "absFunc"

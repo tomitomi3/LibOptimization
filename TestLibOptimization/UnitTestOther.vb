@@ -1,11 +1,12 @@
 ﻿
 'LibOptimization
 Imports LibOptimization.MathTool.RNG
+Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 ''' <summary>
 ''' 単体テスト 最適化、線形代数以外
 ''' </summary>
-<TestClass()> Public Class UnitTestOther
+<TestClass> Public Class UnitTestOther
 #Region "Util"
     ''' <summary>
     ''' check random lib
