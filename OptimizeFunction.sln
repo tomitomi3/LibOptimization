@@ -17,6 +17,11 @@ Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "LibOptimization", "LibOptim
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "TestLibOptimizationDotNetCore", "TestLibOptimizationDotNetCore\TestLibOptimizationDotNetCore.vbproj", "{903A86B9-3C51-4381-811C-685DB6678B16}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{023BE7FB-5F68-4CD1-ACB9-CCD37BD84AF9}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
