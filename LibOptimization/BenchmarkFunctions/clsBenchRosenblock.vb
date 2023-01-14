@@ -48,7 +48,7 @@ Namespace BenchmarkFunction
             Return ret
         End Function
 
-        Public Overrides Function Gradient(ByVal x As List(Of Double)) As List(Of Double)
+        Public Overrides Function Gradient(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
             Dim gradVec As New List(Of Double)
 
             'i0
@@ -69,7 +69,7 @@ Namespace BenchmarkFunction
             Return gradVec
         End Function
 
-        Public Overrides Function Hessian(ByVal x As List(Of Double)) As List(Of List(Of Double))
+        Public Overrides Function Hessian(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
             Dim hesse As New List(Of List(Of Double))
             Dim tempVect(Me.dimension - 1) As Double
             For i As Integer = 0 To Me.dimension - 1

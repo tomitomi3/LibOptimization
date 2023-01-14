@@ -54,11 +54,11 @@ Namespace BenchmarkFunction
             Return Me.F(New List(Of Double)(ai_var))
         End Function
 
-        Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
+        Public Overrides Function Gradient(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
             Throw New NotImplementedException
         End Function
 
-        Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
+        Public Overrides Function Hessian(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
             Throw New NotImplementedException
         End Function
 

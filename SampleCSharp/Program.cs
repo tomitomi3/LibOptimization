@@ -58,12 +58,12 @@ namespace SampleCSharp
             return ret;
         }
 
-        public override List<double> Gradient(List<double> aa)
+        public override List<double> Gradient(List<double> aa, double h = 1E-08)
         {
             return null;
         }
 
-        public override List<List<double>> Hessian(List<double> aa)
+        public override List<List<double>> Hessian(List<double> aa, double h = 1E-08)
         {
             return null;
         }
@@ -78,19 +78,6 @@ namespace SampleCSharp
     {
         static void Main(string[] args)
         {
-            {
-                var a = new DenseMatrix(new double[][]{
-                    new double[]{8   , -4,     2  ,  -2},
-                    new double[]{-4 ,   -2   ,  4   ,  9},
-                    new double[]{2  ,   4  ,   3  ,  -6},
-                    new double[]{-2 ,    9   , -6 ,    2 }
-                });
-                a.PrintValue();
-                a.Eigen();
-            }
-
-            return;
-
             //for SA
             (new SimulatedAnnealingSample()).Run();
 

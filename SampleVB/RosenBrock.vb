@@ -18,11 +18,11 @@ Public Class RosenBrock : Inherits LibOptimization.Optimization.absObjectiveFunc
         Return 100 * (x2 - x1 * x1) * (x2 - x1 * x1) + (1 - x1) * (1 - x1)
     End Function
 
-    Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
+    Public Overrides Function Gradient(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
         Return Nothing
     End Function
 
-    Public Overrides Function Hessian(x As List(Of Double)) As List(Of List(Of Double))
+    Public Overrides Function Hessian(x As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
         Return Nothing
     End Function
 
