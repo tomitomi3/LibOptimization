@@ -36,12 +36,12 @@ namespace SampleCSharp
             return ret;
         }
 
-        public override List<double> Gradient(List<double> aa)
+        public override List<double> Gradient(List<double> aa, double h = 1E-08)
         {
             return null;
         }
 
-        public override List<List<double>> Hessian(List<double> aa)
+        public override List<List<double>> Hessian(List<double> aa, double h = 1E-08)
         {
             return null;
         }

@@ -45,7 +45,7 @@ Namespace BenchmarkFunction
             Return ret
         End Function
 
-        Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
+        Public Overrides Function Gradient(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
             Dim ret As New List(Of Double)
             For i As Integer = 0 To 2
                 ret.Add(2.0 * ai_var(i))
@@ -53,7 +53,7 @@ Namespace BenchmarkFunction
             Return ret
         End Function
 
-        Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
+        Public Overrides Function Hessian(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
             Dim ret As New List(Of List(Of Double))
             For i As Integer = 0 To 2
                 ret.Add(New List(Of Double))

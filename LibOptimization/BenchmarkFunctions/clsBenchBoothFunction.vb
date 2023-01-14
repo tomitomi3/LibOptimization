@@ -36,16 +36,16 @@ Namespace BenchmarkFunction
             Return (x(0) + 2 * x(1) - 7) ^ 2 + (2 * x(0) + x(1) - 5) ^ 2
         End Function
 
-        Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
-            Throw New NotImplementedException
-        End Function
-
-        Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
-            Throw New NotImplementedException
-        End Function
-
         Public Overrides Function NumberOfVariable() As Integer
             Return 2
+        End Function
+
+        Public Overrides Function Gradient(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
+            Return MyBase.Gradient(x, h)
+        End Function
+
+        Public Overrides Function Hessian(x As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
+            Return MyBase.Hessian(x, h)
         End Function
     End Class
 

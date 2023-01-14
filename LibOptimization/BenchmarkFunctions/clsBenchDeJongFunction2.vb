@@ -43,11 +43,11 @@ Namespace BenchmarkFunction
             Return Math.Abs(x(0)) * Math.Abs(x(1)) * 100 'penarty
         End Function
 
-        Public Overrides Function Gradient(ByVal x As List(Of Double)) As List(Of Double)
+        Public Overrides Function Gradient(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
             Throw New NotImplementedException
         End Function
 
-        Public Overrides Function Hessian(ByVal x As List(Of Double)) As List(Of List(Of Double))
+        Public Overrides Function Hessian(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
             Throw New NotImplementedException
         End Function
 

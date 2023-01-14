@@ -30,14 +30,14 @@ Namespace BenchmarkFunction
             Return ret
         End Function
 
-        Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
+        Public Overrides Function Gradient(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
             Dim ret As New List(Of Double)
             ret.Add(3 * ai_var(0) ^ 2 - 9 * ai_var(1))
             ret.Add(3 * ai_var(1) ^ 2 - 9 * ai_var(0))
             Return ret
         End Function
 
-        Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
+        Public Overrides Function Hessian(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
             Dim ret As New List(Of List(Of Double))
 
             ret.Add(New List(Of Double))
@@ -83,14 +83,14 @@ Namespace BenchmarkFunction
             Return ret
         End Function
 
-        Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
+        Public Overrides Function Gradient(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
             Dim ret As New List(Of Double)
             ret.Add(4 * ai_var(0) ^ 3 - 40 * ai_var(0) + 20)
             ret.Add(4 * ai_var(1) ^ 3 - 40 * ai_var(1) + 20)
             Return ret
         End Function
 
-        Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
+        Public Overrides Function Hessian(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
             Return Nothing
         End Function
 

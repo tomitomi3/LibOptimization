@@ -177,17 +177,71 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test Numeric derivative newton
     ''' </summary>
     <TestMethod()> Public Sub Opt_NumericDerivative_Newton()
-        Dim optNewton = New clsOptNewtonMethod(New SphereUsingNumericDerivative(5))
-        optNewton.Init()
-        optNewton.ALPHA = 0.75
-        Dim initEval = optNewton.Result.Eval
-        optNewton.DoIteration()
-        If optNewton.IterationCount <= 2 OrElse initEval <= optNewton.Result.Eval Then
-            Console.WriteLine("Iteration :{0}", optNewton.Iteration)
-            Assert.Fail("not conversion using NumericDerivertive")
-        Else
-            clsUtil.DebugValue(optNewton)
-        End If
+        Dim oFunc = New SphereUsingNumericDerivative(4)
+        With Nothing
+            oFunc.isUseHessianApproximation = True
+            Dim optNewton = New clsOptNewtonMethod(oFunc)
+            optNewton.ALPHA = 0.75
+
+            optNewton.Init()
+            Dim initEval = optNewton.Result.Eval
+            optNewton.DoIteration()
+            If optNewton.IterationCount <= 2 OrElse initEval <= optNewton.Result.Eval Then
+                Console.WriteLine("Iteration :{0}", optNewton.Iteration)
+                Assert.Fail("not conversion using NumericDerivertive")
+            Else
+                clsUtil.DebugValue(optNewton)
+            End If
+        End With
+
+        With Nothing
+            oFunc.isUseHessianApproximation = False
+            Dim optNewton = New clsOptNewtonMethod(oFunc)
+            optNewton.ALPHA = 0.75
+
+            optNewton.Init()
+            Dim initEval = optNewton.Result.Eval
+            optNewton.DoIteration()
+            If optNewton.IterationCount <= 2 OrElse initEval <= optNewton.Result.Eval Then
+                Console.WriteLine("Iteration :{0}", optNewton.Iteration)
+                Assert.Fail("not conversion using NumericDerivertive")
+            Else
+                clsUtil.DebugValue(optNewton)
+            End If
+        End With
+
+        oFunc = New SphereUsingNumericDerivative(5)
+        With Nothing
+            oFunc.isUseHessianApproximation = True
+            Dim optNewton = New clsOptNewtonMethod(oFunc)
+            optNewton.ALPHA = 0.99
+
+            optNewton.Init()
+            Dim initEval = optNewton.Result.Eval
+            optNewton.DoIteration()
+            If optNewton.IterationCount <= 2 OrElse initEval <= optNewton.Result.Eval Then
+                Console.WriteLine("Iteration :{0}", optNewton.Iteration)
+                Assert.Fail("not conversion using NumericDerivertive")
+            Else
+                clsUtil.DebugValue(optNewton)
+            End If
+        End With
+
+        With Nothing
+            oFunc.isUseHessianApproximation = False
+            Dim optNewton = New clsOptNewtonMethod(oFunc)
+            optNewton.ALPHA = 0.99
+
+            optNewton.Init()
+            Dim initEval = optNewton.Result.Eval
+            optNewton.DoIteration()
+            If optNewton.IterationCount <= 2 OrElse initEval <= optNewton.Result.Eval Then
+                Console.WriteLine("Iteration :{0}", optNewton.Iteration)
+                Assert.Fail("not conversion using NumericDerivertive")
+            Else
+                clsUtil.DebugValue(optNewton)
+            End If
+        End With
     End Sub
 
     ''' <summary>
@@ -392,14 +446,14 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Return RandomXorshiftSingleton.GetInstance().NextDouble * 10
         End Function
 
-        Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
+        Public Overrides Function Gradient(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
             Dim aa = New List(Of Double)
             aa.Add(RandomXorshiftSingleton.GetInstance().NextDouble * 10)
             aa.Add(RandomXorshiftSingleton.GetInstance().NextDouble * 10)
             Return aa
         End Function
 
-        Public Overrides Function Hessian(x As List(Of Double)) As List(Of List(Of Double))
+        Public Overrides Function Hessian(x As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
             Throw New NotImplementedException()
         End Function
 
@@ -423,18 +477,20 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Return func.F(x)
         End Function
 
-        Public Overrides Function Gradient(x As List(Of Double)) As List(Of Double)
-            Return Me.NumericDerivative(x, 0.0001)
+        Public Overrides Function Gradient(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
+            Return Me.CalcNumericGradient(x, 0.0001)
         End Function
 
-        Public Overrides Function Hessian(x As List(Of Double)) As List(Of List(Of Double))
-            Return Me.NumericHessianToDiagonal(x, 0.0001)
+        Public Overrides Function Hessian(x As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
+            Return Me.CalcNumericDiagonalHessianApproximation(x, 0.0001)
         End Function
 
     End Class
 
     Public Class SphereUsingNumericDerivative : Inherits absObjectiveFunction
         Private dimension As Integer = 0
+
+        Public isUseHessianApproximation = True
 
         ''' <summary>
         ''' Default constructor
@@ -463,12 +519,16 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Return ret
         End Function
 
-        Public Overrides Function Gradient(ByVal ai_var As List(Of Double)) As List(Of Double)
-            Return NumericDerivative(ai_var)
+        Public Overrides Function Gradient(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
+            Return CalcNumericGradient(ai_var)
         End Function
 
-        Public Overrides Function Hessian(ByVal ai_var As List(Of Double)) As List(Of List(Of Double))
-            Return NumericHessianToDiagonal(ai_var)
+        Public Overrides Function Hessian(ByVal ai_var As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
+            If Me.isUseHessianApproximation Then
+                Return CalcNumericDiagonalHessianApproximation(ai_var)
+            Else
+                Return CalcNumericHessian(ai_var)
+            End If
         End Function
 
         Public Overrides Function NumberOfVariable() As Integer
@@ -477,4 +537,67 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     End Class
 
 #End Region
+End Class
+
+<TestClass> Public Class UnitTestabsObjectiveFunction
+
+    Public Class TgtObjectiveFunction : Inherits LibOptimization.Optimization.absObjectiveFunction
+        Public Overrides Function NumberOfVariable() As Integer
+            Return 3
+        End Function
+
+        Public Overrides Function F(x As List(Of Double)) As Double
+            Return x(0) ^ 2 + x(1) ^ 2 + 2.0 * x(0) * x(1) * x(2)
+        End Function
+    End Class
+
+    Public Class TgtObjectiveFunction2 : Inherits LibOptimization.Optimization.absObjectiveFunction
+        Public Overrides Function NumberOfVariable() As Integer
+            Return 3
+        End Function
+
+        Public Overrides Function F(x As List(Of Double)) As Double
+            Return x(0) ^ 2 + x(1) ^ 2 + x(0) * x(1) + x(0) * x(1) * x(2)
+        End Function
+    End Class
+
+    <TestMethod>
+    Public Sub CalcNumericGradientTest()
+        Dim x As New DenseVector(New Double() {1, 1, 1})
+        Dim tgtFunction = New TgtObjectiveFunction()
+        Dim deriv = tgtFunction.CalcNumericGradient(x)
+
+        Assert.AreEqual(4, deriv(0), 0.00001)
+        Assert.AreEqual(4, deriv(1), 0.00001)
+        Assert.AreEqual(2, deriv(2), 0.00001)
+    End Sub
+
+    <TestMethod>
+    Public Sub CalcNumericDiagonalHessianApproximationTest()
+        Dim x As New DenseVector(New Double() {1, 1, 1})
+        Dim tgtFunction = New TgtObjectiveFunction()
+        Dim deriv = tgtFunction.CalcNumericDiagonalHessianApproximation(x)
+
+        Assert.AreEqual(2, deriv(0)(0), 0.001)
+        Assert.AreEqual(2, deriv(1)(1), 0.001)
+        Assert.AreEqual(0, deriv(2)(2), 0.001)
+    End Sub
+
+    <TestMethod>
+    Public Sub CalcNumericHessianTest()
+        Dim x As New DenseVector(New Double() {1, 1, 1})
+        Dim tgtFunction = New TgtObjectiveFunction2()
+        Dim deriv = tgtFunction.CalcNumericHessian(x)
+
+        Assert.AreEqual(2, deriv(0)(0), 0.001)
+        Assert.AreEqual(2, deriv(0)(1), 0.001)
+        Assert.AreEqual(1, deriv(0)(2), 0.001)
+        Assert.AreEqual(2, deriv(1)(0), 0.001)
+        Assert.AreEqual(2, deriv(1)(1), 0.001)
+        Assert.AreEqual(1, deriv(1)(2), 0.001)
+        Assert.AreEqual(1, deriv(2)(0), 0.001)
+        Assert.AreEqual(1, deriv(2)(1), 0.001)
+        Assert.AreEqual(0, deriv(2)(2), 0.001)
+    End Sub
+
 End Class
