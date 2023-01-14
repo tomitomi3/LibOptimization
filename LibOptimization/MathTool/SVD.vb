@@ -14,9 +14,12 @@
         Public Property D As DenseMatrix = Nothing
 
         Private Sub New()
+            Throw New NotImplementedException
         End Sub
 
         Public Sub New(ByRef matS As DenseMatrix, ByRef matV As DenseVector, ByRef matD As DenseMatrix)
+            Throw New NotImplementedException
+
             Me.S = matS
             Me.V = matV
             Me.D = matD

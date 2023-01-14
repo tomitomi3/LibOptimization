@@ -475,7 +475,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             d = detMat.Det()
             Console.WriteLine("Determinant:{0}", d)
 
-            If MathUtil.IsCloseToValues(d, 1.0) = False Then
+            If MathUtil.IsSameValues(d, 1.0) = False Then
                 Assert.Fail()
             End If
 
@@ -703,7 +703,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                 vec1vec2.PrintValue(name:="vec1vec2")
                 Assert.Fail("error : vector * vector")
             End If
-            If MathUtil.IsCloseToValues(vec1vec2(0)(0), 32.0) = False Then
+            If MathUtil.IsSameValues(vec1vec2(0)(0), 32.0) = False Then
                 vec1vec2.PrintValue(name:="vec1vec2")
                 Assert.Fail("error : vector * vector")
             End If
@@ -721,7 +721,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim correctMat As New DenseMatrix(New Double()() {(vec2 * 1.0).ToArray(),
                                                                 (vec2 * 2.0).ToArray(),
                                                                 (vec2 * 3.0).ToArray()})
-            If MathUtil.IsNearyEqualMatrix(vec2vec1, correctMat) = False Then
+            If MathUtil.IsSameMatrix(vec2vec1, correctMat) = False Then
                 vec2vec1.PrintValue(name:="vec2vec1")
                 Assert.Fail("error : vector * vector")
             End If
@@ -756,9 +756,11 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' Matrix x scalar
     ''' </summary>
     <TestMethod()> Public Sub Mat_Product_MatrixScalar()
+        Dim rng = New System.Random(123456)
+
         With Nothing
             Dim dimNum = 3
-            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
             Try
                 For i As Integer = 0 To matA.RowCount - 1
                     For j As Integer = 0 To matA.ColCount - 1
@@ -787,9 +789,11 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' Scalar x Matrix
     ''' </summary>
     <TestMethod()> Public Sub Mat_Product_ScalarMatrix()
+        Dim rng = New System.Random()
+
         With Nothing
             Dim dimNum = 3
-            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
             Try
                 For i As Integer = 0 To matA.RowCount - 1
                     For j As Integer = 0 To matA.ColCount - 1
@@ -818,13 +822,15 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test Matrix x Matrix
     ''' </summary>
     <TestMethod()> Public Sub Mat_Product_MatrixMatrix()
+        Dim rng = New System.Random(123456)
+
         '---------
         'bad
         '---------
         '3x3 * 2x2
         With Nothing
             Dim dimNum = 3
-            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
             Dim matB = New DenseMatrix(dimNum - 1, True)
             Try
                 Dim temp = matA * matB
@@ -837,7 +843,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         '2x2 * 3x3
         With Nothing
             Dim dimNum = 3
-            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum - 1)
+            Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum - 1, rng:=rng)
             Dim matB = New DenseMatrix(dimNum, True)
             Try
                 Dim temp = matA * matB
@@ -867,13 +873,13 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         '---------
         For dimNum = 2 To 10 - 1
             With Nothing
-                Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
                 Dim matB = New DenseMatrix(dimNum, True)
                 Try
                     Dim temp = matA * matB
                     temp.PrintValue(name:="A*B")
 
-                    If MathUtil.IsNearyEqualMatrix(temp, matA) = False Then
+                    If MathUtil.IsSameMatrix(temp, matA) = False Then
                         Assert.Fail("error : {0}x{0}", dimNum)
                     End If
                 Catch myex As MathException
@@ -882,13 +888,13 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             End With
 
             With Nothing
-                Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim matA = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
                 Dim matB = New DenseMatrix(dimNum, False)
                 Try
                     Dim temp = matA * matB
                     temp.PrintValue(name:="B(zero)*A")
 
-                    If MathUtil.IsNearyEqualMatrix(temp, matB) = False Then
+                    If MathUtil.IsSameMatrix(temp, matB) = False Then
                         Assert.Fail("error : {0}x{0}", dimNum)
                     End If
                 Catch myex As MathException
@@ -914,7 +920,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                 End If
 
                 'check value
-                If MathUtil.IsNearyEqualMatrix(temp, matA) = False Then
+                If MathUtil.IsSameMatrix(temp, matA) = False Then
                     Assert.Fail()
                 End If
             Catch myex As MathException
@@ -927,7 +933,8 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' Transopose
     ''' </summary>
     <TestMethod()> Public Sub Mat_Transopose()
-        Dim rng = New Random()
+        Dim rng = New System.Random(123456)
+
         For i As Integer = 2 To 50 - 1
             Dim dimNum = i
             Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng)
@@ -937,7 +944,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             t = t.T()
 
             'check
-            If MathUtil.IsNearyEqualMatrix(t, source) = True Then
+            If MathUtil.IsSameMatrix(t, source) = True Then
                 'OK
             Else
                 source.PrintValue(name:="source")
@@ -951,6 +958,8 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' Inverse
     ''' </summary>
     <TestMethod()> Public Sub Mat_Inverse()
+        Dim rng = New System.Random(123456)
+
         With Nothing
             Dim dimNum = 1
             Dim source = New DenseMatrix(1)
@@ -958,7 +967,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim product = source * source.Inverse()
 
             'check
-            If MathUtil.IsNearyEqualMatrix(product, New DenseMatrix(dimNum, True)) = True Then
+            If MathUtil.IsSameMatrix(product, New DenseMatrix(dimNum, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -972,7 +981,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
             'check Identy matrix I = A * A^-1
             Dim productMat = source * sourceInv
-            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
+            If MathUtil.IsSameMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -984,7 +993,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             sourceInv = source.Inverse()
             productMat = source * sourceInv
             'check
-            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(3, True)) = True Then
+            If MathUtil.IsSameMatrix(productMat, New DenseMatrix(3, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -1000,7 +1009,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
             'check Identy matrix I = A * A^-1
             Dim productMat = source * sourceInv
-            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
+            If MathUtil.IsSameMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -1012,7 +1021,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             sourceInv = source.Inverse()
             productMat = source * sourceInv
             'check
-            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(3, True)) = True Then
+            If MathUtil.IsSameMatrix(productMat, New DenseMatrix(3, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -1031,7 +1040,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
             'check Identy matrix I = A * A^-1
             Dim productMat = source * sourceInv
-            If MathUtil.IsNearyEqualMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
+            If MathUtil.IsSameMatrix(productMat, New DenseMatrix(source.RowCount, True)) = True Then
                 'OK
             Else
                 source.PrintValue(name:="Source matrix")
@@ -1041,13 +1050,13 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         With Nothing
             For i = 0 To 10 - 1
                 Dim dimNum = 4
-                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, isIncludeZero:=True, isFloating:=True)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng, isIncludeZero:=True, isFloating:=True)
                 Try
                     Dim souceInv = source.Inverse()
                     Dim product = source * souceInv
 
                     'check
-                    If MathUtil.IsNearyEqualMatrix(product, New DenseMatrix(dimNum, True)) = True Then
+                    If MathUtil.IsSameMatrix(product, New DenseMatrix(dimNum, True)) = True Then
                         'OK
                     Else
                         source.PrintValue(name:="is not equal Source matrix")
@@ -1063,13 +1072,13 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         With Nothing
             For i = 5 To 10 - 1
                 Dim dimNum = i
-                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
                 Try
                     Dim souceInv = source.Inverse()
                     Dim product = source * souceInv
 
                     'check
-                    If MathUtil.IsNearyEqualMatrix(product, New DenseMatrix(dimNum, True)) = True Then
+                    If MathUtil.IsSameMatrix(product, New DenseMatrix(dimNum, True)) = True Then
                         'OK
                     Else
                         source.PrintValue(name:="Source matrix")
@@ -1095,7 +1104,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim c = tempMat.Cholesky()
             Dim check = c * c.T()
 
-            If MathUtil.IsNearyEqualMatrix(tempMat, check) = False Then
+            If MathUtil.IsSameMatrix(tempMat, check) = False Then
                 tempMat.PrintValue(name:=String.Format("error source(dim={0})", tempMat.RowCount))
                 c.PrintValue(name:="L")
                 Assert.Fail()
@@ -1111,7 +1120,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Dim c = tempMat.Cholesky()
             Dim check = c * c.T()
 
-            If MathUtil.IsNearyEqualMatrix(tempMat, check) = False Then
+            If MathUtil.IsSameMatrix(tempMat, check) = False Then
                 tempMat.PrintValue(name:=String.Format("error source(dim={0})", tempMat.RowCount))
                 c.PrintValue(name:="L")
                 Assert.Fail()
@@ -1123,6 +1132,8 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test Eigen decomposition
     ''' </summary>
     <TestMethod()> Public Sub Mat_Eigen()
+        Dim rng = New System.Random(123456)
+
         For i As Integer = 2 To 5
             Dim srcMat = DenseMatrix.CreateDiagonalMatrix(Enumerable.Range(1, i).Select(Function(v) v * 1.0).ToArray())
             srcMat.PrintValue(name:="Source Matrix")
@@ -1137,7 +1148,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             'check 元に戻るか Source = V * D * V^T
             Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
             temp.PrintValue(name:="V * D * V^T")
-            If MathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
+            If MathUtil.IsSameMatrix(srcMat, temp) = False Then
                 Assert.Fail("Error eigen() V*D*V^T dim={0} try={1}", i, 0)
             End If
 
@@ -1148,7 +1159,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         'ランダム
         For i As Integer = 4 To 6
             Dim matDim = i
-            Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(matDim)
+            Dim srcMat = MathUtil.CreateRandomSymmetricMatrix(matDim, rng:=rng)
             srcMat.PrintValue(name:="Source Matrix")
 
             'eigen
@@ -1169,7 +1180,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             'check 元に戻るか Source = V * D * V^T
             Dim temp = retM * retV.ToDiagonalMatrix() * retM.T()
             temp.PrintValue(name:="V * D * V^T")
-            If MathUtil.IsNearyEqualMatrix(srcMat, temp) = False Then
+            If MathUtil.IsSameMatrix(srcMat, temp) = False Then
                 Assert.Fail("Error eigen() V*D*V^T dim={0} try={1}", matDim, 0)
             End If
         Next
@@ -1179,11 +1190,13 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test LU decomposition
     ''' </summary>
     <TestMethod()> Public Sub Mat_LU()
+        Dim rng = New System.Random(123456)
+
         For j = 2 To 5
             Console.WriteLine("Dim={0} run", j)
             For i = 0 To 100 - 1
                 Dim dimNum = j
-                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
                 If j > 2 AndAlso i Mod 2 = 0 Then
                     source(0)(0) = 0.0
@@ -1197,7 +1210,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
                 'check
                 Dim flg = True
-                If MathUtil.IsNearyEqualMatrix(source, P * L * U) = False Then
+                If MathUtil.IsSameMatrix(source, P * L * U) = False Then
                     Console.WriteLine("No={0} det={1}", i, resultLU.Det)
                     source.PrintValue(name:="souce")
                     P.PrintValue(name:="P")
@@ -1210,7 +1223,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
         With Nothing
             Dim dimNum = 4
-            Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+            Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
             '列を0に
             source(2)(0) = 0.0
@@ -1240,16 +1253,18 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' test Solve() Ax=b
     ''' </summary>
     <TestMethod()> Public Sub Mat_Solve()
+        Dim rng = New System.Random(123456)
+
         For dimNum = 2 To 20 - 1
             For j As Integer = 0 To 10 - 1
-                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum)
+                Dim source = MathUtil.CreateRandomSymmetricMatrix(dimNum, rng:=rng)
 
                 'add 対角成分
                 source += New DenseMatrix(dimNum, True)
 
                 Try
                     Dim matLUP = source.LUP()
-                    If MathUtil.IsCloseToZero(matLUP.Det) = True Then
+                    If MathUtil.IsSameZero(matLUP.Det) = True Then
                         Continue For
                     End If
 
@@ -1258,7 +1273,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
                     Dim result = matLUP.Solve((New DenseMatrix(dimNum, True))(0))
 
                     'check
-                    If MathUtil.IsNearyEqualVector(colVec, result) = True Then
+                    If MathUtil.IsSameVecotr(colVec, result) = True Then
                         'OK
                     Else
                         source.PrintValue(name:="Source vector")
@@ -1481,4 +1496,40 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         End With
     End Sub
 
+    ''' <summary>
+    ''' 正方行列
+    ''' </summary>
+    <TestMethod()>
+    Public Sub IsSquareTest()
+        Dim rng = New System.Random(123456)
+
+        Dim tempMat = MathUtil.CreateRandomSymmetricMatrix(1, rng:=rng)
+        Assert.IsTrue(tempMat.IsSquare(), "error 1 dim")
+
+        tempMat = MathUtil.CreateRandomSymmetricMatrix(2, rng:=RNG)
+        Assert.IsTrue(tempMat.IsSquare(), "error 2 dim")
+
+        tempMat = New DenseMatrix(2, 3)
+        Assert.IsFalse(tempMat.IsSquare(), "error")
+    End Sub
+
+    ''' <summary>
+    ''' 対称行列
+    ''' </summary>
+    <TestMethod()>
+    Public Sub IsSymmetricMatrixTest()
+        Dim rng = New System.Random(123456)
+
+        Dim tempMat = MathUtil.CreateRandomSymmetricMatrix(1, rng:=rng)
+        Assert.IsTrue(tempMat.IsSymmetricMatrix(), "ererrorro 1 dim")
+
+        tempMat = MathUtil.CreateRandomSymmetricMatrix(2, rng:=rng)
+        Assert.IsTrue(tempMat.IsSymmetricMatrix(), "error 2 dim")
+
+        tempMat = MathUtil.CreateRandomSymmetricMatrix(3, rng:=rng)
+        Assert.IsTrue(tempMat.IsSymmetricMatrix(), "error 3 dim")
+
+        tempMat = MathUtil.CreateRandomSymmetricMatrix(4, rng:=rng)
+        Assert.IsTrue(tempMat.IsSymmetricMatrix(), "error 4 dim")
+    End Sub
 End Class

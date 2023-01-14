@@ -15,7 +15,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestLibOptimizationDotNet3.
 EndProject
 Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "LibOptimization", "LibOptimization\LibOptimization.vbproj", "{2C280EED-8DE4-43BB-9466-000D65794E2D}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestLibOptimizationDotNetCore", "TestLibOptimizationDotNetCore\TestLibOptimizationDotNetCore.vbproj", "{903A86B9-3C51-4381-811C-685DB6678B16}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "TestLibOptimizationDotNetCore", "TestLibOptimizationDotNetCore\TestLibOptimizationDotNetCore.vbproj", "{903A86B9-3C51-4381-811C-685DB6678B16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

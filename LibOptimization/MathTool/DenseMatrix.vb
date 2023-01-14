@@ -225,6 +225,22 @@
                 Me.AddRange(value)
             End Set
         End Property
+
+        ''' <summary>
+        ''' Matrix dimension
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property Dimension As Integer
+            Get
+                Dim row = Me.RowCount
+                Dim col = Me.ColCount
+                If row = col Then
+                    Return row
+                Else
+                    Return -1
+                End If
+            End Get
+        End Property
 #End Region
 
 #Region "Public Operator"
@@ -630,19 +646,20 @@
         End Function
 
         ''' <summary>
-        ''' Condition number. only square and symmetric matrix
+        ''' Condition number
         ''' </summary>
         ''' <returns></returns>
-        'Public Function Cond() As Double
-        '    If Me.IsSquare() = False Then
-        '        Return Double.PositiveInfinity
-        '    End If
-        '    If Me.IsSymmetricMatrix() = False Then
-        '        Return Double.PositiveInfinity
-        '    End If
-        '    Dim eig = Me.EigenValue()
-        '    Return eig.Max() / eig.Min()
-        'End Function
+        Public Function Cond() As Double
+            If Me.IsSquare() = False Then
+                Throw New MathException(MathException.ErrorSeries.NotComputable)
+            End If
+            If Me.IsSymmetricMatrix() = False Then
+                Throw New MathException(MathException.ErrorSeries.NotComputable)
+            End If
+
+            Dim eig = Me.Eigen(isCheckSymetricMatrix:=False)
+            Return eig.EigenVector.MaxElementValue() / eig.EigenVector.MinElementValue()
+        End Function
 
         ''' <summary>
         ''' Convert to a matrix with only diagonal values
@@ -706,33 +723,31 @@
         End Sub
 
         ''' <summary>
-        ''' 正方行列判定
+        ''' check Square matrix
         ''' </summary>
+        ''' <param name="tgtMat"></param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
         Public Function IsSquare() As Boolean
-            If Me.Count = 0 Then
+            Dim dimension = Me.Dimension
+            If dimension = -1 Then
                 Return False
             End If
 
-            If Me.Count = Me(0).Count Then
-                Return True
-            End If
-
-            Return False
+            Return True
         End Function
 
         ''' <summary>
-        ''' check SymmetricMatrix
+        ''' check Symmetric matrix
         ''' </summary>
+        ''' <param name="eps">acceptable error. Set eps is 0 for precise comparisons. default:0</param>
         ''' <returns></returns>
-        Public Function IsSymmetricMatrix(Optional eps As Double = ConstantValues.MachineEpsiron) As Boolean
-            Dim s = Me
-            Dim n = s.ColCount
+        Public Function IsSymmetricMatrix(Optional ByVal eps As Double = 0.0) As Boolean
+            Dim tgtMat = Me
+            Dim n = tgtMat.Dimension
             For i = 0 To n - 1
                 For j = 0 To i - 1
-                    Dim flg = MathUtil.IsCloseToValues(s(i)(j), s(j)(i), eps)
-                    If flg = False Then
+                    Dim isSameValue = MathUtil.IsSameValues(tgtMat(i)(j), tgtMat(j)(i), eps)
+                    If isSameValue = False Then
                         Return False
                     End If
                 Next
@@ -1034,12 +1049,12 @@
         ''' Inverse
         ''' </summary>
         ''' <param name="eps"></param>
-        ''' <param name="samezero"></param>
+        ''' <param name="epsNearlyZero"></param>
         ''' <param name="isUsingLUDecomposition"></param>
         ''' <param name="isForceInverse"></param>
         ''' <returns></returns>
         Public Function Inverse(Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
-                                Optional ByVal samezero As Double = ConstantValues.SAME_ZERO,
+                                Optional ByVal epsNearlyZero As Double = ConstantValues.SAME_ZERO,
                                 Optional ByVal isUsingLUDecomposition As Boolean = False) As DenseMatrix
             If Me.RowCount <> Me.ColCount Then
                 Return New DenseMatrix(0)
@@ -1051,13 +1066,13 @@
             If n = 0 Then
                 'nop
             ElseIf n = 1 Then
-                If MathUtil.IsCloseToZero(source(0)(0), eps) = True Then
+                If MathUtil.IsSameZero(source(0)(0), eps) = True Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, "Inverse 1x1")
                 End If
                 retInverse(0)(0) = 1.0 / source(0)(0)
             ElseIf n = 2 AndAlso isUsingLUDecomposition = False Then
-                Dim det = Me.Det(eps, samezero)
-                If MathUtil.IsCloseToZero(det, eps) = True Then
+                Dim det = Me.Det(eps, epsNearlyZero)
+                If MathUtil.IsSameZero(det, eps) = True Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, "Inverse 2x2")
                 End If
                 det = 1.0 / det
@@ -1066,8 +1081,8 @@
                 retInverse(1)(0) = det * -Me(1)(0)
                 retInverse(1)(1) = det * Me(0)(0)
             ElseIf n = 3 AndAlso isUsingLUDecomposition = False Then
-                Dim det = Me.Det(eps, samezero)
-                If MathUtil.IsCloseToZero(det, eps) = True Then
+                Dim det = Me.Det(eps, epsNearlyZero)
+                If MathUtil.IsSameZero(det, eps) = True Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, "Inverse 3x3")
                 End If
                 retInverse(0)(0) = ((Me(1)(1) * Me(2)(2) - Me(1)(2) * Me(2)(1))) / det
@@ -1080,9 +1095,9 @@
                 retInverse(2)(1) = -((Me(0)(0) * Me(2)(1) - Me(0)(1) * Me(2)(0))) / det
                 retInverse(2)(2) = ((Me(0)(0) * Me(1)(1) - Me(0)(1) * Me(1)(0))) / det
             Else
-                Dim lup = Me.LUP(eps, samezero)
+                Dim lup = Me.LUP(eps, epsNearlyZero)
                 Dim det = lup.Det
-                If MathUtil.IsCloseToZero(det, samezero) = True Then
+                If MathUtil.IsSameZero(det, epsNearlyZero) = True Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, String.Format("Inverse {0}x{0} det=0", n))
                 End If
 
@@ -1122,7 +1137,7 @@
         ''' </remarks>
         ''' <returns><see cref="MathTool.LU"/></returns>
         Public Function LUP(Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
-                            Optional ByVal samezero As Double = ConstantValues.SAME_ZERO) As LU
+                            Optional ByVal epsNearlyZero As Double = ConstantValues.SAME_ZERO) As LU
             Dim n = Me.ColCount
             Dim source = New DenseMatrix(Me)
             Dim matP = New DenseMatrix(n, True)
@@ -1142,7 +1157,7 @@
                     End If
                 Next
                 '列要素の絶対最大値が0に近い場合
-                If MathUtil.IsCloseToZero(absValue, eps) Then
+                If MathUtil.IsSameZero(absValue, epsNearlyZero) Then
                     Throw New MathException(MathException.ErrorSeries.NotComputable, "LUP() singular matrix")
                 End If
                 weight(i) = 1.0 / absValue
@@ -1188,8 +1203,8 @@
                     pivotrow(j) = temp
                 End If
                 'diagonal value is close to 0.
-                If MathUtil.IsCloseToZero(source(j)(j), eps) Then
-                    source(j)(j) = samezero
+                If MathUtil.IsSameZero(source(j)(j), eps) Then
+                    source(j)(j) = epsNearlyZero
                 End If
 
                 'calc det
@@ -1264,7 +1279,7 @@
         ''' <param name="iteration">default:1000</param>
         ''' <param name="eps"><see cref="ConstantValues.MachineEpsiron"/></param>
         ''' <param name="isSort">descent sort by EigenValue default:true</param>
-        ''' <param name="nearlyZero"></param>
+        ''' <param name="epsNearlyZero"></param>
         ''' <remarks>
         ''' 固有値、固有ベクトルを求める方針
         '''  反復計算によって求める。計算しやすい行列に変換
@@ -1280,7 +1295,7 @@
         Public Function EigenJacobi(Optional ByVal iteration As Integer = 1000,
                                     Optional ByVal eps As Double = ConstantValues.MachineEpsiron,
                                     Optional ByVal isSort As Boolean = True,
-                                    Optional ByVal nearlyZero As Double = Double.Epsilon) As Eigen
+                                    Optional ByVal epsNearlyZero As Double = Double.Epsilon) As Eigen
             '正方行列、対象行列チェック
             If Me.IsSquare() = False Then
                 Throw New MathException(MathException.ErrorSeries.DifferRowNumberAndCollumnNumber)
@@ -1322,7 +1337,7 @@
                 Dim temp_pq = retEigenMat(p)(q)
                 Dim theta = 0.0
                 Dim diff = temp_pp - temp_qq
-                If MathUtil.IsCloseToZero(diff, nearlyZero) = True Then
+                If MathUtil.IsSameZero(diff, epsNearlyZero) = True Then
                     theta = System.Math.PI / 4.0
                 Else
                     theta = System.Math.Atan(-2.0 * temp_pq / diff) * 0.5
@@ -1361,7 +1376,7 @@
             'sort by Eigen value
             Dim eigenValue = retEigenMat.ToDiagonalVector()
             If isSort = True Then
-                MathUtil.EigenSort(eigenValue, rotate, True)
+                Eigen.EigenSort(eigenValue, rotate, True)
             End If
 
             Return New Eigen(eigenValue, rotate, isConversion)
@@ -1372,21 +1387,32 @@
         ''' </summary>
         ''' <param name="iteration">iteration default 100</param>
         ''' <param name="eps">eps default:<see cref="ConstantValues.MachineEpsiron"/></param>
+        ''' <param name="isCheckSymetricMatrix">symmetric matrix check</param>
         ''' <returns><see cref="MathTool.Eigen"/></returns>
         ''' <remarks>
         ''' Refference
         ''' Press, W. H., et al. "円慶寺勝市, 奥村晴彦, 佐藤俊郎, 他訳: C 言語による数値計算のレシピ." (1993).
         ''' </remarks>
-        Public Function Eigen(Optional iteration As Integer = 100, Optional eps As Double = ConstantValues.MachineEpsiron) As Eigen
+        Public Function Eigen(Optional iteration As Integer = 100,
+                              Optional eps As Double = ConstantValues.MachineEpsiron,
+                              Optional isCheckSymetricMatrix As Boolean = True) As Eigen
+            '対称行列の確認
+            If isCheckSymetricMatrix Then
+                Me.IsSymmetricMatrix()
+                If Me.IsSymmetricMatrix(ConstantValues.MachineEpsiron) = False Then
+                    Throw New MathException(MathException.ErrorSeries.NotComputable, "Not symmetric matrix. Eigenvalue decomposition of asymmetric matrices is not yet implemented.")
+                End If
+            End If
+
             Dim n = Me.RowCount()
             Dim eigenVec = New DenseMatrix(Me)
             Dim subDiag = New DenseVector(n)    '3重対角行列の副対角要素
             Dim eigenValue = New DenseVector(n) '3重対角行列の対角要素
 
             'calc Eigen value and vector
-            tred2(eigenVec, subDiag, eigenValue)
+            Me.tred2(eigenVec, subDiag, eigenValue)
             Dim isConversion = Me.tqli(eigenVec, subDiag, eigenValue, iteration, eps)
-            MathUtil.EigenSort(eigenValue, eigenVec, True)
+            Eigen.EigenSort(eigenValue, eigenVec, True)
 
             Return New Eigen(eigenValue, eigenVec, isConversion)
         End Function
@@ -1674,14 +1700,19 @@
 
 #Region "Public Shared"
         ''' <summary>
-        ''' 対角行列を作る
+        ''' ベクトルを対角成分とした対角行列を作る
         ''' </summary>
         ''' <param name="v"></param>
         ''' <returns></returns>
-        Public Shared Function CreateDiagonalMatrix(v() As Double) As DenseMatrix
+        Public Shared Function CreateDiagonalMatrix(ByRef v() As Double) As DenseMatrix
             Return (New DenseVector(v)).ToDiagonalMatrix()
         End Function
 
+        ''' <summary>
+        ''' ベクトルを対角成分とした対角行列を作る
+        ''' </summary>
+        ''' <param name="v"></param>
+        ''' <returns></returns>
         Public Shared Function CreateDiagonalMatrix(ByRef v As DenseVector) As DenseMatrix
             Return v.ToDiagonalMatrix()
         End Function

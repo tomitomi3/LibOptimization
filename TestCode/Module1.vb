@@ -205,7 +205,7 @@ Module Module1
                             Dim P = resultLU.P
                             Dim L = resultLU.L
                             Dim U = resultLU.U
-                            Dim flg = MathUtil.IsNearyEqualMatrix(P * L * U, source)
+                            Dim flg = MathUtil.IsSameMatrix(P * L * U, source)
                             If flg = False Then
                                 Return
                             End If
@@ -234,7 +234,7 @@ Module Module1
                             Dim P = resultLU.P
                             Dim L = resultLU.L
                             Dim U = resultLU.U
-                            Dim flg = MathUtil.IsNearyEqualMatrix(P * L * U, source)
+                            Dim flg = MathUtil.IsSameMatrix(P * L * U, source)
                             If flg = False Then
                                 Return
                             End If

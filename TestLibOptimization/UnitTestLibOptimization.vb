@@ -376,7 +376,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
             Assert.Fail(String.Format("not same iteration count"))
         End If
 
-        flg = flg And MathUtil.IsNearyEqualVector(result1, result2)
+        flg = flg And MathUtil.IsSameVecotr(result1, result2)
         If flg = False Then
             Assert.Fail(String.Format("not same result"))
         End If

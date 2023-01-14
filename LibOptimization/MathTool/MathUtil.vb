@@ -4,50 +4,11 @@
     ''' </summary>
     Public Class MathUtil
         ''' <summary>
-        ''' for sort
-        ''' </summary>
-        Private Class ValueDescSort
-            Implements IComparable
-
-            Public v As Double = 0.0
-
-            Public idx As Integer = 0
-
-            Public Sub New(ByVal v As Double, ByVal idx As Integer)
-                Me.v = v
-                Me.idx = idx
-            End Sub
-
-            Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
-                'Nothing check
-                If obj Is Nothing Then
-                    Return 1
-                End If
-
-                'Type check
-                If Not Me.GetType() Is obj.GetType() Then
-                    Throw New ArgumentException("Different type", "obj")
-                End If
-
-                'Compare descent sort
-                Dim mineValue As Double = Me.v
-                Dim compareValue As Double = DirectCast(obj, ValueDescSort).v
-                If mineValue < compareValue Then
-                    Return 1
-                ElseIf mineValue > compareValue Then
-                    Return -1
-                Else
-                    Return 0
-                End If
-            End Function
-        End Class
-
-        ''' <summary>
         ''' Calculate the variance(sample variance)
         ''' </summary>
         ''' <param name="v"></param>
         ''' <returns></returns>
-        Public Shared Function Var(ByVal v As DenseVector) As Double
+        Public Shared Function Variance(ByVal v As DenseVector) As Double
             Return (v.SquareSum() / v.Count) - Math.Pow(v.Average(), 2)
         End Function
 
@@ -57,7 +18,7 @@
         ''' <param name="v1">vector a</param>
         ''' <param name="v2">vector b</param>
         ''' <returns></returns>
-        Public Shared Function CoVar(ByVal v1 As DenseVector, ByVal v2 As DenseVector) As Double
+        Public Shared Function CoVariance(ByVal v1 As DenseVector, ByVal v2 As DenseVector) As Double
             Dim ave_xy = v1.InnerProduct(v2) / v1.Count
             Return ave_xy - v1.Average() * v2.Average()
         End Function
@@ -68,7 +29,7 @@
         ''' <param name="v">vector</param>
         ''' <returns></returns>
         Public Shared Function Stddev(ByVal v As DenseVector) As Double
-            Return Math.Sqrt(Var(v))
+            Return Math.Sqrt(Variance(v))
         End Function
 
         ''' <summary>
@@ -77,8 +38,8 @@
         ''' <param name="v1"></param>
         ''' <param name="v2"></param>
         ''' <returns></returns>
-        Public Shared Function Cor(ByVal v1 As DenseVector, ByVal v2 As DenseVector) As Double
-            Return CoVar(v1, v2) / (Stddev(v1) * Stddev(v2))
+        Public Shared Function Correlation(ByVal v1 As DenseVector, ByVal v2 As DenseVector) As Double
+            Return CoVariance(v1, v2) / (Stddev(v1) * Stddev(v2))
         End Function
 
         ''' <summary>
@@ -176,20 +137,19 @@
         End Function
 
         ''' <summary>
-        ''' check eaual matrix(for debug)
+        ''' Compare the two matrices and check for equal value.
         ''' </summary>
         ''' <param name="matA"></param>
         ''' <param name="matB"></param>
-        ''' <param name="eps">default:1E-8</param>
+        ''' <param name="eps">acceptable error. Set eps is 0 for precise comparisons. default:1E-10</param>
         ''' <returns></returns>
-        Public Shared Function IsNearyEqualMatrix(ByVal matA As DenseMatrix, ByVal matB As DenseMatrix,
-                                                      Optional ByVal eps As Double = 0.00000001) As Boolean
+        Public Shared Function IsSameMatrix(ByVal matA As DenseMatrix, ByVal matB As DenseMatrix, Optional ByVal eps As Double = 0.0000000001) As Boolean
             Try
                 For i As Integer = 0 To matA.RowCount - 1
                     For j As Integer = 0 To matA.ColCount - 1
                         Dim tempValA = matA(i)(j)
                         Dim tempValB = matB(i)(j)
-                        If MathUtil.IsCloseToValues(tempValA, tempValB, eps) = False Then
+                        If MathUtil.IsSameValues(tempValA, tempValB, eps) = False Then
                             Return False
                         End If
                     Next
@@ -201,19 +161,18 @@
         End Function
 
         ''' <summary>
-        ''' check eaual vector(for debug)
+        ''' Compare the two vectors and check for equal value.
         ''' </summary>
         ''' <param name="vecA"></param>
         ''' <param name="vecB"></param>
-        ''' <param name="eps">default:1E-8</param>
+        ''' <param name="eps">acceptable error. Set eps is 0 for precise comparisons. default:1E-10</param>
         ''' <returns></returns>
-        Public Shared Function IsNearyEqualVector(ByVal vecA As DenseVector, ByVal vecB As DenseVector,
-                                                      Optional ByVal eps As Double = 0.00000001) As Boolean
+        Public Shared Function IsSameVecotr(ByVal vecA As DenseVector, ByVal vecB As DenseVector, Optional ByVal eps As Double = 0.0000000001) As Boolean
             Try
                 For i As Integer = 0 To vecA.Count - 1
                     Dim tempValA = vecA(i)
                     Dim tempValB = vecB(i)
-                    If MathUtil.IsCloseToValues(tempValA, tempValB, eps) = False Then
+                    If MathUtil.IsSameValues(tempValA, tempValB, eps) = False Then
                         Return False
                     End If
                 Next
@@ -254,14 +213,21 @@
         ''' check close to zero
         ''' </summary>
         ''' <param name="value"></param>
-        ''' <param name="eps">2.20E-16</param>
+        ''' <param name="eps">less than or equal to <see cref="ConstantValues.MachineEpsiron"/></param>
         ''' <returns></returns>
-        Public Shared Function IsCloseToZero(ByVal value As Double, Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As Boolean
-            If System.Math.Abs(value + eps) <= eps Then
+        Public Shared Function IsSameZero(ByVal value As Double, Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As Boolean
+            If System.Math.Abs(value) <= eps Then
                 Return True
             Else
                 Return False
             End If
+
+            'Dim tgtValue = System.Math.Abs(value + eps)
+            'If tgtValue <= eps Then
+            '    Return True
+            'Else
+            '    Return False
+            'End If
         End Function
 
         ''' <summary>
@@ -269,56 +235,16 @@
         ''' </summary>
         ''' <param name="value1"></param>
         ''' <param name="value2"></param>
-        ''' <param name="eps"></param>
+        ''' <param name="eps">less than or equal to <see cref="ConstantValues.MachineEpsiron"/></param>
         ''' <returns></returns>
-        Public Shared Function IsCloseToValues(ByVal value1 As Double, ByVal value2 As Double, Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As Boolean
-            If System.Math.Abs(value1 - value2) < eps Then
+        Public Shared Function IsSameValues(ByVal value1 As Double, ByVal value2 As Double, Optional ByVal eps As Double = ConstantValues.MachineEpsiron) As Boolean
+            If System.Math.Abs(value1 - value2) <= eps Then
                 Return True
             Else
                 Return False
             End If
         End Function
 
-        ''' <summary>
-        ''' sort by eigen value
-        ''' </summary>
-        ''' <param name="eigenValue"></param>
-        ''' <param name="eigenVector"></param>
-        ''' <param name="isColOrder"></param>
-        Public Shared Sub EigenSort(ByRef eigenValue As DenseVector, ByRef eigenVector As DenseMatrix, ByVal isColOrder As Boolean)
-            Dim n = eigenValue.Count
-            Dim colSwapInfo = New List(Of ValueDescSort)
-            For i As Integer = 0 To n - 1
-                colSwapInfo.Add(New ValueDescSort(eigenValue(i), i))
-            Next
-            colSwapInfo.Sort()
-
-            If isColOrder = True Then
-                Dim newEigenVector = New DenseMatrix(n)
-                For j As Integer = 0 To n - 1
-                    'eigen value
-                    eigenValue(j) = colSwapInfo(j).v
-
-                    'eigen vector
-                    Dim k = colSwapInfo(j).idx
-                    For i As Integer = 0 To n - 1
-                        newEigenVector(i)(j) = eigenVector(i)(k)
-                    Next
-                Next
-                eigenVector = newEigenVector
-            Else
-                Dim newEigenVector = New DenseMatrix(n)
-                For i = 0 To n - 1
-                    'eigen value
-                    eigenValue(i) = colSwapInfo(i).v
-
-                    'eigen vector
-                    Dim k = colSwapInfo(i).idx
-                    newEigenVector(i) = eigenVector(k)
-                Next
-                eigenVector = newEigenVector
-            End If
-        End Sub
 
         ''' <summary>
         ''' Create Covariance Matrix
@@ -415,7 +341,7 @@
         ''' <param name="targetValue"></param>
         ''' <returns></returns>
         Public Shared Function RelativeError(ByVal trueValue As Double, ByVal targetValue As Double) As Double
-            If MathUtil.IsCloseToValues(trueValue, targetValue) Then
+            If MathUtil.IsSameValues(trueValue, targetValue) Then
                 Return 0
             Else
                 '分母が0の場合はNaN

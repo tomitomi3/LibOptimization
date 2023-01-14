@@ -19,12 +19,11 @@
     <PackageIcon>logo_liboptimization.png</PackageIcon>
     <RepositoryUrl>https://github.com/tomitomi3/LibOptimization</RepositoryUrl>
     <Product>LibOptimization</Product>
-    <PackageReleaseNotes>-add adaptive nelder-mead
--some bugfix
--Renamed the namespace and class name of my math library.</PackageReleaseNotes>
+    <PackageReleaseNotes>some bugfix. Renamed the namespace and class name of my math library.</PackageReleaseNotes>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyVersion>1.14.0.0</AssemblyVersion>
     <Platforms>AnyCPU;x86</Platforms>
+    <NeutralLanguage />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -41,6 +40,14 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|x86'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>

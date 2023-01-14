@@ -57,6 +57,11 @@ Namespace Optimization
         ''' </summary>
         ''' <remarks></remarks>
         Public Overrides Sub Init()
+
+            '-----------------------------------------
+            Throw New Exception("not use this class. this class is template.")
+            '-----------------------------------------
+
             Try
                 'init varibles
                 Me.m_iteration = 0
