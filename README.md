@@ -1,10 +1,8 @@
 |  appveyor  |  nuget  |
 | ---- | ---- |
-| [![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/master?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/master) | [![NuGet](https://img.shields.io/nuget/dt/LibOptimization.svg)](https://www.nuget.org/packages/LibOptimization/) |
+| [![Build status](https://ci.appveyor.com/api/projects/status/c4n61lv6x59sfqw5/branch/develop?svg=true)](https://ci.appveyor.com/project/tomitomi3/liboptimization/branch/develop) | [![NuGet](https://img.shields.io/nuget/dt/LibOptimization.svg)](https://www.nuget.org/packages/LibOptimization/) |
 
 <img src="https://github.com/tomitomi3/LibOptimization/blob/master/github_pic/logo_liboptimization.png" width=30%>
-
-**[Added LibOptimization  tutorial🚀](/HowToUse.md)**
 
 LibOptimization
 ===============
@@ -15,14 +13,18 @@ LibOptimizationは制約条件の無い数値最適化を行う.NET Frameworkの
 
 実装しているアルゴリズムは最急降下法、ニュートン法、HookeJeevesのパターンサーチ法、Nelder-Mead法（オリジナルの実装、Wikipediaの実装）、適応パラメータ Nelder-Mead法、実数値遺伝的アルゴリズム（BLX-α、UNDX、SPX（シンプレクス）、REX、世代交代はJGG、PCX（世代交代はG3））、進化戦略（Evolution Strategy、1+1 ES）、粒子群最適化（Basic PSO, LDIW-PSO, CDIW-PSO, CRIW-PSO, AIW-PSO）、Differential Evolution(差分進化？ DE/rand/1/bin, DE/rand/2/bin, DE/best/1/bin, DE/best/2/bin)、JADE（自己適応型DE）ホタルアルゴリズム、Cuckoo Search（Matlabコードの移植版）、焼きなまし法、山登り法です。
 
+## Tutrial
+**[LibOptimization  tutorial🚀](/HowToUse.md)**
+
+## Contact
 I may miss your Issues. When a reply is slow, please give me e-mail.
 <pre>
 tomi.nori+github atmark gmail.com
 </pre>
 
-# Cite
+## Cite
 
-If you like, f you use LibOptimization for a publication, please cite it as:
+If you use LibOptimization in your publication, please cite the following
 
 <pre>
 @misc{LibOptimization,
