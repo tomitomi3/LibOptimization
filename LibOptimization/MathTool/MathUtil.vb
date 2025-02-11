@@ -403,6 +403,73 @@
             End If
             Return Math.Exp(LogGamma(x))
         End Function
+
+
+
+        ''' <summary>
+        ''' Numerical derivertive
+        ''' </summary>
+        ''' <param name="x"></param>
+        ''' <param name="h">step</param>
+        ''' <returns></returns>
+        Public Shared Function CalcNumericGradient(ByRef func As Optimization.absObjectiveFunction,
+                                                   ByVal x As List(Of Double), ByVal h As Double) As List(Of Double)
+            Dim gradient As New List(Of Double)
+            Dim n = func.NumberOfVariable()
+            For i As Integer = 0 To n - 1
+                'central differences
+                Dim tempX1 As New List(Of Double)(x)
+                Dim tempX2 As New List(Of Double)(x)
+                tempX1(i) = tempX1(i) + h
+                tempX2(i) = tempX2(i) - h
+
+                'diff
+                Dim tempDf = (func.F(tempX1) - func.F(tempX2)) / (2.0 * h)
+                gradient.Add(tempDf)
+            Next
+            Return gradient
+        End Function
+
+        ''' <summary>
+        ''' Numerical Hessian
+        ''' </summary>
+        ''' <param name="x"></param>
+        ''' <param name="h">step default 1e-6</param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' ex)
+        ''' f(x1,x2) = x1^2 + x2^2
+        ''' del   f = [df/dx1 df/dx2]
+        ''' del^2 f = [d^2f/d^2x1     d^2f/dx1dx2]
+        '''           [d^2f/d^2dx2dx1 d^2f/d^2x2]
+        ''' </remarks>
+        Public Shared Function CalcNumericHessian(ByRef func As Optimization.absObjectiveFunction,
+                                                  ByVal x As List(Of Double), ByVal h As Double) As List(Of List(Of Double))
+            'df/dx =~ f(x+h)-f(x-h)/2h
+            'd^2f/d^2x = d(df/dx)/dx =~ (f(x+h)-f(x-h)/2h) - (f(x+h)-f(x-h)/2h) / 2h
+            Dim n = func.NumberOfVariable()
+            Dim retH As New List(Of List(Of Double))
+            For i As Integer = 0 To n - 1
+                retH.Add(New List(Of Double))
+                For j As Integer = 0 To n - 1
+                    Dim ei = New MathTool.DenseVector(n)
+                    ei(i) = 1.0
+                    Dim ej = New MathTool.DenseVector(n)
+                    ej(j) = 1.0
+                    ei = ei * h
+                    ej = ej * h
+                    Dim initial = New MathTool.DenseVector(x)
+                    Dim f1 = initial + ei + ej
+                    Dim f2 = initial + ei - ej
+                    Dim f3 = initial - ei + ej
+                    Dim f4 = initial - ei - ej
+                    Dim tempDf = (func.F(f1.ToList()) - func.F(f2.ToList()) - func.F(f3.ToList()) + func.F(f4.ToList())) / (4.0 * h * h)
+                    retH(i).Add(tempDf)
+                Next
+            Next
+            Return retH
+        End Function
+
     End Class
 
 End Namespace

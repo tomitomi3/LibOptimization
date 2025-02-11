@@ -78,10 +78,7 @@ namespace SampleCSharp
     {
         static void Main(string[] args)
         {
-            //for SA
-            (new SimulatedAnnealingSample()).Run();
-
-            //Typical use
+            // Typical use
             {
                 //How to use
                 //1. You inherit "absObjectiveFunction" class and design objective function.
@@ -111,7 +108,33 @@ namespace SampleCSharp
                 }
             }
 
-            //Evaluate optimization result per 100 iteration
+            // set initial position
+            {
+                //objective function
+                var func = new RosenBrock(2);
+
+                //Set objective function to optimizeclass
+                var opt = new LibOptimization.Optimization.clsOptNelderMead(func);
+                opt.InitialPosition = new double[] { -10, -10 };
+                opt.Init();
+
+                //Optimization
+                opt.DoIteration();
+
+                //Check Error
+                if (opt.IsRecentError() == true)
+                {
+                    return;
+                }
+                else
+                {
+                    //Get Result
+                    clsUtil.DebugValue(opt);
+                }
+
+            }
+
+            // Evaluate optimization result per 100 iteration
             {
                 var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(10));
                 opt.Init();
@@ -124,7 +147,7 @@ namespace SampleCSharp
                 clsUtil.DebugValue(opt);
             }
 
-            //Evaluate optimization result per 100 iteration with check my criterion.
+            // Evaluate optimization result per 100 iteration with check my criterion.
             {
                 var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(10));
                 //Disable Internal criterion
@@ -152,8 +175,8 @@ namespace SampleCSharp
                 clsUtil.DebugValue(opt);
             }
 
-            //Set boundary variable.
-            //-20<x1<-1, -15<x2<0
+            // Set boundary variable.
+            // -20<x1<-1, -15<x2<0
             {
                 var opt = new LibOptimization.Optimization.clsOptDEJADE(new RosenBrock(2));
                 //move initial position
@@ -185,9 +208,9 @@ namespace SampleCSharp
                 clsUtil.DebugValue(opt);
             }
 
-            //Optimiztion problem using MyObjectiveFunction
-            // min f(x)
-            //  s.t. x>0, 170<=x1<=200, 200<=x2<=300, 250<=x3<=400, 370<=x4<=580, 380<=x5<=600
+            // Optimiztion problem using MyObjectiveFunction
+            //  min f(x)
+            //   s.t. x>0, 170<=x1<=200, 200<=x2<=300, 250<=x3<=400, 370<=x4<=580, 380<=x5<=600
             {
                 var func = new MyObjectiveFunction();
                 var opt = new LibOptimization.Optimization.clsOptDEJADE(func);
@@ -227,6 +250,10 @@ namespace SampleCSharp
                 clsUtil.DebugValue(opt);
                 //return;
             }
+
+            // Other Simulated Annealing
+            (new SimulatedAnnealingSample()).Run();
+
         }
     }
 }

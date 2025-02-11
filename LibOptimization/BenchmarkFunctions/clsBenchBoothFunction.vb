@@ -40,11 +40,11 @@ Namespace BenchmarkFunction
             Return 2
         End Function
 
-        Public Overrides Function Gradient(ByVal x As List(Of Double), Optional h As Double = 0.00000001) As List(Of Double)
+        Public Overrides Function Gradient(ByVal x As List(Of Double), Optional h As Double = 0.000001) As List(Of Double)
             Return MyBase.Gradient(x, h)
         End Function
 
-        Public Overrides Function Hessian(x As List(Of Double), Optional h As Double = 0.00000001) As List(Of List(Of Double))
+        Public Overrides Function Hessian(x As List(Of Double), Optional h As Double = 0.000001) As List(Of List(Of Double))
             Return MyBase.Hessian(x, h)
         End Function
     End Class

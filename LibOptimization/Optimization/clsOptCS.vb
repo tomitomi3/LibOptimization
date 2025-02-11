@@ -97,7 +97,7 @@ Namespace Optimization
                 End If
 
                 'initial position
-                For i As Integer = 0 To Me.PopulationSize - 1
+                For i As Integer = 0 To Me.PopulationSize - 2
                     Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                     Me.m_nests.Add(New clsPoint(Me.m_func, array))
                 Next
