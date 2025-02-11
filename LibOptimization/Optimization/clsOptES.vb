@@ -120,7 +120,7 @@ Namespace Optimization
                     Next
                     ' 指定されたInitialPositionを個体群に追加
                     Dim initPoint As New clsPoint(Me.m_func, MyBase.InitialPosition)
-                    If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                    If Me.UpperBounds IsNot Nothing AndAlso Me.LowerBounds IsNot Nothing Then
                         clsUtil.LimitSolutionSpace(initPoint, Me.LowerBounds, Me.UpperBounds)
                     End If
                     Me._populations.Add(initPoint)
@@ -129,7 +129,7 @@ Namespace Optimization
                     For i As Integer = 0 To Me.PopulationSize - 1
                         Dim array = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                         Dim tempPoint As New clsPoint(Me.m_func, array)
-                        If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                        If Me.UpperBounds IsNot Nothing AndAlso Me.LowerBounds IsNot Nothing Then
                             clsUtil.LimitSolutionSpace(tempPoint, Me.LowerBounds, Me.UpperBounds)
                         End If
                         Me._populations.Add(tempPoint)

@@ -368,44 +368,48 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
     ''' <summary>
     ''' test serialize and deserialize
     ''' </summary>
-    <TestMethod()> Public Sub Opt_SerializeAndDesrialize()
+    <TestMethod()>
+    <Ignore>
+    Public Sub Opt_SerializeAndDesrialize()
 #If NETCOREAPP Then
         'net frameworkの時はテストしない
         'https://github.com/dotnet/runtime/issues/27429
 #Else
-        Dim opt = New LibOptimization.Optimization.clsOptCS(New clsBenchSphere(5))
-        opt.Random = New RandomXorshift()
-        opt.Init()
+        ' BinaryFormatter を使わない
 
-        'serialize
-        opt.DoIteration(10)
-        RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
-        Dim PATH_SERIALIZE = "serialize_file.txt"
-        clsUtil.SerializeOpt(CType(opt, clsOptCS), PATH_SERIALIZE)
-        opt.DoIteration(10)
-        Dim result1 = opt.Result()
-        Dim itr1 = opt.IterationCount
+        'Dim opt = New LibOptimization.Optimization.clsOptCS(New clsBenchSphere(5))
+        'opt.Random = New RandomXorshift()
+        'opt.Init()
 
-        'deserialize
-        Dim temp = clsUtil.DeSerializeOpt(PATH_SERIALIZE)
-        opt = CType(temp, clsOptCS)
-        RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
-        opt.DoIteration(10)
-        Dim result2 = opt.Result()
-        Dim itr2 = opt.IterationCount
+        ''serialize
+        'opt.DoIteration(10)
+        'RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        'Dim PATH_SERIALIZE = "serialize_file.txt"
+        'clsUtil.SerializeOpt(CType(opt, clsOptCS), PATH_SERIALIZE)
+        'opt.DoIteration(10)
+        'Dim result1 = opt.Result()
+        'Dim itr1 = opt.IterationCount
 
-        'compare
-        Dim flg = True
+        ''deserialize
+        'Dim temp = clsUtil.DeSerializeOpt(PATH_SERIALIZE)
+        'opt = CType(temp, clsOptCS)
+        'RandomXorshiftSingleton.GetInstance.SetDefaultSeed()
+        'opt.DoIteration(10)
+        'Dim result2 = opt.Result()
+        'Dim itr2 = opt.IterationCount
 
-        flg = flg And (itr1 = itr2)
-        If flg = False Then
-            Assert.Fail(String.Format("not same iteration count"))
-        End If
+        ''compare
+        'Dim flg = True
 
-        flg = flg And MathUtil.IsSameVecotr(result1, result2)
-        If flg = False Then
-            Assert.Fail(String.Format("not same result"))
-        End If
+        'flg = flg And (itr1 = itr2)
+        'If flg = False Then
+        '    Assert.Fail(String.Format("not same iteration count"))
+        'End If
+
+        'flg = flg And MathUtil.IsSameVecotr(result1, result2)
+        'If flg = False Then
+        '    Assert.Fail(String.Format("not same result"))
+        'End If
 #End If
     End Sub
 
