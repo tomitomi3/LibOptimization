@@ -88,26 +88,27 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
                 Me.m_error.Clear()
                 Me.m_archive.Clear()
 
-                'init muF, muCR
-                MuCR = 0.5
-                MuF = 0.5
+                ' init muF, muCR
+                Me.MuCR = 0.5
+                Me.MuF = 0.5
 
-                'check initialposition
+                ' InitialPositionのチェック
+                Dim validInitial As Boolean = False
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
+                    If MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        validInitial = True
                     Else
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'bound check
+                ' 境界値チェック
                 If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
                     If UpperBounds.Length <> Me.m_func.NumberOfVariable Then
                         Throw New Exception("UpperBounds.Length is different")
@@ -117,27 +118,42 @@ Namespace Optimization
                     End If
                 End If
 
-                'generate population
-                For i As Integer = 0 To Me.PopulationSize - 1
-                    'initial position
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-
-                    'bound check
-                    Dim tempPoint = New clsPoint(MyBase.m_func, array)
+                ' 個体群（m_parents）の生成
+                If validInitial Then
+                    ' 有効なInitialPositionがある場合は PopulationSize-1 個の乱数初期値を生成
+                    For i As Integer = 0 To Me.PopulationSize - 2
+                        Dim array = clsUtil.GenRandomPositionArray(Me.m_func, MyBase.InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Dim tempPoint As New clsPoint(Me.m_func, array)
+                        ' 境界チェック
+                        If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                            clsUtil.LimitSolutionSpace(tempPoint, Me.LowerBounds, Me.UpperBounds)
+                        End If
+                        Me.m_parents.Add(tempPoint)
+                    Next
+                    ' 指定されたInitialPositionを個体群に追加
+                    Dim initPoint As New clsPoint(Me.m_func, MyBase.InitialPosition)
                     If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
-                        clsUtil.LimitSolutionSpace(tempPoint, Me.LowerBounds, Me.UpperBounds)
+                        clsUtil.LimitSolutionSpace(initPoint, Me.LowerBounds, Me.UpperBounds)
                     End If
+                    Me.m_parents.Add(initPoint)
+                Else
+                    ' 有効なInitialPositionがない場合は PopulationSize 個の乱数初期値を生成
+                    For i As Integer = 0 To Me.PopulationSize - 1
+                        Dim array = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Dim tempPoint As New clsPoint(Me.m_func, array)
+                        If UpperBounds IsNot Nothing AndAlso LowerBounds IsNot Nothing Then
+                            clsUtil.LimitSolutionSpace(tempPoint, Me.LowerBounds, Me.UpperBounds)
+                        End If
+                        Me.m_parents.Add(tempPoint)
+                    Next
+                End If
 
-                    'save point
-                    Me.m_parents.Add(tempPoint)
-                Next
-
-                'Sort Evaluate
+                ' 評価値によるソート
                 Me.m_parents.Sort()
 
-                'Detect HigherNPercentIndex
+                ' HigherNPercentIndexの決定
                 Me.HigherNPercentIndex = CInt(Me.m_parents.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_parents.Count OrElse Me.HigherNPercentIndex >= Me.m_parents.Count Then
+                If Me.HigherNPercentIndex >= Me.m_parents.Count Then
                     Me.HigherNPercentIndex = Me.m_parents.Count - 1
                 End If
 

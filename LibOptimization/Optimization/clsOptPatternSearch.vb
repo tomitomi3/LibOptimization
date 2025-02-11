@@ -58,28 +58,26 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'Init meber varibles
+                ' メンバ変数の初期化
                 Me.m_error.Clear()
                 Me.m_iteration = 0
                 Me.m_stepLength = Me.StepLength
                 Me.m_base = Nothing
 
-                'check initialposition
+                ' InitialPosition のチェックと初期値の設定
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
-                    Else
+                    ' 指定された初期位置の次元数が目的関数の変数数と一致するか確認
+                    If MyBase.InitialPosition.Length <> Me.m_func.NumberOfVariable Then
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
-                End If
-
-                'init position
-                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                    Me.m_base = New clsPoint(Me.m_func, InitialPosition)
+                    ' 有効な場合はその値を利用して初期位置を設定
+                    Me.m_base = New clsPoint(Me.m_func, MyBase.InitialPosition)
                 Else
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    ' InitialPosition が指定されていない場合は、乱数で生成した初期位置を設定
+                    Dim array() As Double = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                     Me.m_base = New clsPoint(Me.m_func, array)
                 End If
+
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             Finally
@@ -87,31 +85,6 @@ Namespace Optimization
             End Try
         End Sub
 
-        ''' <summary>
-        ''' Init
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Overloads Sub Init(ByVal ai_initPoint() As Double)
-            Try
-                'Init meber varibles
-                Me.m_error.Clear()
-                Me.m_iteration = 0
-                Me.m_stepLength = Me.StepLength
-                Me.m_base = Nothing
-
-                If ai_initPoint.Length <> Me.m_func.NumberOfVariable Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
-                    Return
-                End If
-
-                'Initialize
-                Me.m_base = New clsPoint(MyBase.m_func, ai_initPoint)
-            Catch ex As Exception
-                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
-            Finally
-                System.GC.Collect()
-            End Try
-        End Sub
 
         ''' <summary>
         ''' Do optimization

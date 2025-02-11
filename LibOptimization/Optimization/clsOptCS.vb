@@ -82,32 +82,46 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_iteration = 0
                 Me.m_nests.Clear()
                 Me.m_error.Clear()
 
-                'check initialposition
+                ' InitialPositionが有効かどうか判定するフラグ
+                Dim validInitialPos As Boolean = False
+
+                ' 初期位置の有無確認
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
+                    If MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        validInitialPos = True
                     Else
-                        Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
+                        Throw New ArgumentException("The number of variables in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'initial position
-                For i As Integer = 0 To Me.PopulationSize - 2
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                    Me.m_nests.Add(New clsPoint(Me.m_func, array))
-                Next
+                ' 有効な初期位置がある場合は、その値を含める
+                If validInitialPos Then
+                    ' PopulationSize - 1 個の乱数初期値を生成
+                    For i As Integer = 0 To Me.PopulationSize - 2
+                        Dim array = clsUtil.GenRandomPositionArray(Me.m_func, MyBase.InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Me.m_nests.Add(New clsPoint(Me.m_func, array))
+                    Next
+                    ' 指定されたInitialPositionを1件追加
+                    Me.m_nests.Add(New clsPoint(Me.m_func, MyBase.InitialPosition))
+                Else
+                    ' InitialPositionが指定されていない場合は、PopulationSize分の乱数初期値を生成
+                    For i As Integer = 0 To Me.PopulationSize - 1
+                        Dim array = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Me.m_nests.Add(New clsPoint(Me.m_func, array))
+                    Next
+                End If
 
-                'Sort Evaluate
+                ' 評価値に基づいてソート
                 Me.m_nests.Sort()
 
-                'Detect HigherNPercentIndex
+                ' HigherNPercentIndexの決定
                 Me.HigherNPercentIndex = CInt(Me.m_nests.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_nests.Count OrElse Me.HigherNPercentIndex >= Me.m_nests.Count Then
+                If Me.HigherNPercentIndex >= Me.m_nests.Count Then
                     Me.HigherNPercentIndex = Me.m_nests.Count - 1
                 End If
             Catch ex As Exception

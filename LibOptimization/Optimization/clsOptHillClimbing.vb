@@ -33,6 +33,8 @@ Namespace Optimization
         ''' <summary>Lower bound(limit solution space)</summary>
         Public Property LowerBounds As Double() = Nothing
 
+        Public Count As Integer = 0
+
         '----------------------------------------------------------------
         'Hill-Climbing parameters
         '----------------------------------------------------------------
@@ -62,33 +64,33 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_iteration = 0
                 Me._populations.Clear()
                 Me.m_error.Clear()
 
-                'check initialposition
+                ' InitialPositionのチェック
+                Dim validInitial As Boolean = False
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
+                    If MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        validInitial = True
                     Else
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'init initial position
-                If InitialPosition IsNot Nothing Then
-                    Me._populations.Add(New clsPoint(Me.m_func, InitialPosition))
+                ' 初期個体の生成（Populationに1個体だけ生成）
+                If validInitial Then
+                    Me._populations.Add(New clsPoint(Me.m_func, MyBase.InitialPosition))
                 Else
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Dim array() As Double = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                     Me._populations.Add(New clsPoint(Me.m_func, array))
                 End If
+
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try
         End Sub
-
-        Public Count As Integer = 0
 
         ''' <summary>
         ''' Do Iteration

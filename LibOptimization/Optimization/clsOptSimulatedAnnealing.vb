@@ -102,46 +102,37 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
+                ' 初期化
                 Me.m_iteration = 0
-                Me.m_point.Clear()
 
-                'check initialposition
+                ' m_point が Nothing でなければクリアする（※ m_point がコレクションの場合）
+                If Me.m_point IsNot Nothing Then
+                    Me.m_point.Clear()
+                End If
+
+                ' InitialPosition のチェック
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
-                    Else
+                    If MyBase.InitialPosition.Length <> MyBase.m_func.NumberOfVariable Then
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'init Temperature
+                ' Temperature の初期化
                 Me._nowTemprature = Me.Temperature
 
-                'init initial position
-                If InitialPosition IsNot Nothing Then
-                    Me.m_point = New clsPoint(Me.m_func, InitialPosition)
+                ' 初期解の設定
+                If MyBase.InitialPosition IsNot Nothing Then
+                    ' 指定された InitialPosition をそのまま利用
+                    Me.m_point = New clsPoint(Me.m_func, MyBase.InitialPosition)
                 Else
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    ' InitialPosition が指定されていない場合は乱数生成
+                    Dim array() As Double = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                     Me.m_point = New clsPoint(Me.m_func, array)
                 End If
 
+                ' 現在の解をコピーして最良解として設定
                 Me.m_Bestpoint = Me.m_point.Copy()
-            Catch ex As Exception
-                Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
-            Finally
-                System.GC.Collect()
-            End Try
-        End Sub
 
-        ''' <summary>
-        ''' Initialize(for restart)
-        ''' </summary>
-        ''' <param name="point">reserve best point</param>
-        Public Overloads Sub Init(ByVal point As clsPoint)
-            Try
-                Dim tempPoint = point.Copy()
-                Me.Init()
-                Me.m_Bestpoint = tempPoint
             Catch ex As Exception
                 Me.m_error.SetError(True, Util.clsError.ErrorType.ERR_INIT)
             Finally

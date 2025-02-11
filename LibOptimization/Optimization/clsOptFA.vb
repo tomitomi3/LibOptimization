@@ -86,33 +86,50 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_iteration = 0
                 Me.m_fireflies.Clear()
                 Me.m_error.Clear()
 
-                'check initialposition
+                ' InitialPositionのチェック
+                Dim validInitial As Boolean = False
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
+                    If MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        validInitial = True
                     Else
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'initial position
-                For i As Integer = 0 To Me.PopulationSize - 1
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                    Me.m_fireflies.Add(New clsFireFly(MyBase.m_func, array))
-                    Me.m_fireflies(i).ReEvaluate() 'with update intensity
-                Next
+                ' Firefly群の生成
+                If validInitial Then
+                    ' 有効なInitialPositionがある場合は、PopulationSize-1個の乱数初期値を生成
+                    For i As Integer = 0 To Me.PopulationSize - 2
+                        Dim array = clsUtil.GenRandomPositionArray(Me.m_func, MyBase.InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Dim firefly As New clsFireFly(Me.m_func, array)
+                        firefly.ReEvaluate() ' 強度の更新を含む再評価
+                        Me.m_fireflies.Add(firefly)
+                    Next
+                    ' 指定されたInitialPositionをfirefly群に追加
+                    Dim initFirefly As New clsFireFly(Me.m_func, MyBase.InitialPosition)
+                    initFirefly.ReEvaluate()
+                    Me.m_fireflies.Add(initFirefly)
+                Else
+                    ' 有効なInitialPositionがない場合は、PopulationSize個の乱数初期値を生成
+                    For i As Integer = 0 To Me.PopulationSize - 1
+                        Dim array = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Dim firefly As New clsFireFly(Me.m_func, array)
+                        firefly.ReEvaluate()
+                        Me.m_fireflies.Add(firefly)
+                    Next
+                End If
 
-                'Sort Evaluate
+                ' 評価値に基づいてソート
                 Me.m_fireflies.Sort()
 
-                'Detect HigherNPercentIndex
+                ' HigherNPercentIndexの決定
                 Me.HigherNPercentIndex = CInt(Me.m_fireflies.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_fireflies.Count OrElse Me.HigherNPercentIndex >= Me.m_fireflies.Count Then
+                If Me.HigherNPercentIndex >= Me.m_fireflies.Count Then
                     Me.HigherNPercentIndex = Me.m_fireflies.Count - 1
                 End If
 

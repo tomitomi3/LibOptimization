@@ -57,31 +57,34 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_iteration = 0
                 Me.m_vect.Clear()
                 Me.m_error.Clear()
 
-                'check initialposition
+                ' InitialPosition のチェック
+                Dim validInitial As Boolean = False
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
+                    If MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        validInitial = True
                     Else
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'init initial position
-                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                    Me.m_vect = New DenseVector(InitialPosition)
+                ' ベクトルの初期化
+                If validInitial Then
+                    Me.m_vect = New DenseVector(MyBase.InitialPosition)
                 Else
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Dim array() As Double = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
                     Me.m_vect = New DenseVector(array)
                 End If
+
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try
         End Sub
+
 
         ''' <summary>
         ''' Do Iteration

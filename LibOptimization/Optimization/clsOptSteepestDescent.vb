@@ -60,31 +60,33 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_iteration = 0
                 Me.m_vect.Clear()
                 Me.m_error.Clear()
 
-                'check initialposition
+                ' InitialPosition のチェック
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
-                    Else
+                    If MyBase.InitialPosition.Length <> MyBase.m_func.NumberOfVariable Then
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'init initial position
-                If InitialPosition IsNot Nothing AndAlso InitialPosition.Length = m_func.NumberOfVariable Then
-                    Me.m_vect = New DenseVector(InitialPosition)
+                ' m_vect の初期化（集団に InitialPosition を含む）
+                If MyBase.InitialPosition IsNot Nothing AndAlso MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                    ' 指定された InitialPosition をそのまま利用する
+                    Me.m_vect = New DenseVector(MyBase.InitialPosition)
                 Else
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                    Me.m_vect = New DenseVector(array)
+                    ' InitialPosition が指定されていない場合は、乱数で生成した配列を利用する
+                    Dim randArray() As Double = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_vect = New DenseVector(randArray)
                 End If
+
             Catch ex As Exception
                 Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
             End Try
         End Sub
+
 
         ''' <summary>
         ''' Do Iteration

@@ -84,31 +84,43 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_iteration = 0
                 Me.m_parents.Clear()
 
-                'check initialposition
+                ' InitialPosition のチェック
+                Dim validInitial As Boolean = False
                 If MyBase.InitialPosition IsNot Nothing Then
                     If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
+                        validInitial = True
                     Else
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'initial position
-                For i As Integer = 0 To Me.PopulationSize - 1
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                    Me.m_parents.Add(New clsPoint(Me.m_func, array))
-                Next
+                ' 集団（m_parents）の生成
+                If validInitial Then
+                    ' 有効な InitialPosition がある場合:
+                    For i As Integer = 0 To Me.PopulationSize - 2
+                        Dim array() As Double = clsUtil.GenRandomPositionArray(Me.m_func, MyBase.InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Me.m_parents.Add(New clsPoint(Me.m_func, array))
+                    Next
+                    ' 指定された InitialPosition をそのまま含める
+                    Me.m_parents.Add(New clsPoint(Me.m_func, MyBase.InitialPosition))
+                Else
+                    ' 有効な InitialPosition が指定されていない場合は、すべて乱数生成で作成
+                    For i As Integer = 0 To Me.PopulationSize - 1
+                        Dim array() As Double = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Me.m_parents.Add(New clsPoint(Me.m_func, array))
+                    Next
+                End If
 
-                'Sort Evaluate
+                ' 評価値に基づいてソート
                 Me.m_parents.Sort()
 
-                'Detect HigherNPercentIndex
+                ' HigherNPercentIndex の決定
                 Me.HigherNPercentIndex = CInt(Me.m_parents.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_parents.Count OrElse Me.HigherNPercentIndex >= Me.m_parents.Count Then
+                If Me.HigherNPercentIndex >= Me.m_parents.Count Then
                     Me.HigherNPercentIndex = Me.m_parents.Count - 1
                 End If
 

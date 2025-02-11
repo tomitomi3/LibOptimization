@@ -418,9 +418,21 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
         Dim optimizers = clsUtil.GetOptimizersForUnitTest(testFunc)
 
         For Each opt In optimizers
-            opt.InitialPosition = New Double() {1, -1}
+            Dim initialPos = New Double() {1, -1}
+            opt.InitialPosition = initialPos
             opt.Init()
-            Dim ar = opt.Results
+
+            'check
+            Dim isIncludeInialPos = False
+            For Each ar In opt.Results
+                ' SequenceEqual メソッドで各要素が一致するか確認
+                If initialPos.SequenceEqual(ar) Then
+                    isIncludeInialPos = True
+                    Exit For
+                End If
+            Next
+
+            Assert.IsTrue(isIncludeInialPos, opt.GetType().ToString())
         Next
     End Sub
 

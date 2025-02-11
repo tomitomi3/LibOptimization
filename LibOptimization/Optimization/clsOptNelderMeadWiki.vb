@@ -49,7 +49,7 @@ Namespace Optimization
         ''' </summary>
         ''' <param name="ai_func">Optimize Function</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal ai_func As absObjectiveFunction )
+        Public Sub New(ByVal ai_func As absObjectiveFunction)
             Me.m_func = ai_func
         End Sub
 #End Region
@@ -63,72 +63,58 @@ Namespace Optimization
         ''' </remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_error.Clear()
                 Me.m_iteration = 0
                 Me.m_points.Clear()
 
-                'check initialposition
+                ' Nelder–Mead法では、少なくとも2変数以上でなければならない
+                If Me.m_func.NumberOfVariable < 2 Then
+                    Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "Number of variables must be at least 2 for Nelder–Mead simplex.")
+                    Return
+                End If
+
+                ' InitialPosition のチェック
+                Dim validInitial As Boolean = False
                 If MyBase.InitialPosition IsNot Nothing Then
-                    If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
+                    If MyBase.InitialPosition.Length = Me.m_func.NumberOfVariable Then
+                        validInitial = True
                     Else
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'initial position
-                Dim tempSimplex()() As Double = Nothing
-                ReDim tempSimplex(MyBase.m_func.NumberOfVariable)
-                For i As Integer = 0 To tempSimplex.Length - 1
-                    tempSimplex(i) = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                Next
+                ' 頂点数は (次元数 + 1)
+                Dim simplexSize As Integer = Me.m_func.NumberOfVariable + 1
+                Dim tempSimplex(simplexSize - 1)() As Double
 
-                Me.Init(tempSimplex)
-            Catch ex As Exception
-                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, "")
-            End Try
-        End Sub
-
-        ''' <summary>
-        ''' Init
-        ''' </summary>
-        ''' <param name="ai_initPoint"></param>
-        ''' <remarks>
-        ''' Set simplex
-        ''' </remarks>
-        Public Overloads Sub Init(ByVal ai_initPoint()() As Double)
-            Try
-                'init meber varibles
-                Me.m_error.Clear()
-                Me.m_iteration = 0
-                Me.m_points.Clear()
-
-                'Check number of variable
-                If Me.m_func.NumberOfVariable < 2 Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
-                    Return
+                If validInitial Then
+                    ' 初期位置を1頂点として採用（ここでは先頭頂点）
+                    tempSimplex(0) = MyBase.InitialPosition
+                    ' 残りの頂点は、初期位置を基準とした乱数生成で作成
+                    For i As Integer = 1 To simplexSize - 1
+                        tempSimplex(i) = clsUtil.GenRandomPositionArray(Me.m_func, MyBase.InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Next
+                Else
+                    ' 初期位置が指定されていない場合は、すべて乱数生成で作成
+                    For i As Integer = 0 To simplexSize - 1
+                        tempSimplex(i) = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Next
                 End If
 
-                'Check Simplex
-                'MEMO:Target function variable is the same as vertex of simplex.
-                If ai_initPoint.Length <> (MyBase.m_func.NumberOfVariable + 1) Then
-                    Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
-                    Return
-                End If
-
-                'Generate vertex
-                For i As Integer = 0 To m_func.NumberOfVariable
-                    Me.m_points.Add(New clsPoint(MyBase.m_func, New List(Of Double)(ai_initPoint(i))))
+                ' 生成された頂点（配列）から clsPoint オブジェクトを作成し、m_points に追加
+                For i As Integer = 0 To simplexSize - 1
+                    Me.m_points.Add(New clsPoint(Me.m_func, New List(Of Double)(tempSimplex(i))))
                 Next
 
-                'Sort Evaluate
+                ' 評価値に基づいて頂点をソート
                 Me.m_points.Sort()
 
             Catch ex As Exception
-                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT)
+                Me.m_error.SetError(True, clsError.ErrorType.ERR_INIT, ex.Message)
             End Try
         End Sub
+
 
         ''' <summary>
         ''' Do optimization

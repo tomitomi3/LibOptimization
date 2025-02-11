@@ -143,8 +143,8 @@ namespace SampleCSharp
             }
             clsUtil.DebugValue(opt);
 
-            //restart
-            opt.Init(opt.Result);
+            // restart
+            opt.InitialPosition = opt.Result.ToArray();
             clsUtil.DebugValue(opt);
 
             //do optimization

@@ -72,43 +72,64 @@ Namespace Optimization
         ''' <remarks></remarks>
         Public Overrides Sub Init()
             Try
-                'init meber varibles
+                ' メンバ変数の初期化
                 Me.m_iteration = 0
                 Me.m_swarm.Clear()
 
-                'check initialposition
+                ' InitialPosition のチェック
+                Dim validInitial As Boolean = False
                 If MyBase.InitialPosition IsNot Nothing Then
                     If MyBase.InitialPosition.Length = MyBase.m_func.NumberOfVariable Then
-                        'nothing
+                        validInitial = True
                     Else
                         Throw New ArgumentException("The number of variavles in InitialPosition and objective function are different.")
                     End If
                 End If
 
-                'init position
-                For i As Integer = 0 To Me.SwarmSize - 1
-                    'position
-                    Dim tempPosition = New clsPoint(Me.m_func)
-                    Dim tempBestPosition = New clsPoint(Me.m_func)
-                    Dim array = clsUtil.GenRandomPositionArray(Me.m_func, InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
-                    tempPosition = New clsPoint(Me.m_func, array)
-                    tempBestPosition = tempPosition.Copy()
+                ' 粒子群（swarm）の生成
+                Dim particleCount As Integer = Me.SwarmSize
+                Dim i As Integer
 
-                    'velocity
-                    Dim tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                If validInitial Then
+                    ' 有効な InitialPosition がある場合:
+                    For i = 0 To particleCount - 2
+                        Dim array() As Double = clsUtil.GenRandomPositionArray(Me.m_func, MyBase.InitialPosition, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Dim tempPosition As New clsPoint(Me.m_func, array)
+                        Dim tempBestPosition As clsPoint = tempPosition.Copy()
 
-                    'create swarm
-                    Me.m_swarm.Add(New clsParticle(tempPosition, tempVelocity, tempBestPosition))
-                Next
+                        Dim tempVelocity() As Double = New Double(Me.m_func.NumberOfVariable - 1) {}
+                        tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
 
-                'Sort Evaluate
+                        Me.m_swarm.Add(New clsParticle(tempPosition, tempVelocity, tempBestPosition))
+                    Next
+
+                    ' 指定された InitialPosition をそのまま利用する粒子を追加
+                    Dim initPosition As New clsPoint(Me.m_func, MyBase.InitialPosition)
+                    Dim initBestPosition As clsPoint = initPosition.Copy()
+                    Dim initVelocity() As Double = New Double(Me.m_func.NumberOfVariable - 1) {}
+                    initVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                    Me.m_swarm.Add(New clsParticle(initPosition, initVelocity, initBestPosition))
+                Else
+                    ' 有効な InitialPosition が指定されていない場合は、すべて乱数生成で作成
+                    For i = 0 To particleCount - 1
+                        Dim array() As Double = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Dim tempPosition As New clsPoint(Me.m_func, array)
+                        Dim tempBestPosition As clsPoint = tempPosition.Copy()
+
+                        Dim tempVelocity() As Double = New Double(Me.m_func.NumberOfVariable - 1) {}
+                        tempVelocity = clsUtil.GenRandomPositionArray(Me.m_func, Nothing, Me.InitialValueRangeLower, Me.InitialValueRangeUpper)
+                        Me.m_swarm.Add(New clsParticle(tempPosition, tempVelocity, tempBestPosition))
+                    Next
+                End If
+
+                ' 評価値に基づいて swarm をソート
                 Me.m_swarm.Sort()
                 Me.m_globalBest = Me.m_swarm(0).BestPoint.Copy()
                 Me.Weight = 1
 
-                'Detect HigherNPercentIndex
+                ' HigherNPercentIndex の決定
                 Me.HigherNPercentIndex = CInt(Me.m_swarm.Count * Me.HigherNPercent)
-                If Me.HigherNPercentIndex = Me.m_swarm.Count OrElse Me.HigherNPercentIndex >= Me.m_swarm.Count Then
+                If Me.HigherNPercentIndex >= Me.m_swarm.Count Then
                     Me.HigherNPercentIndex = Me.m_swarm.Count - 1
                 End If
 
