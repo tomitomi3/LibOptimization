@@ -1,33 +1,35 @@
 # How to use LibOptimization
 
-This tutrial, You design a objective function to find the minimum value of the [2D Sphere function](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda#sphere-function). 
-This function is a unimodal convex function and has a global minimum value.
+In this tutorial, you will design an objective function to find the minimum value of the [2D Sphere function](https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda#sphere-function). 
+This function is a unimodal convex function with a global minimum.
 
 **Optimization flow using LibOptimization**
 
-1. Get LibOptimization your solution from Nuget.
-1. You inherit "absObjectiveFunction" class and design the objective function.
-1. Choose an optimization method and implement code.
-1. Do optimization.
-1. Get result and evaluate.
+1. Install LibOptimization from NuGet.
+1. Inherit the **absObjectiveFunction** class and define the objective function.
+1. Choose an optimization method and implement the code.
+1. Run the optimization.
+1. Retrieve the result and evaluate it.
 
 ## preparation
 
-Create a console application and development language is C#.
-In this example, You use C#. You can also use VisualBasic.NET.
+Create a console application in C#. In this example, we use C#, but you can also use Visual Basic .NET.
 
 ## Step1. Get LibOptimization
 
+Install LibOptimization via NuGet:
+
 URL:https://www.nuget.org/packages/LibOptimization/
+
 ```
 PM> Install-Package LibOptimization
 ```
 
 ## Step2. Design objective fucntion
 
-Add an objective function class that inherit **absObjectiveFunction** to the solution.
+Add a class that inherits **absObjectiveFunction** to your solution.
 
-absObjectiveFunction is the base class for objective functions in the LibOptimization.
+**absObjectiveFunction** is the base class for defining objective functions in LibOptimization.
 
 **SphereFunction.cs**
 ```csharp
@@ -89,7 +91,8 @@ absObjectiveFunction is the base class for objective functions in the LibOptimiz
     }
 ```
 
-**Gradient(List<double> x)**, **Hessian(List<double> x)** implement the derivative of the objective function. However, it is a little difficult to implement it.
+The **Gradient(List<double> x)** and **Hessian(List<double> x)** methods define the gradient and Hessian matrix of the objective function.
+These are used in gradient-based methods. If they are not explicitly defined, they will be computed numerically using the CalcNumericGradient and CalcNumericHessian functions.
 
 ```csharp
         public override List<double> Gradient(List<double> x)
@@ -120,24 +123,6 @@ absObjectiveFunction is the base class for objective functions in the LibOptimiz
             h[1].add(2.0);
             h[1].add(0.0);
             return h;
-        }
-```
-
-If the function is smooth, it can be approximated by using numerical differentiation.
-Numerical differentiation of the objective function can be easily implemented using the following API.
-
-Hessian uses Newton method only. Newton method can be optimized correctly only if the Hessian matrix is positive definite and the initial values are not near the solution.
-
-```csharp
-        public override List<double> Gradient(List<double> x)
-        {
-            return base.NumericDerivative(x);
-        }
-        
-        public override List<List<double>> Hessian(List<double> x)
-        {
-            //NumericHessianToDiagonal() stores the second derivative of the objective function in the diagonal component.
-            return base.NumericHessianToDiagonal(x);
         }
 ```
 
@@ -207,6 +192,28 @@ opt.IsUseCriterion = false; //not use criteria
 
 //Initialize(generate initial value)
 opt.Init();
+```
+
+## Using InitialPosition
+
+When performing optimization, you may want to start from a specific initial position instead of relying solely on a randomly generated population. The InitialPosition property allows you to include a predefined starting point in the population.
+
+```csharp
+// objective function
+var func = new RosenBrock(2);
+
+var opt = new Optimization.clsOptNelderMead(func);
+opt.InitialPosition = new double[] { -10, -10 };
+opt.Init();
+
+// Optimization
+opt.DoIteration();
+
+// best result
+for (int i = 0; i < opt.Result.Count; i++)
+{
+    Console.WriteLine(opt.Result[i]);
+}
 ```
 
 ## Evaluate optimization result per 100 iteration
