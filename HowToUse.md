@@ -115,14 +115,9 @@ These are used in gradient-based methods. If they are not explicitly defined, th
             // H =
             // | d^2 f/d^2x1 df1/dx2     |
             // | df2/dx1     d^2 f/d^2x2 |
-            var h = new List<List<double>>();
-            h.add( new List<double>());
-            h[0].add(0.0);
-            h[0].add(2.0);
-            h.add( new List<double>());
-            h[1].add(2.0);
-            h[1].add(0.0);
-            return h;
+            //
+            // omit
+            //
         }
 ```
 
@@ -272,19 +267,16 @@ clsUtil.DebugValue(opt);
     }
 ```
 
-## Saving and Restoring Optimization Calculations
+## ~~Saving and Restoring Optimization Calculations~~
 
-You can export and restore the optimization results in binary format. **BinaryFormatter** is used to achieve this functionality.
+~~You can export and restore the optimization results in binary format. **BinaryFormatter** is used to achieve this functionality.~~
 
-* Save(Serialize)**
-```csharp
-LibOptimization.Util.clsUtil.SerializeOpt((absOptimization)opt, "saveOptimization.bin");
-```
+~~LibOptimization.Util.clsUtil.SerializeOpt((absOptimization)opt, "saveOptimization.bin");~~
 
-* Restore(DeSerialize)**
-```csharp
-var restoreOpt = LibOptimization.Util.clsUtil.DeSerializeOpt("saveOptimization.bin");
-```
+~~var restoreOpt = LibOptimization.Util.clsUtil.DeSerializeOpt("saveOptimization.bin");~~
+
+I have discontinued the use of BinaryFormatter.
+For Save/Restore, please use InitialPosition to restore the most recent results.
 
 ## fix Random Number Generator
 
